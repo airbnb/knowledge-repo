@@ -1,0 +1,5 @@
+A knowledge post was just posted under tag {{ full_tag }}
+
+Link to post: {{ knowledge_app_base_url }}/render?markdown={{ page_id }}
+
+{{ post_text }}

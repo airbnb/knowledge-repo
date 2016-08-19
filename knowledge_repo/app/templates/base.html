@@ -1,0 +1,89 @@
+<!-- js includes at the top as post embedded js colliding >
+<!-->
+<script src="{{ url_for('static', filename='modules/jquery/jquery.min.js')}}"></script>
+<script src="{{ url_for('static', filename='modules/tether/js/tether.min.js')}}"></script>
+<script src="{{ url_for('static', filename='modules/bootstrap/js/bootstrap.min.js')}}"></script>
+<script src="{{ url_for('static', filename='modules/bootstrap-slider/js/bootstrap-slider.min.js')}}"></script>
+<script src="{{ url_for('static', filename='modules/typeahead.js/typeahead.bundle.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/handlebars.js')}}"></script>
+<script src="{{ url_for('static', filename='js/helpers.js')}}"></script>
+
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <title> {% block title %} {% endblock %}  </title>
+      <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6.2/html5shiv.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/2.1.0/es5-shim.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='modules/bootstrap/css/bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='modules/bootstrap-slider/css/bootstrap-slider.min.css')}}">
+    <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='css/custom.css') }}">
+    <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='css/select2.min.css') }}">
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,900|Playfair+Display|Source+Serif+Pro:400,700' rel='stylesheet' type='text/css'>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}">
+
+    <style>
+        .spinner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            margin-left: -50px; /* half width of the spinner gif */
+            margin-top: -50px; /* half height of the spinner gif */
+            text-align:center;
+            z-index:1234;
+            overflow: auto;
+            width: 100px; /* width of the spinner gif */
+            height: 102px; /*hight of the spinner gif +2px to fix IE8 issue */
+        }
+
+        .table {
+          font-size: 14px;
+        }
+
+        .modal-content {
+          max-width: 1024px;
+        }
+
+        {% block style %} {% endblock %}
+
+      </style>
+
+  </head>
+
+
+  <body>
+
+    <div class="navbar navbar-knowledge" role="navigation">
+      <div class="container page-container">
+        <a id="feed_tab" href="/" aria-selected="false" class="navbar-text">
+          Feed
+        </a>
+        <a id="favorites_tab" href="/favorites" aria-selected="false" class="navbar-text">
+          Favorites
+        </a>
+        <a id="help_tab" href="/about" aria-selected="false" class="navbar-text">
+         About
+        </a>
+        <a id="stats_tab" href="/stats" aria-selected="false" class="navbar-text">
+         Stats
+        </a>
+        <a id="webposts_tab" href="/webposts" class="navbar-text pull-right">
+          <i class="glyphicon glyphicon-edit glyphicon-navbar"></i> Write a Post!
+        </a>
+      </div>
+    </div>
+
+    <div class="container page-container">
+
+    {% block content %} {% endblock %}
+
+     </div>
+
+    </body>
+
+    {% block scripts %} {% endblock %}
+
+</html>
+

@@ -1,0 +1,80 @@
+{% extends "index-base.html" %}
+
+{% block header %}
+
+<text style="font-size:32px">Knowledge Clusters {% endblock %}</text>
+
+{% block inner_content %}
+
+  <br><br>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="col-md-2">
+        <h5 style="text-align:center;"> Group posts by:</h5>
+      </div>
+      <span class="col-md-4">
+        <button class="btn btn-default" id="clusterFolder"> Folder </button>
+        <button class="btn btn-default" id="clusterTags"> Tags </button>
+        <button class="btn btn-default" id="clusterAuthor"> Author </button>
+      </span>
+      <div class="col-md-2">
+        <h5 style="text-align:center;"> Sort by:</h5>
+      </div>
+      <span class="col-md-3">
+        <button class="btn btn-default" id="sortAlpha"> Alphabetically </button>
+        <button class="btn btn-default" id="sortCount"> Count </button>
+      </span>
+    <div style="clear:both"></div>
+    </div>
+  </div>
+
+  <br><br>
+
+  <ul id="cluster_list">
+  {% for cluster, contents in grouped_data %}
+    {%- if contents|length > 0 and cluster|length > 0 %}
+    {% set cluster_id = cluster|replace('/', '__')|replace(' ', '__')|replace('-', '__') %}
+    <li>
+    <div id="{{ cluster_id|safe }}">
+      <h6 style="margin-bottom:0"> {{ [cluster,' (', contents|length, ')'] | join }} <i class="glyphicon glyphicon-chevron-right"></i></h6>
+    </div>
+    </li>
+      <div id="{{ cluster_id|safe }}-content" style="display:none">
+        <ul>
+        {% for item in contents %}
+          <li>
+            <a href="{{'/render?markdown=' + item.path|urlencode }}">
+              {{ item.title|replace('_', ' ')|title }}
+            </a>
+          </li>
+        {% endfor %}
+        </ul>
+     </div>
+    {%- endif%}
+  {% endfor %}
+  </ul>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/index-cluster.js') }}"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    var tag = "{{ tag |default('', true)}}";
+    var clusterSelected = '#cluster{{ group_by|title }}';
+    var sortSelected = '#sort{{ sort_by|title }}';
+    var clusterButtons = ["clusterFolder", "clusterTags", "clusterAuthor"];
+    var sortButtons = ["sortAlpha", "sortCount"];
+    indexClusterJx.addFoldingToGroups();
+    indexClusterJx.clickTag(tag);
+    clusterSelected = indexClusterJx.getClusterSelected(clusterSelected);
+    sortSelected = indexClusterJx.getSortSelected(sortSelected);
+    indexClusterJx.formatButtons(clusterSelected, clusterButtons, sortSelected, sortButtons);
+
+    function search(){
+      indexClusterJx.refreshPage(clusterSelected, sortSelected);
+    }
+  })
+</script>
+{% endblock %}

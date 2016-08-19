@@ -1,0 +1,9 @@
+{{ commenter }} commented on your post: "{{ post_title }}"!
+
+They said "{{ comment_text }}"
+
+Link to post: {{ request.base_url }}/render?markdown={{ post_id }}
+
+Regards,
+
+The Knowledge Editors

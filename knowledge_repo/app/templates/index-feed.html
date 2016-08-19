@@ -1,0 +1,148 @@
+{% extends "index-base.html" %}
+
+{% macro pagination() %}
+<div class='row'>
+  <div class='col-sm-6 col-md-offset-5'>
+    <div class='btn-group' role='group'>
+      <button class="btn btn-default prev_btn">
+        <span><i class="glyphicon glyphicon-chevron-left"></i> prev</span>
+      </button>
+      <button class="btn btn-default next_btn">
+        <span>next <i class="glyphicon glyphicon-chevron-right"></i></span>
+      </button>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% block header %} {{ top_header }} {% endblock %}
+
+{% block inner_content %}
+  {{ pagination() }}
+
+  <br>
+
+  {% for post in posts %}
+    {% set idx_item = loop.index0 %}
+    {% set stats = post_stats[post.path] %}
+    <div class='row row-space-4 panel feed-post'>
+      <div class='panel-header panel-light'>
+        <div class = "col-md-10">
+          <a href="{{'/render?markdown=' + post.path|urlencode }}">
+            {{ post.title |title }}
+          </a>
+        </div>
+        <div class='feed-post-counts'>
+          <i class="glyphicon glyphicon-eye-open" id="tooltip-pageviews-{{ idx_item }}"></i> {{ stats['all_views'] }}&nbsp
+          <i class="glyphicon glyphicon-heart-empty" id="tooltip-likes-{{ idx_item }}"></i> {{ stats['total_likes']}}&nbsp
+          <i class="glyphicon glyphicon-comment" id="tooltip-comments-{{ idx_item }}"></i> {{ stats['total_comments']}}
+        </div>
+      </div>
+      <div class='panel-body'>
+        <div class="col-md-{% if post['thumbnail'] != null %}6{% else %}12{% endif %}">
+          <ul class="post-list" style='list-style-type: none;'>
+            <li class="feed-author">Author(s) : {{ format_authors(post.authors) |safe }}</li>
+            <li class="feed-date">Date: {{ post['updated_at'].date().isoformat() }}</li>
+            <li class="feed-tags">
+              Tags:
+              {% for tag_obj in post.tags %}
+                {% set tag = tag_obj.name %}
+                {% set tag_flat = tag.replace("/", "__") %}
+                <a  href="/tag_pages?tag={{ tag|urlencode }}"
+                    data-tag-name="{{ tag_flat }}"
+                    data-container="body"
+                    data-toggle="popover"
+                    data-placement="bottom"
+                    data-html="true"
+                    {% if tag in feed_params['subscriptions'] %}
+                      class="label label-primary pop"
+                      data-content="<div class='content'>
+                       <button class='btn btn-small btn-primary'
+                               title=''
+                               id='tag-subscription-{{idx_item}}__{{tag_flat}}'>
+                         <i class='glyphicon glyphicon-remove-sign glyphicon-white'></i>Unsubscribe
+                     </button></div>"
+                    {% else %}
+                      class="label label-default pop"
+                      data-content="<div class='content'>
+                       <button class='btn btn-small btn-default'
+                             title=''
+                             id='tag-subscription-{{idx_item}}__{{tag_flat}}'>
+                         <i class='glyphicon glyphicon-ok-sign glyphicon-filled'></i>Subscribe
+                       </button></div>"
+                    {% endif %}
+                    class="text">
+                  {{ "#" + tag}}
+                </a>
+                {% if not loop.last %}
+                  ,
+                {% endif %}
+              {% endfor %}
+            </li>
+          </ul>
+          <p class="feed-tldr">
+            <i>{{ post['tldr']|safe }}</i>
+            <br>
+            <br>
+            <a href="{{'/render?markdown=' + post.path|urlencode }}">Read post</a>
+          </p>
+        </div>
+        <div class="col-md-6">
+          <center><img src="{{ post['thumbnail'] if post['thumbnail'] else '/static/images/default_thumbnail.png' }}" style="max-width:100%;max-height:225px" /></center>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+
+  {{ pagination() }}
+
+{% endblock %}
+
+{% block scripts %}
+{{ super () }}
+<script src="{{ url_for('static', filename='js/helpers.js')}}" type='text/javascript'></script>
+<script src="{{ url_for('static', filename='js/tags.js')}}" type='text/javascript'></script>
+<script type="text/javascript">
+
+  $(".pop").popover({ trigger: "manual" , html: true, animation:false, delay: 100})
+    .on("mouseenter", function () {
+        var _this = this;
+        $(this).popover("show");
+        $(".popover").on("mouseleave", function () {
+            $(_this).popover('hide');
+        });
+    }).on("mouseleave", function () {
+        var _this = this;
+        setTimeout(function () {
+            if (!$(".popover:hover").length) {
+                $(_this).popover("hide");
+            }
+        }, 300);
+  });
+
+
+   $(document).ready(function(){
+      var start = {{ feed_params['start']|default(0) }};
+      var results = {{ feed_params['results']|default(10) }};
+      var next_start = start + results;
+      var prev_start = start - results;
+      var filters;
+      {% if feed_params['filters'] %}
+      var filters = "{{ feed_params['filters'] }}";
+      {% endif %}
+
+    $(".next_btn").on("click", function(){
+      helpersJx.changePage(next_start, results, filters)
+    });
+
+    $(".prev_btn").on("click", function(){
+      helpersJx.changePage(prev_start, results, filters)
+    })
+
+    $(document.body).on('click',"button[id^=tag-subscription]",function () {
+      tagsJx.addTagSubscriptionListener($(this)[0]);
+    });
+  });
+</script>
+{% endblock %}
+

@@ -1,0 +1,9 @@
+{{ commenter }} reviewed your web post: "{{ post_title }}"!
+
+They said "{{ comment_text }}"
+
+Link to post: {{ request.base_url }}/posteditor?post_id={{ post_id }}
+
+Regards,
+
+The Knowledge Editors

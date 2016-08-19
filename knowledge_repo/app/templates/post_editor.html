@@ -1,0 +1,952 @@
+{% extends "base.html" %}
+
+{% block title %} Knowledge {% endblock %}
+
+{% block content %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/highlight/default.css')}}">
+    <style>
+
+    .slider-track {
+      cursor: auto !important;
+    }
+
+    .tooltip {
+      position:absolute;
+      background-color:inherit;
+      border-radius:0px;
+      opacity:inherit;
+      box-shadow: none;
+      font-size:12px;
+    }
+
+    .twitter-typeahead {
+      width:94% !important;
+    }
+
+    .tt-input, .tt-menu {
+      width:100% !important;
+    }
+
+    #post_project {
+      vertical-align:inherit !important;
+    }
+
+    .select2-container--open {
+      z-index:10000;
+    }
+
+    .select2-container {
+      width:94% !important;
+    }
+    .select2-selection {
+      border:1px solid #dce0e0 !important;
+      border-radius:0px !important;
+
+    }
+    </style>
+    <div class="panel-webpost container">
+      <div class="col-md-12"  id="#header-panel">
+        <h3> Knowledge Post &nbsp &nbsp
+
+        <div class="btn-group">
+          <button class="btn btn-large btn-default" id="btn_save">Save as Draft</button>
+          <button class="btn btn-large {{'btn-primary' if status == 1 else 'btn-default'}}" id="btn_in_review" data-toggle="modal" data-target="#webpost-send-for-review-modal">
+            {% if status == 1 %}
+            In Review Phase
+            {% else %}
+            Submit for Review
+            {% endif %}
+          </button>
+          <button class="btn btn-large {{'btn-primary' if status >= 2 else 'btn-default'}}" id="btn_publish">
+            {% if status == 3 %}
+            Unpublish
+            {% else %}
+            Publish
+            {% endif %}
+          </button>
+          {% if status > 0 %}
+          <label style="font-size:12px; padding-top:15px">
+            <input type="checkbox" style="margin-left:15px;"
+                   id="author_can_publish" {{ 'checked' if status > 1 }}
+                   {% if username in author %}
+                      disabled=true
+                   {% endif %}>
+              Allow author to publish?
+            </input>
+          </label>
+          {% endif %}
+        </div>
+
+      </h3>
+      </div>
+        <div class="modal"
+          id="webpost-send-for-review-modal"
+          role="dialog"
+          aria-hidden="true"
+          aria-labelledby="modal-body-label"
+          aria-describedby="modal-body">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title">
+                    Who should review this post?
+                  </h4>
+                </div>
+
+                <div class="modal-body">
+                  Comma-separate the emails, and the reviewers will get a post saying your post is ready to review!
+                  <br><br>
+                  <form style="padding-left:12px">
+                    <text class="text-left" for="form-vert-text">
+                    Emails of the Reviewers:
+                    </text>
+                  <input id="post_reviewers" type="text" value="...@emailext.com"
+                        style="width:75%; display:inline-block">
+                </form>
+                <p>
+                <button class="btn btn-primary" data-behavior='modal-close' id='submission_close'>
+                  Email Reviewers!
+                </button>
+                </p>
+              </div>
+              </div>
+          </div>
+        </div>
+      <div class="col-12" style="padding-left:col-6px">
+        <h4>Post Headers
+        <i class="glyphicon glyphicon-chevron-down" id="fold_metadata"></i>
+        </h4>
+      </div>
+      <div id="metadata_fields">
+        <div class="row row-condensed">
+          <form style="padding-left:12px">
+            <text class="text-left" for="form-vert-text">
+              Title:
+            </text>
+            <input id="post_title" type="text" placeholder="Title of the post"
+                  style="width:96%; display:inline-block" value='{{title if title else ''}}'>
+          </form>
+        </div>
+        <div class="row row-condensed">
+          <form style="padding-left:12px">
+            <text class="text-left" for="form-vert-text">
+              Project:
+            </text>
+            <input id="post_project" class="typeahead" type="text" placeholder="Project of the post"
+                    value='{{project if project else ''}}'>
+            </input>
+          </form>
+        </div>
+        <div class="row row-condensed">
+          <form style="padding-left:12px">
+            <text class="text-left" for="form-vert-text">
+              Created At:
+            </text>
+            <input id="post_created_at" type="text" placeholder="When was this post created?"
+                   style="width:91%; display:inline-block" value='{{ created_at if created_at else ''}}'>
+            </input>
+          </form>
+        </div>
+        <div class="row row-condensed">
+          <form style="padding-left:12px">
+            <text class="text-left" for="form-vert-text">
+              Updated At:
+            </text>
+            <input id="post_updated_at" type="text" placeholder="What was this post last edited?"
+                  style="width:91%; display:inline-block" value='{{ updated_at if updated_at else ''}}'>
+            </input>
+          </form>
+        </div>
+        <div class="row row-condensed">
+          <form style="padding-left:12px">
+            <text class="text-left" for="form-vert-text">
+              Author:
+            </text>
+            <select class="js-example-tags"
+                    id="post_author"
+                    multiple
+                    data-tags='true'>
+                <option value='{{username}}'> {{username}} </option>
+              {% for user in users_typeahead %}
+                {% if user != username %}
+                  <option value='{{user}}'> {{user}} </option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </form>
+        </div>
+        <div class="row row-condensed">
+          <form style="padding-left:15px">
+            <text class="text-left" for="form-vert-text">
+              Image for the feed:
+            </text>
+            <input id="post_image_feed" type="text" placeholder="Link to the image"
+                   style="width:87%; display:inline-block", value='{{feed_image if feed_image else ''}}'>
+            </input>
+          </form>
+        </div>
+        <div class="row row-condensed"  style="padding-bottom:10px">
+          <text class="text-left" style="padding-left:12px">
+            Tags:
+          </text>
+          <select class="js-example-tags"
+                    id="post_tags"
+                    multiple
+                    data-tags='true'>
+              {% for tag in tags_typeahead %}
+                <option value='{{tag}}'> {{tag}} </option>
+              {% endfor %}
+            </select>
+        </div>
+        <div class="row row-space-2">
+          <div class="row row-condensed col-12">
+            <textarea class="input input-resize-both"
+                      id = "post_tldr"
+                      type="text"
+                      placeholder="TL;DR goes here"
+                      style="margin-left:12px; height:10%; width:100%"
+                      >{{ tldr if tldr}}</textarea>
+          </div>
+        </div>
+        <div class="row row-condensed" style="padding-left:17px">
+          <a href="https://daringfireball.net/projects/markdown/basics">
+            How to write Markdown <i class="glyphicon glyphicon-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+      <div class="row row-space-4 col-12">
+        <div class="col-12">
+          <input id="markdown-slider" style="width:100%"></input>
+        </div>
+        <br>
+      </div>
+
+      <div class="row col-12">
+        <div class="col-md-6" style="padding-left:0px" id="post_text_div">
+          <textarea class="input input-resize-both"
+                    id="post_text"
+                    type="text"
+                    placeholder="Start writing markdown here" style="height:100%; width:102%"
+                    >{{markdown if markdown}}</textarea>
+        </div>
+        <div class="col-md-6" id="rendered-markdown">
+        </div>
+      </div>
+      <div class="row row-space-4"></div>
+      {% if status == 1 %}
+      <div class="row row-space-12">
+        <div class="col-md-12">
+          <h2> {{ comments | length }} Comments </h2>
+          <div class="panel">
+            <div class="panel-body panel-light">
+              <div class="row row-space-12">
+                <div class="col-12">
+                  <textarea id="comment-text" style="height:87px; width=1100px" placeholder="Leave a comment..."></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="panel-footer">
+              <button class="btn btn-primary" onClick="javascript:postReview()">Post</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="row row-space-12">
+        <div class="col-md-12">
+
+          {% for item in comments %}
+            {% set messageId = item.id %}
+            <div class="panel">
+              <div class="panel-header panel-light">
+                <div class="row row-space-12">
+                  <div class="col-md-11">
+                    Posted by <b>{{ item.author }}</b> on {{ item.created_at_fmt }}
+                  </div>
+                  <div class="col-md-1" onClick="deleteReview('{{ messageId }}')">
+                    <p style="text-align:right"><i class="glyphicon glyphicon-remove"></i></p>
+                  </div>
+                </div>
+              </div>
+              <div class="panel-body panel-light">
+                <p> {{ item.text|safe }} </p>
+              </div>
+            </div>
+            </br>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/select2.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/highlight.pack.js')}}"></script>
+<script src="{{ url_for('static', filename='js/marked.js')}}"></script>
+<script>
+var all_form_fields = ['#post_title', '#post_project',
+                       '#post_created_at', '#post_updated_at',
+                       '#post_author', '#post_image_feed', '#post_tags']
+
+// This will ensure that when you
+$.each(all_form_fields, function(i, v){
+  $(v).keydown(function(event){
+    if (event.keyCode == 13){
+      return false;
+    }
+  })
+})
+$('#post_reviewers').keydown(function(event) {
+  if (event.keyCode == 13) {
+    $("#submission_close").click()
+    return false;
+  }
+});
+
+
+$("#fold_metadata").on("click", function(){
+  $(this).toggleClass("glyphicon-chevron-down glyphicon-arrow-right")
+  $("#metadata_fields").toggle("fold")
+})
+var substringMatcher = function(pageMeta) {
+  return function findMatches(q, cb) {
+    var matches, substringRegex;
+
+    // an array that will be populated with substring matches
+    matches = [];
+
+    // regex used to determine if a string contains the substring `q`
+    substrRegex = new RegExp(q, 'i');
+
+    // iterate through the pool of strings and for any string that
+    // contains the substring `q`, add it to the `matches` array
+    $.each(pageMeta, function(i, meta) {;
+      if (substrRegex.test(meta)) {
+        matches.push(meta)
+      };
+    });
+
+    cb(matches);
+  };
+};
+
+var typeahead_post_info = {{ projects_typeahead|tojson|safe }};
+
+var project = '{{ project if project else ''}}';
+$('#post_project').typeahead({
+      hint: false,
+      highlight: true,
+      minLength: 1,
+      value: '{{ project if project else '' }}'
+    },
+    {
+      name: 'Projects',
+      display: function (item) {
+        return item;
+      },
+      templates: {
+        empty: Handlebars.compile(
+          '<div class="tt-not-found">' +
+            'Unable to find any projects that match the current query' +
+            '</div>'
+        ),
+      },
+      source: substringMatcher(typeahead_post_info)
+    }
+);
+
+var tags_default_text =  "Tags are in the form: #tag_type/tag_name. Start typing to see suggestions!"
+var tags = '{{ tags if tags else '' }}'
+var tags_in_list = tags.split(",")
+var all_tags = {{ tags_typeahead|tojson|safe }}
+$.each(tags_in_list, function(i,v){
+  tags_in_list[i] = v.trim()
+});
+
+
+var authors_default_text =  "Users contributing to the post."
+var authors = '{{ author if author else '' }}'
+var authors_in_list = authors.split(",")
+var all_users = {{ users_typeahead|tojson|safe }}
+$.each(authors_in_list, function(i,v){
+  authors_in_list[i] = v.trim()
+});
+
+$('#post_tags').select2({
+  placeholder: tags_default_text
+});
+
+$("#post_tags").select2()
+               .val(tags_in_list)
+               .trigger("change")
+
+
+$('#post_author').select2({
+  placeholder: authors_default_text
+});
+
+$("#post_author").select2()
+               .val(authors_in_list)
+               .trigger("change")
+
+$("#post_tags").on("select2:select", function (e) {
+  // hack becaue refreshRenderedMarkdown doesn't work
+  var content = $('#rendered-markdown').html()
+  var content_split = content.split("<strong>Tags</strong>:")
+  var header = content_split[0]
+  var split_again = (content_split[1]).split("<br>")
+  var footer = split_again[1]
+  var new_tags = $("#post_tags").select2().val()
+  var new_tags_string = new_tags.join(", ")
+  $("#rendered-markdown").html(header + "<strong>Tags</strong>:"  + new_tags + "<br>" + footer);
+});
+
+$("#post_tags").on("select2:selecting", function(e){
+    var new_tag = (e.params.args.data['text'].trim())
+    if (all_tags.indexOf(new_tag) === -1){
+      var new_tag_group = new_tag.split("/")[0]
+      var new_tag_type = new_tag.split("/")[1]
+      alert("You're creating a new tag, are you sure you want to?");
+      return true;
+    }
+    return true;
+})
+
+var border_fix = $(".select2-selection.select2-selection--multiple")[0]
+border_fix.style['border-radius'] = 0
+border_fix.style['border-color'] = "#dce0e0"
+
+var slider = $("#markdown-slider").slider({
+  min: 0,
+  max: 2,
+  step: 1,
+  tooltip: 'always',
+  tooltip_position: 'bottom',
+  value: 1,
+  formatter: function(value){
+    if (value === 0){
+      return "Rendered Only"
+    } else if (value === 1) {
+      return "Markdown/Rendered"
+    } else {
+      return "Markdown Only"
+    }
+  },
+})
+
+$("#markdown-slider").slider().on("change", function(val_obj){
+   var old_val = val_obj.value.oldValue;
+   var new_val = val_obj.value.newValue;
+   var md_text = $("#post_text_div")[0];
+   var rendered_text = $("#rendered-markdown")[0];
+   if (new_val == 2){ // all markdown
+      md_text.className = "col-md-12";
+      md_text.style.visibility='visible';
+      md_text.style.display = 'inherit';
+      rendered_text.style.visibility='hidden';
+      rendered_text.style.display='none';
+   } else if ( new_val == 1){ // half and half
+      md_text.className = "col-md-6";
+      md_text.style.visibility = 'visible';
+      md_text.style.display = 'inherit';
+      rendered_text.className = "col-md-6";
+      rendered_text.style.visibility = 'visible';
+      rendered_text.style.display = 'inherit';
+   } else { // all rendered
+     md_text.style.visibility = 'hidden';
+     md_text.style.display = 'none';
+     rendered_text.className = "col-md-12";
+     rendered_text.style.visibility = 'visible';
+     rendered_text.style.display = 'inherit';
+   }
+})
+
+
+
+function escapeEquationBlocks(text, sep) {
+
+    var clean_text = ''
+    var equation_blocks = text.split(sep)
+    for (var i=0; i<equation_blocks.length; i++) {
+
+      if (i%2 == 0) {
+        clean_text += equation_blocks[i]
+        if (equation_blocks.length > 1 && i != equation_blocks.length - 1) {
+          clean_text += sep
+        }
+      }
+      else {
+        clean_text += equation_blocks[i].split('_').join('\\_')
+        if (i != equation_blocks.length - 1) {
+          clean_text += sep
+        }
+      }
+    }
+    return clean_text
+  }
+
+
+var status = {{ status }}
+
+if (status < 2){
+  var published_button = $("#btn_publish")[0];
+  published_button.setAttribute("disabled", "disabled");
+}
+
+
+var in_review_button = $("#btn_in_review")[0];
+var submission_close = $("#submission_close")[0];
+var save_button = $("#btn_save")[0];
+
+$(submission_close).on("click", function(){
+  in_review_button.setAttribute("class", "btn btn-large btn-primary");
+  in_review_button.innerText = 'In Review Phase';
+  status = 1;
+
+  // Get emails from modal
+  post_reviewers = $("#post_reviewers")[0].value
+
+  data = {
+    'new_status': status,
+    'post_reviewers': post_reviewers
+  }
+
+  // make an ajax call to change the status
+  $.ajax({
+    type: "POST",
+    dataType: "json",
+    data: JSON.stringify(data),
+    contentType: 'application/json',
+    url: '/submit?post_id={{ post_id }}',
+    async: true,
+    success:function(response_data){
+      alert("The status has been changed!")
+      window.location = '/posteditor?post_id={{ post_id }}'
+    },
+    error: function(response_data){
+      console.log("ERROR")
+      console.log(JSON.stringify(response_data))
+      if (response_data['status'] == 200){
+        window.location = '/posteditor?post_id={{ post_id }}'
+      } else {
+        alert("Your post wasn't submitted for review, please try again!")
+      }
+    }
+  })
+
+})
+
+if ( status == 2 || status == 3 ) {
+  var publish_button = $("#btn_publish")[0];
+  $(publish_button).on("click", function(){
+    var publish_button_text = publish_button.textContent.trim();
+    var url = '';
+    if (publish_button_text == "Unpublish"){
+      url = '/unpublish_post?post_id={{ post_id }}';
+      alert_text = 'Your post has been unpublished!';
+    } else {
+      url = '/publish_post?post_id={{post_id}}';
+      alert_text = "Your post has been published!";
+    }
+
+    $.ajax({
+      type:"POST",
+      contentType: 'application/json',
+      url: url,
+      async: true,
+      success: function(response_data){
+        alert(alert_text);
+        location.reload();
+      },
+      error: function(response_data){
+        console.log("ERROR");
+        console.log(JSON.stringify(response_data));
+      }
+    })
+  })
+}
+
+var author_publish_checkbox = $("#author_can_publish")[0]
+$(author_publish_checkbox).on("click", function(){
+  var checked = this.can_approve;
+  var url = "/author_publish";
+  url += "?post_id={{post_id}}"
+  $.ajax({
+    type: "POST",
+    contentType: "application/json",
+    url: url,
+    async: true,
+    success: function(response_data){
+      alert("The publishing status was changed!");
+      window.location = '/posteditor?post_id={{ post_id }}';
+    },
+    error: function(response_data){
+      alert("The publishing status was NOT changed");
+    }
+  });
+})
+
+$(save_button).on("click", function(){
+  save_button.setAttribute("class", "btn btn-large btn-primary");
+  var error = false;
+  var title = $("#post_title")[0].value;
+  var project = $('#post_project').typeahead('val');
+  // Currently, the tags from the post_tags are in a list
+  var tags = $("#post_tags").select2().val()
+  var tldr = $("#post_tldr")[0].value;
+  var created_at = $("#post_created_at")[0].value;
+  var updated_at = $("#post_updated_at")[0].value;
+  var author = $("#post_author").select2().val();
+  var markdown = $("#post_text")[0].value;
+  var feed_image = $("#post_image_feed")[0].value;
+
+  if (title === '' || project === '' || tags === null ||
+      tldr === '' || author === null || markdown === ''){
+    alert("One of the fields was left empty! Your post was not saved, please try again")
+    error = true;
+  } else {
+    // check to make sure the user didn't create another project
+    if (typeahead_post_info.indexOf(project) == -1){
+      error_message = "Please do not create another project, use an existing one.\n" +
+                      "Your post was not saved, please try again. "
+      alert(error_message)
+      error = true;
+    }
+
+    // check the tags of the post
+    $.each(tags, function(i, tag){
+      tag = tag.trim()
+    })
+
+    function parseDate(ds, error_name){
+      var parsed_date = ds.split("-")
+      var error_message = error_name  + " is not in the right format. \
+                          Make sure it's YYYY-mm-dd! Your post was not saved, please try again"
+      if (parsed_date.length != 3){
+        alert(error_message);
+        return false;
+      }
+      var year = parsed_date[0].trim()
+      var month = parsed_date[1].trim()
+      var day = parsed_date[2].trim()
+      if (year.length != 4){
+        alert(error_message);
+        return false;
+      }
+
+      if (parseInt(month) <= 0 || parseInt(month) >= 13){
+        alert(error_message);
+        return false;
+      }
+
+      if (parseInt(day) <= 0 || parseInt(day) >= 32){
+        alert(error_message);
+        return false;
+      }
+
+      return true;
+    }
+
+    check_created_at = parseDate(created_at, "Created_At");
+    check_updated_at = parseDate(updated_at, "Updated_At");
+    if (!check_created_at || !check_updated_at){
+      error = true;
+    }
+
+    postContent = {
+      'title': title,
+      'project': project,
+      'feed_image': feed_image,
+      'tags': tags,
+      'tldr': tldr,
+      'status': status,
+      'created_at': created_at,
+      'updated_at': updated_at,
+      'author': author,
+      'markdown': encodeURIComponent(markdown)
+    }
+  }
+
+    if (!error){
+      $.ajax({
+          type: "POST",
+          dataType: "json",
+          data: JSON.stringify(postContent),
+          contentType: "application/json",
+          url: '/save_post?post_id={{ post_id }}',
+          async: true,
+          success: function(response_data) {
+            if (response_data['success'] == 0) {
+              alert(response_data['error_message'])
+            }
+            else {
+              save_button.setAttribute("class", "btn btn-large");
+              var post_id = response_data['post_id']
+              alert("The post was successfully saved!")
+              window.location = '/posteditor?post_id=' + post_id
+            }
+          },
+          error: function(response_data) {
+            save_button.setAttribute("class", "btn btn-large");
+            console.log("ERROR")
+            console.log(JSON.stringify(response_data));
+            alert("The post wasn't saved! Message: " + response_data['msg'])
+          }
+      });
+    } else {
+      save_button.setAttribute("class", "btn btn-large");
+    }
+});
+
+function deleteReview(commentId) {
+  $.ajax({
+      type: "GET",
+      url: '/delete_review?post_id={{ post_id|urlencode }}&comment_id=' + commentId,
+      async: false
+  });
+  location.reload();
+}
+
+function postReview() {
+  var commentText = $('#comment-text').val()
+  if (commentText == '') {
+    return;
+  }
+  var postContent = {
+    'text':commentText
+  }
+  $.ajax({
+      type: "POST",
+      dataType: "json",
+      data: JSON.stringify(postContent),
+      contentType: "application/json",
+      url: '/review?post_id={{ post_id|urlencode }}',
+      async: false
+  });
+  location.reload();
+}
+
+function refreshRenderedMarkdown() {
+    var markdownString = $('#post_text').val();
+
+    var metadata_ids = ['#post_title', '#post_author', '#post_created_at',
+                        '#post_updated_at', '#post_tags', '#post_tldr']
+    var metadata_vals = {}
+    $.each(metadata_ids, function(i, mid){
+      metadata_key = mid.split("_")[1];
+      textfield = $(mid)[0].value;
+      metadata_vals[metadata_key] = textfield;
+    });
+
+    // authors and tags are a little bit different
+    tags = $("#post_tags").select2().val()
+    if (tags !== null){
+      metadata_vals['tags'] = tags.join(", ")
+    } else {
+      metadata_vals['tags'] = ''
+    }
+
+    author = $("#post_author").select2().val()
+    if (author !== null){
+      metadata_vals['author'] = author.join(", ")
+    } else {
+      metadata_vals['author'] = ''
+    }
+
+    metadata_content =
+      "<h1>" + metadata_vals['title'] + "</h1>" +
+      "<p><strong>Author</strong>: " + metadata_vals['author'] + "<br/>" +
+      "<strong>Date Created</strong>: " + metadata_vals['created'] + "<br/>" +
+      "<strong>Date Updated</strong>: " + metadata_vals['updated'] + "<br/>" +
+      "<strong>Tags</strong>: " + metadata_vals['tags'] + "<br/>" +
+      "<strong>TLDR</strong>: " + metadata_vals['tldr'] + "<br/> </p>"
+
+    //escape underscores in equations
+    var blocks = markdownString.split('```')
+    markdownString = metadata_content
+    for (var i=0; i<blocks.length; i++) {
+      if (i%2 == 1) {
+        var block = blocks[i]
+        markdownString += block + '```'
+      }
+      else {
+        var block = blocks[i]
+        block = escapeEquationBlocks(block, '$$')
+        block = escapeEquationBlocks(block, '$')
+        markdownString += block
+        if (i != blocks.length - 1) {
+          markdownString += '```'
+        }
+      }
+    }
+
+    // Using async version of marked
+    marked(markdownString, function (err, content) {
+      if (err) throw err;
+      //make sure images are not larger than the page
+      content = content.split('<img ').join('<img style="max-width:100%"')
+      //make tables look prettier:
+      content = content.split('<table>').join('<table class="table table-striped table-condensed table-bordered">')
+      content = content.split('<table class="dataframe">').join('<table class="table table-striped table-condensed table-bordered">')
+      $('#rendered-markdown').html(content)
+    });
+
+    try {
+      MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+    }
+    catch (e) {
+      //console.log(e);
+    }
+  }
+
+  var timeout = null;
+  $("#post_text").on("input",function(e){
+    if($(this).data("lastval")!= $(this).val()){
+      $(this).data("lastval",$(this).val());
+
+
+      if (timeout !== null) {
+        clearTimeout(timeout);
+      }
+      //if no new input is entered within 1 second, apply the filters
+      timeout = setTimeout(function() {
+        refreshRenderedMarkdown();
+      }, 500);
+    };
+  });
+
+  var metadata_fields = ['#post_title', '#post_author', '#post_created_at',
+                        '#post_updated_at', '#post_tags', '#post_tldr']
+
+  $.each(metadata_fields, function(i, field){
+    var timeout = null;
+    if (field != "#post_tags"){
+      $(field).on("input",function(e){
+        if($(this).data("lastval")!= $(this).val()){
+          $(this).data("lastval",$(this).val());
+
+          if (timeout !== null) {
+            clearTimeout(timeout);
+          }
+          //if no new input is entered within 1 second, apply the filters
+          timeout = setTimeout(function() {
+            refreshRenderedMarkdown();
+          }, 500);
+        };
+    });
+  }
+})
+
+  $( document ).ready(function() {
+    marked.setOptions({
+      highlight: function (code, lang) {
+        try {
+          return hljs.highlight(lang, code, true).value;
+        }
+        catch(err) {
+          console.log(err)
+          try {
+            return hljs.highlightAuto(code).value;
+          }
+          catch(err) {
+            return code;
+          }
+        }
+      }
+      , renderer : new marked.Renderer()
+      , gfm: true
+      , toc: true
+      , tables: true
+      , breaks: true
+      , pedantic: false
+      , sanitize: false
+      , smartLists: true
+      , smartypants: true
+    });
+    var hash = window.location.hash;
+    if (hash) {
+      var text = decodeURIComponent(hash)
+      text = text.replace("#", '')
+    }
+    var text = $("#post_text").text()
+    var len = text.split(/\r\n|\r|\n/).length
+    $("#post_text").text(text)
+    refreshRenderedMarkdown();
+  });
+
+
+  $("#post_project")[0].setSelectionRange(1000, 1000);
+
+
+// uploads images dropped in the textbox, and returns the marked-down links
+$("#post_text").on("drop", function (event) {
+    event.preventDefault();
+    var files = event.originalEvent.dataTransfer.files;
+    var url="/file_upload";
+    var data    = new FormData();
+    var title   = $("#post_title").val()
+
+  if (title === ''){
+
+    alert("Title field is empty! Please fill it in before adding images")
+    error = true;
+
+  } else {
+
+    data.append('title', title)
+
+    for (var i = 0; i < files.length; i++) {
+        data.append('file' + i, files[i]);
+    }
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        contentType: false,
+        data: data,
+        processData: false,
+        cache: false,
+        dataType: 'json'
+    }).done(function (response_data) {
+        if (response_data['success']) {
+          var links = response_data['links']
+          var markdownString = $("#post_text").val() + "\n"
+          for (var i = 0; i < links.length; i++) {
+              markdownString += "![](" + links[i] + ")" + "\n";
+          };
+          $("#post_text").val(markdownString)
+        } else {
+          console.log("ERROR")
+          console.log(JSON.stringify(response_data))
+        }
+    });
+    timeout = setTimeout(function() {
+        refreshRenderedMarkdown();
+    }, 500);
+  }
+});
+
+
+</script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+<script type="text/javascript"
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js">
+</script>
+
+{% endblock %}
+

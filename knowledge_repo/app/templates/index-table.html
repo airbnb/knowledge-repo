@@ -1,0 +1,136 @@
+{% extends "index-base.html" %}
+
+{% macro pagination() %}
+<div class='row'>
+  <div class='col-sm-6 col-md-offset-5'>
+    <div class='btn-group' role='group'>
+      <button class="btn btn-default prev_btn">
+        <span><i class="glyphicon glyphicon-chevron-left"></i> prev</span>
+      </button>
+      <button class="btn btn-default next_btn">
+        <span>next <i class="glyphicon glyphicon-chevron-right"></i></span>
+      </button>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+
+{% block header %} {{ top_header }} {% endblock %}
+
+{% block inner_content %}
+
+
+  {{ pagination() }}
+  <br>
+
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        {% for item in ['Title', 'Author', 'Tags', 'CreatedAt', 'UpdatedAt', 'Views', 'Upvotes', 'Comments'] %}
+          {% if item in ['CreatedAt', 'UpdatedAt', 'Views', 'Upvotes', 'Comments'] %}
+            <th style="min-width:130px;">
+          {% else %}
+            <th style="min-width:95px;">
+          {% endif %}
+          {{ item }}
+          {% if item != 'Tags' %}
+            <i id="sortBy{{ item }}Asc" class="glyphicon glyphicon-chevron-up"></i>
+            <i id="sortBy{{ item }}Desc" class="glyphicon glyphicon-chevron-down"></i>
+          {% endif %}
+          </th>
+        {% endfor %}
+        <th style="min-width:200px">Short TLDR</th>
+      </tr>
+    </thead>
+    <tbody>
+
+  {% for post in posts %}
+    {% set idx_item = loop.index0 %}
+    {% set stats = post_stats[post.path] %}
+    <tr class="table-post">
+      <td id="path-{{ idx_item }}">
+        <a href="{{'/render?markdown=' + post.path|urlencode }}">
+          {{ post.title|replace('_', ' ')|title }}
+        </a>
+
+      </td>
+      <td id="author-{{ idx_item }}">
+        {{ format_authors(post.authors)|safe }}
+      </td>
+      <td id="tags-{{ idx_item }}">
+          {% for tag_obj in post.tags %}
+            {% set tag = tag_obj.name %}
+            {% if loop.last %}
+               <a href="/tag_pages?tag={{ tag|urlencode }}">{{ "#" + tag}}</a>
+              {% else %}
+               <a href="/tag_pages?tag={{ tag|urlencode }}">{{ "#" + tag}}</a>,
+              {% endif %}
+          {% endfor %}
+      </td>
+      <td id="created_at-{{ idx_item }}">
+          {{ post['created_at'].date().isoformat() }}
+      </td>
+      <td id="updated_at-{{ idx_item }}">
+          {{ post['updated_at'].date().isoformat() }}
+      </td>
+      <td id="views-{{ idx_item }}">
+          {{ stats['all_views'] }}
+      </td>
+      <td id="upvotes-{{ idx_item}}">
+          {{ stats['total_likes']}}
+      </td>
+      <td id="comments-{{ idx_item }}">
+          {{ stats['total_comments']}}
+      </td>
+      <td id="tldr-{{ idx_item }}">
+          {%- set tldr = post['tldr'] | safe %}
+          {%- if tldr == None %}
+            {%- set tldr = "(No TL;DR)" %}
+          {%- endif %}
+          <i>{{ tldr | truncate(100, True) }} </i>
+          <a href="{{'/render?markdown=' + post.path|urlencode }}">
+            post.
+          </a>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{{ pagination() }}
+
+{% endblock %}
+
+
+{% block scripts %}
+
+{{ super () }}
+<script src="{{ url_for('static', filename='js/helpers.js')}}"></script>
+<script type="text/javascript">
+var start = {{ feed_params['start']|default(0) }}
+var results = {{ feed_params['results']|default(0) }}
+var filters = "{{ feed_params['filters']| default('') }}"
+var next_start = (start + results).toString();
+var prev_start = (start - results).toString();
+$(document).ready(function(){
+    $(".next_btn").on("click", function(){
+      helpersJx.changePage(next_start, results, filters)
+    });
+    $(".prev_btn").on("click", function(){
+      helpersJx.changePage(prev_start, results, filters)
+    });
+    var col_names = ['Title', 'Author', 'CreatedAt', 'UpdatedAt', 'Views', 'Upvotes', 'Comments']
+    $.each(col_names, function(i, col){
+        var desc_sort = "#sortBy" + col + "Desc";
+        var asc_sort = "#sortBy" + col + "Asc";
+        $(desc_sort).click(function(){
+            document.location = '/table?start=' + start.toString() + '&results=' + results.toString() + '&sort_by=' + col + '&filters=' + filters;
+        });
+        $(asc_sort).click(function(){
+            document.location = '/table?start=' + start.toString() + '&results=' + results.toString() + '&sort_by=' + col + '&sort_asc=1&filters=' + filters;
+        });
+    });
+});
+</script>
+{% endblock %}
