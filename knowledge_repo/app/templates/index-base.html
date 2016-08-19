@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% macro format_authors(authors) %}
+  {% for author in authors %}
+    <a href='/feed?authors={{ author.username|urlencode }}'>
+      {{ author.format_name }}
+    </a>
+    {% if not loop.last %}
+      ,
+    {% endif %}
+  {% endfor %}
+{% endmacro %}
+
+
+{% block title %} Knowledge Repo {% endblock %}
+
+{% block content %}
+
+  <div class="row">
+    <br>
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-4">
+      <h2> {% block header %} {% endblock %} </h2>
+    </div>
+    <div class="col-md-4">
+      <h2>
+        <a class="tooltip-toggleFeedView" href="/feed" aria-selected="false" data-toggle="tooltip" data-placement="top" title="Blog">
+          <i class="glyphicon glyphicon-post-org glyphicon-home"></i>
+        </a>
+        <a class="tooltip-toggleTableView" href="/table" aria-selected="false" data-toggle="tooltip" data-placement="top" title="Grid">
+          <i class="glyphicon glyphicon-post-org glyphicon-th-large"></i>
+        </a>
+        <a class="tooltip-toggleClusterView" href="/cluster" aria-selected="false" data-toggle="tooltip" data-placement="top" title="Cluster">
+          <i class="glyphicon glyphicon-post-org glyphicon-th-list"></i>
+        </a>
+      </h2>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <input class="form-control" id="searchbar" placeholder="Search for Knowledge" style="text-align:right">
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    {% block inner_content %}
+    {% endblock %}
+  </div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+
+    $( document ).ready(function() {
+     $.ajaxSetup({
+      cache: true
+    });
+
+    $('[data-toggle="tooltip"]').tooltip();
+
+    $("#searchbar")[0].setSelectionRange(1000, 1000);
+
+    var substringMatcher = function(pageMeta) {
+      return function findMatches(q, cb) {
+        var matches, substringRegex;
+
+        // an array that will be populated with substring matches
+        matches = [];
+
+        // regex used to determine if a string contains the substring `q`
+        substrRegex = new RegExp(q, 'i');
+
+        // iterate through the pool of strings and for any string that
+        // contains the substring `q`, add it to the `matches` array
+        $.each(pageMeta, function(i, meta) {
+          var match = false;
+          if (substrRegex.test(meta.title)) {
+            match = true;
+          };
+          if (substrRegex.test(meta.author)) {
+            match = true;
+          };
+          if (match) {
+            matches.push(meta);
+          }
+        });
+
+        cb(matches);
+      };
+    };
+
+
+    $.get('/ajax_post_typeahead', function(typeahead_post_info) {
+      typeahead_post_info = JSON.parse(typeahead_post_info);
+      $('#searchbar').typeahead({
+          hint: false,
+          highlight: true,
+          minLength: 1
+        },
+        {
+          name: 'knowledge_posts',
+          display: function (item) {
+            return item.title;
+          },
+          templates: {
+            empty: Handlebars.compile(
+              '<div class="tt-not-found">' +
+                'Unable to find any posts that match the current query' +
+                '</div>'
+            ),
+            suggestion: function(data) {
+              return '<p><strong class="text-rausch">' + data.author + '</strong> – ' + data.title + '</p>';
+            }
+          },
+          source: substringMatcher(typeahead_post_info)
+        }
+    );
+
+    $('#searchbar').bind('typeahead:select', function(obj, datum, name) {
+      window.location = '/render?markdown=' + encodeURIComponent(datum.path);
+    });
+
+    $('#searchbar').keypress(function(event){
+      var keycode = (event.keyCode ? event.keyCode : event.which);
+      if(keycode == '13'){
+        var path = document.location.pathname;
+        window.location = path + '?filters=' + $('#searchbar').val()
+      }
+    });
+
+    var padding = $('.tt-menu').outerWidth()
+    $('.tt-menu').width($('#searchbar').width() + padding + "px")
+    });
+
+
+  });
+</script>
+{% endblock %}
+
+

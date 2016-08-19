@@ -1,0 +1,110 @@
+{% extends "index-base.html" %}
+
+
+{% block header %} Stats  {% endblock %}
+
+{% block inner_content %}
+
+  <br>
+    <div class="panel">
+      <div class="panel-header">Post Activity Per Week</div>
+      <div id="posts_week"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">Cumulative Number of Posts in the Repo</div>
+      <div id="posts_cum"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">Pageviews per Week</div>
+      <div id="pageviews_weeks"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">Pageviews per Day</div>
+      <div id="pageviews_daily"></div>
+    </div>
+  </br>
+
+
+
+
+{% endblock %}
+
+{% block scripts %}
+{{ super () }}
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+google.load('visualization', '1', {'packages':['corechart']});
+google.setOnLoadCallback(drawChart);
+
+function drawChart() {
+
+  // Daily PageViews
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Day');
+  data.addColumn('number', 'Pageviews');
+  data.addRows([
+          {%- for date in pageview_dates %}
+          ['{{ date }}', {{ pageview_views[loop.index0] }}],
+          {%- endfor %}
+  ]);
+  var chart = new google.visualization.LineChart(document.getElementById('pageviews_daily'));
+  chart.draw(data, {vAxis: {baseline: 0, viewWindow: {max:750}},
+                    colors: ['#ff5a5f'],
+                    height:350,
+                    hAxis: {showTextEvery:14, slantedText:true}});
+
+  // Weekly Posts
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Week');
+  data.addColumn('number', 'Created_at');
+  data.addColumn('number', 'Updated_at')
+  data.addRows([
+          {%- for date in posts_dates %}
+          ['{{ date }}', {{ posts_values[loop.index0][0]}},{{ posts_values[loop.index0][1]}}],
+          {%- endfor %}
+  ]);
+  var chart = new google.visualization.LineChart(document.getElementById('posts_week'));
+  chart.draw(data, {vAxis: {baseline: 0},
+                    colors: ['#ff5a5f','#ffb400'],
+                    height:350,
+                    hAxis: {showTextEvery:4, slantedText:true}});
+
+  // Weekly Posts Cumulative
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Week');
+  data.addColumn('number', '# Posts')
+  data.addRows([
+          {%- for date in posts_dates %}
+          ['{{ date }}', {{ posts_values_cum[loop.index0][0]}}],
+          {%- endfor %}
+  ]);
+  var chart = new google.visualization.LineChart(document.getElementById('posts_cum'));
+  chart.draw(data, {vAxis: {baseline: 0},
+                    colors: ['#ff5a5f'],
+                    height:350,
+                    hAxis: {showTextEvery:4, slantedText:true}});
+
+  // Weekly PageViews
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Week');
+  data.addColumn('number', 'Pageviews');
+  data.addRows([
+          {%- for date in posts_dates %}
+          ['{{ date }}', {{ posts_values[loop.index0][2]}} ],
+          {%- endfor %}
+  ]);
+  var chart = new google.visualization.LineChart(document.getElementById('pageviews_weeks'));
+  chart.draw(data, {vAxis: {baseline: 0},
+                    colors: ['#007a87'],
+                    height:350,
+                    hAxis: {showTextEvery:4, slantedText:true}});
+
+}
+
+function search(s){
+  window.location = '/feed?filters=' + $('#searchbar').val()
+}
+
+</script>
+
+{% endblock %}

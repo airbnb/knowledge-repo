@@ -1,0 +1,9 @@
+You've been asked to review a knowledge post!
+
+Link to post: {{ request.base_url }}/posteditor?post_id={{ post_id }}
+
+There is a comment section at the bottom where you can leave your feedback. Once the review is done, ping one of the Knowledge Editors, and they can publish the post.
+
+Happy Reviewing!
+
+The Knowledge Editors

@@ -87,3 +87,20 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+*.iml
+**/.idea
+**/.idea/*
+**/target
+**/target/*
+*.sw*
+*#
+*.pk
+*.coverage
+*node_modules
+web/js/knowledgeconf.js
+app/config/knowledge.cfg
+web/data/repo.json
+*.pyc
+/build
+/dist

@@ -1,0 +1,382 @@
+.twitter-typeahead {
+  width: 100%;
+}
+
+.tt-menu {
+ background-color: #fff;
+ padding: 8px 6px;
+ border: 1px solid rgba(0,0,0,0.2);
+ border-radius: 8px;
+ box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+
+.tt-suggestion:hover {
+ background-color: #f5f5f5 ;
+ cursor:pointer;
+}
+
+.tt-input {
+  width: 300px;
+}
+
+.tt-hint {
+  width: 300px;
+}
+
+/* overall page elements */
+.page-container {
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 25px;
+    padding-right: 25px;
+    width: 1045px;
+}
+
+/* navbar elements*/
+.navbar-knowledge, .navbar-text, .glyphicon-navbar {
+  color: #cacccd;
+  background-color: #565a5c;
+  border-radius: 0px;
+}
+
+.navbar-text[href]:hover {
+  color: white;
+}
+
+#searchbar {
+  border: 1px solid #ccc;
+  width: 100%;
+  margin: 10px 0;
+}
+
+.panel {
+  border: 1px solid #dce0e0;
+  color: #565a5c;
+  background-color: white;
+  border-radius: 0;
+  margin-bottom: 0px;
+}
+
+.panel-header {
+    color: #565a5c;
+    font-size: 16px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #dce0e0;
+}
+
+.panel-body, .panel-header {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.panel-dark, .panel-header {
+    background-color: #edefed;
+}
+
+.panel-header, .panel-body, ul.panel-body > li, ol.panel-body > li, .panel-footer {
+    position: relative;
+    margin: 0;
+    padding: 20px;
+    border-top: 1px solid #dce0e0;
+}
+
+.panel-light {
+    background-color: white;
+}
+
+body {
+  color: #565a5c;
+  background-color: whitesmoke;
+  font-size: 14px;
+  font-family: 'Lato';
+  /*background-color: #F8F8F8;*/
+}
+
+a {
+  color: #FF5A5F;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #FF5A5F;
+  opacity: 0.5;
+  text-decoration: none;
+}
+
+ul {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+h1 {
+  font-size: 44px;
+}
+h2 {
+  margin-top: 0;
+  margin-bottom: 0;
+  color: #484848;
+  font-size: 32px;
+  font-weight: bolder;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 14px;
+}
+
+img {
+    max-width:100%;
+}
+
+.logo {
+  display: block;
+  font-size: 21px;
+  padding: 0 15px;
+  margin-bottom: 10px;
+  font-weight: 900;
+  font-family: 'Playfair Display';
+}
+
+.glyphicon {
+  vertical-align: baseline;
+}
+
+.link-reset {
+  color:black;
+}
+
+.label-primary, .label-default {
+  font-size: 14px;
+  border: 1px solid;
+  border-radius: 15px;
+  border-color: #FF5A5F;
+  font-weight: normal;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+
+.label-primary {
+  color: white;
+  background-color: #FF5A5F;
+}
+
+.label-default {
+  color: #FF5A5F;
+  background-color: transparent;
+}
+
+.btn-primary {
+  background-color: #FF5A5F;
+  border: 1px solid #FF5A5F;
+  color: #FFFFFF
+}
+
+.glyphicon-white {
+  color: #FFFFFF
+}
+
+.btn-default {
+  background-color: #FFFFFF;
+  border: 1px solid #FF5A5F;
+  color: #FF5A5F
+}
+
+.glyphicon-post-org {
+  color:black;
+}
+
+.glyphicon-filled, .glyphicon-clickable {
+  color: #FF5A5F
+}
+
+.feed-post {
+  border-bottom: 1px solid #F8F8F8;
+}
+
+.feed-post-counts {
+  color: #aaa;
+  margin-right: 3px;
+  margin-left: 15px;
+}
+
+.content-offset {
+  margin-left: 50px;
+}
+
+.content-offset-right {
+  margin-right: 50px;
+}
+
+.js-example-tags {
+  position:inherit !important;
+  display:inline-block;
+}
+
+.tag--subscribed {
+  color:white;
+  background-color: #FF5A5F;
+  border-color: transparent;
+}
+
+.btn-batch-tags-invisible {
+  padding: 2px 0px;
+  background-color: Transparent;
+}
+
+.batch-tags-text-field {
+  width: 500px;
+}
+
+.label-primary[href]:hover, .label-primary[href]:focus, .label-primary[href]:active, .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+  color:white;
+  background-color: #FF5A5F;
+  border-color: #FF5A5F;
+  opacity: 0.5;
+}
+
+.label-default[href]:hover, .label-default[href]:focus, .label-default[href]:active, .btn-default:hover, .btn-default:focus, .btn-default:active {
+  color:#FF5A5F;
+  background-color: white;
+  border-color: #FF5A5F;
+  opacity: 0.5;
+}
+
+.feed-post-counts, .glyphicon:first-child {
+  margin-left: 0px;
+}
+
+.content {
+  border-left: 1px solid #F8F8F8;
+  background-color: white;
+  line-height: 1.6em;
+  color: #555;
+  font-size: 18px;
+}
+
+#renderedMarkdown h1,
+#renderedMarkdown h2,
+#renderedMarkdown h3,
+#renderedMarkdown h4,
+#renderedMarkdown h5,
+#renderedMarkdown h6 {
+  margin-top: 50px;
+  margin-bottom: 25px;
+  font-weight: bold;
+}
+
+#renderedMarkdown h1 {
+  margin-top: 0;
+  font-weight: bold;
+}
+
+/*#renderedMarkdown p {
+  margin: 0 0 25px;
+}*/
+
+#renderedMarkdown p,
+#renderedMarkdown h1,
+#renderedMarkdown h2,
+#renderedMarkdown h3,
+#renderedMarkdown .codehilite,
+#renderedMarkdown ul {
+  width: 80%;
+  color: #484848;
+}
+
+#renderedMarkdown p > img {
+  margin-top: 25px;
+  margin-bottom: 25px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#renderedMarkdown table {
+  width: 80%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: block;
+  overflow-x: auto;
+  border-spacing: 10px;
+}
+
+#renderedMarkdown th, #renderedMarkdown td {
+  border: 1px solid grey;
+  padding: 0.5em;
+}
+
+#renderedMarkdown .codehilite {
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+
+#renderedMarkdown ul > li > p {
+  margin-left: 0;
+}
+
+.row-space-1 {
+  margin-bottom: 6.25px; }
+
+.row-space-top-1 {
+  margin-top: 6.25px; }
+
+.row-space-2 {
+  margin-bottom: 12.5px; }
+
+.row-space-top-2 {
+  margin-top: 12.5px; }
+
+.row-space-3 {
+  margin-bottom: 18.75px; }
+
+.row-space-top-3 {
+  margin-top: 18.75px; }
+
+.row-space-4 {
+  margin-bottom: 25px; }
+
+.row-space-top-4 {
+  margin-top: 25px; }
+
+.row-space-5 {
+  margin-bottom: 31.25px; }
+
+.row-space-top-5 {
+  margin-top: 31.25px; }
+
+.row-space-6 {
+  margin-bottom: 37.5px; }
+
+.row-space-top-6 {
+  margin-top: 37.5px; }
+
+.row-space-7 {
+  margin-bottom: 43.75px; }
+
+.row-space-top-7 {
+  margin-top: 43.75px; }
+
+.row-space-8 {
+  margin-bottom: 50px; }
+
+.row-space-top-8 {
+  margin-top: 50px; }
+
+.row-space-top-12 {
+  margin-top: 75px; }
+
+.tooltip.bottom .tooltip-inner {
+  background-color:transparent;
+  color:grey;
+  }
+
+.tooltip.bottom .tooltip-arrow {
+  border-bottom-color: grey;
+}
