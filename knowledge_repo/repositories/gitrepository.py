@@ -15,7 +15,35 @@ logger = logging.getLogger(__name__)
 class GitKnowledgeRepository(KnowledgeRepository):
     _registry_keys = ['', 'git']
 
+    @classmethod
+    def create(cls, uri, embed_tooling=True):
+        path = uri.replace('git://', '')
+        assert not os.path.exists(path), "Repository already exists!"
+        try:
+            repo = git.Repo.init(path, mkdir=True)
+            sm_created = False
+            if embed_tooling is True or isinstance(embed_tooling, dict):
+                if not isinstance(embed_tooling, dict):
+                    embed_tooling = {}
+                tooling_repo = embed_tooling.get('repository', __git_uri__)
+                tooling_branch = embed_tooling.get('branch', 'master')
+                sm = repo.create_submodule('knowledge_repo', '.resources', url=tooling_repo, branch=tooling_branch)
+                sm_created = True
+            shutil.copy(os.path.join(os.path.dirname(__file__), '../config_defaults.py'),
+                        os.path.join(path, '.knowledge_repo_config.py'))
+            shutil.copy(os.path.join(os.path.dirname(__file__), '../templates', 'repo_data_readme.md'),
+                        os.path.join(path, 'README.md'))
+            repo.index.add(['.knowledge_repo_config.py', 'README.md'])
+            repo.index.commit("Initial commit.")
+            if sm_created:
+                sm.update()
+        except Exception as e:
+            shutil.rmtree(path)
+            raise e
+        return GitKnowledgeRepository(path)
+
     def init(self, config='git:////.knowledge_repo_config.py', auto_create=False):
+        self.config.update_defaults(published_branch='master')
         self.auto_create = auto_create
         self.path = self.uri.replace('git://', '')
 
@@ -35,7 +63,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         if not os.path.exists(path):
             path = os.path.abspath(path)
             if self.auto_create:
-                self.__repo_init(path)
+                self.create(path)
             else:
                 raise ValueError("Provided path '{}' does not exist.".format(path))
         assert self.__is_valid_repo(
@@ -50,22 +78,6 @@ class GitKnowledgeRepository(KnowledgeRepository):
         except git.InvalidGitRepositoryError:
             return False
 
-    def __repo_init(self, path):
-        try:
-            repo = git.Repo.init(path, mkdir=True)
-            sm = repo.create_submodule(
-                'knowledge_repo', '.resources', url=__git_uri__, branch='stable')
-            shutil.copy(os.path.join(os.path.dirname(__file__), 'config_defaults.py'),
-                        os.path.join(path, '.knowledge_repo_config.py'))
-            shutil.copy(os.path.join(os.path.dirname(__file__), 'templates',
-                                     'repo_data_readme.md'), os.path.join(path, 'README.md'))
-            repo.index.add(['.knowledge_repo_config.py', 'README.md'])
-            repo.index.commit("Initial commit.")
-            sm.update()
-        except Exception as e:
-            shutil.rmtree(path)
-            raise e
-
     @property
     def git(self):
         if not hasattr(self, '_git'):
@@ -77,7 +89,8 @@ class GitKnowledgeRepository(KnowledgeRepository):
     def revision(self):
         return self.git.commit().hexsha
 
-    def update(self, branch='master'):
+    def update(self, branch=None):
+        branch = branch or self.config.published_branch
         if len(self.git.remotes) == 0:
             return
         if not self.__remote_available:
@@ -88,12 +101,14 @@ class GitKnowledgeRepository(KnowledgeRepository):
         self.git.remote().fetch()
         current_branch = self.git.active_branch
         self.git.branches.master.checkout()
-        self.git.remote().pull('master')
+        self.git.remote().pull(branch)
         self.git.submodules[0].update(init=True)  # TODO: FIXME
         current_branch.checkout()
 
-    def set_active_draft(self, path):
-        self.git_branch_for_post(path).checkout()
+    def set_active_draft(self, path):  # TODO: deprecate
+        branch = self.git_branch_for_post(path)
+        self.config.published_branch = branch.name
+        branch.checkout()
 
     @property
     def status(self):
@@ -111,8 +126,8 @@ class GitKnowledgeRepository(KnowledgeRepository):
         return message
 
     # ---------------- Git properties and actions -------------------------
-    def git_dir(self, prefix=None, commit='master'):
-        commit = self.git.commit(commit)
+    def git_dir(self, prefix=None, commit=None):
+        commit = self.git.commit(commit or self.config.published_branch)
         tree = commit.tree
         if prefix is not None:
             tree = tree[prefix]
@@ -123,14 +138,14 @@ class GitKnowledgeRepository(KnowledgeRepository):
                 )
                 ]
 
-    def git_read(self, path, commit='master'):
-        commit = self.git.commit(commit)
+    def git_read(self, path, commit=None):
+        commit = self.git.commit(commit or self.config.published_branch)
         return commit.tree[path].data_stream.read()
 
     @property
     def git_local_branches(self):
         unmerged_branches = [branch.replace(
-            '*', '').strip() for branch in self.git.git.branch('--no-merged', 'master').split('\n')]
+            '*', '').strip() for branch in self.git.git.branch('--no-merged', self.config.published_branch).split('\n')]
         return unmerged_branches
 
     def __get_path_from_ref(self, ref):
@@ -170,7 +185,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
         if len(branches) == 0:
             if path in self.dir():
-                return self.git_branch('master')
+                return self.git_branch(self.config.published_branch)
             return None
 
         if len(branches) == 1:
@@ -213,7 +228,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
             branch_obj.checkout()
             return branch_obj
 
-        if soft and self.git.active_branch.name not in ['master', branch] and not self.git.active_branch.name.endswith('.kp'):
+        if soft and self.git.active_branch.name not in [self.config.published_branch, branch] and not self.git.active_branch.name.endswith('.kp'):
             response = None
             while response not in ['y', 'n']:
                 response = raw_input(
@@ -242,7 +257,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
     def git_diff(self, ref=None, ref_base=None, patch=False):
         commit = self.git.commit(ref)
-        ref = self.git.merge_base(self.git.commit(ref_base or 'master'), commit)[0]
+        ref = self.git.merge_base(self.git.commit(ref_base or self.config.published_branch), commit)[0]
         return commit.diff(ref, create_patch=patch)
 
     # ---------------- Post retrieval methods --------------------------------
@@ -255,7 +270,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
         for status in statuses:
             if status == self.PostStatus.PUBLISHED:
-                posts.update(self.git_dir(prefix=prefix, commit='master'))
+                posts.update(self.git_dir(prefix=prefix, commit=self.config.published_branch))
             else:
                 for branch in local_posts:
                     for prefix in local_posts[branch]:
@@ -353,7 +368,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         if branch is None:
             return ValueError("No such post: {}".format(path))
 
-        if branch.name == 'master':
+        if branch.name == self.config.published_branch:
             status = self.PostStatus.PUBLISHED, None
         elif branch.name in self.git.remote().refs:
             remote_branch = self.git.remote().refs[branch.name].name

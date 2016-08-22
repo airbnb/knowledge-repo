@@ -28,40 +28,44 @@ class KnowledgeRepositoryConfig(dict):
     def __dir__(self):
         return list(set(list(self.DEFAULT_CONFIGURATION.keys()) + list(self.keys())))
 
-    def update(self, values):
-        if isinstance(values, dict):
-            if 'DEFAULT_CONFIGURATION' in values:
-                values = values.copy()
-                values.pop('DEFAULT_CONFIGURATION')
-            super(KnowledgeRepositoryConfig, self).update(values)
-        elif isinstance(values, types.ModuleType):
-            self.__update_from_module(values)
-        elif type(values) == str:
-            if os.path.exists(values):
-                self.__update_from_file(values)
+    def update(self, *values, **kwargs):
+        for value in values:
+            if isinstance(value, dict):
+                if 'DEFAULT_CONFIGURATION' in value:
+                    value = value.copy()
+                    value.pop('DEFAULT_CONFIGURATION')
+                dict.update(self, value)
+            elif isinstance(value, types.ModuleType):
+                self.__update_from_module(value)
+            elif type(value) == str:
+                if os.path.exists(value):
+                    self.__update_from_file(value)
+                else:
+                    logger.warning(
+                        "Configuration file {} does not exist.".format(value))
+            elif isinstance(value, types.NoneType):
+                pass
             else:
-                logger.warning(
-                    "Configuration file {} does not exist.".format(values))
-        elif isinstance(values, types.NoneType):
-            pass
-        else:
-            raise ValueError("Cannot interpret {}".format(values))
+                raise ValueError("Cannot interpret {}".format(value))
+        dict.update(self, kwargs)
 
-    def update_defaults(self, values):
-        if type(values) == dict:
-            self.DEFAULT_CONFIGURATION.update(values)
-        elif isinstance(values, types.ModuleType):
-            self.__defaults_from_module(values)
-        elif type(values) == str:
-            if os.path.exists(values):
-                self.__defaults_from_file(values)
+    def update_defaults(self, *values, **kwargs):
+        for value in values:
+            if type(value) == dict:
+                self.DEFAULT_CONFIGURATION.update(value)
+            elif isinstance(value, types.ModuleType):
+                self.__defaults_from_module(value)
+            elif type(value) == str:
+                if os.path.exists(value):
+                    self.__defaults_from_file(value)
+                else:
+                    logger.warning(
+                        "Configuration file {} does not exist.".format(value))
+            elif isinstance(value, types.NoneType):
+                pass
             else:
-                logger.warning(
-                    "Configuration file {} does not exist.".format(values))
-        elif isinstance(values, types.NoneType):
-            pass
-        else:
-            raise ValueError("Cannot interpret {}".format(values))
+                raise ValueError("Cannot interpret {}".format(value))
+        self.DEFAULT_CONFIGURATION.update(kwargs)
 
     def __defaults_from_file(self, filename):
         self.__set_from_file(self.DEFAULT_CONFIGURATION, filename, force=True)

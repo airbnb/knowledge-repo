@@ -38,7 +38,7 @@ If you have already set up your system as described below, here is a snapshot of
 2. knowledge_repo add ~/Documents/my_post.ipynb [-p projects/test_project] [--update]
 3. knowledge_repo preview projects/test_project
 4. knowledge_repo submit projects/test_project
-5. Open a PR in GitHub
+5. [If applicable] Open a PR in GitHub or other git web UI
 6. After it has been reviewed, merge it in to master.
 
 For more details, read on.
@@ -161,11 +161,11 @@ If you've been cautious and didn't shortcut the previewing process, and your pos
 
 `knowledge_repo --repo <knowledge_repo_path> push <project_branch>`
 
-### 4. Open a pull request in Github
+### 4. [If applicable] Open a pull request in Github or other git web ui
 
-Visit this repo's github page and create a new pull request from the yellow bar that appears above the files currently in the repo. It should have the name of your post as the branch name.
+Visit this repo's git web ui and create a new pull request. In GitHub this is done from the yellow bar that appears above the files currently in the repo. The branch to be merged should have the same name as the path of your post.
 
-Be sure to **label your pull request** with the appropriate label:
+Be sure to **label your pull request** with the appropriate label. For example, your organization might use:
 
 * **WIP** - _"this is a work in progress, don't look yet"_
 * **Review** - _"this is ready to be reviewed"_ - Someone in your organization should take a look as soon as possible, hopefully within a day or so.

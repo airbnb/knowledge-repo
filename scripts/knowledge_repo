@@ -2,6 +2,7 @@
 
 import sys
 import os
+import signal
 import re
 import threading
 import webbrowser
@@ -9,7 +10,9 @@ import shutil
 import argparse
 import subprocess
 from tabulate import tabulate
-from alembic import command
+
+# Register handler for SIGTERM, so we can run cleanup code if we are terminated
+signal.signal(signal.SIGTERM, lambda signum, frame: sys.exit(0))
 
 # If this script is being run out of a checked out repository, we need to make sure
 # the appropriate knowledge_repo is being used. To do this, we add the parent directory
@@ -77,11 +80,17 @@ if args.main_help:
 if args.repo is None:
     raise ValueError("No repository specified. Please set the --repo flag, or the KNOWLEDGE_REPO environment variable.")
 
-# Update repository so that git submodules are initialised
+# Update repository so that we can ensure git repository configuration is up to date
+# We wrap this in a try/except block because failing to update a repository can
+# happen for all sorts of reasons that should not inhibit other actions
+# For example: if the repository does not exist and the action will be 'init'
 if args.update:
-    kr = knowledge_repo.KnowledgeRepository.for_uri(args.repo)
-    if isinstance(kr, GitKnowledgeRepository):
-        kr.update(branch=args.knowledge_branch)
+    try:
+        kr = knowledge_repo.KnowledgeRepository.for_uri(args.repo)
+        if isinstance(kr, GitKnowledgeRepository):
+            kr.update(branch=args.knowledge_branch)
+    except:
+        pass
 
 # If not running in dev mode, and the specified repo exists, along with a knowledge_repo
 # script in the .resources/scripts folder, pass execution to this script in the
@@ -105,8 +114,11 @@ if (isinstance(args.repo, str) and not args.dev
 # Add the action parsers
 subparsers = parser.add_subparsers(help='sub-commands')
 
-init = subparsers.add_parser('init', help='Initialise a new knowledge repository.')
+init = subparsers.add_parser('init', help='Initialise a new git knowledge repository.')
 init.set_defaults(action='init')
+init.add_argument('--tooling-skip', action='store_true', help='Disable embedding of knowledge_repo tooling.')
+init.add_argument('--tooling-repo', help='The repository to use (if not the default).')
+init.add_argument('--tooling-branch', help='The branch to use when embedding the tools as a submodule.')
 
 create = subparsers.add_parser('create', help='Start a new knowledge post based on a template.')
 create.set_defaults(action='create')
@@ -142,6 +154,7 @@ preview.set_defaults(action='preview')
 preview.add_argument('path', help="The path of the knowledge post to preview.")
 preview.add_argument('--port', default=7000, type=int, help="Specify the port on which to run the web server")
 preview.add_argument('--dburi', help='The SQLAlchemy database uri.')
+preview.add_argument('--config', default=None)
 
 # Developer and server side actions
 runserver = subparsers.add_parser('runserver', help='Run the knowledge repo app.')
@@ -178,7 +191,16 @@ args = parser.parse_args()
 
 # If init, use this code to create a new repository.
 if args.action == 'init':
-    knowledge_repo.KnowledgeRepository.for_uri(args.repo, auto_create=True)
+    if args.tooling_skip:
+        embed_tooling = False
+    else:
+        embed_tooling = {}
+        if args.tooling_repo is not None:
+            embed_tooling['repository'] = args.tooling_repo
+        if args.tooling_branch is not None:
+            embed_tooling['branch'] = args.tooling_branch
+    kr = knowledge_repo.KnowledgeRepository.create_for_uri(args.repo, embed_tooling=embed_tooling)
+    print "Knowledge repository created for uri `{}`.".format(kr.uri)
     sys.exit(0)
 
 # All subsequent actions perform an action on the repository, and so we instantiate
@@ -227,7 +249,7 @@ if args.action in ['preview', 'runserver']:
 
     if args.action == 'preview':
         kp_path = repo._kp_path(args.path)
-        repo.set_active_draft(kp_path)
+        repo.set_active_draft(kp_path)  # TODO: Deprecate
         url = 'http://127.0.0.1:{}/render?markdown={}'.format(args.port, kp_path)
         threading.Timer(1.25, lambda: webbrowser.open(url)).start()
 
@@ -255,9 +277,13 @@ import knowledge_repo
 app = knowledge_repo.KnowledgeRepository.for_uri({}).get_app(db_uri={}, debug={}, config={})
         '''.format(kr_path, uris, db_uri, str(args.debug), '"' + os.path.abspath(args.config) + '"' if args.config is not None else "None"))
 
-    cmd = "cd {}; gunicorn -w {} --timeout {} -b 0.0.0.0:{} server:app".format(tmp_dir, args.workers, args.timeout, args.port)
-    # logger.info("Starting server with command:  " + " ".join(cmd))
-    subprocess.check_output(cmd, shell=True)
+    try:
+        # Run gunicorn server
+        cmd = "cd {}; gunicorn -w {} --timeout {} -b 0.0.0.0:{} server:app".format(tmp_dir, args.workers, args.timeout, args.port)
+        # logger.info("Starting server with command:  " + " ".join(cmd))
+        subprocess.check_output(cmd, shell=True)
+    finally:
+        shutil.rmtree(tmp_dir)
 
 elif args.action == 'db_upgrade':
     app = repo.get_app(db_uri=args.dburi, debug=args.debug, config=args.config)
