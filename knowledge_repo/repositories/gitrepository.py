@@ -18,28 +18,39 @@ class GitKnowledgeRepository(KnowledgeRepository):
     @classmethod
     def create(cls, uri, embed_tooling=True):
         path = uri.replace('git://', '')
-        assert not os.path.exists(path), "Repository already exists!"
-        try:
-            repo = git.Repo.init(path, mkdir=True)
-            sm_created = False
-            if embed_tooling is True or isinstance(embed_tooling, dict):
-                if not isinstance(embed_tooling, dict):
-                    embed_tooling = {}
-                tooling_repo = embed_tooling.get('repository', __git_uri__)
-                tooling_branch = embed_tooling.get('branch', 'master')
-                sm = repo.create_submodule('knowledge_repo', '.resources', url=tooling_repo, branch=tooling_branch)
-                sm_created = True
-            shutil.copy(os.path.join(os.path.dirname(__file__), '../config_defaults.py'),
-                        os.path.join(path, '.knowledge_repo_config.py'))
-            shutil.copy(os.path.join(os.path.dirname(__file__), '../templates', 'repo_data_readme.md'),
-                        os.path.join(path, 'README.md'))
-            repo.index.add(['.knowledge_repo_config.py', 'README.md'])
-            repo.index.commit("Initial commit.")
-            if sm_created:
-                sm.update()
-        except Exception as e:
-            shutil.rmtree(path)
-            raise e
+        if os.path.exists(path):
+            response = raw_input('Repository already exists. Do you want to convert it to a knowledge data repository? Note that this will override any existing `README.md` and `.knowledge_repo_config.py` files, and replace any submodule at `.resources`. (y/n) ')
+            if response is not 'y':
+                logger.warning('Not updating existing repository. Aborting!')
+                return
+        repo = git.Repo.init(path, mkdir=True)
+        sm = None
+        if embed_tooling is True or isinstance(embed_tooling, dict):
+            if not isinstance(embed_tooling, dict):
+                embed_tooling = {}
+            tooling_repo = embed_tooling.get('repository', __git_uri__)
+            tooling_branch = embed_tooling.get('branch', 'master')
+            # Delete any existing submodule at .resources
+            try:
+                if '.resources' in repo.tree():
+                    obj = repo.tree()['.resources']
+                    if isinstance(obj, git.Submodule):
+                        sm = repo.tree()['.resources']
+                        sm._name = 'embedded_knowledge_repo'
+                        sm.remove()
+                    else:
+                        repo.git.rm(obj.path)
+            except ValueError:  # Repository has no active refs
+                pass
+            sm = repo.create_submodule(name='embedded_knowledge_repo', path='.resources', url=tooling_repo, branch=tooling_branch)
+        shutil.copy(os.path.join(os.path.dirname(__file__), '../config_defaults.py'),
+                    os.path.join(path, '.knowledge_repo_config.py'))
+        shutil.copy(os.path.join(os.path.dirname(__file__), '../templates', 'repo_data_readme.md'),
+                    os.path.join(path, 'README.md'))
+        repo.index.add(['.knowledge_repo_config.py', 'README.md'])
+        repo.index.commit("Initial creation of knowledge data repository structure.")
+        if sm is not None:
+            repo.submodule('embedded_knowledge_repo').update()
         return GitKnowledgeRepository(path)
 
     def init(self, config='git:////.knowledge_repo_config.py', auto_create=False):
@@ -102,7 +113,15 @@ class GitKnowledgeRepository(KnowledgeRepository):
         current_branch = self.git.active_branch
         self.git.branches.master.checkout()
         self.git.remote().pull(branch)
-        self.git.submodules[0].update(init=True)  # TODO: FIXME
+        try:
+            self.git.submodule('embedded_knowledge_repo').update(init=True)
+        except ValueError:  # This repository does not use embedded knowledge_repo tools or it is misnamed
+            # Check for misnamed submodule
+            tree = self.git.tree()
+            if '.resources' in tree and isinstance(tree['.resources'], git.Submodule):
+                sm = tree['.resources']
+                sm._name = 'embedded_knowledge_repo'
+                sm.update(init=True)
         current_branch.checkout()
 
     def set_active_draft(self, path):  # TODO: deprecate
