@@ -1,8 +1,6 @@
 import imghdr
 import io
 import os
-import PyPDF2
-from wand.image import Image
 
 ALLOWED_IMAGE_TYPES = ('png', 'jpeg', 'gif')
 
@@ -27,6 +25,11 @@ def pdf_page_to_png(src_pdf, pagenum=0, resolution=154):
     :param int pagenum: Page number to take.
     :param int resolution: Resolution for resulting png in DPI.
     """
+
+    # Import libraries within this function so as to avoid import-time dependence
+    import PyPDF2
+    from wand.image import Image  # TODO: When we start using this again, document which system-level libraries are required.
+
     dst_pdf = PyPDF2.PdfFileWriter()
     dst_pdf.addPage(src_pdf.getPage(pagenum))
 

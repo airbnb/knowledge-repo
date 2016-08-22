@@ -58,7 +58,7 @@ If not, or for fun, you can create a new knowledge repository using:
 
 `knowledge_repo --repo <repo_path> init`
 
-Running this same script if a repo already exists at `<repo_path>` will have no effect.
+Running this same script if a repo already exists at `<repo_path>` will allow you to update it to be a knowledge data repository. This is useful if you are starting a repository on a remote service like GitHub, as this allows you to clone the remote repository as per normal; run this script; and then push the initialization back into the remote service using `git push`.
 
 You can drop the `--repo` option if you set the `$KNOWLEDGE_REPO` environment variable to the location of that repository.
 
