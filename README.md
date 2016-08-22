@@ -1,6 +1,28 @@
 # The Knowledge Repository
 
-	Note: The Knowledge Repository is a work in progress. There are lots of code cleanups and feature extensions TBD. Your assistance and involvement is more than encouraged.
+**Note:** The Knowledge Repository is a work in progress. There are lots of code cleanups and feature extensions TBD. Your assistance and involvement is more than encouraged.
+
+## Beta Release Information
+
+### Feedback for Beta
+
+The Knowledge Repo is currently in a private beta, and we are rolling it out to more people to get feedback. In particular, we'd love to hear about the following:
+
+ - How easy is it to set up the git knowledge post repository?
+ - How easy is it to set up the web application, and make it live internally within your organization?
+ - Where are the gaps in our documentation that we should fill in to assist others in understanding the system?
+ - At a higher level, are there any blockers or barriers to setting up the Knowledge Repo in your organization?
+
+### Known Issues
+
+Here's a running list of known issues we are working on:
+
+ - The in-app webeditor needs refactoring to:
+    - Rely completely on KnowledgePost objects instead of interacting with db records
+    - Trigger "save" actions when necessary
+    - Allow for image uploading
+    - Only reveal the "Write a Post!" button if webeditor is properly configured (non-empty `WEB_EDITOR_PREFIXES` in server_config.py, dbrepo specified on webapp runtime call)
+ - The Python configuration for git knowledge repositories currently reads directly out of the `master` branch, allowing (depending on your organization's git policy) a malicious user to commit arbitrary code into the master branch, which then gets run on client and server machines during interactions with the git repository using the inbuilt knowledge repository abstractions.
 
 ## Introduction
 
@@ -9,7 +31,7 @@ The Knowledge Repository project is focussed on facilitating the sharing of know
  - Jupyter/Ipython notebooks
  - Rmd notebooks
  - Markdown files
- 
+
 Users add these notebooks/files to the knowledge repository through the `knowledge_repo` tool, as described below; which allows them to be rendered and curated in the knowledge repository's web app.
 
 If your favourite format is missing, we welcome contributions; and are happy to work with you to get it supported. See the "Contributing" section below to see how to add support for more formats.
