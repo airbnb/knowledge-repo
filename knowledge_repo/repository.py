@@ -79,6 +79,17 @@ class KnowledgeRepository(object):
         krs = {name: cls.for_uri(uri) for name, uri in uris.items()}
         return MetaKnowledgeRepository(krs)
 
+    @classmethod
+    def create_for_uri(cls, uri, **kwargs):
+        if isinstance(uri, dict):
+            return cls.for_uris(uri)
+        scheme = urlparse(uri).scheme
+        return cls._get_subclass_for(scheme).create(uri, **kwargs)
+
+    @classmethod
+    def create(cls, uri, **kwargs):
+        raise NotImplementedError
+
     def __init__(self, uri, debug=False, **kwargs):
         self.uri = uri
         self.config = KnowledgeRepositoryConfig()

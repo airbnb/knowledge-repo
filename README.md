@@ -100,11 +100,11 @@ Supported options are `--port` and `--dburi` which respectively change the local
 
 The web application can be run on top of multiple knowledge repo backends. To do this, include each repo with a name and path, prefixed by --repo. For example:
 
-`knowledge_repo --repo {git}/path/to/github/repo --repo {webposts}sqlite:////tmp/dbrepo.db:mypostreftable runserver`
+`knowledge_repo --repo {git}/path/to/git/repo --repo {webposts}sqlite:////tmp/dbrepo.db:mypostreftable runserver`
 
 If including a dbrepo, add the name of the dbrepo to the `WEB_EDITOR_PREFIXES` in the server config, and add it as config when running the app:
 
-`knowledge_repo --repo {git}/path/to/github/repo --repo {webposts}sqlite:////tmp/dbrepo.db:mypostreftable runserver --config resources/server_config.py`
+`knowledge_repo --repo {git}/path/to/git/repo --repo {webposts}sqlite:////tmp/dbrepo.db:mypostreftable runserver --config resources/server_config.py`
 
 Note that this is required for the webeditor, the "Write a Post!" section of the application.
 
@@ -116,7 +116,7 @@ Deploying is as simple as:
 `knowledge_repo --repo <repo_path> deploy`
 
 or if using multiple repos:
-`knowledge_repo --repo {git}/path/to/github/repo --repo {webposts}sqlite:////tmp/dbrepo.db:mypostreftable deploy --config resources/server_config.py`
+`knowledge_repo --repo {git}/path/to/git/repo --repo {webposts}sqlite:////tmp/dbrepo.db:mypostreftable deploy --config resources/server_config.py`
 
 Supported options are `--port`, `--dburi`,`--workers`, `--timeout` and `--config`. The `--config` option allows you to specify a python config file from which to load the extended configuration. A template config file is provided in `resources/server_config.py`. The `--port` and `--dburi` options are as before, with the `--workers` and `--timeout` options specifying the number of threads to use when serving through gunicorn, and the timeout after which the threads are presumed to have died, and will be restarted.
 
