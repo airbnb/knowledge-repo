@@ -64,13 +64,24 @@ You can drop the `--repo` option if you set the `$KNOWLEDGE_REPO` environment va
 
 For more details about the structure of a knowledge repository, see the technical details section below.
 
-### Adding knowledge
+### TLDR Guide For Contributing
+
+If you have already set up your system as described below, here is a snapshot of the commands you need to run to upload your knowledge post stored in ~/Documents/my_post.ipynb. It assumes you have configured the KNOWLEDGE_REPO environment variable to point to your local copy of the knowledge repository.
+
+1. knowledge_repo create ipynb ~/Documents/my_post.ipynb
+2. knowledge_repo add ~/Documents/my_post.ipynb [-p projects/test_project] [--update]
+3. knowledge_repo preview projects/test_project
+4. knowledge_repo submit projects/test_project
+5. [If applicable] Open a PR in GitHub or other git web UI
+6. After it has been reviewed, merge it in to master.
+
+More Details:
 
 The whole point of a knowledge repository is to host knowledge posts. You can add a knowledge post using:
 
 `knowledge_repo --repo <repo_path> add <supported knowledge format> [-p <location in knowledge repo>]`
 
-Specifying the target location is not necessary if 'path' is in the knowledge post's headers. For example, if my knowledge repository is in a folder named `test_repo`, and I have an IPython notebook at `Documents/notebook.ipynb`, and I want it to be added to the knowledge repository under `projects/test_knowledge`, I can run:
+For example, if my knowledge repository is in a folder named `test_repo`, and I have an IPython notebook at `Documents/notebook.ipynb`, and I want it to be added to the knowledge repository under `projects/test_knowledge`, I can run:
 
 `knowledge_repo --repo test_repo add Documents/notebook.ipynb -p projects/test_knowledge`
 
