@@ -121,11 +121,6 @@
                     multiple
                     data-tags='true'>
               <option value='{{username}}'> {{username}} </option>
-              {% for user in users_typeahead %}
-                {% if user != username %}
-                  <option value='{{user}}'> {{user}} </option>
-                {% endif %}
-              {% endfor %}
             </select>
             <br>
 
@@ -150,9 +145,6 @@
                     multiple
                     data-tags="true"
                     value="{{ tags if tags else ''}}">
-                    {% for tag in tags_typeahead %}
-                      <option value='{{tag}}'> {{tag}} </option>
-                    {% endfor %}
             </select>
             <br><br>
 
@@ -302,11 +294,6 @@ $('#post_reviewers').keydown(function(event) {
   }
 });
 
-
-$("#fold_metadata").on("click", function(){
-  $(this).toggleClass("glyphicon-chevron-down glyphicon-arrow-right")
-  $("#metadata_fields").toggle("fold")
-})
 var substringMatcher = function(pageMeta) {
   return function findMatches(q, cb) {
     var matches, substringRegex;
@@ -329,10 +316,9 @@ var substringMatcher = function(pageMeta) {
   };
 };
 
-var typeahead_post_info = {{ projects_typeahead|tojson|safe }};
-
-var project = '{{ project if project else ''}}';
-$('#post_project').typeahead({
+$.get('/ajax_projects_typeahead', function(typeahead_projects_info) {
+    typeahead_projects_info = JSON.parse(typeahead_projects_info);
+    $('#post_project').typeahead({
       hint: false,
       highlight: true,
       minLength: 1,
@@ -343,52 +329,37 @@ $('#post_project').typeahead({
       display: function (item) {
         return item;
       },
-      templates: {
-        empty: Handlebars.compile(
-          '<div class="tt-not-found">' +
-            'Unable to find any projects that match the current query' +
-            '</div>'
-        ),
-      },
-      source: substringMatcher(typeahead_post_info)
+      source: substringMatcher(typeahead_projects_info)
     }
-);
-
-var tags_default_text =  "Tags are in the form: #tag_type/tag_name. Start typing to see suggestions!"
-var tags = '{{ tags if tags else '' }}'
-var tags_in_list = tags.split(",")
-var all_tags = {{ tags_typeahead|tojson|safe }}
-$.each(tags_in_list, function(i,v){
-  tags_in_list[i] = v.trim()
+  );
 });
 
+$.get('/ajax_tags_typeahead', function(typeahead_tags_info) {
+  var all_tags =  JSON.parse(typeahead_tags_info)
+  $.each(all_tags, function(i, tag){
+     var option_tag = new Option;
+     option_tag.value = tag;
+     option_tag.text = tag;
+     $("#post_tags")[0].appendChild(option_tag);
+  });
 
-var authors_default_text =  "Users contributing to the post."
-var authors = '{{ author if author else '' }}'
-var authors_in_list = authors.split(",")
-var all_users = {{ users_typeahead|tojson|safe }}
-$.each(authors_in_list, function(i,v){
-  authors_in_list[i] = v.trim()
-});
+  var tags_default_text =  "Tags are in the form: #tag_type/tag_name. Start typing to see suggestions!"
+  var tags = '{{ tags if tags else '' }}'
+  var tags_in_list = tags.split(",")
 
-$('#post_tags').select2({
-  placeholder: tags_default_text
-});
+  $.each(tags_in_list, function(i,v){
+    tags_in_list[i] = v.trim()
+  });
 
-$("#post_tags").select2()
-               .val(tags_in_list)
-               .trigger("change")
+  $('#post_tags').select2({
+    placeholder: tags_default_text
+  });
 
+  $("#post_tags").select2()
+                 .val(tags_in_list)
+                 .trigger("change")
 
-$('#post_author').select2({
-  placeholder: authors_default_text
-});
-
-$("#post_author").select2()
-               .val(authors_in_list)
-               .trigger("change")
-
-$("#post_tags").on("select2:select", function (e) {
+  $("#post_tags").on("select2:select", function (e) {
   // hack becaue refreshRenderedMarkdown doesn't work
   var content = $('#rendered-markdown').html()
   var content_split = content.split("<strong>Tags</strong>:")
@@ -398,19 +369,46 @@ $("#post_tags").on("select2:select", function (e) {
   var new_tags = $("#post_tags").select2().val()
   var new_tags_string = new_tags.join(", ")
   $("#rendered-markdown").html(header + "<strong>Tags</strong>:"  + new_tags + "<br>" + footer);
-});
+  });
 
-$("#post_tags").on("select2:selecting", function(e){
+  $("#post_tags").on("select2:selecting", function(e){
     var new_tag = (e.params.args.data['text'].trim())
     if (all_tags.indexOf(new_tag) === -1){
-      var new_tag_group = new_tag.split("/")[0]
+        var new_tag_group = new_tag.split("/")[0]
       var new_tag_type = new_tag.split("/")[1]
       alert("You're creating a new tag, are you sure you want to?");
       return true;
     }
     return true;
-})
+  })
+});
 
+$.get('/ajax_users_typeahead', function(typeahead_users_info){
+  var all_users = JSON.parse(typeahead_users_info);
+  var username = "{{ username }}";
+  $.each(all_users, function(i, user){
+    if (user != username){
+      var option_tag = new Option;
+      option_tag.value = user;
+      option_tag.text = user;
+      $("#post_author")[0].appendChild(option_tag);
+    }
+  })
+  var authors_default_text =  "Users contributing to the post."
+  var authors = '{{ author if author else '' }}'
+  var authors_in_list = authors.split(",")
+  $.each(authors_in_list, function(i,v){
+    authors_in_list[i] = v.trim()
+  });
+
+  $('#post_author').select2({
+    placeholder: authors_default_text
+  });
+
+  $("#post_author").select2()
+                   .val(authors_in_list)
+                   .trigger("change")
+})
 
 $("#markdown-only").on("click", function(){
   var md_text = $("#post_text_div")[0];
@@ -585,14 +583,6 @@ $(save_button).on("click", function(){
     alert("One of the fields was left empty! Your post was not saved, please try again")
     error = true;
   } else {
-    // check to make sure the user didn't create another project
-    if (typeahead_post_info.indexOf(project) == -1){
-      error_message = "Please do not create another project, use an existing one.\n" +
-                      "Your post was not saved, please try again. "
-      alert(error_message)
-      error = true;
-    }
-
     // check the tags of the post
     $.each(tags, function(i, tag){
       tag = tag.trim()
