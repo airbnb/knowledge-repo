@@ -7,8 +7,7 @@ This includes:
   - /favorites
 """
 import os
-from flask import request, render_template, redirect, Blueprint, current_app
-from sqlalchemy import and_, or_
+from flask import request, render_template, redirect, Blueprint, current_app, make_response
 
 from ..app import db_session
 from ..utils.posts import get_posts
@@ -27,7 +26,7 @@ def has_no_empty_params(rule):
 
 
 @blueprint.route("/site-map")
-@PageView.log_pageview
+@PageView.logged
 def site_map():
     links = []
     for rule in current_app.url_map.iter_rules():
@@ -41,13 +40,13 @@ def site_map():
 
 
 @blueprint.route('/')
-@PageView.log_pageview
+@PageView.logged
 def render_index():
     return redirect('/feed')
 
 
 @blueprint.route('/favorites')
-@PageView.log_pageview
+@PageView.logged
 def render_favorites():
     """ Renders the index-feed view for posts that are liked """
 
@@ -63,11 +62,6 @@ def render_favorites():
                               'distinct_views': post.view_user_count,
                               'total_likes': post.vote_count,
                               'total_comments': post.comment_count} for post in posts}
-    # Post.authors is lazy loaded, so we need to make sure it has been loaded before being
-    # passed beyond the scope of this database db_session.
-    for post in posts:
-        post.authors
-    db_session.close()
 
     return render_template("index-feed.html",
                            feed_params=feed_params,
@@ -78,7 +72,7 @@ def render_favorites():
 
 
 @blueprint.route('/feed')
-@PageView.log_pageview
+@PageView.logged
 def render_feed():
     """ Renders the index-feed view """
     feed_params = from_request_get_feed_params(request)
@@ -95,7 +89,7 @@ def render_feed():
 
 
 @blueprint.route('/table')
-@PageView.log_pageview
+@PageView.logged
 def render_table():
     """Renders the index-table view"""
     feed_params = from_request_get_feed_params(request)
@@ -110,7 +104,7 @@ def render_table():
 
 
 @blueprint.route('/cluster')
-@PageView.log_pageview
+@PageView.logged
 def render_cluster():
     """ Render the cluster view """
     # we don't use the from_request_get_feed_params because some of the
@@ -136,7 +130,7 @@ def render_cluster():
             author_posts = [post for post in author.posts if post.is_published]
             if author_posts:
                 author_to_posts[author.format_name] = author_posts
-        tuples = [(k, v) for (k, v) in author_to_posts.iteritems()]
+        tuples = [(k, v) for (k, v) in author_to_posts.items()]
 
     elif group_by == "tags":
         tags_to_posts = {}
@@ -146,7 +140,7 @@ def render_cluster():
             tag_posts = [post for post in tag.posts if post.is_published]
             if tag_posts:
                 tags_to_posts[tag.name] = tag.posts
-        tuples = [(k, v) for (k, v) in tags_to_posts.iteritems()]
+        tuples = [(k, v) for (k, v) in tags_to_posts.items()]
 
     elif group_by == "folder":
         posts = post_query.all()
@@ -160,7 +154,7 @@ def render_cluster():
             else:
                 folder_to_posts[folder] = [post]
 
-        tuples = [(k, v) for (k, v) in folder_to_posts.iteritems()]
+        tuples = [(k, v) for (k, v) in folder_to_posts.items()]
 
     else:
         raise ValueError("Group by `{}` not understood.".format(group_by))
@@ -171,8 +165,6 @@ def render_cluster():
         grouped_data = sorted(
             tuples, key=lambda x: len(x[1]), reverse=sort_desc)
 
-    db_session.close()
-
     return render_template("index-cluster.html",
                            grouped_data=grouped_data,
                            filters=filters,
@@ -180,3 +172,19 @@ def render_cluster():
                            group_by=group_by,
                            tag=request_tag,
                            contribs=current_app.config['plugins'])
+
+
+@blueprint.route('/create')
+@blueprint.route('/create/<knowledge_format>')
+@PageView.logged
+def create(knowledge_format=None):
+    """ Renders the create knowledge view """
+    if knowledge_format is None:
+        return render_template("create-knowledge.html")
+
+    cur_dir = os.path.dirname(os.path.realpath(__file__))
+    knowledge_template = "knowledge_template.{}".format(knowledge_format)
+    filename = os.path.join(cur_dir, '../../templates', knowledge_template)
+    response = make_response(open(filename).read())
+    response.headers["Content-Disposition"] = "attachment; filename=" + knowledge_template
+    return response

@@ -1,26 +1,11 @@
 {% extends "index-base.html" %}
 
-{% macro pagination() %}
-<div class='row'>
-  <div class='col-sm-6 col-md-offset-5'>
-    <div class='btn-group' role='group'>
-      <button class="btn btn-default prev_btn">
-        <span><i class="glyphicon glyphicon-chevron-left"></i> prev</span>
-      </button>
-      <button class="btn btn-default next_btn">
-        <span>next <i class="glyphicon glyphicon-chevron-right"></i></span>
-      </button>
-    </div>
-  </div>
-</div>
-{% endmacro %}
-
 {% block header %} {{ top_header }} {% endblock %}
 
 
 {% block inner_content %}
   <br>
-  <div class='panel'>
+  <div class='panel' style='margin-left: -15px; margin-right: -15px'>
     <div class="panel-header"> {{ full_tag }} </div>
     <div class="panel-body">
       {{ tag_description }} <br>
@@ -29,21 +14,21 @@
     <div class="panel-footer" style='text-align:left'>
       {% set tag_flat = full_tag.replace("/", "__") %}
       {% if full_tag in feed_params['subscriptions'] %}
-        <button class="btn btn-primary" id="tag-subscription-top__{{ tag_flat }}" style='font-color:white'>
+        <button class="btn btn-primary btn-unsubscribe" id="tag-subscription-top__{{ tag_flat }}" style='font-color:white'>
           <i class='glyphicon glyphicon-remove-sign glyphicon-white'></i>Unsubscribe
         </button>
       {% else %}
-        <button class="btn btn-default" id="tag-subscription-top__{{ tag_flat }}" style='font-color:white'>
+        <button class="btn btn-default btn-subscribe" id="tag-subscription-top__{{ tag_flat }}" style='font-color:white'>
           <i class='glyphicon glyphicon-ok-sign glyphicon-filled'></i>Subscribe
         </button>
       {% endif %}
     </div>
   </div>
 
+  <div class="row row-space-4"></div>
 
-
-  <div class="panel-header">
-    All Posts with tag: {{ full_tag }} 
+  <div class="panel-header" style='margin-left: -15px; margin-right: -15px'>
+    All Posts with tag: {{ full_tag }}
   </div>
 
   {% for post in posts %}
@@ -57,59 +42,53 @@
           </a>
         </div>
         <div class='feed-post-counts'>
-          <i class="glyphicon glyphicon-eye-open" id="tooltip-pageviews-{{ idx_item }}"></i> {{ stats['all_views'] }}&nbsp
-          <i class="glyphicon glyphicon-heart-empty" id="tooltip-likes-{{ idx_item }}"></i> {{ stats['total_likes']}}&nbsp
-          <i class="glyphicon glyphicon-comment" id="tooltip-comments-{{ idx_item }}"></i> {{ stats['total_comments']}}
+          <i class="glyphicon glyphicon-eye-open"> </i> {{ stats['all_views'] }}&nbsp
+          <i class="glyphicon glyphicon-heart-empty"></i> {{ stats['total_likes']}}&nbsp
+          <i class="glyphicon glyphicon-comment"></i> {{ stats['total_comments']}}
         </div>
       </div>
       <div class='panel-body'>
-        {% set colWidth=12 %}
-        {% if post['thumbnail'] != null %}
-          {% set colWidth=6 %}
-        {% endif %}
-        <div class="col-md-{{ colWidth }}">
-          <ul class="post-list" style='list-style-type: none;'>
-            <li class="feed-author">Author(s) : {{ format_authors(post.authors) }}</li>
-            <li class="feed-date">Date: {{ post['updated_at'].date().isoformat() }}</li>
+        <div class="col-md-6">
+          <ul class="post-list" style='list-style-type: none; padding-left: 0px'>
+            <li class="feed-author"> {{ format_authors(post.authors) |safe }}</li>
+            <li class="feed-date"> Updated: {{ post['updated_at'].date().isoformat() }}</li>
             <li class="feed-tags">
-              Tags:
               {% for tag_obj in post.tags %}
                 {% set tag = tag_obj.name %}
                 {% set tag_flat = tag.replace("/", "__") %}
                 <a  href="/tag_pages?tag={{ tag|urlencode }}"
                     data-tag-name="{{ tag_flat }}"
-                    data-container="body" 
-                    data-toggle="popover" 
-                    data-placement="bottom" 
+                    data-container="body"
+                    data-toggle="popover"
+                    data-placement="bottom"
                     data-html="true"
                     {% if tag in feed_params['subscriptions'] %}
-                      class="label label-primary pop"
+                      class="label label-tag label-subscribed pop"
                       data-content="<div class='content'>
-                       <button class='btn btn-small btn-primary' 
-                             title='' 
-                             id='tag-subscription-{{idx_item}}__{{tag_flat}}'>
+                       <button class='btn btn-small btn-primary btn-unsubscribe'
+                               title=''
+                               id='tag-subscription-{{idx_item}}__{{tag_flat}}'>
                          <i class='glyphicon glyphicon-remove-sign glyphicon-white'></i>Unsubscribe
                      </button></div>"
                     {% else %}
-                      class="label label-default pop"
+                      class="label label-tag label-unsubscribed pop"
                       data-content="<div class='content'>
-                       <button class='btn btn-small btn-default' 
-                             title='' 
+                       <button class='btn btn-small btn-default btn-subscribe'
+                             title=''
                              id='tag-subscription-{{idx_item}}__{{tag_flat}}'>
                          <i class='glyphicon glyphicon-ok-sign glyphicon-filled'></i>Subscribe
                        </button></div>"
-                    {% endif %} 
+                    {% endif %}
                     class="text">
                   {{ "#" + tag}}
                 </a>
-                {% if not loop.last %}
-                  ,
-                {% endif %}
               {% endfor %}
             </li>
           </ul>
           <p class="feed-tldr">
             <i>{{ post['tldr']|safe }}</i>
+            <br>
+            <br>
             <a href="{{'/render?markdown=' + post.path|urlencode }}">Read post</a>
           </p>
         </div>
@@ -119,8 +98,6 @@
       </div>
     </div>
   {% endfor %}
-
-  {{ pagination() }}
 
 {% endblock %}
 

@@ -1,38 +1,46 @@
-#!/usr/bin/env python
 import os
-from flask import current_app, request
+import sys
+import traceback
+from future.utils import raise_with_traceback
+from flask import current_app, request, g
 from flask_sqlalchemy import SQLAlchemy
 import functools
+from collections import defaultdict
 
 from werkzeug.local import LocalProxy
 from sqlalchemy import func, distinct, and_, select
-import base64
-import mimetypes
 import logging
 
+from knowledge_repo._version import __version__
 from knowledge_repo.repository import KnowledgeRepository
-from .constants import WebPostStatus, GitPostStatus, TagConstants
-from .proxies import current_repo
+from .proxies import current_repo, db_session
 from .utils.models import unique_constructor
-from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.orderinglist import ordering_list
+from sqlalchemy.ext.associationproxy import association_proxy
 
 logger = logging.getLogger(__name__)
 
 db = SQLAlchemy()
 db_session = LocalProxy(lambda: current_app.db.session)
 
-PostAuthors = db.Table(
-    'knowledge_post_author',
-    db.Model.metadata,
-    db.Column('post_id', db.Integer, db.ForeignKey('posts.id')),
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
-)
 
-PostTags = db.Table(
-    'knowledge_post_tags',
+class PostAuthorAssoc(db.Model):
+    __tablename__ = 'assoc_post_author'
+
+    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, primary_key=True)
+    order = db.Column(db.Integer)
+
+    post = db.relationship('Post', lazy='joined')
+    author = db.relationship('User', lazy='joined')
+
+
+assoc_post_tag = db.Table(
+    'assoc_post_tag',
     db.Model.metadata,
     db.Column('post_id', db.Integer, db.ForeignKey('posts.id')),
-    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id')),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'))
 )
 
 
@@ -57,102 +65,67 @@ class PageView(db.Model):
     user_id = db.Column(db.Integer)
     object_id = db.Column(db.Integer)
     object_type = db.Column(db.String(100))
+    object_action = db.Column(db.String(100))
     ip_address = db.Column(db.String(64))
     created_at = db.Column(db.DateTime, default=func.now())
     error_message = db.Column(db.Text())
+    version = db.Column(db.String(100))
 
-    @classmethod
-    def log_pageview(cls, f):
-        """Decorator to log user actions"""
-        @functools.wraps(f)
-        def wrapped(*args, **kwargs):
-            dct = request.args.to_dict()
-            dct.update(kwargs)
+    class logged(object):
 
-            username = current_app.config.get(
-                'AUTH_USERNAME_DEFAULT') or 'knowledge_default'
-            if current_app.config.get('AUTH_USERNAME_REQUEST_HEADER'):
-                username = request.headers.get(current_app.config.get(
-                    'AUTH_USERNAME_REQUEST_HEADER'), username)
+        def __init__(self, route, object_extractor=None):
+            self._route = route
+            self._object_extractor = object_extractor
 
-            user = User.query.filter(User.username == username).first()
-            if not user:
-                user = User(username=username)
-                db.session.add(user)
-                db.session.commit()
+        def __getattr__(self, attr):
+            return getattr(self._route, attr)
 
-            user_id = user.id
+        def __call__(self, *args, **kwargs):
+            if not current_app.config.get('REPOSITORY_INDEXING_ENABLED', True):
+                return self._route(*args, **kwargs)
 
-            ip_address = request.remote_addr
-
-            page = request.full_path
-            endpoint = request.endpoint
-            blueprint = request.blueprint
-
-            object_id, object_type = None, None
-
-            if 'markdown' in request.args:
-                # we're looking at a post
-                object_type = 'post'
-                post_path = request.args.get('markdown', '')
-                object_id = Post.query.filter(Post.path == post_path).first().id
-
-            if blueprint == 'comments':
-                object_type = 'comment'
-                comment_id = request.args.get('comment_id', '')
-                object_id = comment_id if comment_id else None
-
-            if blueprint == 'tag':
-                object_type = 'tag'
-                tag_name = None
-                if endpoint in ['tag.delete_tag_post', 'tag.toggle_tag_subscription']:
-                    tag_name = request.args.get('tag_name', '')
-
-                if endpoint == 'tag.tag_pages':
-                    tag_name = request.args.get('tag', '')
-
-                if endpoint == 'tag.edit_tag_description':
-                    data = request.get_json()
-                    tag_name = data['tagName']
-
-                if endpoint == 'tag.rename_tag':
-                    data = request.get_json()
-                    old_tag = data['oldTag']
-                    tag_name = old_tag.replace('__', '/')
-
-                if tag_name:
-                    tag_obj = (Tag.query
-                                  .filter(Tag.name == tag_name)
-                                  .first())
-                    object_id = tag_obj.id
-
-                if endpoint == 'tag.remove_posts_tags':
-                    data = request.get_json()
-                    tag_id = data['tagId']
-                    object_id = int(tag_id)
-
-                if endpoint == 'tag.tag_list':
-                    object_type = 'post'
-                    post_path = request.args.get('post_id', '')
-                    object_id = Post.query.filter(Post.path == post_path).first().id
-
-            if blueprint == 'vote':
-                object_type = 'post'
-                post_path = request.args.get('post_id', '')
-                object_id = Post.query.filter(Post.path == post_path).first().id
-
-            log = cls(
-                page=page,
-                endpoint=endpoint,
-                user_id=user_id,
-                object_id=object_id,
-                object_type=object_type,
-                ip_address=ip_address
+            log = PageView(
+                page=request.full_path,
+                endpoint=request.endpoint,
+                user_id=g.user.id,
+                ip_address=request.remote_addr,
+                version=__version__
             )
-            db.session.add(log)
-            db.session.commit()
-            return f(*args, **kwargs)
-        return wrapped
+            log.object_id, log.object_type, log.object_action, reextract_after_request = self.extract_objects(*args, **kwargs)
+            db_session.add(log)
+
+            try:
+                return self._route(*args, **kwargs)
+            except Exception as e:
+                tb = traceback.extract_tb(sys.exc_info()[2])
+                log.error_message = type(e).__name__ + ': ' + str(e) + '\nTraceback (most recent call last):\n' + '\n'.join(traceback.format_list(tb[1:]))
+                raise_with_traceback(e)
+            finally:
+                # Extract object id and type after response generated (if requested) to ensure
+                # most recent data is collected
+                if reextract_after_request:
+                    log.object_id, log.object_type, log.object_action, _ = self.extract_objects(*args, **kwargs)
+
+                db_session.rollback()
+                db_session.add(log)
+                db_session.commit()
+
+        def object_extractor(self, extractor):
+            self._object_extractor = extractor
+            return self
+
+        def extract_objects(self, *args, **kwargs):
+            if self._object_extractor is None:
+                return None, None, None, False
+            try:
+                object_info = self._object_extractor(*args, **kwargs)
+            except Exception as e:
+                logger.warning("Error using object extractor: " + str(e))
+                object_info = {'id': (-1), 'type': None}
+            assert isinstance(object_info, dict), "Object extractors must return a dictionary."
+            assert len(set(['id', 'type']).difference(object_info.keys())) == 0 and len(set(object_info.keys()).difference(['id', 'type', 'action', 'may_change'])) == 0, "Object extractors must at least include the keys 'id' and 'type', and optionally 'action' and 'may_change'. Was provided with: {}".format(str(list(object_info.keys())))
+            object_info = defaultdict(lambda: None, object_info)
+            return object_info['id'], object_info['type'], object_info['action'], object_info['may_change'] or False
 
 
 class Vote(db.Model):
@@ -177,11 +150,12 @@ class User(db.Model):
     username = db.Column(db.String(500))
     created_at = db.Column(db.DateTime, default=func.now())
 
-    # posts field created by backreferences
+    _posts_assoc = db.relationship("PostAuthorAssoc")
+    posts = association_proxy('_posts_assoc', 'post')  # This property should not directly modified
 
     @property
     def format_name(self):
-        username_to_name = current_app.config['repo'].config.username_to_name
+        username_to_name = current_repo.config.username_to_name
         return username_to_name(self.username)
 
     @property
@@ -259,7 +233,7 @@ class Post(db.Model):
     __tablename__ = 'posts'
 
     id = db.Column(db.Integer, primary_key=True)
-    # uuid = db.Column(db.String, unique=True)
+    uuid = db.Column(db.String(100), unique=True)
     path = db.Column(db.String(512), unique=True)
     project = db.Column(db.String(512), nullable=True)  # DEPRECATED
     repository = db.Column(db.String(512))
@@ -273,7 +247,12 @@ class Post(db.Model):
     created_at = db.Column(db.DateTime, default=func.now())
     updated_at = db.Column(db.DateTime, default=func.now())
 
-    _authors = db.relationship("User", secondary=PostAuthors, backref='posts')
+    _authors_assoc = db.relationship("PostAuthorAssoc",
+                                     order_by='PostAuthorAssoc.order',
+                                     collection_class=ordering_list('order'),
+                                     cascade="all, delete-orphan")
+    _authors = association_proxy('_authors_assoc', 'author',
+                                 creator=lambda author: PostAuthorAssoc(author=author),)
 
     @property
     def authors(self):
@@ -303,7 +282,7 @@ class Post(db.Model):
     def authors_string(self):
         raise NotImplementedError
 
-    _tags = db.relationship("Tag", secondary=PostTags, backref='posts',
+    _tags = db.relationship("Tag", secondary=assoc_post_tag, backref='posts',
                             lazy='subquery')
 
     @hybrid_property
@@ -332,7 +311,7 @@ class Post(db.Model):
 
     @hybrid_property
     def status(self):
-        return current_repo.PostStatus.for_value(self._status or 0)
+        return current_repo.PostStatus(self._status or 0)
 
     @status.expression
     def status(self):
@@ -343,7 +322,7 @@ class Post(db.Model):
         if status is None:
             self._status = None
         else:
-            assert isinstance(status, KnowledgeRepository.PostStatus.Status), "Status must be an instance of KnowledgeRepository.PostStatus.Status or None"
+            assert isinstance(status, KnowledgeRepository.PostStatus), "Status must be an instance of KnowledgeRepository.PostStatus.Status or None"
             self._status = status.value
 
     @hybrid_property
@@ -356,7 +335,8 @@ class Post(db.Model):
 
     _views = db.relationship("PageView", lazy='dynamic',
                              primaryjoin="and_(foreign(PageView.object_id)==Post.id, "
-                                         "PageView.object_type=='post')")
+                                         "PageView.object_type=='post',"
+                                         "PageView.object_action=='view')")
 
     @hybrid_property
     def views(self):
@@ -483,6 +463,3 @@ class Email(db.Model):
     sent_at = db.Column(db.DateTime, default=func.now())
     subject = db.Column(db.Text)
     text = db.Column(db.Text)
-
-
-from .utils.requests import from_request_get_user_info  # noqa

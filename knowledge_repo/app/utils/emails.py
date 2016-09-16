@@ -8,6 +8,7 @@ from flask import render_template, current_app
 from flask_mail import Message
 
 from ..app import db_session
+from ..proxies import current_repo
 from ..models import Email, Subscription, User, Post
 from ..utils.render import render_post
 
@@ -18,7 +19,7 @@ TAGS_EXCLUDED_FROM_SUBSCRIPTION_EMAILS = ['other/private', 'private']
 
 
 def usernames_to_emails(usernames):
-    username_to_email = current_app.config['repo'].config.username_to_email
+    username_to_email = current_repo.config.username_to_email
     return [username_to_email(username) for username in usernames]
 
 
@@ -149,7 +150,7 @@ def send_internal_error_email(subject_line, **kwargs):
         logger.warning(
             'Mail subsystem is not configured. Silently dropping email.')
         return
-    recipients = usernames_to_emails(current_app.config['repo'].config.editors)
+    recipients = usernames_to_emails(current_repo.config.editors)
     msg = Message(subject_line, recipients)
     msg.body = render_template(
         "email_templates/internal_error_email.txt", **kwargs)
@@ -160,10 +161,6 @@ def send_reviewer_request_email(post_id, reviewer):
     if 'mail' not in current_app.config:
         logger.warning('Mail subsystem is not configured. Silently dropping email.')
         return
-    webpost = (db_session.query(Post)
-               .filter(Post.id == post_id)
-               .first())
-    post_title = webpost.title
     subject = "Someone requested a web post review from you!"
     msg = Message(subject, [reviewer])
     msg.body = render_template("email_templates/reviewer_request_email.txt",

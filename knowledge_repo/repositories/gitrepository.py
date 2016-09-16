@@ -1,13 +1,19 @@
+from __future__ import print_function
+from builtins import input
+
 import os
 import shutil
 import logging
 import re
 import git
 import socket
+from io import open
 
 from knowledge_repo._version import __git_uri__
 from ..repository import KnowledgeRepository
 from ..utils.exec_code import get_module_for_source
+from ..utils.types import str_types
+from ..utils.encoding import encode
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +25,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
     def create(cls, uri, embed_tooling=True):
         path = uri.replace('git://', '')
         if os.path.exists(path):
-            response = raw_input('Repository already exists. Do you want to convert it to a knowledge data repository? Note that this will override any existing `README.md` and `.knowledge_repo_config.py` files, and replace any submodule at `.resources`. (y/n) ')
+            response = input('Repository already exists. Do you want to convert it to a knowledge data repository? Note that this will override any existing `README.md` and `.knowledge_repo_config.py` files, and replace any submodule at `.resources`. (y/n) ')
             if response is not 'y':
                 logger.warning('Not updating existing repository. Aborting!')
                 return
@@ -217,7 +223,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
                 print("{}. {}".format(i, branch))
             response = None
             while not isinstance(response, int):
-                response = raw_input('Please select the branch you would like to use: ')
+                response = input('Please select the branch you would like to use: ')
                 try:
                     response = int(response)
                 except:
@@ -233,7 +239,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         if branch is None:
             return self.git.active_branch
 
-        if not isinstance(branch, (str, unicode)):
+        if not isinstance(branch, str_types):
             raise ValueError("'{}' of type `{}` is not a valid branch descriptor.".format(branch, type(branch)))
 
         try:
@@ -250,8 +256,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         if soft and self.git.active_branch.name not in [self.config.published_branch, branch] and not self.git.active_branch.name.endswith('.kp'):
             response = None
             while response not in ['y', 'n']:
-                response = raw_input(
-                    'It looks like you have checked out the `{}` branch, whereas we were expecting to use `{}`. Do you want to use your current branch instead? (y/n) '.format(self.git.active_branch.name, branch))
+                response = input('It looks like you have checked out the `{}` branch, whereas we were expecting to use `{}`. Do you want to use your current branch instead? (y/n) '.format(self.git.active_branch.name, branch))
                 if response == 'y':
                     branch = self.git.active_branch.name
 
@@ -322,7 +327,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         # Commit the knowledge post and rollback if it fails
         try:
             if message is None:
-                message = raw_input("Please enter a commit message for this post: ")
+                message = input("Please enter a commit message for this post: ")
             self.git.index.commit(message)
         except (KeyboardInterrupt, Exception) as e:
             if message is None:
@@ -378,7 +383,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         if not hasattr(self, '_dir_cache'):
             self._dir_cache = {path: None for path in self.dir()}
         if path in self._dir_cache:
-            return self.PostStatus().PUBLISHED
+            return self.PostStatus.PUBLISHED
         if branch is None:
             branch = self.git_branch_for_post(path, interactive=False)
         else:
@@ -425,7 +430,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         ref_dir = os.path.dirname(ref_path)
         if not os.path.exists(ref_dir):
             os.makedirs(ref_dir)
-        with open(ref_path, 'w') as f:
+        with open(ref_path, 'wb') as f:
             return f.write(data)
 
     def _kp_dir(self, path, parent=None, revision=None):  # TODO: Account for revision
@@ -442,10 +447,10 @@ class GitKnowledgeRepository(KnowledgeRepository):
         raise NotImplementedError
 
     def _kp_new_revision(self, path):
-        self._kp_write_ref(path, "REVISION", str(self._kp_get_revision(path) + 1))
+        self._kp_write_ref(path, "REVISION", encode(self._kp_get_revision(path) + 1))
 
     def _kp_read_ref(self, path, reference, revision=None):
-        with open(os.path.join(self.path, path, reference)) as f:
+        with open(os.path.join(self.path, path, reference), 'rb') as f:
             return f.read()
 
     # ------------- Utility methods --------------------------------------

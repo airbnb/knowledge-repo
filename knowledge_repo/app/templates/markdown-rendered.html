@@ -89,6 +89,9 @@
 
 <script>
 $(document).on('ready', function(){
+  // Make the Rendered Markdown Button active
+  $(".btn-rendered").addClass("btn-active");
+
   // Initialize headers
   helpersJx.linkifyHeaders();
 
@@ -150,18 +153,18 @@ $.each(tags_list, function(i,tag){
   ahref.setAttribute("data-html", "true")
   ahref.setAttribute("data-tag-name", f_tag)
   if (subscriptions_list.indexOf(tag) >= 0) {
-    ahref.setAttribute("class", "label label-primary pop")
+    ahref.setAttribute("class", "label label-subscribed pop")
     ahref.setAttribute("data-content", "<div class='content'>" +
-                  " <button class='btn btn-small btn-primary'" +
+                  " <button class='btn btn-small btn-primary btn-unsubscribe'" +
                         " title='' " +
                           " id='" + tag_subscription_button_id_name + "'> " +
                     " <i class='glyphicon glyphicon-remove-sign glyphicon-white'></i>Unsubscribe " +
                   " </button> " +
                   " </div>")
   } else {
-    ahref.setAttribute("class", "label label-default pop")
+    ahref.setAttribute("class", "label label-unsubscribed pop")
     ahref.setAttribute("data-content", "<div class='content'>" +
-                  " <button class='btn btn-small btn-default'" +
+                  " <button class='btn btn-small btn-default btn-subscribe'" +
                         " title='' " +
                           " id='" + tag_subscription_button_id_name + "'> " +
                     " <i class='glyphicon glyphicon-ok-sign glyphicon-filled'></i>Subscribe " +
@@ -257,7 +260,7 @@ $('#tooltip-edit_tags').click(function(){
         dataType: "json",
         data: JSON.stringify(postContent),
         contentType: "application/json",
-        url: '/tag_list?post_id={{ post_id|urlencode }}',
+        url: '/tag_list?post_path={{ post_path|urlencode }}',
         async: false
       });
       location.reload()

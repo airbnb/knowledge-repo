@@ -5,7 +5,7 @@ import unittest
 
 from knowledge_repo import KnowledgeRepository
 from knowledge_repo.app.proxies import db_session
-from knowledge_repo.app.models import Tag, User, Subscription, Post, PostTags
+from knowledge_repo.app.models import Tag, User, Subscription, Post, assoc_post_tag
 
 
 class TagsTest(unittest.TestCase):
@@ -123,17 +123,16 @@ class TagsTest(unittest.TestCase):
         the new tag is added, and
         the tag_string for related posts has changed
         """
-        old_tag_string = TagsTest.tag_name.replace('/', "__")
         new_tag_string = TagsTest.tag_name + '_renamed'
 
         with self.app.app_context():
             # get all the posts with the old_tag_string
-            post_tags = (db_session.query(PostTags)
-                         .filter(PostTags.c.tag_id == TagsTest.tag_id)
+            post_tags = (db_session.query(assoc_post_tag)
+                         .filter(assoc_post_tag.c.tag_id == TagsTest.tag_id)
                          .all())
             post_ids = [x[0] for x in post_tags]
 
-            data = {'oldTag': old_tag_string,
+            data = {'oldTagId': TagsTest.tag_id,
                     'newTag': new_tag_string}
 
             rv = self.client.post('/rename_tag',
@@ -155,9 +154,9 @@ class TagsTest(unittest.TestCase):
             new_id = new_tag_obj[0].id
 
             for post_id in post_ids:
-                post_tag = (db_session.query(PostTags)
-                            .filter(PostTags.c.post_id == post_id)
-                            .filter(PostTags.c.tag_id == new_id)
+                post_tag = (db_session.query(assoc_post_tag)
+                            .filter(assoc_post_tag.c.post_id == post_id)
+                            .filter(assoc_post_tag.c.tag_id == new_id)
                             .all())
                 assert post_tag
 
@@ -169,14 +168,11 @@ class TagsTest(unittest.TestCase):
         """
         with self.app.app_context():
             tag_id = Tag(name=TagsTest.tag_name + '_renamed').id
-            post_tags = (db_session.query(PostTags)
-                         .filter(PostTags.c.tag_id == tag_id)
+            post_tags = (db_session.query(assoc_post_tag)
+                         .filter(assoc_post_tag.c.tag_id == tag_id)
                          .all())
             post_ids = [x[0] for x in post_tags]
-
-            tag_url = ''.join(
-                ['tag_name=', TagsTest.tag_name, '_renamed'])
-            delete_tag_url = '/delete_tag_post?{tag_url}'.format(**locals())
+            delete_tag_url = '/delete_tag_post?tag_id={tag_id}'.format(**locals())
             rv = self.client.get(delete_tag_url)
 
             assert rv.status == "200 OK"
@@ -188,9 +184,9 @@ class TagsTest(unittest.TestCase):
             assert not tag
 
             for post_id in post_ids:
-                post_tag = (db_session.query(PostTags)
-                            .filter(PostTags.c.tag_id == tag_id)
-                            .filter(PostTags.c.post_id == post_id)
+                post_tag = (db_session.query(assoc_post_tag)
+                            .filter(assoc_post_tag.c.tag_id == tag_id)
+                            .filter(assoc_post_tag.c.post_id == post_id)
                             .all())
                 assert not post_tag
 

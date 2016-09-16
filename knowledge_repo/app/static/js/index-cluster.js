@@ -30,17 +30,13 @@ var indexClusterJx = (function(){
   }
 
   function formatButtons(clusterSelected, clusterButtons, sortSelected, sortButtons) {
-    $(clusterSelected).toggleClass("btn-default btn-primary");
-    $(sortSelected).toggleClass("btn-default btn-primary");
+    $(clusterSelected)[0].setAttribute("checked", "checked");
+    $(sortSelected)[0].setAttribute("checked", "checked");
 
     $.each(clusterButtons, function(i, button) {
       $("#" + button).click(function() {
-         $.each(clusterButtons, function(i, buttonId) {
-            $("#" + buttonId).removeClass();
-            $("#" + buttonId).addClass("btn btn-default");
-         });
         clusterSelected = '#' + (this).id;
-        $(clusterSelected).toggleClass("btn-default btn-primary");
+        $(clusterSelected)[0].setAttribute("checked", "checked");
         if (sortSelected !== '') {
             refreshPage(clusterSelected, sortSelected);
         }
@@ -49,12 +45,8 @@ var indexClusterJx = (function(){
 
     $.each(sortButtons, function(i, button) {
       $("#" + button).click(function() {
-         $.each(sortButtons, function(i, buttonId){
-            $("#" + buttonId).removeClass();
-            $("#" + buttonId).addClass("btn btn-default");
-         });
           sortSelected = '#' + (this).id;
-          $(sortSelected).toggleClass("btn-default btn-primary");
+          $(sortSelected)[0].setAttribute("checked", "checked")
           if (clusterSelected !== '') {
               refreshPage(clusterSelected, sortSelected);
           }

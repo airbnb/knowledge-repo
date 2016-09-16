@@ -5,8 +5,6 @@ from sqlalchemy import and_
 from knowledge_repo import KnowledgeRepository
 from knowledge_repo.app.models import Post, Subscription, Email, User
 from knowledge_repo.app.utils.emails import send_internal_error_email, send_subscription_emails, send_comment_email, send_review_email
-from knowledge_repo.app.utils.requests import check_user_exists
-from knowledge_repo.app.utils.requests import get_user_id
 from knowledge_repo.app.proxies import db_session
 
 
@@ -16,13 +14,13 @@ class EmailTest(unittest.TestCase):
     def setUpClass(self):
         self.repo = KnowledgeRepository.for_uri('tests/test_repo', auto_create=True)
         self.app = self.repo.get_app(config='tests/config_server.py')
-        self.app.config['repo'].config.editors = ['knowledge_editors']
+        self.app.repository.config.editors = ['knowledge_editors']
         self.client = self.app.test_client()
 
         self.knowledge_username = 'email_test_user'
         # this creates a user
         with self.app.app_context():
-            check_user_exists(self.knowledge_username)
+            User(username=self.knowledge_username)
 
             web_post = Post(title='test_webpost')
             git_post = (db_session.query(Post)
@@ -91,9 +89,8 @@ class EmailTest(unittest.TestCase):
 
                     # make sure that internal emails are sent to the editors
                     # TODO does this make sense for open source?
-                    username_to_email = self.app.config[
-                        'repo'].config.username_to_email
-                    knowledge_editors = self.app.config['repo'].config.editors
+                    username_to_email = self.app.repository.config.username_to_email
+                    knowledge_editors = self.app.repository.config.editors
                     editor_emails = [username_to_email(
                         editor) for editor in knowledge_editors]
                     assert sorted(outbox[0].recipients) == sorted(editor_emails)
@@ -111,10 +108,10 @@ class EmailTest(unittest.TestCase):
                         .filter(Post.id == self.git_post_id)
                         .first())
 
-            user_id = get_user_id(self.knowledge_username)
-            user = (db_session.query(User)
-                    .filter(User.id == user_id)
-                    .first())
+            user = User(username=self.knowledge_username)
+            if user.id is None:
+                db_session.commit()
+            user_id = user.id
 
             # grab the first tag from the post
             tag_id = git_post.tags[0].id
@@ -148,7 +145,7 @@ class EmailTest(unittest.TestCase):
                 outbox[0].bcc) == 1, 'One subscription email should be actually sent to one user'
             assert "A knowledge post was just posted under tag" in outbox[0].body, 'Email should be the subscription email'
 
-            username_to_email = self.app.config['repo'].config.username_to_email
+            username_to_email = self.app.repository.config.username_to_email
             assert outbox[0].bcc[0] == username_to_email(self.knowledge_username)
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 import unittest
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from knowledge_repo import KnowledgeRepository
 from knowledge_repo.app.app import db_session
@@ -25,7 +25,7 @@ class FeedTest(unittest.TestCase):
         rv = self.app.get("/feed", headers=self.headers)
         assert (rv.status == "200 OK")
         data = rv.data.decode('utf-8')
-        soup = BeautifulSoup(data)
+        soup = BeautifulSoup(data, 'html.parser')
         all_posts = soup.findAll('div', {'class': 'row row-space-4 panel feed-post'})
         self.data = all_posts
 
@@ -117,7 +117,7 @@ class FeedTest(unittest.TestCase):
         assert rv.status == '200 OK'
 
         data = rv.data.decode('utf-8')
-        soup = BeautifulSoup(data)
+        soup = BeautifulSoup(data, 'html.parser')
         all_posts = soup.findAll('div', {'class': 'row row-space-4 panel feed-post'})
         assert not all_posts
 
@@ -131,7 +131,7 @@ class FeedTest(unittest.TestCase):
         assert rv.status == '200 OK'
 
         data = rv.data.decode('utf-8')
-        soup = BeautifulSoup(data)
+        soup = BeautifulSoup(data, 'html.parser')
         all_posts = soup.findAll('div', {'class': 'row row-space-4 panel feed-post'})
         assert len(all_posts) == 3, "Expected 3 posts, found {}".format(len(all_posts))
 

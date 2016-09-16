@@ -82,4 +82,4 @@ USER_GROUP_TO_PROJECT = {}  # TODO: Deprecate?
 # a limited set of parent directories by setting
 # WEB_EDITOR_PREFIXES to a list of supported path prefixes.
 # e.g. ['webposts', 'projects']
-WEB_EDITOR_PREFIXES = None
+WEB_EDITOR_PREFIXES = ['webposts']

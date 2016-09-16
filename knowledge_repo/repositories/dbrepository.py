@@ -1,9 +1,9 @@
+from builtins import object
 
 import logging
-from collections import OrderedDict
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session, mapper, clear_mappers
+from sqlalchemy.orm import sessionmaker, scoped_session, mapper
 from sqlalchemy.sql import func
 
 from sqlalchemy import Table, Column, Integer, String, DateTime, BLOB, MetaData
@@ -143,7 +143,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
                                  .filter(self.PostRef.path == path)
                                  .filter(self.PostRef.revision == revision)
                                  .distinct()).all()
-        return self.PostStatus.for_value(min([pr.status if pr.status else 0 for pr in post_refs]))  # return the most 'open' status
+        return self.PostStatus(min([pr.status if pr.status else 0 for pr in post_refs]))  # return the most 'open' status
 
     # ----------- Knowledge Post Data Retrieval/Pushing Methods --------------------
 

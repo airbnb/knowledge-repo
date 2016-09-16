@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import logging
 from .proxies import db_session, current_repo
 from .models import Post

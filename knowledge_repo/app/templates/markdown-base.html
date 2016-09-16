@@ -8,19 +8,23 @@
     <div class="container">
       <div class="row">
         <div class="col-md-6">
-          <i class="glyphicon glyphicon-book" style="font-size:16pt" id="tooltip-view" data-toggle="tooltip" data-placement="top" title="Knowledge Post"></i>
-          <i class="glyphicon glyphicon-list-alt" style="font-size:16pt" id="tooltip-raw" data-toggle="tooltip" data-placement="top" title="View Raw Markdown"></i>
-          <i class="glyphicon glyphicon-picture" style="font-size:16pt" id="tooltip-presentation" data-toggle="tooltip" data-placement="top" title="View Presentation"></i>
-          {% if not webeditor_buttons %}
-            <i class="glyphicon glyphicon-upload" style="font-size:16pt" id="tooltip-ghe" data-toggle="tooltip" data-placement="top" title="View on Github"></i>
-            <i class="glyphicon glyphicon-external-link" style="font-size:16pt" id="tooltip-edgit" data-toggle="tooltip" data-placement="top" title="Edit on Github"></i>
-          {% endif %}
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-default btn-rendered">
+              View Post
+            </button>
+            <button type="button" class="btn btn-default btn-raw">
+              View Raw Markdown
+            </button>
+          </div>
         </div>
         <div class="col-md-2">
         </div>
         <div class="col-md-4">
           {% if page_views >= 0 %}
-            <i class="glyphicon glyphicon-eye-open"></i> Viewed {{ page_views }} times by {{ unique_views }} different users
+            <i class="glyphicon glyphicon-eye-open" id="pageview_stats" style='color: #9CA299'></i>
+            <div id="pageview_stats" style="display: inline-block">
+              Viewed {{ page_views }} times by {{ unique_views }} different users
+            </div>
           {% endif %}
           {% if likes %}
             <i class="glyphicon glyphicon-heart glyphicon-clickable pop" style="font-size:16pt" id="tooltip-unlike" data-placement="bottom"
@@ -40,6 +44,21 @@
           {% endif %}
         </div>
       </div>
+      <div class="row row-space-4"></div>
+      <div class="row col-md-12">
+        {% if not webeditor_buttons and data_repo_git_root %}
+          <a href='{{ data_repo_git_root}}/blob/master/{{post_path|urlencode}}'
+             target="_blank"
+             style='padding-right:10px;'>
+            View on Github
+            <i class='glyphicon glyphicon-new-window'></i>
+          </a>
+          <a href='{{ data_repo_git_root}}/edit/master/{{post_path|urlencode}}' target="_blank">
+            Edit on Github
+            <i class='glyphicon glyphicon-new-window'></i>
+          </a>
+        {% endif %}
+      </div>
     </div>
     <br>
 {% endblock %}
@@ -54,16 +73,22 @@ $("document").ready(function(){
   {% if webeditor_buttons %}
   var is_webeditor = true;
   {% endif %}
-  var post_path = "{{ post_id|urlencode }}";
   var post_id = "{{ post_id|urlencode }}";
   var id = "{{ table_id }}";
+  var post_path = "{{ post_path }}"
   var data_repo_github_root = "{{ data_repo_git_root }}"
-  tooltipsJx.initializeTooltips(is_webeditor, post_path, id, data_repo_github_root);
+  tooltipsJx.initializeTooltips(is_webeditor, post_id, id, data_repo_github_root);
 
+  $(".btn-rendered").on("click", function(){
+    document.location.href = "/render?markdown=" + encodeURI(post_path);
+  })
+
+  $(".btn-raw").on("click", function(){
+    document.location.href = "/raw?markdown=" + encodeURI(post_path);
+  })
 });
 
 </script>
 
 
 {% endblock %}
-

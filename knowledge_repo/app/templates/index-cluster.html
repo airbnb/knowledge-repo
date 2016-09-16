@@ -5,38 +5,56 @@
 <text style="font-size:32px">Knowledge Clusters {% endblock %}</text>
 
 {% block inner_content %}
-
   <br><br>
-  <div class="row">
-    <div class="col-md-12">
-      <div class="col-md-2">
-        <h5 style="text-align:center;"> Group posts by:</h5>
+  <div class="row cluster-header">
+    <div class="col-md-12" style='background-color:white'>
+      <div class="col-md-2 group-by-header">
+        <h5> Group posts by:</h5>
       </div>
-      <span class="col-md-4">
-        <button class="btn btn-default" id="clusterFolder"> Folder </button>
-        <button class="btn btn-default" id="clusterTags"> Tags </button>
-        <button class="btn btn-default" id="clusterAuthor"> Author </button>
+      <span class="col-md-3 group-by-options">
+        <div class="radio-inline radio-cluster">
+          <label>
+            <input type="radio" name="cluster-radio" id="clusterFolder">Folder
+          </label>
+        </div>
+        <div class="radio-inline radio-cluster">
+          <label>
+            <input type="radio" name="cluster-radio" id="clusterTags">Tags
+          </label>
+        </div>
+        <div class="radio-inline radio-cluster">
+          <label>
+            <input type="radio" name="cluster-radio" id="clusterAuthor">Author
+          </label>
+        </div>
       </span>
-      <div class="col-md-2">
-        <h5 style="text-align:center;"> Sort by:</h5>
+      <div class="col-md-2 sort-by-header">
+        <h5> Sort by:</h5>
       </div>
-      <span class="col-md-3">
-        <button class="btn btn-default" id="sortAlpha"> Alphabetically </button>
-        <button class="btn btn-default" id="sortCount"> Count </button>
+      <span class="col-md-3 sort-by-options">
+        <div class="radio-inline radio-cluster">
+          <label>
+            <input type="radio" name="sort-radio" id="sortAlpha"> Alphabetically
+          </label>
+        </div>
+        <div class="radio-inline radio-cluster">
+          <label>
+            <input type="radio" name="sort-radio" id="sortCount">Count
+          </label>
+        </div>
       </span>
     <div style="clear:both"></div>
     </div>
   </div>
-
-  <br><br>
-
   <ul id="cluster_list">
   {% for cluster, contents in grouped_data %}
     {%- if contents|length > 0 and cluster|length > 0 %}
     {% set cluster_id = cluster|replace('/', '__')|replace(' ', '__')|replace('-', '__') %}
     <li>
     <div id="{{ cluster_id|safe }}">
-      <h6 style="margin-bottom:0"> {{ [cluster,' (', contents|length, ')'] | join }} <i class="glyphicon glyphicon-chevron-right"></i></h6>
+      <h6 style="margin-bottom:0"> {{ [cluster,' (', contents|length, ')'] | join }}
+        <i class="glyphicon glyphicon-chevron-right cluster-dropdown"></i>
+      </h6>
     </div>
     </li>
       <div id="{{ cluster_id|safe }}-content" style="display:none">
@@ -61,6 +79,11 @@
 <script src="{{ url_for('static', filename='js/index-cluster.js') }}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
+    var cluster_button = $(".btn-cluster")[0];
+    $(cluster_button).addClass("btn-active");
+    var glyphicon = $(".glyphicon-post-org.glyphicon-th-list")[0] ;
+    $(glyphicon).addClass("glyphicon-active");
+
     var tag = "{{ tag |default('', true)}}";
     var clusterSelected = '#cluster{{ group_by|title }}';
     var sortSelected = '#sort{{ sort_by|title }}';
@@ -70,6 +93,8 @@ $(document).ready(function() {
     indexClusterJx.clickTag(tag);
     clusterSelected = indexClusterJx.getClusterSelected(clusterSelected);
     sortSelected = indexClusterJx.getSortSelected(sortSelected);
+    $(clusterSelected)[0].setAttribute("checked", "checked")
+    $(sortSelected)[0].setAttribute("checked", "checked")
     indexClusterJx.formatButtons(clusterSelected, clusterButtons, sortSelected, sortButtons);
 
     function search(){

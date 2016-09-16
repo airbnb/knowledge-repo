@@ -5,9 +5,16 @@
 {% block content %}
 {{ super() }}
 <div>
-  <h1> {{ post_id }} </h1>
+  <h1> {{ post_path }} </h1>
   <div style="white-space: pre-wrap;">
   {{ raw_post | safe }}
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+$(".btn-raw").addClass("btn-active")
+</script>
 {% endblock %}

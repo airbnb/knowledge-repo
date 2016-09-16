@@ -1,8 +1,9 @@
+from builtins import object
 from .utils.registry import SubclassRegisteringABCMeta
+from future.utils import with_metaclass
 
 
-class KnowledgePostProcessor(object):
-    __metaclass__ = SubclassRegisteringABCMeta
+class KnowledgePostProcessor(with_metaclass(SubclassRegisteringABCMeta, object)):
     _registry_keys = []
 
     @classmethod

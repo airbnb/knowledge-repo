@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 import datetime
 
 from knowledge_repo import KnowledgeRepository, KnowledgePost
@@ -61,7 +61,7 @@ class WebEditorPostTest(unittest.TestCase):
             assert rv.status == '200 OK'
 
             data = rv.data.decode('utf-8')
-            soup = BeautifulSoup(data)
+            soup = BeautifulSoup(data, 'html.parser')
 
             table_rows = soup.findAll("tr")
 
@@ -70,8 +70,8 @@ class WebEditorPostTest(unittest.TestCase):
 
             rv = self.client.get('/webposts', headers={'user_header': 'webeditor_test_user'})
 
-            data = rv.data.decode('utf-8')
-            soup = BeautifulSoup(data)
+            data = rv.data.decode('utf-8', 'html.parser')
+            soup = BeautifulSoup(data, 'html.parser')
             table_rows = soup.findAll("tr")
 
             assert len(table_rows) - 1 == 1
@@ -87,7 +87,7 @@ class WebEditorPostTest(unittest.TestCase):
         rv = self.client.get('/posteditor?post_id={}'.format(self.post_id))
         assert rv.status == "200 OK"
         data = rv.data.decode('utf-8')
-        soup = BeautifulSoup(data)
+        soup = BeautifulSoup(data, 'html.parser')
 
         with self.app.app_context():
 
@@ -101,10 +101,10 @@ class WebEditorPostTest(unittest.TestCase):
             # assert project['value'] == post.project
 
             created_at = soup.findAll("input", {"id": "post_created_at"})[0]
-            assert created_at['value'] == headers['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+            assert created_at['value'] == headers['created_at'].strftime('%Y-%m-%d')
 
             updated_at = soup.findAll("input", {"id": "post_updated_at"})[0]
-            assert updated_at['value'] == headers['updated_at'].strftime('%Y-%m-%d %H:%M:%S')
+            assert updated_at['value'] == headers['updated_at'].strftime('%Y-%m-%d')
 
             # TODO this now is populated by a "select"
             # author = soup.findAll("input", {"id": "post_author"})[0]
@@ -176,13 +176,13 @@ class WebEditorPostTest(unittest.TestCase):
         assert rv.status == "200 OK"
 
         data = rv.data.decode("utf-8")
-        soup = BeautifulSoup(data)
+        soup = BeautifulSoup(data, 'html.parser')
 
         comments_textarea = soup.findAll("textarea", {"id": "comment-text"})
         assert comments_textarea
 
         btn_in_review = soup.findAll("button", {"id": "btn_in_review"})
-        assert btn_in_review and btn_in_review[0].text == "In Review Phase"
+        assert btn_in_review and btn_in_review[0].text.strip() == "In Review Phase"
 
         with self.app.app_context():
             post = (db_session.query(Post)
@@ -230,11 +230,11 @@ class WebEditorPostTest(unittest.TestCase):
             assert rv.status == "200 OK"
 
             data = rv.data.decode("utf-8")
-            soup = BeautifulSoup(data)
+            soup = BeautifulSoup(data, 'html.parser')
 
             # go to the posteditor form to check the button
             btn_publish = soup.findAll("button", {"id": "btn_publish"})
-            assert btn_publish and btn_publish[0].text == "Unpublish"
+            assert btn_publish and btn_publish[0].text.strip() == "Unpublish"
 
             rv = self.client.post('/unpublish_post?post_id={}'.format(self.post_id))
             assert rv.status == "200 OK"
@@ -250,11 +250,11 @@ class WebEditorPostTest(unittest.TestCase):
             assert rv.status == "200 OK"
 
             data = rv.data.decode("utf-8")
-            soup = BeautifulSoup(data)
+            soup = BeautifulSoup(data, 'html.parser')
 
             # go to the posteditor form to check the button
             btn_publish = soup.findAll("button", {"id": "btn_publish"})
-            assert btn_publish and btn_publish[0].text == "Publish"
+            assert btn_publish and btn_publish[0].text.strip() == "Publish"
 
     def test07_test_delete_button(self):
         """Test webpost deletion."""

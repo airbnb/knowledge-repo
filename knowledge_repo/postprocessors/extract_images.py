@@ -3,7 +3,6 @@ import re
 import logging
 
 from ..postprocessor import KnowledgePostProcessor
-from __builtin__ import classmethod
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +56,7 @@ class ExtractImages(KnowledgePostProcessor):
     def skip_image(cls, kp, image):
         if re.match('http[s]?://', image['src']):
             return True
-        if image['src'].startswith('images/') and kp.has_file(image['src']):
+        if image['src'].startswith('images/') and image['src'] in kp.image_paths:
             return True
         return False
 

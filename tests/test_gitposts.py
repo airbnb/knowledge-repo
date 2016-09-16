@@ -1,6 +1,6 @@
 import unittest
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 from sqlalchemy import and_
 
 from knowledge_repo import KnowledgeRepository
@@ -8,7 +8,8 @@ from knowledge_repo.app.proxies import db_session
 from knowledge_repo.app.models import Post
 
 
-class GitPostTest(unittest.TestCase):
+class PostTest(unittest.TestCase):
+
     def setUp(self):
         self.repo = KnowledgeRepository.for_uri('tests/test_repo', auto_create=True)
         self.app = self.repo.get_app(config='tests/config_server.py')
@@ -19,53 +20,49 @@ class GitPostTest(unittest.TestCase):
             post = (db_session.query(Post)
                               .filter(Post.is_published)
                               .first())
-
-            GitPostTest.post_path = post.path
+            self.post_id = post.id
+            self.post_rendered_url = '/render?markdown={}'.format(post.path)
 
     def test01_check_render_route(self):
         """
-        Check gitpost path will render in /render?markdown=
+        Check post path will render in /render?markdown=
         """
-        render_url = '/render?markdown='
-        rv = self.client.get(render_url + GitPostTest.post_path)
+        rv = self.client.get(self.post_rendered_url)
         assert rv.status == "200 OK"
 
-    @unittest.skip("Post stats formatting changed. Test needs to be updated.")
     def test02_check_post_stats(self):
         """
-        Make sure pageview, distinct viewers correct for gitpost
+        Make sure pageview, distinct viewers correct for post
         """
-        render_url = '/render?markdown='
-        rv = self.client.get(render_url + GitPostTest.post_path)
+        rv = self.client.get(self.post_rendered_url)
 
         data = rv.data.decode('utf-8')
-        soup = BeautifulSoup(data)
+        soup = BeautifulSoup(data, 'html.parser')
 
         # we'll check the post_stats of the post by computing them
         # and ensuring that the upper-right-hand text is correct
-
         icon = soup.findAll("div", {"id": "pageview_stats"})
-        pageviews_str = icon[0].text
+        pageviews_str = icon[0].text.strip()
 
-        post = (db_session.query(Post)
-                          .filter(Post.path == GitPostTest.post_path)
-                          .first())
-        pageviews = post.get_pageviews
-        distinct_viewers = post.get_distinct_views
+        with self.app.app_context():
+            post = (db_session.query(Post)
+                              .filter(Post.id == self.post_id)
+                              .first())
+            distinct_viewers = post.view_user_count
+            pageviews = post.view_count
 
-        db_pageviews_str = "Viewed {pageviews} times by {distinct_viewers} different users.".format(**locals())
+        db_pageviews_str = "Viewed {pageviews} times by {distinct_viewers} different users".format(**locals())
 
-        assert db_pageviews_str == pageviews_str
+        assert db_pageviews_str == pageviews_str, "'{}' is not '{}'!".format(db_pageviews_str, pageviews_str)
 
     def test03_check_post_metadata(self):
         """
-        Check gitpost metadata
+        Check post metadata
         """
-        render_url = '/render?markdown='
-        rv = self.client.get(render_url + GitPostTest.post_path)
+        rv = self.client.get(self.post_rendered_url)
 
         data = rv.data.decode('utf-8')
-        soup = BeautifulSoup(data)
+        soup = BeautifulSoup(data, 'html.parser')
         metadata = soup.findAll("p", {"id": "metadata"})
 
         assert metadata

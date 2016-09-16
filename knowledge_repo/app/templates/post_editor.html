@@ -6,22 +6,8 @@
     {{ super() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/highlight/default.css')}}">
     <style>
-
-    .slider-track {
-      cursor: auto !important;
-    }
-
-    .tooltip {
-      position:absolute;
-      background-color:inherit;
-      border-radius:0px;
-      opacity:inherit;
-      box-shadow: none;
-      font-size:12px;
-    }
-
     .twitter-typeahead {
-      width:94% !important;
+      display: inherit !important;
     }
 
     .tt-input, .tt-menu {
@@ -36,29 +22,30 @@
       z-index:10000;
     }
 
-    .select2-container {
-      width:94% !important;
-    }
     .select2-selection {
-      border:1px solid #dce0e0 !important;
-      border-radius:0px !important;
-
+      border: 1px solid #ccc !important;
+      border-radius: 4px !important;
     }
     </style>
     <div class="panel-webpost container">
       <div class="col-md-12"  id="#header-panel">
-        <h3> Knowledge Post &nbsp &nbsp
+        <h3> New Knowledge Post &nbsp &nbsp
 
-        <div class="btn-group">
-          <button class="btn btn-large btn-default" id="btn_save">Save as Draft</button>
-          <button class="btn btn-large {{'btn-primary' if status == 1 else 'btn-default'}}" id="btn_in_review" data-toggle="modal" data-target="#webpost-send-for-review-modal">
-            {% if status == 1 %}
+        <div class="btn-group pull-right" style='margin-right: 15px'>
+          <button class="btn btn-large btn-default btn-webeditor" id="btn_save">
+            Save as Draft
+          </button>
+          <button
+            class="btn btn-large {{'btn-primary' if (status == 1 or status == 2) else 'btn-default'}} btn-webeditor" id="btn_in_review"
+            data-toggle="modal"
+            data-target="#webpost-send-for-review-modal">
+            {% if status == 1 or status == 2 %}
             In Review Phase
             {% else %}
             Submit for Review
             {% endif %}
           </button>
-          <button class="btn btn-large {{'btn-primary' if status >= 2 else 'btn-default'}}" id="btn_publish">
+          <button class="btn btn-large btn-webeditor {{'btn-primary' if status == 3 else 'btn-default'}}" id="btn_publish">
             {% if status == 3 %}
             Unpublish
             {% else %}
@@ -105,7 +92,9 @@
                         style="width:75%; display:inline-block">
                 </form>
                 <p>
-                <button class="btn btn-primary" data-behavior='modal-close' id='submission_close'>
+                <button class="btn btn-primary btn-email-reviewers"
+                        data-behavior='modal-close'
+                        id='submission_close'>
                   Email Reviewers!
                 </button>
                 </p>
@@ -113,127 +102,137 @@
               </div>
           </div>
         </div>
-      <div class="col-12" style="padding-left:col-6px">
-        <h4>Post Headers
-        <i class="glyphicon glyphicon-chevron-down" id="fold_metadata"></i>
-        </h4>
-      </div>
-      <div id="metadata_fields">
-        <div class="row row-condensed">
-          <form style="padding-left:12px">
-            <text class="text-left" for="form-vert-text">
-              Title:
-            </text>
-            <input id="post_title" type="text" placeholder="Title of the post"
-                  style="width:96%; display:inline-block" value='{{title if title else ''}}'>
-          </form>
-        </div>
-        <div class="row row-condensed">
-          <form style="padding-left:12px">
-            <text class="text-left" for="form-vert-text">
-              Project:
-            </text>
-            <input id="post_project" class="typeahead" type="text" placeholder="Project of the post"
-                    value='{{project if project else ''}}'>
-            </input>
-          </form>
-        </div>
-        <div class="row row-condensed">
-          <form style="padding-left:12px">
-            <text class="text-left" for="form-vert-text">
-              Created At:
-            </text>
-            <input id="post_created_at" type="text" placeholder="When was this post created?"
-                   style="width:91%; display:inline-block" value='{{ created_at if created_at else ''}}'>
-            </input>
-          </form>
-        </div>
-        <div class="row row-condensed">
-          <form style="padding-left:12px">
-            <text class="text-left" for="form-vert-text">
-              Updated At:
-            </text>
-            <input id="post_updated_at" type="text" placeholder="What was this post last edited?"
-                  style="width:91%; display:inline-block" value='{{ updated_at if updated_at else ''}}'>
-            </input>
-          </form>
-        </div>
-        <div class="row row-condensed">
-          <form style="padding-left:12px">
-            <text class="text-left" for="form-vert-text">
-              Author:
-            </text>
-            <select class="js-example-tags"
-                    id="post_author"
+      <div class="row row-space-2"></div>
+
+      <div class="row col-md-12" id="metadata_fields">
+        <form>
+          <div class="form-group webeditor-form">
+            <label for="post_title"> Title </label>
+            <input id="post_title"
+                   class="form-control"
+                   type="text"
+                   value="{{ title if title else '' }}"></input>
+            <br>
+
+            <label for="post_author"> Author </label>
+            <select id="post_author"
+                    class="js-example-tags form-control"
+                    type="text"
                     multiple
                     data-tags='true'>
-                <option value='{{username}}'> {{username}} </option>
+              <option value='{{username}}'> {{username}} </option>
               {% for user in users_typeahead %}
                 {% if user != username %}
                   <option value='{{user}}'> {{user}} </option>
                 {% endif %}
               {% endfor %}
             </select>
-          </form>
-        </div>
-        <div class="row row-condensed">
-          <form style="padding-left:15px">
-            <text class="text-left" for="form-vert-text">
-              Image for the feed:
-            </text>
-            <input id="post_image_feed" type="text" placeholder="Link to the image"
-                   style="width:87%; display:inline-block", value='{{feed_image if feed_image else ''}}'>
-            </input>
-          </form>
-        </div>
-        <div class="row row-condensed"  style="padding-bottom:10px">
-          <text class="text-left" style="padding-left:12px">
-            Tags:
-          </text>
-          <select class="js-example-tags"
-                    id="post_tags"
+            <br>
+
+            <label for="post_project"> Project </label>
+            <input id="post_project"
+                   class="form-control typeahead"
+                   type="text"
+                   value="{{ project if project else '' }}"></input>
+            <br>
+
+            <label for="post_image_feed"> Feed Image</label>
+            <input id="post_image_feed"
+                   class="form-control"
+                   type="text"
+                   value="{{ feed_image if feed_image else ''}}"></input>
+            <br>
+
+            <label for="post_tags"> Tags </label>
+            <select id="post_tags"
+                    class="js-example-tags form-control"
+                    type="text"
                     multiple
-                    data-tags='true'>
-              {% for tag in tags_typeahead %}
-                <option value='{{tag}}'> {{tag}} </option>
-              {% endfor %}
+                    data-tags="true"
+                    value="{{ tags if tags else ''}}">
+                    {% for tag in tags_typeahead %}
+                      <option value='{{tag}}'> {{tag}} </option>
+                    {% endfor %}
             </select>
-        </div>
-        <div class="row row-space-2">
-          <div class="row row-condensed col-12">
-            <textarea class="input input-resize-both"
-                      id = "post_tldr"
-                      type="text"
-                      placeholder="TL;DR goes here"
-                      style="margin-left:12px; height:10%; width:100%"
-                      >{{ tldr if tldr}}</textarea>
+            <br><br>
+
+            <label for="post_tldr"> TLDR </label>
+            <textarea id="post_tldr"
+                      class="form-control"
+                      type="text">{{tldr if tldr else ''}}</textarea>
+            <br>
+            <label for="post_created_at"> Created At: </label>
+            <input id="post_created_at"
+                   class="form-control"
+                   type="text"
+                   value="{{ created_at if created_at else '' }}"></input>
+            <br>
+
+            <label for="post_updated_at"> Updated At: </label>
+            <input id="post_updated_at"
+                   class="form-control"
+                   type="text"
+                   value="{{ updated_at if updated_at else ''}}"></input>
+            <br>
           </div>
-        </div>
-        <div class="row row-condensed" style="padding-left:17px">
-          <a href="https://daringfireball.net/projects/markdown/basics">
-            How to write Markdown <i class="glyphicon glyphicon-arrow-right"></i>
-          </a>
-        </div>
-      </div>
-      <div class="row row-space-4 col-12">
-        <div class="col-12">
-          <input id="markdown-slider" style="width:100%"></input>
-        </div>
-        <br>
+        </form>
       </div>
 
-      <div class="row col-12">
-        <div class="col-md-6" style="padding-left:0px" id="post_text_div">
-          <textarea class="input input-resize-both"
+      <hr class="row col-md-12" style="border-top:1px solid #9ca299; margin-left: 15px; width: 93%">
+      <div class="row col-md-12">
+        <div class="col-md-1 group-by-header">
+          <h5> View:</h5>
+        </div>
+        <div class="col-md-5">
+          <span class="group-by-options">
+          <div class="radio-inline radio-cluster">
+            <label>
+              <input type="radio" name="cluster-radio" id="markdown-only">Text Editor Only
+            </label>
+          </div>
+          <div class="radio-inline radio-cluster">
+            <label>
+              <input type="radio" name="cluster-radio" id="split-view" checked='checked'> Split View
+            </label>
+          </div>
+          <div class="radio-inline radio-cluster">
+            <label>
+              <input type="radio" name="cluster-radio" id="rendered-only">Rendered Only
+            </label>
+          </div>
+        </span>
+      </div>
+    </div>
+    <div class="row row-space-3"></div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <a class="col-md-3"
+           target="_blank"
+           href="https://daringfireball.net/projects/markdown/basics"
+           style="padding-right: 13px">
+           How to write Markdown
+           <i class="glyphicon glyphicon-new-window"></i>
+         </a>
+      </div>
+    </div>
+    <div class="row row-space-2"></div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="col-md-6" id="post_text_div">
+          <textarea class="input input-resize-both form-control"
                     id="post_text"
                     type="text"
-                    placeholder="Start writing markdown here" style="height:100%; width:102%"
-                    >{{markdown if markdown}}</textarea>
+                    placeholder="Start writing markdown here"
+                    style="height:100%; width:100%">{{markdown if markdown}}
+          </textarea>
         </div>
         <div class="col-md-6" id="rendered-markdown">
         </div>
       </div>
-      <div class="row row-space-4"></div>
+    </div>
+    <div class="row row-space-4"></div>
+
       {% if status == 1 %}
       <div class="row row-space-12">
         <div class="col-md-12">
@@ -251,7 +250,6 @@
             </div>
           </div>
         </div>
-      </div>
 
       <br>
 
@@ -284,9 +282,6 @@
 
 {% block scripts %}
 {{ super() }}
-<script src="{{ url_for('static', filename='js/select2.min.js')}}"></script>
-<script src="{{ url_for('static', filename='js/highlight.pack.js')}}"></script>
-<script src="{{ url_for('static', filename='js/marked.js')}}"></script>
 <script>
 var all_form_fields = ['#post_title', '#post_project',
                        '#post_created_at', '#post_updated_at',
@@ -416,55 +411,36 @@ $("#post_tags").on("select2:selecting", function(e){
     return true;
 })
 
-var border_fix = $(".select2-selection.select2-selection--multiple")[0]
-border_fix.style['border-radius'] = 0
-border_fix.style['border-color'] = "#dce0e0"
 
-var slider = $("#markdown-slider").slider({
-  min: 0,
-  max: 2,
-  step: 1,
-  tooltip: 'always',
-  tooltip_position: 'bottom',
-  value: 1,
-  formatter: function(value){
-    if (value === 0){
-      return "Rendered Only"
-    } else if (value === 1) {
-      return "Markdown/Rendered"
-    } else {
-      return "Markdown Only"
-    }
-  },
+$("#markdown-only").on("click", function(){
+  var md_text = $("#post_text_div")[0];
+  var rendered_text = $("#rendered-markdown")[0];
+  md_text.className = "col-md-12"
+  md_text.style.visibility = "visible"
+  rendered_text.style.visibility = "hidden";
+  rendered_text.style.display = "none";
 })
 
-$("#markdown-slider").slider().on("change", function(val_obj){
-   var old_val = val_obj.value.oldValue;
-   var new_val = val_obj.value.newValue;
-   var md_text = $("#post_text_div")[0];
-   var rendered_text = $("#rendered-markdown")[0];
-   if (new_val == 2){ // all markdown
-      md_text.className = "col-md-12";
-      md_text.style.visibility='visible';
-      md_text.style.display = 'inherit';
-      rendered_text.style.visibility='hidden';
-      rendered_text.style.display='none';
-   } else if ( new_val == 1){ // half and half
-      md_text.className = "col-md-6";
-      md_text.style.visibility = 'visible';
-      md_text.style.display = 'inherit';
-      rendered_text.className = "col-md-6";
-      rendered_text.style.visibility = 'visible';
-      rendered_text.style.display = 'inherit';
-   } else { // all rendered
-     md_text.style.visibility = 'hidden';
-     md_text.style.display = 'none';
-     rendered_text.className = "col-md-12";
-     rendered_text.style.visibility = 'visible';
-     rendered_text.style.display = 'inherit';
-   }
-})
+$("#split-view").on("click", function(){
+  var md_text = $("#post_text_div")[0];
+  var rendered_text = $("#rendered-markdown")[0];
+  md_text.className = "col-md-6";
+  md_text.style.visibility = "visible";
+  md_text.style.display = "inherit";
+  rendered_text.className = "col-md-6";
+  rendered_text.style.visibility = "visible";
+  rendered_text.style.display = "inherit";
+});
 
+$("#rendered-only").on("click", function(){
+  var md_text = $("#post_text_div")[0];
+  var rendered_text = $("#rendered-markdown")[0];
+  md_text.style.visibility = "hidden";
+  md_text.style.display = "none";
+  rendered_text.className = "col-md-12";
+  rendered_text.style.visibility = "visible";
+  rendered_text.style.display = "inherit";
+})
 
 
 function escapeEquationBlocks(text, sep) {

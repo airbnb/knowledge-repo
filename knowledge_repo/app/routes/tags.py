@@ -11,14 +11,13 @@ This includes:
   - /toggle_tag_subscription
   - /tag_list
 """
-
-from flask import request, render_template, Blueprint, current_app
+from flask import request, render_template, Blueprint, g
 from sqlalchemy import and_
 import logging
 
 from ..app import db_session
-from ..models import PageView, Post, PostTags, Subscription, Tag
-from ..utils.requests import from_request_get_feed_params, from_request_get_user_info
+from ..models import PageView, Post, assoc_post_tag, Subscription, Tag
+from ..utils.requests import from_request_get_feed_params
 from ..utils.emails import send_subscription_email
 
 blueprint = Blueprint('tag', __name__,
@@ -26,7 +25,7 @@ blueprint = Blueprint('tag', __name__,
 
 
 @blueprint.route('/batch_tags')
-@PageView.log_pageview
+@PageView.logged
 def render_batch_tags():
     """ Render the batch_tags page, which lists all the tags.
 
@@ -37,9 +36,11 @@ def render_batch_tags():
             - add a tag description
     """
     # get the args
+    # sort_by will either be "Tag" or "Number of Posts"
     sort_by = request.args.get('sort_by', '')
     sort_asc = request.args.get('sort_asc', '')
     sort_desc = not sort_asc
+    feed_params = from_request_get_feed_params(request)
 
     # get all tags
     all_tags = db_session.query(Tag).all()
@@ -61,42 +62,54 @@ def render_batch_tags():
         tags_to_description[tag.id] = tag.description
 
     if sort_by:
-        sort_field = " ".join(sort_by.split("_")).lower()
-        if sort_field == 'tag group':
+        if sort_by == "Tag":
             def compare(x):
-                return x.tag_group.lower()
-        elif sort_field == 'tag name':
-            def compare(x):
-                return x.tag_name.lower()
-        else:
+                return x.name.lower()
+        elif sort_by == "Number_of_Posts":
             def compare(x):
                 return len(tags_to_posts[x.id])
+        else:
+            def compare(x):
+                return x
         nonzero_tags = sorted(nonzero_tags, key=compare, reverse=sort_desc)
 
     return render_template("batch_tags.html",
                            tags=nonzero_tags,
                            tags_to_posts=tags_to_posts,
-                           tags_to_desc=tags_to_description)
+                           tags_to_desc=tags_to_description,
+                           feed_params=feed_params)
 
 
 @blueprint.route('/delete_tag_post', methods=['GET', 'POST'])
-@PageView.log_pageview
+@PageView.logged
 def delete_tags_from_posts():
     """ Delete a tag from all the posts associated with it """
-    tag_name = request.args.get('tag_name', '')
+    tag_id = int(request.args.get('tag_id'))
 
     tag_obj = (db_session.query(Tag)
-               .filter(Tag.name == tag_name)
+               .filter(Tag.id == tag_id)
                .first())
-    tag_obj.posts = []
+
+    delete_query = assoc_post_tag.delete().where(assoc_post_tag.c.tag_id == tag_id)
+    db_session.execute(delete_query)
     db_session.delete(tag_obj)
     db_session.commit()
 
     return ""
 
 
+@delete_tags_from_posts.object_extractor
+def delete_tags_from_posts():
+    tag_obj = Tag.query.filter(Tag.name == request.args.get('tag_name', '')).first()
+    return {
+        'id': tag_obj.id if tag_obj else None,
+        'type': 'tag',
+        'action': 'delete'
+    }
+
+
 @blueprint.route('/tag_pages')
-@PageView.log_pageview
+@PageView.logged
 def render_tag_pages():
     feed_params = from_request_get_feed_params(request)
     start = feed_params['start']
@@ -139,7 +152,7 @@ def render_tag_pages():
     # get author with the max count
     max_count = 1
     max_author = ''
-    for (author, count) in author_to_count.iteritems():
+    for (author, count) in author_to_count.items():
         if count >= max_count:
             max_author = author
             max_count = count
@@ -155,29 +168,48 @@ def render_tag_pages():
                            post_stats=post_stats)
 
 
+@render_tag_pages.object_extractor
+def render_tag_pages():
+    tag_obj = Tag.query.filter(Tag.name == request.args.get('tag', '')).first()
+    return {
+        'id': tag_obj.id if tag_obj is not None else None,
+        'type': 'tag',
+        'action': 'view'
+    }
+
+
 @blueprint.route('/edit_tag_description', methods=['POST'])
-@PageView.log_pageview
+@PageView.logged
 def edit_tag_desc():
     """ Edit the description of a tag. This is used in the tag_page """
     data = request.get_json()
-    tag_name = data['tagName']
+    tag_id = int(data['tagId'])
     new_tag_desc = data['tagDesc']
     if new_tag_desc:
         tag = (db_session.query(Tag)
-               .filter(Tag.name == tag_name)
+               .filter(Tag.id == tag_id)
                .first())
-        tag.tag_description = new_tag_desc
+        tag._description = new_tag_desc
         db_session.commit()
     return ""
 
 
+@edit_tag_desc.object_extractor
+def edit_tag_desc():
+    tag_obj = Tag.query.filter(Tag.id == request.get_json()['tagId']).first()
+    return {
+        'id': tag_obj.id if tag_obj is not None else None,
+        'type': 'tag',
+        'action': 'edit'
+    }
+
+
 @blueprint.route('/toggle_tag_subscription', methods=['GET', 'POST'])
-@PageView.log_pageview
+@PageView.logged
 def toggle_tag_subscription():
     """ Subscribe/Unsubscribe a user from a tag """
     try:
         # retrieve relevant tag and user args from request
-        username, user_id = from_request_get_user_info(request)
         tag_name = request.args.get('tag_name', '')
         subscribe_action = request.args.get('subscribe_action', '')
         if subscribe_action not in ['unsubscribe', 'subscribe']:
@@ -193,13 +225,13 @@ def toggle_tag_subscription():
         if tag_obj:
             subscription = db_session.query(Subscription).filter(
                 and_(Subscription.object_type == 'tag',
-                     Subscription.user_id == user_id,
+                     Subscription.user_id == g.user.id,
                      Subscription.object_id == tag_obj.id)).first()
         if subscription and subscribe_action == 'unsubscribe':
             db_session.delete(subscription)
         elif not subscription and subscribe_action == 'subscribe':
             # otherwise, create new subscription
-            subscription = Subscription(user_id=user_id, object_type='tag',
+            subscription = Subscription(user_id=g.user.id, object_type='tag',
                                         object_id=tag_obj.id)
             db_session.add(subscription)
         else:
@@ -212,19 +244,34 @@ def toggle_tag_subscription():
         return ""
 
 
+@toggle_tag_subscription.object_extractor
+def toggle_tag_subscription():
+    tag_obj = Tag(name=request.args.get('tag_name', ''))
+    subscription = db_session.query(Subscription).filter(
+        and_(Subscription.object_type == 'tag',
+             Subscription.user_id == g.user.id,
+             Subscription.object_id == tag_obj.id)
+    ).first()
+    return {
+        'id': tag_obj.id if tag_obj is not None else None,
+        'type': 'tag',
+        'action': 'unsubscribe' if subscription else 'subscribe'
+    }
+
+
 @blueprint.route('/rename_tag', methods=['POST'])
-@PageView.log_pageview
+@PageView.logged
 def rename_tags_and_posts():
     """ Rename a tag
         This requires deleteing all the post-tag associations for the old tag
         and re-adding them for the new tag
     """
     data = request.get_json()
-    old_tag = data['oldTag'].replace('__', '/')
+    old_tag_id = int(data['oldTagId'])
     new_tag = data['newTag']
 
     old_tag_obj = (db_session.query(Tag)
-                   .filter(Tag.name == old_tag)
+                   .filter(Tag.id == old_tag_id)
                    .first())
 
     new_tag_obj = (db_session.query(Tag)
@@ -248,8 +295,18 @@ def rename_tags_and_posts():
     return ""
 
 
+@rename_tags_and_posts.object_extractor
+def rename_tags_and_posts():
+    tag_id = int(request.get_json()['oldTagId'])
+    return {
+        'id': tag_id if tag_id else None,
+        'type': 'tag',
+        'action': 'rename'
+    }
+
+
 @blueprint.route('/remove_posts_tags', methods=['POST'])
-@PageView.log_pageview
+@PageView.logged
 def remove_posts_tags():
     """ Delete a tag from certain posts """
     data = request.get_json()
@@ -260,26 +317,35 @@ def remove_posts_tags():
     # for all the posts, query & remove that tag
     for post in posts:
         post_id = (db_session.query(Post).filter(Post.path == post).first()).id
-        delete_query = PostTags.delete().where(
-            and_(PostTags.c.tag_id == tag_id, PostTags.c.post_id == post_id))
+        delete_query = assoc_post_tag.delete().where(
+            and_(assoc_post_tag.c.tag_id == tag_id, assoc_post_tag.c.post_id == post_id))
         db_session.execute(delete_query)
     db_session.commit()
     return ""
 
 
+@remove_posts_tags.object_extractor
+def remove_posts_tags():
+    return {
+        'id': int(request.get_json()['tagId']),
+        'type': 'tag',
+        'action': 'dissociate'
+    }
+
+
 @blueprint.route('/tag_list', methods=['POST'])
-@PageView.log_pageview
+@PageView.logged
 def change_tags():
     """ Change the tags associated with a given post.
         This is called when someone clicks on the a knowledge post
         and changes the tag through the web ui
     """
-    markdown = request.args.get('post_id', ' ')
+    post_path = request.args.get('post_path', ' ')
     data = request.get_json()
     tags_string = data['tags']
 
     post = (db_session.query(Post)
-            .filter(Post.path == markdown)
+            .filter(Post.path == post_path)
             .first())
 
     old_tags = post.tags
@@ -297,3 +363,13 @@ def change_tags():
         send_subscription_email(post, tag)
 
     return " "
+
+
+@change_tags.object_extractor
+def change_tags():
+    post_path = request.args.get('post_path', '')
+    return {
+        'id': Post.query.filter(Post.path == post_path).first().id,
+        'type': 'post',
+        'action': 'tag'
+    }

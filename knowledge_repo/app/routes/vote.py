@@ -5,12 +5,11 @@ This includes:
   - /unlike
 """
 import logging
-from flask import request, Blueprint, current_app
+from flask import request, Blueprint, g
 from sqlalchemy import and_
 
 from ..app import db_session
 from ..models import Post, Vote, PageView
-from ..utils.requests import from_request_get_user_info
 
 
 blueprint = Blueprint(
@@ -18,22 +17,18 @@ blueprint = Blueprint(
 
 
 @blueprint.route('/like')
-@PageView.log_pageview
-def render_likes():
+@PageView.logged
+def like_post():
     """ Like a post """
     try:
-        path = request.args.get('post_id', '')  # This will prevent old code from adding invalid post_ids
-        if path == '':
-            return "No Post Found to Unlike!"
-        username, user_id = from_request_get_user_info(request)
-        post_id = (db_session.query(Post)
-                             .filter(Post.path == path)
-                             .first()).id
+        post_id = int(request.args.get('post_id', '-1'))  # This will prevent old code from adding invalid post_ids
+        if post_id < 0:
+            return "No Post Found to like!"
         vote = (db_session.query(Vote)
-                .filter(and_(Vote.object_id == post_id, Vote.user_id == user_id))
+                .filter(and_(Vote.object_id == post_id, Vote.user_id == g.user.id))
                 .first())
         if not vote:
-            vote = Vote(user_id=user_id, object_id=post_id)
+            vote = Vote(user_id=g.user.id, object_id=post_id)
             db_session.add(vote)
             db_session.commit()
     except:
@@ -42,19 +37,15 @@ def render_likes():
 
 
 @blueprint.route('/unlike')
-@PageView.log_pageview
-def render_unlikes():
+@PageView.logged
+def unlike_post():
     """ Un-like a post """
     try:
-        path = request.args.get('post_id', '')  # This will prevent old code from adding invalid post_ids
-        if path == '':
+        post_id = int(request.args.get('post_id', '-1'))  # This will prevent old code from adding invalid post_ids
+        if post_id < 0:
             return "No Post Found to Unlike!"
-        username, user_id = from_request_get_user_info(request)
-        post_id = (db_session.query(Post)
-                             .filter(Post.path == path)
-                             .first()).id
         votes = (db_session.query(Vote)
-                 .filter(and_(Vote.object_id == post_id, Vote.user_id == user_id))
+                 .filter(and_(Vote.object_id == post_id, Vote.user_id == g.user.id))
                  .all())
         if votes:
             for vote in votes:

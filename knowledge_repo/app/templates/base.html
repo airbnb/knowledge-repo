@@ -5,8 +5,14 @@
 <script src="{{ url_for('static', filename='modules/bootstrap/js/bootstrap.min.js')}}"></script>
 <script src="{{ url_for('static', filename='modules/bootstrap-slider/js/bootstrap-slider.min.js')}}"></script>
 <script src="{{ url_for('static', filename='modules/typeahead.js/typeahead.bundle.min.js')}}"></script>
-<script src="{{ url_for('static', filename='js/handlebars.js')}}"></script>
+<script src="{{ url_for('static', filename='modules/handlebars/js/handlebars.js')}}"></script>
 <script src="{{ url_for('static', filename='js/helpers.js')}}"></script>
+<script src="{{ url_for('static', filename='modules/select2/js/select2.min.js')}}"></script>
+<script src="{{ url_for('static', filename='modules/hightlight.pack.js/highlight.pack.js')}}"></script>
+<script src="{{ url_for('static', filename='modules/marked.js/marked.js')}}"></script>
+<!-- require js used for plotly, but has a bunch of collisions with other js packages
+     make sure to have it be last js package imported ><!-- >
+<script src="{{ url_for('static', filename='modules/require.js/require.min.js')}}"></script>
 
 <html>
 
@@ -20,7 +26,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='modules/bootstrap/css/bootstrap.min.css')}}">
     <link rel="stylesheet" href="{{ url_for('static', filename='modules/bootstrap-slider/css/bootstrap-slider.min.css')}}">
     <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='css/custom.css') }}">
-    <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='css/select2.min.css') }}">
+    <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='modules/select2/css/select2.min.css') }}">
     <link href='https://fonts.googleapis.com/css?family=Lato:400,900|Playfair+Display|Source+Serif+Pro:400,700' rel='stylesheet' type='text/css'>
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}">
 
@@ -57,21 +63,33 @@
 
     <div class="navbar navbar-knowledge" role="navigation">
       <div class="container page-container">
-        <a id="feed_tab" href="/" aria-selected="false" class="navbar-text">
-          Feed
+        <a  href="/" aria-selected="false" class="logo-image navbar-text" style='margin-top:20px; margin-left: -7px'>
+          <img width="125" src='{{ url_for("static", filename = "images/logo-white.svg")}}'></img>
         </a>
-        <a id="favorites_tab" href="/favorites" aria-selected="false" class="navbar-text">
+        <a id="feed_tab" href="/" aria-selected="false" class="navbar-text" style='margin-top:18px'>
+          Home
+        </a>
+        <a id="favorites_tab" href="/favorites" aria-selected="false" class="navbar-text" style='margin-top:18px'>
           Favorites
         </a>
-        <a id="help_tab" href="/about" aria-selected="false" class="navbar-text">
+        <a id="help_tab" href="/about" aria-selected="false" class="navbar-text" style='margin-top:18px'>
          About
         </a>
-        <a id="stats_tab" href="/stats" aria-selected="false" class="navbar-text">
+        <a id="stats_tab" href="/stats" aria-selected="false" class="navbar-text" style='margin-top:18px'>
          Stats
         </a>
-        <a id="webposts_tab" href="/webposts" class="navbar-text pull-right">
-          <i class="glyphicon glyphicon-edit glyphicon-navbar"></i> Write a Post!
-        </a>
+        {% if webeditor_enabled %}
+          <a id="webposts_tab" href="/create"
+           class="btn btn-primary navbar-text pull-right"
+           style='border-radius:4px; margin-top:10px; margin-right:-10px; background-color: #00a699; color:white; border-color: #00a699'>
+            Write a Post!
+          </a>
+        {% endif %}
+        <div class="pull-right">
+          <div class="form-group">
+            <input class="form-control" id="searchbar" placeholder="Search for Knowledge" style="text-align:right">
+          </div>
+        </div>
       </div>
     </div>
 
@@ -83,7 +101,84 @@
 
     </body>
 
-    {% block scripts %} {% endblock %}
+    {% block scripts %}
+    <script type='text/javascript'>
+    $("#searchbar")[0].setSelectionRange(1000, 1000);
+    var substringMatcher = function(pageMeta) {
+      return function findMatches(q, cb) {
+        var matches, substringRegex;
+
+        // an array that will be populated with substring matches
+        matches = [];
+
+        // regex used to determine if a string contains the substring `q`
+        substrRegex = new RegExp(q, 'i');
+
+        // iterate through the pool of strings and for any string that
+        // contains the substring `q`, add it to the `matches` array
+        $.each(pageMeta, function(i, meta) {
+          var match = false;
+          if (substrRegex.test(meta.title)) {
+            match = true;
+          };
+          if (substrRegex.test(meta.author)) {
+            match = true;
+          };
+          if (match) {
+            matches.push(meta);
+          }
+        });
+
+        cb(matches);
+      };
+    };
+
+
+    $.get('/ajax_post_typeahead', function(typeahead_post_info) {
+      typeahead_post_info = JSON.parse(typeahead_post_info);
+      $('#searchbar').typeahead({
+          hint: false,
+          highlight: true,
+          minLength: 1
+        },
+        {
+          name: 'knowledge_posts',
+          display: function (item) {
+            return item.title;
+          },
+          templates: {
+            empty: Handlebars.compile(
+              '<div class="tt-not-found">' +
+                'Unable to find any posts that match the current query' +
+                '</div>'
+            ),
+            suggestion: function(data) {
+              return '<p><strong class="text-rausch">' + data.author + '</strong> – ' + data.title + '</p>';
+            }
+          },
+          source: substringMatcher(typeahead_post_info)
+        }
+    );
+
+    $('#searchbar').bind('typeahead:select', function(obj, datum, name) {
+      window.location = '/render?markdown=' + encodeURIComponent(datum.path);
+    });
+
+    $('#searchbar').keypress(function(event){
+      var keycode = (event.keyCode ? event.keyCode : event.which);
+      if(keycode == '13'){
+        var path = document.location.pathname;
+        window.location = path + '?filters=' + $('#searchbar').val()
+      }
+    });
+
+    var padding = $('.tt-menu').outerWidth()
+    $('.tt-menu').width($('#searchbar').width() + padding + "px")
+    });
+
+
+    </script>
+    {% endblock %}
 
 </html>
 
