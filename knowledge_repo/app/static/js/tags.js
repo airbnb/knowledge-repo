@@ -3,9 +3,8 @@ var tagsJx = (function () {
   function deleteTagPosts(tag) {
     tag.addEventListener('click', function () {
       var tagList = tag.id.split('__');
-      var tagType = tagList[1];
-      var tagName = tagList[2];
-      var urlRequest = 'delete_tag_post?tag_type=' + tagType + '&tag_name=' + tagName;
+      var tagId = tagList[1];
+      var urlRequest = 'delete_tag_post?tag_id=' + tagId;
       $.ajax({
         type: 'GET',
         url: urlRequest,
@@ -18,14 +17,12 @@ var tagsJx = (function () {
   function renameTagPosts(tag) {
     tag.addEventListener('click', function () {
       var oldTagList = this.id.split('__');
-      var oldTagType = oldTagList[1];
-      var oldTagName = oldTagList[2];
-      var fullTag = oldTagType + '__' + oldTagName;
-      var newTagForm = $('#' + fullTag + '__new_tag_name')[0];
+      var oldTagId = oldTagList[1]
+      var newTagForm = $('#' + oldTagId + '__new_tag_name')[0];
       var newTagName = newTagForm.value;
       var urlRequest = '/rename_tag';
       var tagData = {};
-      tagData.oldTag = fullTag;
+      tagData.oldTagId = oldTagId;
       tagData.newTag = newTagName;
       $.ajax({
         type: 'POST',
@@ -68,15 +65,11 @@ function editTagDescription(tag) {
   tag.addEventListener('click', function () {
     var id = tag.id;
     var tagId = id.split('edit_desc__')[1];
-    var tagList = tagId.split('__');
-    var tagType = tagList[0];
-    var tagName = tagList[1];
     var tagDescForm = $('#' + tagId + '__new_tag_description')[0];
     var newDesc = tagDescForm.value;
     var urlRequest = '/edit_tag_description';
     var tagDesc = {};
-    tagDesc.tagType = tagType;
-    tagDesc.tagName = tagName;
+    tagDesc.tagId = tagId
     tagDesc.tagDesc = newDesc;
     $.ajax({
       type: 'POST',
@@ -130,17 +123,17 @@ function addTagSubscriptionListener(v) {
             el = document.createElement( 'html' );
             el.innerHTML = data_content
             id = $('button[id^=tag-subscription]', el).attr("id")
-            $(popover).toggleClass('label-default');
-            $(popover).toggleClass('label-primary');
+            $(popover).toggleClass('label-subscribed');
+            $(popover).toggleClass('label-unsubscribed');
             if (text == "Subscribe"){
               popover.setAttribute('data-content',
-                            "<div class='content'> <button class='btn btn-small btn-primary' title='' " +
+                            "<div class='content'> <button class='btn btn-small btn-unsubscribe btn-primary' title='' " +
                              "id='" + id + "'> " +
                              "<i class='glyphicon glyphicon-remove-sign glyphicon-white'></i>Unsubscribe" +
                              "</button></div>")
             } else {
                popover.setAttribute('data-content',
-                            "<div class='content'> <button class='btn btn-small btn-default' title='' " +
+                            "<div class='content'> <button class='btn btn-small btn-subscribe btn-default' title='' " +
                              "id='" + id + "'> " +
                              "<i class='glyphicon glyphicon-ok-sign glyphicon-filled'></i>Subscribe" +
                              "</button></div>");
@@ -197,7 +190,7 @@ function createTagTooltip(i, tag, subscriptionsList) {
 
 }
 
-function changeAndSaveTags(postId, tagsString) {
+function changeAndSaveTags(postPath, tagsString) {
   var tagsList = tagsString.split(',');
 
   var re = /^[a-z0-9\-\:]+$/i;
@@ -233,7 +226,7 @@ function changeAndSaveTags(postId, tagsString) {
           dataType: 'json',
           data: JSON.stringify(postContent),
           contentType: 'application/json',
-          url: '/tag_list?post_id=' + postId,
+          url: '/tag_list?post_path=' + postPath,
           async: false
       });
   window.location = oldHref;

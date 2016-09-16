@@ -18,29 +18,73 @@
 
   <div class="row">
     <br>
-    <div class="col-md-1">
-    </div>
-    <div class="col-md-4">
-      <h2> {% block header %} {% endblock %} </h2>
-    </div>
-    <div class="col-md-4">
-      <h2>
-        <a class="tooltip-toggleFeedView" href="/feed" aria-selected="false" data-toggle="tooltip" data-placement="top" title="Blog">
-          <i class="glyphicon glyphicon-post-org glyphicon-home"></i>
+    <div class="col-md-5">
+      <div class="btn-group btn-group-justified index-view-btn-group" role="group">
+        <a href="/feed" class="btn btn-default btn-card no-underline" role="button">
+          <i class="glyphicon glyphicon-post-org glyphicon-align-justify"></i>
+          <span class="index-view-name"> Card </span>
         </a>
-        <a class="tooltip-toggleTableView" href="/table" aria-selected="false" data-toggle="tooltip" data-placement="top" title="Grid">
-          <i class="glyphicon glyphicon-post-org glyphicon-th-large"></i>
+        <a href="/table" class="btn btn-default btn-table no-underline" role="button">
+          <i class="glyphicon glyphicon-post-org glyphicon-th"></i>
+          <span class="index-view-name"> Table </span>
         </a>
-        <a class="tooltip-toggleClusterView" href="/cluster" aria-selected="false" data-toggle="tooltip" data-placement="top" title="Cluster">
+        <a href="/cluster" class="btn btn-default btn-cluster no-underline" role="button">
           <i class="glyphicon glyphicon-post-org glyphicon-th-list"></i>
+          <span class="index-view-nane"> Cluster </span>
         </a>
-      </h2>
-    </div>
-    <div class="col-md-3">
-      <div class="form-group">
-        <input class="form-control" id="searchbar" placeholder="Search for Knowledge" style="text-align:right">
       </div>
     </div>
+
+  {% if request.endpoint != 'index.render_cluster' %}
+  <div class='col-md-3 col-md-offset-4'>
+    {% set start = feed_params['start'] | default(0) %}
+    {% set results = feed_params['results'] | default(10) %}
+    {% if start == 0 %}
+      {% set page = 1 %}
+    {% else %}
+      {% set page = start//results + 1 %}
+    {% endif %}
+    <div class="btn-group btn-sm btn-group-justified pagination-group" role="group">
+      {% if page == 1 %}
+        <a href="#" class="btn btn-default disabled">
+          <i class="glyphicon glyphicon-chevron-left"></i>
+        </a>
+      {% else %}
+        {% set prev_page = url_for(request.endpoint, start=(page-2)*results, results=results, filters=feed_params['filters']) %}
+        {% if request.endpoint == 'tag.render_tag_pages' %}
+          {% set prev_page = prev_page + "&tag=" + full_tag %}
+        {% endif %}
+        <a href="{{ prev_page }}" class="btn btn-default">
+          <i class="glyphicon glyphicon-chevron-left"></i>
+        </a>
+      {% endif %}
+      {% if page == 1 %}
+        {% set page_nums = [page, page + 1, page + 2] %}
+      {% else %}
+        {% set page_nums = [page - 1, page, page + 1] %}
+      {% endif %}
+      {% for page_num in page_nums %}
+        {% set href = url_for(request.endpoint, start=(page_num - 1) * results, results=results, filters=feed_params["filters"]) %}
+          {% if request.endpoint == 'tag.render_tag_pages' %}
+            {% set href = href + "&tag=" + full_tag %}
+          {% endif %}
+        {% if page == page_num %}
+          <a href= "{{ href }}" class="btn btn-default page-btn active-page"> {{ page_num }} </a>
+        {% else %}
+          <a href = "{{ href }}" class="btn btn-default page-btn"> {{ page_num }} </a>
+        {% endif %}
+      {% endfor %}
+      {% set next_page = url_for(request.endpoint, start=page*results, results=results, filters=feed_params['filters']) %}
+        {% if request.endpoint == 'tag.render_tag_pages' %}
+          {% set next_page = next_page + "&tag=" + full_tag %}
+        {% endif %}
+        <a href="{{ next_page }}" class="btn btn-default">
+          <i class="glyphicon glyphicon-chevron-right"></i>
+        </a>
+    </div>
+  </div>
+  {% endif %}
+
   </div>
 
   <div class="col-12">
@@ -50,6 +94,7 @@
 {% endblock %}
 
 {% block scripts %}
+{{ super() }}
 <script type="text/javascript">
 
     $( document ).ready(function() {
@@ -58,81 +103,6 @@
     });
 
     $('[data-toggle="tooltip"]').tooltip();
-
-    $("#searchbar")[0].setSelectionRange(1000, 1000);
-
-    var substringMatcher = function(pageMeta) {
-      return function findMatches(q, cb) {
-        var matches, substringRegex;
-
-        // an array that will be populated with substring matches
-        matches = [];
-
-        // regex used to determine if a string contains the substring `q`
-        substrRegex = new RegExp(q, 'i');
-
-        // iterate through the pool of strings and for any string that
-        // contains the substring `q`, add it to the `matches` array
-        $.each(pageMeta, function(i, meta) {
-          var match = false;
-          if (substrRegex.test(meta.title)) {
-            match = true;
-          };
-          if (substrRegex.test(meta.author)) {
-            match = true;
-          };
-          if (match) {
-            matches.push(meta);
-          }
-        });
-
-        cb(matches);
-      };
-    };
-
-
-    $.get('/ajax_post_typeahead', function(typeahead_post_info) {
-      typeahead_post_info = JSON.parse(typeahead_post_info);
-      $('#searchbar').typeahead({
-          hint: false,
-          highlight: true,
-          minLength: 1
-        },
-        {
-          name: 'knowledge_posts',
-          display: function (item) {
-            return item.title;
-          },
-          templates: {
-            empty: Handlebars.compile(
-              '<div class="tt-not-found">' +
-                'Unable to find any posts that match the current query' +
-                '</div>'
-            ),
-            suggestion: function(data) {
-              return '<p><strong class="text-rausch">' + data.author + '</strong> – ' + data.title + '</p>';
-            }
-          },
-          source: substringMatcher(typeahead_post_info)
-        }
-    );
-
-    $('#searchbar').bind('typeahead:select', function(obj, datum, name) {
-      window.location = '/render?markdown=' + encodeURIComponent(datum.path);
-    });
-
-    $('#searchbar').keypress(function(event){
-      var keycode = (event.keyCode ? event.keyCode : event.which);
-      if(keycode == '13'){
-        var path = document.location.pathname;
-        window.location = path + '?filters=' + $('#searchbar').val()
-      }
-    });
-
-    var padding = $('.tt-menu').outerWidth()
-    $('.tt-menu').width($('#searchbar').width() + padding + "px")
-    });
-
 
   });
 </script>

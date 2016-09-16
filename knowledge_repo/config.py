@@ -43,7 +43,7 @@ class KnowledgeRepositoryConfig(dict):
                 else:
                     logger.warning(
                         "Configuration file {} does not exist.".format(value))
-            elif isinstance(value, types.NoneType):
+            elif isinstance(value, type(None)):
                 pass
             else:
                 raise ValueError("Cannot interpret {}".format(value))
@@ -59,9 +59,8 @@ class KnowledgeRepositoryConfig(dict):
                 if os.path.exists(value):
                     self.__defaults_from_file(value)
                 else:
-                    logger.warning(
-                        "Configuration file {} does not exist.".format(value))
-            elif isinstance(value, types.NoneType):
+                    logger.warning("Configuration file {} does not exist.".format(value))
+            elif isinstance(value, type(None)):
                 pass
             else:
                 raise ValueError("Cannot interpret {}".format(value))

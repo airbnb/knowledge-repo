@@ -1,5 +1,5 @@
 import unittest
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from knowledge_repo import KnowledgeRepository
 
@@ -17,10 +17,10 @@ class TableTest(unittest.TestCase):
         """
         rv = self.app.get("/table", headers=self.headers)
         assert (rv.status == "200 OK")
-        soup = BeautifulSoup(rv.data.decode('utf-8'))
+        soup = BeautifulSoup(rv.data.decode('utf-8'), 'html.parser')
         post_rows = soup.findAll('tr', {'class': 'table-post'})
         for row in post_rows:
-            column_ids = ['path', 'author', 'tags', 'created_at', 'updated_at',
+            column_ids = ['path', 'author', 'tags', 'updated_at',
                           'views', 'upvotes', 'comments', 'tldr']
 
             for column in column_ids:

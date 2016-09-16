@@ -1,7 +1,6 @@
 import markdown
-import os
 from flask import url_for
-# TODO replace_knowledge_urls, replace_images
+from knowledge_repo.post import KnowledgePost
 
 MARKDOWN_EXTENSTIONS = ['markdown.extensions.extra',
                         'markdown.extensions.abbr',
@@ -22,16 +21,15 @@ MARKDOWN_EXTENSTIONS = ['markdown.extensions.extra',
 
 
 def render_post_tldr(post):
-    return markdown.Markdown(extensions=MARKDOWN_EXTENSTIONS).convert(post.tldr)
+    if isinstance(post, KnowledgePost):
+        return markdown.Markdown(extensions=MARKDOWN_EXTENSTIONS).convert(post.headers.get('tldr'))
+    else:
+        return markdown.Markdown(extensions=MARKDOWN_EXTENSTIONS).convert(post.tldr)
 
 
 def render_post_header(post):
 
-    author_hrefs = ', '.join(["<a href='{}'>{}</a>".format(
-        url_for('index.render_feed', authors=author.username), author.format_name)
-        for author in post.authors])
-
-    header = """
+    header_template = """
     <h1>{title}</h1>
     <p id='metadata'>
     <strong>Author(s): </strong>{author_hrefs} <br>
@@ -40,17 +38,30 @@ def render_post_header(post):
     <strong>Tags</strong><text>: </text><br>
     <strong>TLDR</strong>: {tldr}<br>
     </p>
-    """.format(title=post.title,
-               author_hrefs=author_hrefs,
-               date_created=post.created_at.isoformat(),
-               date_updated=post.updated_at.isoformat(),
-               tldr=render_post_tldr(post))
+    """
 
-    return header
+    if isinstance(post, KnowledgePost):
+        return header_template.format(title=post.headers['title'],
+                                      author_hrefs=', '.join(post.headers['authors']),
+                                      date_created=post.headers['created_at'].isoformat(),
+                                      date_updated=post.headers['updated_at'].isoformat(),
+                                      tldr=render_post_tldr(post))
+    else:
+        author_hrefs = ', '.join(["<a href='{}'>{}</a>".format(
+            url_for('index.render_feed', authors=author.username), author.format_name)
+            for author in post.authors])
+        return header_template.format(title=post.title,
+                                      author_hrefs=author_hrefs,
+                                      date_created=post.created_at.isoformat(),
+                                      date_updated=post.updated_at.isoformat(),
+                                      tldr=render_post_tldr(post))
 
 
 def render_post_raw(post):
-    return post.text.decode('utf-8')
+    if isinstance(post, KnowledgePost):
+        return post.read().encode('ascii', 'ignore')
+    else:
+        return post.text.encode('ascii', 'ignore')
 
 
 def render_post(post):
@@ -62,9 +73,9 @@ def render_post(post):
             return url_for('render.render', markdown=url.split('knowledge:')[1])
         return None
 
-    html = render_post_header(post) + post.kp.to_string('html',
-                                                        skip_headers=True,
-                                                        urlmappers=[intra_knowledge_urlmapper])
+    html = render_post_header(post) + (post if isinstance(post, KnowledgePost) else post.kp).to_string('html',
+                                                                                                       skip_headers=True,
+                                                                                                       urlmappers=[intra_knowledge_urlmapper])
     return html
 
 

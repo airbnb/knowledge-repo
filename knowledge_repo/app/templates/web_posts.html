@@ -8,15 +8,14 @@
     <div class="container">
       <div class="col-md-12">
         <div>
-          <i class="glyphicon glyphicon-edit" id="new-post" style:"opacity:0.4;"></i> New Post 
+          <i class="glyphicon glyphicon-edit" id="new-post" style:"opacity:0.4;"></i> New Post
         </div>
         <br>
-        <table class="table table-bordered">
+        <table class="table table-bordered table-webposts">
           <thead>
             <tr>
               <th>Title</th>
               <th>Author</th>
-              <th>Project</th>
               <th>Created</th>
               <th>Action</th>
               <th>Review Status</th>
@@ -27,13 +26,10 @@
             <tr>
               <td>{{ post.title }} </td>
               <td>{{ post.authors_string }} </td>
-              <td>{{ post.project }} </td>
               <td>{{ post.created_at.strftime('%Y-%m-%d')  }} </td>
               <td>
-                <h4>
                 <i class="glyphicon glyphicon-edit" id="tooltip-edit-{{ post.id }}" data-toggle="tooltip" data-placement="top" title="Edit"></i>
                 <i class="glyphicon glyphicon-remove" id="tooltip-delete-{{ post.id }}" data-toggle="tooltip" data-placement="top" title="Delete"></i>
-                </h4>
               </td>
               <td>
               {% if post.webpost_status == 0 %}
@@ -75,7 +71,7 @@ $("#new-post").click(function() {
         url: '/delete_post?post_id={{ post.id }}',
         async: false
       });
-    } 
+    }
     location.reload();
   });
 

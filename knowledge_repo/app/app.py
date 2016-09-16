@@ -1,18 +1,19 @@
+from __future__ import absolute_import
 import os
 import imp
 import logging
 import traceback
 
-from flask import Flask, current_app, render_template
+from flask import Flask, current_app, render_template, g, request
 from flask_mail import Mail
 from flask_migrate import Migrate
 from alembic import command
 from alembic.migration import MigrationContext
 
-from .proxies import db_session
+from .proxies import db_session, current_repo
 from .index import update_index
-from .models import db as sqlalchemy_db, Post
-import routes
+from .models import db as sqlalchemy_db, Post, User
+from . import routes
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 class KnowledgeFlask(Flask):
 
-    def __init__(self, repo, db_uri=None, debug=None, config=None):
+    def __init__(self, repo, db_uri=None, debug=None, config=None, **kwargs):
         Flask.__init__(self, __name__,
                        template_folder='templates',
                        static_folder='static')
@@ -30,10 +31,11 @@ class KnowledgeFlask(Flask):
             if isinstance(config, str):
                 config = imp.load_source('knowledge_server_config', os.path.abspath(config))
             self.config.from_object(config)
+        self.config.update(kwargs)
 
         if hasattr(config, 'prepare_repo'):
             repo = config.prepare_repo(repo)
-        self.config['repo'] = repo  # TODO: deprecate this and make it only accessible by app.repository
+        self.repository = repo
 
         # Lift debug mode from underlying KnowledgeRepository object if not specified
         self.config['DEBUG'] = debug if debug is not None else repo.config.debug
@@ -68,7 +70,7 @@ class KnowledgeFlask(Flask):
         # Set config defaults if not included
         server_config_defaults = {'SERVER_NAME': 'localhost',
                                   'plugins': []}
-        for k, v in server_config_defaults.iteritems():
+        for k, v in server_config_defaults.items():
             self.config[k] = self.config.get(k, v)
 
         # Register routes to be served
@@ -105,6 +107,9 @@ class KnowledgeFlask(Flask):
                 across the app in addition to being run at first.
             """
 
+            if not current_app.config.get('REPOSITORY_INDEXING_ENABLED', True):
+                return
+
             typeahead_data = {}
 
             def update_typeahead_data(post):
@@ -128,17 +133,39 @@ class KnowledgeFlask(Flask):
             current_app.config['typeahead_data'] = typeahead_data
 
         @self.before_request
+        def set_user_information():
+            if not request.path.startswith('/static'):
+                username = current_app.config.get('AUTH_USERNAME_DEFAULT') or 'knowledge_default'
+                if current_app.config.get('AUTH_USERNAME_REQUEST_HEADER') is not None:
+                    username = request.headers.get(current_app.config.get(
+                        'AUTH_USERNAME_REQUEST_HEADER'), username)
+                g.user = User(username=username)
+                if g.user.id is None:
+                    db_session.commit()
+
+        @self.before_request
         def open_repository_session():
-            current_app.config['repo'].session_begin()
+            if not request.path.startswith('/static'):
+                current_repo.session_begin()
 
         @self.after_request
         def close_repository_session(response):
-            current_app.config['repo'].session_end()
+            if not request.path.startswith('/static'):
+                current_repo.session_end()
             return response
+
+        @self.context_processor
+        def webeditng_enabled():
+            repos = self.config.get('REPOS')
+            return {"webeditor_enabled": 'webposts' in repos if repos else False}
 
     @property
     def repository(self):
-        return self.config['repo']
+        return getattr(self, '_repository')
+
+    @repository.setter
+    def repository(self, repo):
+        self._repository = repo
 
     @property
     def db(self):

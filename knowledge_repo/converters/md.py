@@ -1,4 +1,3 @@
-from ..post import KnowledgePost
 from ..converter import KnowledgePostConverter
 
 

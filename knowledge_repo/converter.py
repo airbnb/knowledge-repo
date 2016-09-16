@@ -1,9 +1,11 @@
+from builtins import object
+
 import os
 from functools import wraps
 
-from .post import KnowledgePost
 from .postprocessor import KnowledgePostProcessor
 from .utils.registry import SubclassRegisteringABCMeta
+from future.utils import with_metaclass
 
 
 def get_format(filename, format=None):
@@ -14,13 +16,14 @@ def get_format(filename, format=None):
     return format
 
 
-class KnowledgePostConverter(object):
-    __metaclass__ = SubclassRegisteringABCMeta
+class KnowledgePostConverter(with_metaclass(SubclassRegisteringABCMeta, object)):
     _registry_keys = None  # File extensions
 
-    def __init__(self, kp, format=None, postprocessors=['extract_images', 'format_checks'], **kwargs):
+    def __init__(self, kp, format=None, postprocessors=None, **kwargs):
         self.kp = kp
         self.format = format
+        if postprocessors is None:
+            postprocessors = ['extract_images', 'format_checks']
         self.postprocessors = postprocessors
         self.init(**kwargs)
 
@@ -71,5 +74,5 @@ class KnowledgePostConverter(object):
     def for_format(cls, kp, format, postprocessors=None):
         if format.lower() not in cls._registry:
             raise ValueError("The knowledge repository does not support files of type '{}'. Supported types are: {}."
-                             .format(format, ','.join(cls._registry.keys())))
+                             .format(format, ','.join(list(cls._registry.keys()))))
         return cls._get_subclass_for(format.lower())(kp, format=format, postprocessors=postprocessors)

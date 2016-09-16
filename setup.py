@@ -15,7 +15,7 @@ setup(
         " A workflow for contributing company knowledge, in the form "
         " of RMarkdowns, iPythons, and Markdowns, rendered and organized"
         " to magnify research impact across teams and time "),
-    version=version_info['__version__'],
+    version=version_info['__version__'].split('_')[0],  # remove git revision if present
     author=version_info['__author__'],
     author_email=version_info['__author_email__'],
     packages=find_packages(),
@@ -31,6 +31,7 @@ setup(
         'pyyaml',  # Yaml parser and utilities
         'tabulate',  # Rendering user information prettily
         'enum34',  # Post status enum object
+        'future',  # Python 2/3 support
         # Flask App Dependencies
         'flask',  # Main flask framework
         'flask_mail',  # Mail client and utilities
@@ -45,7 +46,7 @@ setup(
         'Pillow',  # image processing for sending images
         # Testing Dependencies
         'nose',  # Testing framework
-        'beautifulsoup'  # HTML/XML parser
+        'beautifulsoup4'  # HTML/XML parser
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',

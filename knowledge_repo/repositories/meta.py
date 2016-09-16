@@ -1,7 +1,6 @@
 import os
-from collections import OrderedDict
 
-from ..repository import KnowledgeRepository  # nopep8
+from ..repository import KnowledgeRepository
 
 
 class MetaKnowledgeRepository(KnowledgeRepository):
@@ -27,10 +26,10 @@ class MetaKnowledgeRepository(KnowledgeRepository):
         raise ValueError("No KnowledgeRepository found for '{}'.".format(path))
 
     def __distribute_method(self, method, **kwargs):
-        return {name: getattr(repo, method)(**kwargs) for name, repo in self.uri.items()}
+        return {name: getattr(repo, method)(**kwargs) for name, repo in list(self.uri.items())}
 
     def __distribute_attribute(self, attribute):
-        return {name: getattr(repo, attribute) for name, repo in self.uri.items()}
+        return {name: getattr(repo, attribute) for name, repo in list(self.uri.items())}
 
     def __delegate_for_path(self, path, method, **kwargs):
         prefix, repo, path = self.__repo_for_path(path)

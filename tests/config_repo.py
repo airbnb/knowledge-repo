@@ -61,5 +61,5 @@ def prepare_app(app):
                               'AUTH_USERNAME_REQUEST_HEADER': 'user_header'}
     for k in server_config_defaults:
         app.config[k] = server_config_defaults[k]
-    app.config['repo'].config.editors.append('knowledge_default')
+    app.repository.config.editors.append('knowledge_default')
     return app

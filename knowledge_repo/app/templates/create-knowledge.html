@@ -5,22 +5,18 @@
 
 
 {% block content %}
-<br>
-<h2> Select format to download a knowledge stub. </h2>
-<br>
 <center>
-<a class="btn" href="create/ipynb">
-Jupyter Notebook
-</a>
-<a class="btn" href="create/Rmd">
-<span>  R-Markdown </span>
-</a>
-<a class="btn" href="create/md">
-<span>  Markdown </span>
-</a>
-<a class="btn" href="posteditor">
-<span>  Web Post </span>
-</a>
+  <br>
+  <h3> Select format to download a knowledge stub. </h3>
+  <br>
+  <div class="create-btn-group" role="group">
+    <a class="btn btn-primary" href="create/ipynb" role="button"> Jupyter Notebook </a>
+    <a class="btn btn-primary" href="create/Rmd" role="button"> R-Markdown </a>
+    <a class="btn btn-primary" href="create/md" role="button"> Markdown </a>
+    {% if webeditor_enabled %}
+      <a class="btn btn-primary" href="posteditor" role="button"> Web Post </a>
+    {% endif %}
+</div>
 </center>
 
 

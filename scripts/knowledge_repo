@@ -1,7 +1,10 @@
 #!/usr/bin/env python
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import sys
 import os
+import itertools
 import signal
 import re
 import threading
@@ -78,7 +81,8 @@ if args.main_help:
     sys.exit(0)
 
 if args.repo is None:
-    raise ValueError("No repository specified. Please set the --repo flag, or the KNOWLEDGE_REPO environment variable.")
+    raise ValueError("No repository specified. Please set the --repo flag, \
+                      or the KNOWLEDGE_REPO environment variable.")
 
 # Update repository so that we can ensure git repository configuration is up to date
 # We wrap this in a try/except block because failing to update a repository can
@@ -201,7 +205,7 @@ if args.action == 'init':
             embed_tooling['branch'] = args.tooling_branch
     kr = knowledge_repo.KnowledgeRepository.create_for_uri(args.repo, embed_tooling=embed_tooling)
     if kr is not None:
-        print "Knowledge repository created for uri `{}`.".format(kr.uri)
+        print("Knowledge repository created for uri `{}`.".format(kr.uri))
     sys.exit(0)
 
 # All subsequent actions perform an action on the repository, and so we instantiate
@@ -214,20 +218,20 @@ if args.action == 'create':
     if os.path.exists(args.filename):
         raise ValueError("File already exists at '{}'. Please choose a different filename and try again.".format(args.filename))
     shutil.copy(src, args.filename)
-    print "Created a {format} knowledge post template at {filename}.".format(format=args.format, filename=args.filename)
+    print("Created a {format} knowledge post template at {filename}.".format(format=args.format, filename=args.filename))
 
 # # Check which branches have local work
 if args.action == 'drafts':
     statuses = repo.post_statuses(repo.dir(status=[repo.PostStatus.DRAFT, repo.PostStatus.SUBMITTED, repo.PostStatus.UNPUBLISHED]), detailed=True)
-    print tabulate([[path, status.name, details] for path, (status, details) in statuses.items()], ['Post', 'Status', 'Details'], 'fancy_grid')
+    print(tabulate([[path, status.name, details] for path, (status, details) in statuses.items()], ['Post', 'Status', 'Details'], 'fancy_grid'))
     sys.exit(0)
 
 if args.action == 'status':
     status = repo.status_message
     if isinstance(args.repo, dict):
-        print "\n-----\n".join(['Repository: {name}\n{message}'.format(name=name, message=message) for name, message in status.items()])
+        print("\n-----\n".join(['Repository: {name}\n{message}'.format(name=name, message=message) for name, message in status.items()]))
     else:
-        print repo.status_message
+        print(repo.status_message)
     sys.exit(0)
 
 # Add a document to the data repository
@@ -238,15 +242,18 @@ if args.action == 'add':
 
 if args.action in ['submit', 'push']:
     if args.action == 'push':
-        print "WARNING: The `push` action is deprecated, and you are encouraged to use `knowledge_repo submit <path>` instead."
+        print("WARNING: The `push` action is deprecated, and you are encouraged to use `knowledge_repo submit <path>` instead.")
     repo.submit(path=args.path)
     sys.exit(0)
 
 # Everything below this point has to do with running and/or managing the web app
 
 if args.action in ['preview', 'runserver']:
-
-    app = repo.get_app(debug=args.debug, db_uri=args.dburi, config=args.config)
+    app = repo.get_app(debug=args.debug,
+                       db_uri=args.dburi,
+                       config=args.config,
+                       REPOSITORY_INDEXING_ENABLED=(args.action == 'runserver'),
+                       REPOS=args.repo)
 
     if args.action == 'preview':
         kp_path = repo._kp_path(args.path)
@@ -254,7 +261,32 @@ if args.action in ['preview', 'runserver']:
         url = 'http://127.0.0.1:{}/render?markdown={}'.format(args.port, kp_path)
         threading.Timer(1.25, lambda: webbrowser.open(url)).start()
 
-    app.run(debug=args.dev, host='0.0.0.0', port=args.port, use_reloader=args.action == 'runserver', threaded=True)
+    use_reloader = args.dev and args.action == 'runserver'
+    threaded = True
+    # Check if in-memory databases are being used, and if so, avoid using threading
+    uris = []
+    def get_uris(uri):
+        if isinstance(uri, str):
+            uris.append(uri)
+            return
+        elif isinstance(uri, knowledge_repo.KnowledgeRepository):
+            get_uris(uri.uri)
+        elif isinstance(uri, dict):
+            for u in uri.values():
+                get_uris(u)
+    get_uris(repo)
+    for u in itertools.chain(uris, [app.config['SQLALCHEMY_DATABASE_URI']]):
+        if ':memory:' in u or u.startswith('sqlite://:'):
+            use_reloader = False
+            threaded = False
+            break
+
+    app.run(debug=args.dev,
+            host='0.0.0.0',
+            port=args.port,
+            use_reloader=use_reloader,
+            threaded=threaded)
+
 
 elif args.action == 'deploy':
     import tempfile
@@ -275,12 +307,15 @@ elif args.action == 'deploy':
 import sys
 sys.path.insert(0, '{}')
 import knowledge_repo
-app = knowledge_repo.KnowledgeRepository.for_uri({}).get_app(db_uri={}, debug={}, config={})
-        '''.format(kr_path, uris, db_uri, str(args.debug), '"' + os.path.abspath(args.config) + '"' if args.config is not None else "None"))
+app = knowledge_repo.KnowledgeRepository.for_uri({}).get_app(db_uri={}, debug={}, config={}, REPOS={})
+        '''.format(kr_path, uris, db_uri, str(args.debug),
+                   '"' + os.path.abspath(args.config) + '"' if args.config is not None else "None",
+                   args.repo))
 
     try:
         # Run gunicorn server
-        cmd = "cd {}; gunicorn -w {} --timeout {} -b 0.0.0.0:{} server:app".format(tmp_dir, args.workers, args.timeout, args.port)
+        cmd = "cd {}; gunicorn -w {} --timeout {} -b 0.0.0.0:{} server:app"
+        cmd = cmd.format(tmp_dir, args.workers, args.timeout, args.port)
         # logger.info("Starting server with command:  " + " ".join(cmd))
         subprocess.check_output(cmd, shell=True)
     finally:

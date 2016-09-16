@@ -1,10 +1,6 @@
 # Configuration for this knowledge data repository.
 
 
-# Paths relative to repository root in which to look for posts
-search_paths = ['.']
-
-
 # A function called to see whether a specified path is permitted in the repository
 # Only enforced when creating/modifying posts. It should return the path as a standard
 # unix path (virtual folders separated by '/' and the final node should end in '.kp').
@@ -31,9 +27,6 @@ postprocessors = []
 # Usernames of users to keep informed of changes to the knowledge data repo
 editors = []
 
-# Contrib plugins used in the app, ex ['web_editor']
-plugins = []
-
 
 # Function to check whether provided username is a valid username, and if not, mutate it
 # such that it is. Should raise an exception if that is not possible, and otherwise
@@ -50,6 +43,14 @@ def username_to_name(username):
 # Function to convert a username to a person's email
 def username_to_email(username):
     return '{}@example.com'.format(username)
+
+
+# Function to generate the web uri for a knowledge post at
+# path `path`. If `None`, should return the web uri for
+# the entire repository. Return `None` if a web uri does
+# not exist.
+def web_uri(path=None):
+    return None
 
 
 # WARNING: ADVANCED!

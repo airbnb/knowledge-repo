@@ -1,10 +1,9 @@
 import unittest
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 from sqlalchemy import and_
 
 from knowledge_repo import KnowledgeRepository
 from knowledge_repo.app.models import User, Vote, Post
-from knowledge_repo.app.constants import GitPostStatus
 from knowledge_repo.app.app import db_session
 
 
@@ -36,7 +35,7 @@ class FavoriteTest(unittest.TestCase):
                          .filter(Vote.object_id == post.id)
                          .filter(Vote.object_type == 'post')
                          .all())
-            rv = self.app.get("/like?post_id=" + str(post.path), headers=self.headers)
+            rv = self.app.get("/like?post_id=" + str(post.id), headers=self.headers)
 
             assert rv.status == '200 OK', post.path + rv.status
 
@@ -49,7 +48,7 @@ class FavoriteTest(unittest.TestCase):
 
             # assert that if you re-like the page, the number of likes doesn't
             # change
-            rv = self.app.get("/like?post_id=" + str(post.path), headers=self.headers)
+            rv = self.app.get("/like?post_id=" + str(post.id), headers=self.headers)
 
             assert rv.status == '200 OK'
 
@@ -66,7 +65,7 @@ class FavoriteTest(unittest.TestCase):
                          .filter(Vote.object_id == post.id)
                          .filter(Vote.object_type == 'post')
                          .all())
-            rv = self.app.get("/unlike?post_id=" + str(post.path), headers=self.headers)
+            rv = self.app.get("/unlike?post_id=" + str(post.id), headers=self.headers)
 
             assert rv.status == '200 OK'
 
@@ -84,7 +83,7 @@ class FavoriteTest(unittest.TestCase):
             rv = self.app.get("/favorites", headers=self.headers)
             assert rv.status == "200 OK"
             data = rv.data.decode('utf-8')
-            soup = BeautifulSoup(data)
+            soup = BeautifulSoup(data, 'html.parser')
             all_posts = soup.findAll(
                 'div', {'class': 'row row-space-4 panel feed-post'})
 

@@ -1,16 +1,20 @@
+from __future__ import absolute_import
+from __future__ import print_function
+
+from builtins import object
 import sys
 import os
 from abc import abstractmethod, abstractproperty
 import datetime
 from collections import OrderedDict
 from enum import Enum
-from itertools import chain
 
 from . import config_defaults
-from post import KnowledgePost
+from .post import KnowledgePost
 from .config import KnowledgeRepositoryConfig
 from .postprocessor import KnowledgePostProcessor
 from .utils.registry import SubclassRegisteringABCMeta
+from future.utils import with_metaclass
 
 if sys.version_info.major > 2:
     from urllib.parse import urlparse
@@ -18,47 +22,19 @@ else:
     from urlparse import urlparse
 
 
-class KnowledgeRepository(object):
-    __metaclass__ = SubclassRegisteringABCMeta
+class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
     _registry_keys = None
 
-    class PostStatus(object):  # TODO: remake this an Enum, and test on Python 2.7.7
+    class PostStatus(Enum):
         '''
         Do not store these values in a datastore, as they may change
         from release to release. These keys should only be used to compare with
         the output of a KnowledgeRepository.
         '''
-
-        class Status(object):  # TODO remove this, since Enum provides this functionality
-            __slots__ = ('name', 'value')
-
-            def __init__(self, name, value):
-                self.name = name
-                self.value = value
-
-            def __str__(self):
-                return '<PostStatus.{}: {}>'.format(self.name, self.value)
-
-            def __eq__(self, other):
-                return other.value == self.value
-
-        DRAFT = Status('DRAFT', 0)  # Post is still being written and not yet submitted
-        SUBMITTED = Status('SUBMITTED', 1)  # Post is submitted and waiting for review
-        UNPUBLISHED = Status('UNPUBLISHED', 2)  # Post is approved to publish, but not published
-        PUBLISHED = Status('PUBLISHED', 3)  # Post is published and visible on /feed
-
-        __members__ = {'DRAFT': DRAFT,
-                       'SUBMITTED': SUBMITTED,
-                       'UNPUBLISHED': UNPUBLISHED,
-                       'PUBLISHED': PUBLISHED
-                       }
-
-        @classmethod
-        def for_value(cls, value):
-            for enum in cls.__members__.values():
-                if enum.value == value:
-                    return enum
-            raise ValueError("No such post status")
+        DRAFT = 0  # Post is still being written and not yet submitted
+        SUBMITTED = 1  # Post is submitted and waiting for review
+        UNPUBLISHED = 2  # Post is approved to publish, but not published
+        PUBLISHED = 3  # Post is published and visible on /feed
 
     @classmethod
     def for_uri(cls, uri, *args, **kwargs):
@@ -76,7 +52,7 @@ class KnowledgeRepository(object):
         else:
             uris = uri
 
-        krs = {name: cls.for_uri(uri) for name, uri in uris.items()}
+        krs = {name: cls.for_uri(uri) for name, uri in list(uris.items())}
         return MetaKnowledgeRepository(krs)
 
     @classmethod
@@ -332,6 +308,9 @@ class KnowledgeRepository(object):
     def _kp_new_revision(self, path):
         raise NotImplementedError
 
+    def _kp_web_uri(self, path):
+        return self.config.web_uri(path)
+
     def _kp_save(self, kp, path, update=False):
         if not update and self.has_post(path):
             raise ValueError("A knowledge post with the same path already exists. To update it, set the update flag.")
@@ -342,7 +321,11 @@ class KnowledgeRepository(object):
         for ref in kp._dir():
             self._kp_write_ref(path, ref, kp._read_ref(ref), revision)
 
+    @property
+    def web_uri(self):
+        return self.config.web_uri()
+
     # ----------- Interface with web app ----------------------------------
     def get_app(self, *args, **kwargs):
-        import app
+        from . import app
         return self.config.prepare_app(app.KnowledgeFlask(self, *args, **kwargs))

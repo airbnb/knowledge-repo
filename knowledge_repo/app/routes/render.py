@@ -1,12 +1,11 @@
 import json
 import logging
 
-from flask import request, url_for, redirect, render_template, current_app, Blueprint
+from flask import request, url_for, redirect, render_template, current_app, Blueprint, g
 
-from ..app import db_session
+from ..proxies import db_session, current_repo
 from ..models import User, Post, PageView
 from ..utils.render import render_post, render_comment, render_post_raw
-from ..utils.requests import from_request_get_user_info
 
 
 logging.basicConfig(level=logging.INFO)
@@ -18,34 +17,80 @@ blueprint = Blueprint('render', __name__,
 
 
 @blueprint.route('/raw', methods=['GET'])
-@PageView.log_pageview
+@PageView.logged
 def raw():
     """ Show the raw markdown of a post """
     return redirect(url_for('render.render', raw='true', **request.args))
 
 
 @blueprint.route('/presentation', methods=['GET'])
-@PageView.log_pageview
+@PageView.logged
 def presentation():
     """ Render the knowledge post as a presentation """
     return redirect(url_for('render.render', presentation='true', **request.args))
 
 
 @blueprint.route('/render', methods=['GET'])
-@PageView.log_pageview
+@PageView.logged
 def render():
     """ Render the knowledge post with all the related formatting """
 
     path = request.args.get('markdown', '')
     raw = request.args.get('raw', False)
 
-    username, user_id = from_request_get_user_info(request)
+    username, user_id = g.user.username, g.user.id
+
+    tmpl = 'markdown-rendered.html'
+    if raw:
+        tmpl = 'markdown-raw.html'
+    elif request.args.get('presentation'):
+        # TODO(dan?) fix presentation post
+        # presentation_post = {}
+        # presentation_post['authors_string'] = post.author_string
+        # presentation_post['tldr'] = post.tldr
+        # presentation_post['html'] = html
+        # html = create_presentation_text(presentation_post)
+        tmpl = "markdown-presentation.html"
+
+    if not current_app.config.get('REPOSITORY_INDEXING_ENABLED', True):
+        post = None
+        if current_repo.has_post(path):
+            post = current_repo.post(path)
+        else:
+            knowledge_aliases = current_repo.config.aliases
+            if path in knowledge_aliases:
+                # TODO: reframe as redirect
+                post = current_repo.post(knowledge_aliases[path])
+
+        if not post:
+            raise Exception("unable to find post at {}".format(path))
+
+        html = render_post(post)
+        raw_post = render_post_raw(post) if raw else None
+
+        return render_template(tmpl,
+                               html=html,
+                               post_id=post.id,
+                               post_path=path,
+                               raw_post=raw_post,
+                               comments=[],
+                               username=username,
+                               post_author=', '.join(post.headers['authors']),
+                               title=post.headers['title'],
+                               page_views=0,
+                               unique_views=0,
+                               likes=1,
+                               total_likes=0,
+                               tags_list=','.join(post.headers.get('tags', [])),
+                               user_subscriptions=[],
+                               webeditor_buttons=False,
+                               table_id=None)
 
     post = (db_session.query(Post)
                       .filter(Post.path == path)
                       .first())
     if not post:
-        knowledge_aliases = current_app.config['repo'].config.aliases
+        knowledge_aliases = current_repo.config.aliases
         if path in knowledge_aliases:
             # TODO: reframe as redirect
             post = (db_session.query(Post)
@@ -67,24 +112,13 @@ def render():
                           .filter(User.id == user_id)
                           .first())
 
-    tmpl = 'markdown-rendered.html'
-    if raw:
-        tmpl = 'markdown-raw.html'
-    elif request.args.get('presentation'):
-        # TODO(dan?) fix presentation post
-        # presentation_post = {}
-        # presentation_post['authors_string'] = post.author_string
-        # presentation_post['tldr'] = post.tldr
-        # presentation_post['html'] = html
-        # html = create_presentation_text(presentation_post)
-        tmpl = "markdown-presentation.html"
-
     tags_list = [str(t.name) for t in post.tags]
     user_subscriptions = [str(s) for s in user_obj.get_subscriptions]
 
     rendered = render_template(tmpl,
                                html=html,
-                               post_id=path,
+                               post_id=post.id,
+                               post_path=path,
                                raw_post=raw_post,
                                comments=comments,
                                username=username,
@@ -97,16 +131,29 @@ def render():
                                tags_list=tags_list,
                                user_subscriptions=user_subscriptions,
                                webeditor_buttons=False,
+                               web_uri=post.kp.web_uri,
                                table_id=None)
     return rendered
 
 
+@render.object_extractor
+def render():
+    post_path = request.args.get('markdown', '')
+    return {
+        'id': Post.query.filter(Post.path == post_path).first().id,
+        'type': 'post',
+        'action': 'view'
+    }
+
+
 @blueprint.route('/about', methods=['GET'])
+@PageView.logged
 def about():
     """Renders about page. This is the html version of REAMDE.md"""
     return render_template("about.html")
 
 
 @blueprint.route('/ajax_post_typeahead', methods=['GET', 'POST'])
+@PageView.logged
 def ajax_post_typehead():
     return json.dumps(current_app.config['typeahead_data'])

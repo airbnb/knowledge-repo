@@ -10,16 +10,6 @@ class RouteTest(unittest.TestCase):
         self.app = self.repo.get_app(config='tests/config_server.py').test_client()
         self.headers = {}
 
-#         config = app.config
-#         username_request_header = config.get('USERNAME_REQUEST_HEADER')
-#         self.app = app.test_client()
-#         self.knowledge_username = 'route_test_user'
-#         username_request_header = app.config.get("USERNAME_REQUEST_HEADER")
-#         self.headers = {
-#             username_request_header: self.knowledge_username
-#         }
-#         engine.echo = False
-
     def test01_test_index(self):
         """
         Test routing / to /feed

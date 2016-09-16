@@ -1,21 +1,27 @@
+from builtins import range
+from builtins import str
 import json
 import logging
+import sys
 import os
-import urllib
 from collections import defaultdict
 from datetime import datetime
-from flask import request, render_template, Blueprint, current_app, url_for, send_from_directory
+from flask import request, render_template, Blueprint, current_app, url_for, send_from_directory, g
 from sqlalchemy import or_
 from werkzeug import secure_filename
 from PyPDF2 import PdfFileReader
 
 from knowledge_repo.post import KnowledgePost
 from ..proxies import db_session, current_repo
-from ..models import Post, PostAuthors, Tag, Comment, User
-from ..utils.requests import from_request_get_user_info
+from ..models import Post, PostAuthorAssoc, Tag, Comment, User, PageView
 from ..utils.emails import send_review_email, send_reviewer_request_email
 from ..utils.image import pdf_page_to_png, is_pdf, is_allowed_image_format
-from ..constants import WebPostStatus
+
+
+if sys.version_info.major > 2:
+    from urllib.parse import unquote as urlunquote
+else:
+    from urllib import unquote as urlunquote
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -53,19 +59,18 @@ def generate_projects_typeahead():
 
 
 @blueprint.route('/webposts', methods=['GET'])
+@PageView.logged
 def gitless_drafts():
     """ Render the gitless posts that a user has created in table form
         Editors can see all the posts created via Gitless_Editing
     """
-    username, user_id = from_request_get_user_info(request)
-
     query = (db_session.query(Post))
     if current_app.config.get('WEB_EDITOR_PREFIXES', None):
         query = query.filter(or_(*[Post.path.like(p + '%') for p in current_app.config['WEB_EDITOR_PREFIXES']]))
 
-    if username not in current_repo.config.editors:
-        query = (query.outerjoin(PostAuthors, PostAuthors.c.post_id == Post.id)
-                      .filter(PostAuthors.c.user_id == user_id))
+    if g.user.username not in current_repo.config.editors:
+        query = (query.outerjoin(PostAuthorAssoc, PostAuthorAssoc.post_id == Post.id)
+                      .filter(PostAuthorAssoc.user_id == g.user.id))
 
     webposts = query.all()
 
@@ -73,17 +78,13 @@ def gitless_drafts():
 
 
 @blueprint.route('/posteditor', methods=['GET', 'POST'])
+@PageView.logged
 def post_editor():
     """ Render the web post editor, either with the default settings
         or if the post already exists, with what has been saved
     """
-    # import ipdb
-    # ipdb.set_trace()
     post_id = request.args.get('post_id', None)
-    # things we want regardless of whether a post exists or not author
-    username, user_id = from_request_get_user_info(request)
 
-    # default feed image
     headers = defaultdict(lambda: None)
     status = current_repo.PostStatus.DRAFT
     markdown = None
@@ -108,18 +109,22 @@ def post_editor():
     authors_str = ''
     if 'authors' in headers:
         authors_str = ', '.join(headers['authors'])
-        if username not in authors_str:
+        if g.user.username not in authors_str:
             can_approve = 1
 
     tags_str = ''
     if 'tags' in headers:
         tags_str = ', '.join(headers['tags'])
 
+    # get created at and updated at, or default to now
+    created_at = (headers['created_at'] or datetime.now()).strftime('%Y-%m-%d')
+    updated_at = (headers['updated_at'] or datetime.now()).strftime('%Y-%m-%d')
+
     return render_template('post_editor.html',
                            title=headers['title'],
-                           project=headers.get('project', ''),  # TODO remove me
-                           created_at=headers['created_at'] or datetime.now().date(),
-                           updated_at=headers['updated_at'] or datetime.now().date(),
+                           project=headers.get('project', ''),
+                           created_at=created_at,
+                           updated_at=updated_at,
                            author=authors_str,
                            tags=tags_str,
                            tldr=headers['tldr'],
@@ -132,10 +137,11 @@ def post_editor():
                            projects_typeahead=generate_projects_typeahead(),
                            tags_typeahead=generate_tags_typeahead(),
                            users_typeahead=generate_users_typeahead(),
-                           username=username)
+                           username=g.user.username)
 
 
 @blueprint.route('/submit', methods=['GET', 'POST'])
+@PageView.logged
 def submit_for_review():
     """ Change the status of a gitless post
         And if there are reviewers assigned, email them
@@ -162,6 +168,7 @@ def submit_for_review():
 
 
 @blueprint.route('/publish_post', methods=['GET', 'POST'])
+@PageView.logged
 def publish_post():
     """ Publish the gitless post by changing the status """
     post_id = request.args.get('post_id', None)
@@ -182,6 +189,7 @@ def publish_post():
 
 
 @blueprint.route('/unpublish_post', methods=['GET', 'POST'])
+@PageView.logged
 def unpublish_post():
     """ Unpublish the post, going back to the in_review status """
     post_id = request.args.get('post_id', None)
@@ -197,6 +205,7 @@ def unpublish_post():
 
 
 @blueprint.route('/author_publish', methods=['POST'])
+@PageView.logged
 def change_author_publish():
     """ Allow the author to publish their own webpost if the
         editor allows them to
@@ -214,6 +223,7 @@ def change_author_publish():
 
 
 @blueprint.route('/save_post', methods=['GET', 'POST'])
+@PageView.logged
 def save_post():
     """ Save the gitless post """
     post_id = request.args.get('post_id', None)
@@ -248,18 +258,18 @@ def save_post():
     kp = KnowledgePost(path=path)
 
     headers = {}
-    headers['created_at'] = datetime.strptime(data['created_at'], '%Y-%m-%d').date()
-    headers['updated_at'] = datetime.strptime(data['updated_at'], '%Y-%m-%d').date()
-    headers['title'] = data['title'].encode('utf8')
+    headers['created_at'] = datetime.strptime(data['created_at'], '%Y-%m-%d')
+    headers['updated_at'] = datetime.strptime(data['updated_at'], '%Y-%m-%d')
+    headers['title'] = str(data['title'])
     headers['path'] = post.path
-    headers['project'] = data['project'].encode('utf8')
+    headers['project'] = str(data['project'])
     # TODO: thumbnail header not working currently, as feed image set with kp
     # method not based on header
-    headers['thumbnail'] = data['feed_image'].encode('utf8')
-    headers['authors'] = [auth.strip().encode('utf8') for auth in data['author']]
-    headers['tldr'] = data['tldr'].encode('utf8')
-    headers['tags'] = [tag.strip().encode('utf8') for tag in data['tags']]
-    kp.write(urllib.unquote(data['markdown']), headers=headers)
+    headers['thumbnail'] = str(data['feed_image'])
+    headers['authors'] = [str(auth).strip() for auth in data['author']]
+    headers['tldr'] = str(data['tldr'])
+    headers['tags'] = [str(tag).strip() for tag in data['tags']]
+    kp.write(urlunquote(str(data['markdown'])), headers=headers)
 
     # add to repo
     current_repo.add(kp, update=True)  # THIS IS DANGEROUS
@@ -275,6 +285,7 @@ def save_post():
 
 
 @blueprint.route('/delete_post', methods=['GET'])
+@PageView.logged
 def delete_post():
     """ Delete a post """
     post_id = request.args.get('post_id', None)
@@ -287,6 +298,7 @@ def delete_post():
 
 
 @blueprint.route('/file_upload', methods=['POST', 'GET'])
+@PageView.logged
 def file_upload():
     """ Uploads images dropped on the web editor's markdown box to static/images
         and notifies editors by email
@@ -316,7 +328,7 @@ def file_upload():
                     src_pdf = PdfFileReader(img_file)
                     filename = os.path.splitext(filename)[0]
                     num_pages = src_pdf.getNumPages()
-                    for page_num in xrange(num_pages):
+                    for page_num in range(num_pages):
                         page_png = pdf_page_to_png(src_pdf, page_num)
                         page_name = "{filename}_{page_num}.jpg".format(**locals())
                         page_png.save(filename=os.path.join(dst_folder, page_name))
@@ -330,13 +342,14 @@ def file_upload():
 
 
 @blueprint.route('/review', methods=['POST'])
+@PageView.logged
 def review_comment():
     """ Saves the comments underneath a Gitless Post to a table
         and sends an email that the post has been reviewed to the
         author of the post
     """
     post_id = request.args.get('post_id', None)
-    commenter, commenter_id = from_request_get_user_info(request)
+    commenter, commenter_id = g.user.username, g.user.id
     data = request.get_json()   # just the comment text
     comment = Comment()
     comment.text = data['text']
@@ -352,6 +365,7 @@ def review_comment():
 
 
 @blueprint.route('/delete_review', methods=['GET', 'POST'])
+@PageView.logged
 def delete_review():
     """ Delete a comment that was made underneath a gitless contribution post """
     try:

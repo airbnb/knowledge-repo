@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from builtins import next
+from builtins import object
 import os
 import re
 import collections
@@ -6,6 +9,8 @@ import datetime
 import yaml
 import mimetypes
 import base64
+
+from .utils.encoding import encode, decode
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +54,7 @@ def setup_yaml():
     _mapping_tag = yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG
 
     def dict_representer(dumper, data):
-        return dumper.represent_dict(data.iteritems())
+        return dumper.represent_dict(data.items())
 
     def dict_constructor(loader, node):
         return collections.OrderedDict(loader.construct_pairs(node))
@@ -100,7 +105,7 @@ class ReferenceCache(object):
         return self._cache[key]
 
     def keys(self):
-        return self._cache.keys()
+        return list(self._cache.keys())
 
     def get(self, key, default=None):
         try:
@@ -162,13 +167,6 @@ class KnowledgePost(object):
         self._path = path
 
     # ------------ Reference cache methods ------------------------------------------
-    def __ustr_encode(self, data):
-        if isinstance(data, (str, unicode)):
-            if not isinstance(data, unicode):
-                data = unicode(data, encoding='utf-8')
-            return data.encode('utf-8')
-        return data
-
     def _read_ref(self, ref):
         if (ref not in self.__cache) and (self.repository is not None) and self.repository._kp_has_ref(self.path, ref):
             self.__cache[ref] = self.repository._kp_read_ref(self.path, ref)
@@ -198,18 +196,21 @@ class KnowledgePost(object):
         if not (body or headers):
             md = ''
         else:
-            md = self._read_ref('knowledge.md')
+            md = decode(self._read_ref('knowledge.md'))
+            mtch = re.match('^---\n[\s\S]+?---\n', md)
+            if not mtch:
+                raise ValueError("YAML header is missing. Please ensure that the top of your post has a header of the following form:\n" + SAMPLE_HEADER)
             if not headers:
                 md = re.sub('^---\n[\s\S]+?---\n', '', md, count=1)
             if not body:
-                md = re.match('^---\n[\s\S]+?---\n', md).group(0)
+                md = mtch.group(0)
         if images:
             return md, self.read_images()
         return md
 
     @property
     def image_paths(self):
-        return ['images/{}'.format(image_name) for image_name in self.__cache.get('images', {}).keys()]
+        return ['images/{}'.format(image_name) for image_name in list(self.__cache.get('images', {}).keys())]
 
     def read_image(self, name):
         return self._read_ref('image/' + name)
@@ -231,20 +232,20 @@ class KnowledgePost(object):
                 yaml.dump(headers, default_flow_style=False) + '---\n' + md
         md += '\n'
 
-        self._write_ref('knowledge.md', self.__ustr_encode(md))
+        self._write_ref('knowledge.md', encode(md))
 
-        for image, data in images.items():
+        for image, data in list(images.items()):
             self._write_ref('images/' + image, data)
 
     def write_image(self, name, data):
         self._write_ref('images/' + name, data)
 
     def write_images(self, image_data={}):
-        for name, data in self.image_data.items():
+        for name, data in list(self.image_data.items()):
             self.write_image(name, data)
 
     def write_src(self, name, data):
-        self._write_ref('orig_src/' + name, self.__ustr_encode(data))
+        self._write_ref('orig_src/' + name, encode(data))
 
     def add_srcfile(self, filename, name=None):
         if not name:
@@ -257,7 +258,7 @@ class KnowledgePost(object):
     @property
     def headers(self):
         try:
-            headers = yaml.load_all(self.read(body=False)).next()
+            headers = next(yaml.load_all(self.read(body=False)))
         except StopIteration as e:
             raise ValueError("YAML header is missing. Please ensure that the top of your post has a header of the following form:\n" + SAMPLE_HEADER)
         except yaml.YAMLError as e:
@@ -320,6 +321,11 @@ class KnowledgePost(object):
     def is_accepted(self):
         return self.status in [self.repository.PostStatus.UNPUBLISHED, self.repository.PostStatus.PUBLISHED]
 
+    @property
+    def web_uri(self):
+        if self.repository is not None:
+            return self.repository._kp_web_uri(self.path)
+
     # Conversion/Import/Export methods
     @classmethod
     def from_file(cls, filename, src_paths=[], format=None, postprocessors=None, **opts):
@@ -333,7 +339,7 @@ class KnowledgePost(object):
     def from_string(cls, string, src_strings={}, format=None, postprocessors=None, **opts):
         kp = KnowledgePostConverter.for_format(cls(), format=format, postprocessors=postprocessors).from_string(string, ** opts)
         if src_strings:
-            for src_name, data in src_strings.items():
+            for src_name, data in list(src_strings.items()):
                 kp.write_src(src_name, data)
         return kp
 
@@ -345,4 +351,4 @@ class KnowledgePost(object):
 
 from .converter import KnowledgePostConverter  # noqa
 from .postprocessors.format_checks import FormatChecks  # noqa
-from postprocessors.extract_images import ExtractImages  # noqa
+from .postprocessors.extract_images import ExtractImages  # noqa
