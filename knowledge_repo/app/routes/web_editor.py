@@ -34,28 +34,45 @@ blueprint = Blueprint('web_editor', __name__,
 # Currently, backended by Post objects but partially implemented on KnowledgePost API
 
 
-# TODO turn these into AJAX calls
+@blueprint.route('/ajax_tags_typeahead', methods=['GET'])
 def generate_tags_typeahead():
     tag_objs = (db_session.query(Tag).all())
     tags_typeahead = [str(tag_obj.name) for tag_obj in tag_objs]
-    return tags_typeahead
+    return json.dumps(tags_typeahead)
 
 
+@blueprint.route('/ajax_users_typeahead', methods=['GET'])
 def generate_users_typeahead():
     user_objs = (db_session.query(User).all())
     users_typeahead = [str(user_obj.username) for user_obj in user_objs]
-    return users_typeahead
+    return json.dumps(users_typeahead)
 
 
+@blueprint.route('/ajax_projects_typeahead', methods=['GET'])
 def generate_projects_typeahead():
     posts = db_session.query(Post).all()
     projects = []
     for p in posts:
         if p.project:
             projects.append(p.project)
-        elif p.path and len(p.path.split('/')) > 3:
-            projects.append(str(p.path.split('/')[2:-1][0]))
-    return list(set(projects))
+        elif p.path:
+            projects.append(from_path_get_project(p.path))
+    return json.dumps(list(set(projects)))
+
+
+def from_path_get_project(path):
+    """
+    To maintain an organization of webposts beyond a top-level
+    grouping, we keep track of a "project" for each post
+    :param: path of the post
+    :type path: string
+    """
+    folder_list = path.split("/")
+    # All posts are under the "projects/" folder
+    # We assume the next folder is the project
+    if len(folder_list) >= 2:
+        return folder_list[1]
+    return ""
 
 
 @blueprint.route('/webposts', methods=['GET'])
@@ -134,9 +151,6 @@ def post_editor():
                            comments=comments,
                            feed_image=thumbnail,
                            can_approve=can_approve,
-                           projects_typeahead=generate_projects_typeahead(),
-                           tags_typeahead=generate_tags_typeahead(),
-                           users_typeahead=generate_users_typeahead(),
                            username=g.user.username)
 
 
