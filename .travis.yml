@@ -4,7 +4,6 @@ python:
   - "3.4"
 
 before_install:
-  - sudo apt-get update
   # We do this conditionally because it saves us some downloading if the
   # version is the same.
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
@@ -34,4 +33,3 @@ before_script:
 script:
   - bash run_tests.sh
 
-sudo: false
