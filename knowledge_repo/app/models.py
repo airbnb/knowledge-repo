@@ -431,6 +431,7 @@ class Post(db.Model):
         """
         headers = kp.headers
 
+        self.uuid = kp.uuid
         self.path = kp.path
         self.project = headers.get('project')
         self.repository = kp.repository_uri

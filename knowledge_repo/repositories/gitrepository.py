@@ -372,6 +372,12 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
     # ------------ Knowledge Post Data Retrieval Methods -------------------------
 
+    def _kp_uuid(self, path):
+        try:
+            return self._kp_read_ref(path, 'UUID')
+        except:
+            return None
+
     def _kp_path(self, path, rel=None):
         return KnowledgeRepository._kp_path(self, os.path.expanduser(path), rel=rel or self.path)
 
@@ -415,7 +421,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         # revisions because using git rev-parse is slow.
         try:
             return int(self._kp_read_ref(path, 'REVISION'))
-        except IOError:
+        except:
             return 0
 
     def _kp_get_revisions(self, path):  # slow
@@ -425,7 +431,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         # of a non-bare git repository.
         raise NotImplementedError
 
-    def _kp_write_ref(self, path, reference, data, revision=None):
+    def _kp_write_ref(self, path, reference, data, uuid=None, revision=None):
         ref_path = os.path.join(self.path, path, reference)
         ref_dir = os.path.dirname(ref_path)
         if not os.path.exists(ref_dir):
@@ -446,8 +452,10 @@ class GitKnowledgeRepository(KnowledgeRepository):
     def _kp_diff(self, path, head, base):
         raise NotImplementedError
 
-    def _kp_new_revision(self, path):
+    def _kp_new_revision(self, path, uuid=None):
         self._kp_write_ref(path, "REVISION", encode(self._kp_get_revision(path) + 1))
+        if uuid:
+            self._kp_write_ref(path, "UUID", encode(uuid))
 
     def _kp_read_ref(self, path, reference, revision=None):
         with open(os.path.join(self.path, path, reference), 'rb') as f:

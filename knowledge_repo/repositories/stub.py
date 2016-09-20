@@ -63,6 +63,9 @@ class StubKnowledgeRepository(KnowledgeRepository):
 
     # ----------- Knowledge Post Data Retrieval/Pushing Methods --------------------
 
+    def _kp_uuid(self, path):
+        raise NotImplementedError
+
     def _kp_exists(self, path, revision=None):
         raise NotImplementedError
 
@@ -87,8 +90,8 @@ class StubKnowledgeRepository(KnowledgeRepository):
     def _kp_diff(self, path, head, base):
         raise NotImplementedError
 
-    def _kp_write_ref(self, path, reference, data, revision=None):
+    def _kp_write_ref(self, path, reference, data, uuid=None, revision=None):
         raise NotImplementedError
 
-    def _kp_new_revision(self, path):
+    def _kp_new_revision(self, path, uuid=None):
         raise NotImplementedError
