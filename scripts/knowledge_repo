@@ -159,6 +159,7 @@ add.add_argument('-p', '--path', help='The path of the destination post to be ad
 add.add_argument('--update', action='store_true', help='Whether this should update an existing post of the same name.')
 add.add_argument('--branch', help='The branch to use for this addition, if not the default (which is the path of the knowledge post).')
 add.add_argument('--squash', action='store_true', help='Automatically suppress all previous commits, and replace it with this version.')
+add.add_argument('--submit', action='store_true', help='Submit newly added post')
 add.add_argument('-m', '--message', help='The commit message to be used when committing into the repo.')
 add.add_argument('--src', nargs='+', help='Specify additional source files to add to <knowledge_post>/orig_src.')
 
@@ -255,9 +256,10 @@ if args.action == 'status':
 if args.action == 'add':
     kp = knowledge_repo.KnowledgePost.from_file(args.filename, src_paths=args.src)
     repo.add(kp, path=args.path, update=args.update, branch=args.branch, message=args.message, squash=args.squash)
-    sys.exit(0)
+    if not args.submit:
+        sys.exit(0)
 
-if args.action in ['submit', 'push']:
+if args.action in ['submit', 'push'] or (args.action == 'add' and args.submit):
     if args.action == 'push':
         print("WARNING: The `push` action is deprecated, and you are encouraged to use `knowledge_repo submit <path>` instead.")
     repo.submit(path=args.path)
