@@ -297,11 +297,11 @@ class GitKnowledgeRepository(KnowledgeRepository):
                 posts.update(self.git_dir(prefix=prefix, commit=self.config.published_branch))
             else:
                 for branch in local_posts:
-                    for prefix in local_posts[branch]:
-                        if prefix is not None and not prefix.startswith(prefix):
+                    for post_path in local_posts[branch]:
+                        if prefix is not None and not post_path.startswith(prefix):
                             continue
-                        if self._kp_status(prefix, branch=branch) in statuses:
-                            posts.add(prefix)
+                        if self._kp_status(post_path, branch=branch) in statuses:
+                            posts.add(post_path)
         for post in sorted(posts):
             yield post
 
@@ -394,7 +394,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
         if branch.name == self.config.published_branch:
             status = self.PostStatus.PUBLISHED, None
-        elif branch.name in self.git.remote().refs:
+        elif self.__remote_uri and branch.name in self.git.remote().refs:
             remote_branch = self.git.remote().refs[branch.name].name
             behind = len(list(self.git.iter_commits('{}..{}'.format(branch, remote_branch))))
             ahead = len(list(self.git.iter_commits('{}..{}'.format(remote_branch, branch))))
@@ -461,7 +461,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
     def __remote_uri(self):
         try:
             return self.git.git.remote('get-url', self.git.remote().name)
-        except git.exc.GitCommandError:
+        except:
             return None
 
     @property
