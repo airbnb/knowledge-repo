@@ -1,12 +1,54 @@
 import os
-import subprocess
 from setuptools import setup, find_packages
-from distutils.command.build import build
+from distutils import log
+from distutils.command.install_scripts import install_scripts
 
 # Extract version info from library
 version_info = {}
 with open('knowledge_repo/_version.py') as version_file:
     exec(version_file.read(), version_info)
+
+# Batch file template for Windows (based on https://github.com/matthew-brett/myscripter/blob/master/setup.py)
+BATCHFILE_TEMPLATE = r"""
+@echo off
+REM Wrapper around {script_name} to execute script in Windows using the interpreter specified with the hashbang
+set dirname=%~dp0
+set wrapped_script="%dirname%{script_name}"
+set /p line1=<%wrapped_script%
+if "%line1:~0,2%" == "#!" (goto :execute)
+echo First line of %wrapped_script% does not start with "#!"
+exit /b 1
+:execute
+set py_exe=%line1:~2%
+call "%py_exe%" %wrapped_script% %*
+"""
+
+
+# Custom script installer for Windows (based on https://github.com/matthew-brett/myscripter/blob/master/setup.py)
+class install_scripts_windows_wrapper(install_scripts):
+    def run(self):
+        install_scripts.run(self)
+        if not os.name == "nt":
+            return
+        for script_path in self.get_outputs():
+            # If we can find an executable name in the #! top line of the script
+            # file, make .bat wrapper for script.
+            with open(script_path) as fobj:
+                first_line = fobj.readline()
+            if not (first_line.startswith('#!') and 'python' in first_line.lower()):
+                log.info("Script does not appear to be a python executable. Skipping creation of batchfile wrapper")
+                continue
+            script_dirname, script_basename = os.path.split(script_path)
+            script_name, _ = os.path.splitext(script_basename)
+            batchfile_path = os.path.join(script_dirname, script_name + '.bat')
+            log.info("Making batchfile wrapper at {} (for {})".format(batchfile_path, script_path))
+
+            batchfile_content = BATCHFILE_TEMPLATE.format(script_name=script_name)
+
+            if self.dry_run:
+                continue
+            with open(batchfile_path, 'w') as fobj:
+                fobj.write(batchfile_content)
 
 
 setup(
@@ -59,5 +101,6 @@ setup(
     extras_require={
         'all': ['coverage'],
         'dev': ['coverage'],
-    }
+    },
+    cmdclass={'install_scripts': install_scripts_windows_wrapper}
 )

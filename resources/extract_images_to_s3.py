@@ -1,4 +1,5 @@
 import os
+import posixpath
 import random
 import string
 import logging
@@ -30,7 +31,7 @@ class ExtractImagesToS3(ExtractImages):
 
         try:
             # Get image type
-            img_ext = os.path.splitext(img_path)[1]
+            img_ext = posixpath.splitext(img_path)[1]
 
             # Make random filename for image
             random_string = ''.join(random.choice(string.ascii_lowercase) for i in range(6))
@@ -41,7 +42,7 @@ class ExtractImagesToS3(ExtractImages):
                 ext=img_ext).strip().replace(' ', '-')
 
             # Copy image to accessible folder on S3
-            fname_s3 = os.path.join(S3_IMAGE_ROOT, repo_name, fname_img)
+            fname_s3 = posixpath.join(S3_IMAGE_ROOT, repo_name, fname_img)
             cmd = "awc-mfa aws s3 cp '{0}' {1}".format(tmp_path, fname_s3)
             logger.info("Uploading images to S3: {cmd}".format(cmd=cmd))
             retval = os.system(cmd)
@@ -53,7 +54,7 @@ class ExtractImagesToS3(ExtractImages):
                 os.remove(tmp_path)
 
         # return uploaded path of file
-        return os.path.join(HTTP_IMAGE_ROOT, repo_name, fname_img)
+        return posixpath.join(HTTP_IMAGE_ROOT, repo_name, fname_img)
 
     @classmethod
     def skip_image(cls, kp, image):

@@ -1,4 +1,4 @@
-import os
+import posixpath
 
 # This file is only needed for setting up a dedicated server configuration
 # with support for extracting username information and emailing users.
@@ -8,7 +8,7 @@ SERVER_NAME = 'localhost'
 # ---------------------------------------------------
 # Database configuration
 # ---------------------------------------------------
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(os.path.dirname(__file__), 'knowledge.db')
+SQLALCHEMY_DATABASE_URI = 'sqlite:///' + posixpath.join(posixpath.dirname(__file__), 'knowledge.db')
 
 # Should the database tables be automatically created
 DB_AUTO_CREATE = True

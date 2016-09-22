@@ -7,6 +7,7 @@ This includes:
   - /favorites
 """
 import os
+import posixpath
 from flask import request, render_template, redirect, Blueprint, current_app, make_response
 
 from ..app import db_session
@@ -148,7 +149,7 @@ def render_cluster():
         folder_to_posts = {}
 
         for post in posts:
-            folder = os.path.dirname(post.path)
+            folder = posixpath.dirname(post.path)
             if folder in folder_to_posts:
                 folder_to_posts[folder].append(post)
             else:
