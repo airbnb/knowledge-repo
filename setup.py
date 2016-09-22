@@ -64,32 +64,7 @@ setup(
     zip_safe=False,
     include_package_data=True,  # See included paths in MANIFEST.in
     scripts=['scripts/knowledge_repo'],
-    install_requires=[
-        # Knowledge Repository Dependencies
-        'markdown',  # Markdown conversion utilities
-        'nbconvert',  # Jupyter notebook conversion utilities
-        'nbformat',  # Jupyter notebook reference format
-        'gitpython',  # Git abstraction
-        'pyyaml',  # Yaml parser and utilities
-        'tabulate',  # Rendering user information prettily
-        'enum34',  # Post status enum object
-        'future',  # Python 2/3 support
-        # Flask App Dependencies
-        'flask',  # Main flask framework
-        'flask_mail',  # Mail client and utilities
-        'Flask-Migrate',  # Database migration utilities
-        'sqlalchemy',  # Database abstractions
-        'jinja2>=2.7',  # Templating engine
-        'werkzeug',  # Development webserver
-        'gunicorn',  # Deployed webserver
-        'inflection',  # String transformation library
-        'PyPDF2',  # image for parsing PDFs to images
-        'wand',  # imagemagick integration for image uploading
-        'Pillow',  # image processing for sending images
-        # Testing Dependencies
-        'nose',  # Testing framework
-        'beautifulsoup4'  # HTML/XML parser
-    ],
+    install_requires=version_info['__dependencies__'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',
