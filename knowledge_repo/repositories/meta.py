@@ -129,8 +129,8 @@ class MetaKnowledgeRepository(KnowledgeRepository):
     def _kp_diff(self, path, head, base):
         return self.__delegate_for_path(path, '_kp_diff', head=head, base=base)
 
-    def _kp_write_ref(self, path, reference, data, revision=None):
-        return self.__delegate_for_path(path, '_kp_write_ref', reference=reference, data=data, revision=revision)
+    def _kp_write_ref(self, path, reference, data, uuid=None, revision=None):
+        return self.__delegate_for_path(path, '_kp_write_ref', reference=reference, data=data, uuid=uuid, revision=revision)
 
-    def _kp_new_revision(self, path):
-        return self.__delegate_for_path(path, '_kp_new_revision')
+    def _kp_new_revision(self, path, uuid=None):
+        return self.__delegate_for_path(path, '_kp_new_revision', uuid=uuid)

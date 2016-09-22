@@ -12,21 +12,29 @@ def update_index():
     """ Initialize the db from a KnowledgeRepository object
     """
     kr_dir = {kp.path: kp for kp in current_repo.posts()}
+    kr_uuids = {kp.uuid: kp for kp in kr_dir.values()}
     posts = db_session.query(Post).all()
 
     for post in posts:
-        # Check if post is reverted
+
+        # If UUID has changed, check if we can find it elsewhere in the repository, and if so update index path
+        if post.uuid and ((post.path not in kr_dir) or (post.uuid != kr_dir[post.path].uuid)):
+            if post.uuid in kr_uuids:
+                logger.info('Updating location of post: {} -> {}'.format(post.path, kr_uuids[post.uuid].path))
+                post.path = kr_uuids[post.uuid].path
+
+        # If path of post no longer in directory, mark as unpublished
         if post.path not in kr_dir:
             logger.info('Recording unpublished status for post at {}'.format(post.path))
             post.status = current_repo.PostStatus.UNPUBLISHED
             continue
 
-        # Otherwise, update database according to current state of knowledge post and
+        # Update database according to current state of existing knowledge post and
         # remove from kp_dir. This means that when this loop finishes, kr_dir will
         # only contain posts which are new to the repo.
         kp = kr_dir.pop(post.path)
 
-        # TODO : Update with new logic using upcoming uuid
+        # Update metadata of post if required
         if (kp.revision > post.revision or not post.is_published):
             if kp.is_valid():
                 logger.info('Recording update to post at: {}'.format(kp.path))

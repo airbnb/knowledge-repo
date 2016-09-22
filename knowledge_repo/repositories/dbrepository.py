@@ -38,6 +38,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
         postref_table = Table(table_name, metadata,
                               Column('id', Integer, primary_key=True),
                               Column('created_at', DateTime, default=func.now()),
+                              Column('uuid', String(512)),
                               Column('path', String(512)),
                               Column('revision', Integer, default=0),
                               Column('status', Integer, default=self.PostStatus.DRAFT.value),
@@ -147,6 +148,12 @@ class DbKnowledgeRepository(KnowledgeRepository):
 
     # ----------- Knowledge Post Data Retrieval/Pushing Methods --------------------
 
+    def _kp_uuid(self, path):
+        result = self.session.query(self.PostRef.uuid).filter(self.PostRef.path == path).first()
+        if result:
+            return result[0]
+        return None
+
     def _kp_exists(self, path, revision=None):
         query = (self.session.query(self.PostRef)
                              .filter(self.PostRef.path == path))
@@ -217,7 +224,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
     def _kp_diff(self, path, head, base):
         raise NotImplementedError
 
-    def _kp_write_ref(self, path, reference, data, revision=None):
+    def _kp_write_ref(self, path, reference, data, uuid=None, revision=None):
         revision = revision or self._kp_get_revision(path, enforce_exists=False) or 0
 
         postref = (self.session.query(self.PostRef)
@@ -229,12 +236,13 @@ class DbKnowledgeRepository(KnowledgeRepository):
             postref = self.PostRef()
             postref.path = path
             postref.ref = reference
+            postref.uuid = uuid
             postref.revision = revision
             self.session.add(postref)
 
         postref.data = data
         self.session.commit()
 
-    def _kp_new_revision(self, path):
+    def _kp_new_revision(self, path, uuid=None):
         revision = self._kp_get_revision(path, enforce_exists=False) or 0
         return revision + 1

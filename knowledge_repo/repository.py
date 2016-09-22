@@ -9,6 +9,7 @@ from abc import abstractmethod, abstractproperty
 import datetime
 from collections import OrderedDict
 from enum import Enum
+import uuid
 
 from . import config_defaults
 from .post import KnowledgePost
@@ -253,6 +254,10 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
 
     # ----------- Knowledge Post Data Retrieval/Pushing Methods --------------------
 
+    @abstractmethod
+    def _kp_uuid(self, path):
+        raise NotImplementedError
+
     def _kp_repository_uri(self, path):
         return self.uri
 
@@ -304,11 +309,11 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         raise NotImplementedError
 
     @abstractmethod
-    def _kp_write_ref(self, path, reference, data, revision=None):
+    def _kp_write_ref(self, path, reference, data, uuid=None, revision=None):
         raise NotImplementedError
 
     @abstractmethod
-    def _kp_new_revision(self, path):
+    def _kp_new_revision(self, path, uuid=None):
         raise NotImplementedError
 
     def _kp_web_uri(self, path):
@@ -317,12 +322,13 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
     def _kp_save(self, kp, path, update=False):
         if not update and self.has_post(path):
             raise ValueError("A knowledge post with the same path already exists. To update it, set the update flag.")
-        revision = self._kp_new_revision(path)
+        kp.uuid = self._kp_uuid(path) or kp.uuid
         kp.path = path
-        kp.revision = revision
+        kp.revision = self._kp_new_revision(path, uuid=kp.uuid)
         kp.repository = self
+
         for ref in kp._dir():
-            self._kp_write_ref(path, ref, kp._read_ref(ref), revision)
+            self._kp_write_ref(path, ref, kp._read_ref(ref), uuid=kp.uuid, revision=kp.revision)
 
     @property
     def web_uri(self):

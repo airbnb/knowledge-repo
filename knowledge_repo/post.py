@@ -10,6 +10,7 @@ import datetime
 import yaml
 import mimetypes
 import base64
+import uuid
 
 from .utils.encoding import encode, decode
 
@@ -166,6 +167,19 @@ class KnowledgePost(object):
     @path.setter
     def path(self, path):
         self._path = path
+
+    @property
+    def uuid(self):
+        if not getattr(self, '_uuid', None):
+            if self.repository is not None:
+                self._uuid = self.repository._kp_uuid(self.path)  # Use repository UUID (even if None)
+            else:
+                self._uuid = str(uuid.uuid4())
+        return self._uuid
+
+    @uuid.setter
+    def uuid(self, uuid):
+        self._uuid = uuid
 
     # ------------ Reference cache methods ------------------------------------------
     def _read_ref(self, ref):
