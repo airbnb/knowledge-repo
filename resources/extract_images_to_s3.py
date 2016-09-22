@@ -43,7 +43,9 @@ class ExtractImagesToS3(ExtractImages):
 
             # Copy image to accessible folder on S3
             fname_s3 = posixpath.join(S3_IMAGE_ROOT, repo_name, fname_img)
-            cmd = "awc-mfa aws s3 cp '{0}' {1}".format(tmp_path, fname_s3)
+            # Note: The following command may need to be prefixed with a login agent;
+            # for example, to handle multi-factor authentication.
+            cmd = "aws s3 cp '{0}' {1}".format(tmp_path, fname_s3)
             logger.info("Uploading images to S3: {cmd}".format(cmd=cmd))
             retval = os.system(cmd)
             if retval != 0:
