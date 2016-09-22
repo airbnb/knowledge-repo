@@ -98,7 +98,7 @@ To update an existing knowledge post, simply pass the `--update` option during t
 
 The knowledge repo's default behavior is to add the markdown's contents as is to your knowledge post git repository. If you do not have git LFS set up, it may be in your interest to have these images hosted on some type of cloud storage, so that pulling the repo locally isn't cumbersome. 
 
-To add support for pushing images to cloud storage, we provide a [postprocessor](https://github.com/airbnb/knowledge-repo/blob/master/resources/extract_images_to_s3.py). This file needs one line to be configured for your organization's cloud storage. Once configured, the postprocessor's registry key can be added to the knowledge git repository's configuration file as a postprocessor.
+To add support for pushing images to cloud storage, we provide an example [postprocessor](https://github.com/airbnb/knowledge-repo/blob/master/resources/extract_images_to_s3.py). This is a postprocessor for pushing the images to S3, and replacing the image references in the knowledge post with s3 links. A similar postprocessor could be written, replacing the aws commands with code suitable for your cloud hard drive.
 
 ## Running the web app
 
