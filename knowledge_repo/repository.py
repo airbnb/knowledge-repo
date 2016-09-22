@@ -4,6 +4,7 @@ from __future__ import print_function
 from builtins import object
 import sys
 import os
+import posixpath
 from abc import abstractmethod, abstractproperty
 import datetime
 from collections import OrderedDict
@@ -128,7 +129,7 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         else:
             prefixes = prefix
         assert all([prefix is None or isinstance(prefix, str) for prefix in prefixes]), "All path prefixes must be strings."
-        prefixes = [prefix if prefix is None else os.path.relpath(prefix, '/') for prefix in prefixes]
+        prefixes = [prefix if prefix is None else posixpath.relpath(prefix, '/') for prefix in prefixes]
         if isinstance(status, str):
             if status == 'all':
                 status = [self.PostStatus.DRAFT, self.PostStatus.SUBMITTED, self.PostStatus.PUBLISHED, self.PostStatus.UNPUBLISHED]
@@ -259,6 +260,8 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         if path is None:
             return None
         path = os.path.relpath(os.path.abspath(os.path.join(rel, path)), rel)
+        if os.name == 'nt':
+            path = path.replace(os.path.sep, os.path.altsep)
         path = self.config.path_parse(path)
         assert all([not segment.endswith('.kp') for segment in path.split(
             '/')[:-1]]), "The post path may not contain a directory named '*.kp'."

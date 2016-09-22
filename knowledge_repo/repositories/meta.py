@@ -1,4 +1,4 @@
-import os
+import posixpath
 
 from ..repository import KnowledgeRepository
 
@@ -21,7 +21,7 @@ class MetaKnowledgeRepository(KnowledgeRepository):
         path_prefixes = sorted(self.uri.keys(), key=lambda x: len(x), reverse=True)
         for prefix in path_prefixes:
             if path.startswith(prefix):
-                relpath = os.path.relpath(path, prefix or '.') if path else ''
+                relpath = posixpath.relpath(path, prefix or '.') if path else ''
                 return prefix, self.uri[prefix], relpath if relpath != '.' else None
         raise ValueError("No KnowledgeRepository found for '{}'.".format(path))
 
@@ -71,7 +71,7 @@ class MetaKnowledgeRepository(KnowledgeRepository):
         # TODO: Handle masked paths
         for (repo_prefix, repo, nested_prefix) in self.__repos_for_prefix(prefix):
             for path in repo.dir(prefix=nested_prefix, status=statuses):
-                yield os.path.join(repo_prefix, path)
+                yield posixpath.join(repo_prefix, path)
 
     # -------------- Post submission / addition user flow --------------------
 

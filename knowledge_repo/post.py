@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from builtins import next
 from builtins import object
 import os
+import posixpath
 import re
 import collections
 import logging
@@ -72,30 +73,30 @@ class ReferenceCache(object):
         self._cache = cache or {}
 
     def __setitem__(self, key, value):
-        parents = os.path.dirname(key).split('/')
+        parents = posixpath.dirname(key).split('/')
         cache = self._cache
         for parent in parents:
             if parent:
                 if parent not in cache:
                     cache[parent] = {}
                 cache = cache[parent]
-        cache[os.path.basename(key)] = value
+        cache[posixpath.basename(key)] = value
 
     def __getitem__(self, key):
-        parents = os.path.dirname(key).split('/')
+        parents = posixpath.dirname(key).split('/')
         cache = self._cache
         for parent in parents:
             if parent:
                 cache = cache[parent]
-        return cache[os.path.basename(key)]
+        return cache[posixpath.basename(key)]
 
     def __delitem__(self, key):
-        parents = os.path.dirname(key).split('/')
+        parents = posixpath.dirname(key).split('/')
         cache = self._cache
         for parent in parents:
             if parent:
                 cache = cache[parent]
-        del cache[os.path.basename(key)]
+        del cache[posixpath.basename(key)]
 
     def __getattr__(self, key):
         if key not in self._cache:
@@ -115,12 +116,12 @@ class ReferenceCache(object):
 
     def __contains__(self, key):
         try:
-            parents = os.path.dirname(key).split('/')
+            parents = posixpath.dirname(key).split('/')
             cache = self._cache
             for parent in parents:
                 if parent:
                     cache = cache[parent]
-            return os.path.basename(key) in cache
+            return posixpath.basename(key) in cache
         except KeyError:
             return False
 
@@ -131,10 +132,10 @@ class ReferenceCache(object):
                 cache = cache[parent]
         for key in cache:
             if isinstance(cache[key], dict):
-                for path in self.dir(parent=os.path.join(parent, key), cache=cache[key]):
+                for path in self.dir(parent=posixpath.join(parent, key), cache=cache[key]):
                     yield path
             else:
-                yield os.path.join(parent, key)
+                yield posixpath.join(parent, key)
 
 
 class KnowledgePost(object):
