@@ -6,7 +6,7 @@
 
 ### Feedback for Beta
 
-The Knowledge Repo is currently in a private beta, and we are rolling it out to more people to get feedback. In particular, we'd love to hear about the following:
+The Knowledge Repo is currently in a public beta, and we are rolling it out to more people to get feedback. In particular, we'd love to hear about the following:
 
  - How easy is it to set up the git knowledge post repository?
  - How easy is it to set up the web application, and make it live internally within your organization?
@@ -21,25 +21,40 @@ Here's a running list of known issues we are working on:
     - Rely completely on KnowledgePost objects instead of interacting with db records
     - Trigger "save" actions when necessary
     - Allow for image uploading
-    - Only reveal the "Write a Post!" button if webeditor is properly configured (non-empty `WEB_EDITOR_PREFIXES` in server_config.py, dbrepo specified on webapp runtime call)
  - The Python configuration for git knowledge repositories currently reads directly out of the `master` branch, allowing (depending on your organization's git policy) a malicious user to commit arbitrary code into the master branch, which then gets run on client and server machines during interactions with the git repository using the inbuilt knowledge repository abstractions.
 
 ## Introduction
 
-The Knowledge Repository project is focussed on facilitating the sharing of knowledge between data scientists and other technical roles using data formats and tools that make sense in these professions. It provides various data stores (and utilities to manage them) for "knowledge posts", which are a general markdown format that is automatically generated from the following common formats:
+The Knowledge Repository project is focussed on facilitating the sharing of knowledge between data scientists and other technical roles using data formats and tools that make sense in these professions. It provides various data stores (and utilities to manage them) for "knowledge posts". These knowledge posts are a general markdown format that is automatically generated from the following common formats:
 
  - Jupyter/Ipython notebooks
  - Rmd notebooks
  - Markdown files
 
+The Jupyter, Rmd, and Markdown files are required to have a specific set of yaml style headers which are used to organize and discover research:
+
+```
+---
+title: I Found that Lemurs Do Funny Dances
+authors:
+- sally_smarts
+- wesley_wisdom
+tags:
+- knowledge
+- example
+created_at: 2016-06-29
+updated_at: 2016-06-30
+tldr: This is short description of the content and findings of the post.
+---
+```
+
 Users add these notebooks/files to the knowledge repository through the `knowledge_repo` tool, as described below; which allows them to be rendered and curated in the knowledge repository's web app.
 
 If your favourite format is missing, we welcome contributions; and are happy to work with you to get it supported. See the "Contributing" section below to see how to add support for more formats.
 
-
 Note that the web application can live on top of multiple Knowledge Repo backends. Supported types so far are:
 
- - Github Repo
+ - Github Repo (Primary Use Case)
  - Web Application SQL db
 
 ## Getting started
@@ -64,20 +79,27 @@ You can drop the `--repo` option if you set the `$KNOWLEDGE_REPO` environment va
 
 For more details about the structure of a knowledge repository, see the technical details section below.
 
+## Writing Knowledge Posts
+
 ### TLDR Guide For Contributing
 
 If you have already set up your system as described below, here is a snapshot of the commands you need to run to upload your knowledge post stored in ~/Documents/my_post.ipynb. It assumes you have configured the KNOWLEDGE_REPO environment variable to point to your local copy of the knowledge repository.
 
-1. knowledge_repo create ipynb ~/Documents/my_post.ipynb
-2. knowledge_repo add ~/Documents/my_post.ipynb [-p projects/test_project] [--update]
-3. knowledge_repo preview projects/test_project
-4. knowledge_repo submit projects/test_project
-5. [If applicable] Open a PR in GitHub or other git web UI
-6. After it has been reviewed, merge it in to master.
+1. `knowledge_repo create ipynb ~/Documents/my_post.ipynb`, which creates a template with required yaml headers. Templates can also be downloaded by clicking "Write a Post!" on air/knowledge. *Make sure your post has these headers with correct values for your post*
+2. Do your work in the generated my_post.ipynb file. *Make sure the post runs through from start to finish before attempting to add to the Knowledge Repo!*
+3. `knowledge_repo add ~/Documents/my_post.ipynb [-p projects/test_project] [--update]`
+4. `knowledge_repo preview projects/test_project`
+5. `knowledge_repo submit projects/test_project`
+6. Open a PR in GitHub
+7. After it has been reviewed, merge it in to master.
 
-More Details:
+### Full Guide for Contributing:
 
-The whole point of a knowledge repository is to host knowledge posts. You can add a knowledge post using:
+The whole point of a knowledge repository is to host knowledge posts. Get started by first grabbing a stub that you'll use to do your research:
+
+`knowledge_repo create ipynb ~/Documents/my_post.ipynb` OR navigate to "Write a Post!" on the knowledge web application.
+
+This stub will be the notebook you do research in. After coding your work into the notebook or markdown, you can add a knowledge post commit using:
 
 `knowledge_repo --repo <repo_path> add <supported knowledge format> [-p <location in knowledge repo>]`
 
@@ -89,15 +111,21 @@ If you look in `test_repo` you will see a new folder `test_repo/projects/test_kn
 
 Note that the folder ends in '.kp'. This is added automatically to indicate that this folder is a knowledge post. Explicitly adding the '.kp' is optional.
 
-To update an existing knowledge post, simply pass the `--update` option, which will allow the add operation to override existing knowledge posts. e.g.
+To update an existing knowledge post, simply pass the `--update` option during the add step, which will allow the add operation to override existing knowledge posts. e.g.
 
 `knowledge_repo --repo <repo_path> add --update <supported knowledge format> <location in knowledge repo>`
 
-### Running the web app
+### Handling Images
+
+The knowledge repo's default behavior is to add the markdown's contents as is to your knowledge post git repository. If you do not have git LFS set up, it may be in your interest to have these images hosted on some type of cloud storage, so that pulling the repo locally isn't cumbersome. 
+
+To add support for pushing images to cloud storage, we provide a [postprocessor](https://github.com/airbnb/knowledge-repo/blob/master/resources/extract_images_to_s3.py). This file needs one line to be configured for your organization's cloud storage. Once configured, the postprocessor's registry key can be added to the knowledge git repository's configuration file as a postprocessor.
+
+## Running the web app
 
 Running the web app allows you to locally view all the knowledge posts in the repository, or to serve it for others to view. It is also useful when developing on the web app.
 
-#### Running the development server
+### Running the development server
 
 Running the web app in development/local/private mode is as simple as running:
 
@@ -107,7 +135,7 @@ Supported options are `--port` and `--dburi` which respectively change the local
 
 `knowledge_repo --repo <repo_path> db_upgrade --dburi <db>`
 
-#### Running the Web App on Multiple Repos
+### Running the Web App on Multiple Repos
 
 The web application can be run on top of multiple knowledge repo backends. To do this, include each repo with a name and path, prefixed by --repo. For example:
 
@@ -117,9 +145,9 @@ If including a dbrepo, add the name of the dbrepo to the `WEB_EDITOR_PREFIXES` i
 
 `knowledge_repo --repo {git}/path/to/git/repo --repo {webposts}sqlite:////tmp/dbrepo.db:mypostreftable runserver --config resources/server_config.py`
 
-Note that this is required for the webeditor, the "Write a Post!" section of the application.
+Note that this is required for the web application's internal post writing UI.
 
-#### Deploying the web app
+### Deploying the web app
 
 Deploying the web app is much like running the development server, except that the web app is deployed on top of gunicorn. It also allows for enabling server-side components such as sending emails to subscribed users.
 

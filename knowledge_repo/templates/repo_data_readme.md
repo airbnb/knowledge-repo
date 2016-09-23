@@ -1,211 +1,192 @@
 # The Knowledge Repository
 
-This document is an introduction to the knowledge repository and contains instructions on how
-to contribute. The Knowledge Repository hosts write-ups of research in a single, organized and accessible repository. It contains three primary types of documents:
+**Note:** The Knowledge Repository is a work in progress. There are lots of code cleanups and feature extensions TBD. Your assistance and involvement is more than encouraged.
 
-1. Contributions to the body of knowledge your organization
-2. Write-ups of projects and work in progress
-3. Descriptions of methods, tips and tricks
+## Introduction
 
-All posts share a common format, and are automatically converted from RMarkdown, IPython, or plain text. They are stored under version control in a git repository and will be rendered as webpages the hosted knowledge repo web application.
+The Knowledge Repository project is focussed on facilitating the sharing of knowledge between data scientists and other technical roles using data formats and tools that make sense in these professions. It provides various data stores (and utilities to manage them) for "knowledge posts". These knowledge posts are a general markdown format that is automatically generated from the following common formats:
 
-## Initial Setup
+ - Jupyter/Ipython notebooks
+ - Rmd notebooks
+ - Markdown files
 
-There are two steps to getting you computer ready to contribute to the knowledge repository.
-1. Install the `knowledge_repo` package and script.
-2. Check out this repository to your machine.
+The Jupyter, Rmd, and Markdown files are required to have a specific set of yaml style headers which are used to organize and discover research:
 
-
-### Installing `knowledge_repo`
-To prepare your computer with the software required to contribute to the repository, you must install the open source python library `knowledge_repo`. Doing this is as simple as:
-
-`pip install git+ssh://git@github.com/airbnb/knowledge-repo.git`
-
-This installs the python library as well as the `knowledge_repo` script that you will be using to interact with the knowledge repository.
-
-### Checking out the `knowledge` repository
-With that done, all that remains for you to do is to checkout this repository to a folder on your computer. 
-
-If you set the `KNOWLEDGE_REPO` environment variable in your `.bash_profile` file, you will not need to specify the `--repo` argument to the `knowledge_repo` script as shown below. You can do this by adding the following:
-
-`export KNOWLEDGE_REPO=/path/to/this/repo`
-
-## TLDR Guide For Contributing
-
-If you have already set up your system as described below, here is a snapshot of the commands you need to run to upload your knowledge post stored in ~/Documents/my_post.ipynb. It assumes you have configured the KNOWLEDGE_REPO environment variable to point to your local copy of the knowledge repository.
-
-1. knowledge_repo create ipynb ~/Documents/my_post.ipynb
-2. knowledge_repo add ~/Documents/my_post.ipynb [-p projects/test_project] [--update]
-3. knowledge_repo preview projects/test_project
-4. knowledge_repo submit projects/test_project
-5. [If applicable] Open a PR in GitHub or other git web UI
-6. After it has been reviewed, merge it in to master.
-
-For more details, read on.
-
-### Creating a new post
-
-Now the fun bit! Writing new posts. Go crazy! Anything is allowed. The web interface to the repo will render your posts for you, automatically converting from the following formats:
-
-* IPython Notebook (ipynb)
-* RMarkdown (Rmd)
-* Simple Markdown (md)
-
-So long as the post you create is in one of these formats, and satisfies the constraints described below, you're good to go.
-
-The easiest workflow is to do your research and write straight into one of these formats, so that when the time comes to actually contribute it, you don't have much overhead in transcribing your work.
-
-The internal knowledge post format is based on markdown, so you can use the vast majority of its features in your posts. If you are unfamiliar with Markdown syntax, you can read up about it online at a number of sites.
-
-### Constraints
-
-The knowledge repository does a pretty good job of converting posts from their original formats into its internal representation. However, it requires certain structural features; and there are other considerations to increase the uniformity of posts throughout the knowledge repository.
-
-#### Required Constraints
-
-__!!! Do not create and edit your posts within the checked out knowledge repository itself. If you do, you run the risk of losing work !!!__
-
-All posts must have a YAML header such as the one below:
 ```
 ---
-title: This is a Knowledge Template Header
+title: I Found that Lemurs Do Funny Dances
 authors:
 - sally_smarts
 - wesley_wisdom
 tags:
 - knowledge
 - example
-created_at: 2016-08-18
-updated_at: 2016-08-19
+created_at: 2016-06-29
+updated_at: 2016-06-30
 tldr: This is short description of the content and findings of the post.
 ---
 ```
-Failure to have such a header will result in the post not being submitted to the knowledge repository. You can either copy and paste this at the top of your existing file (make sure the cell is a markdown or raw cell in Jupyter notebooks), or we recommend getting started with a template that already contains a sample header. To do this, use the following command.
 
-`knowledge_repo --repo <knowledge_repo_path> create <format> <path where template should be created>`
+Users add these notebooks/files to the knowledge repository through the `knowledge_repo` tool, as described below; which allows them to be rendered and curated in the knowledge repository's web app.
 
-For example:
+If your favourite format is missing, we welcome contributions; and are happy to work with you to get it supported. See the "Contributing" section below to see how to add support for more formats.
 
-`knowledge_repo --repo /path/to/local/repo create ipynb ~/Documents/test.ipynb`
+Note that the web application can live on top of multiple Knowledge Repo backends. Supported types so far are:
 
-NOTE: If you want more complex formatting in your `tldr` you can write arbitrary markdown given you escape the field like so: 
+ - Github Repo (Primary Use Case)
+ - Web Application SQL db
 
-```
-tldr: |
-    You can write any markdown you want here (this is an escaped section)
+## Getting started
 
-    * bullet 1
-    * bullet 2
+### Installation
+To install the knowledge repository tooling, simply run:
 
-    You can even write arbitrary html (html is valid markdown)
-    <table>
-    <tr>
-    <th>I'm</th>
-    <th>a table</th>
-    </tr>
-    </table>
+`pip install git+ssh://git@github.com/airbnb/knowledge-repo.git`
 
-```
+### Setup
+If your organization already has a knowledge data repository setup, check it out onto your computer as you normally would; for example:
 
-It may be useful to interactively create your yaml header at a site like http://yaml-online-parser.appspot.com/ in order to quickly see that it's valid.
+`git clone git@example.com:example_data_repo.git`
 
-#### Consistency Constraints
+If not, or for fun, you can create a new knowledge repository using:
 
-* After your headers, include a table of contents section. This both gives a preview of the topics you will be discussing, and also allows you to send links to specific sections of your post. You can create a table of contents by adding this to your source code:
+`knowledge_repo --repo <repo_path> init`
 
-```
-**Table of Contents**
+Running this same script if a repo already exists at `<repo_path>` will allow you to update it to be a knowledge data repository. This is useful if you are starting a repository on a remote service like GitHub, as this allows you to clone the remote repository as per normal; run this script; and then push the initialization back into the remote service using `git push`.
 
-[TOC]
-```
+You can drop the `--repo` option if you set the `$KNOWLEDGE_REPO` environment variable to the location of that repository.
 
-* Try to use tags that already exist, rather than creating your own. 
+For more details about the structure of a knowledge repository, see the technical details section below.
 
-## Submitting your post to the repository
+## Writing Knowledge Posts
 
-Once you are happy with your post, it's time to submit it to the repository. This is mostly taken care of (again) by the `knowledge_repo` script.
+### TLDR Guide For Contributing
 
-### 1. Add your post to your local repository
+If you have already set up your system as described below, here is a snapshot of the commands you need to run to upload your knowledge post stored in ~/Documents/my_post.ipynb. It assumes you have configured the KNOWLEDGE_REPO environment variable to point to your local copy of the knowledge repository.
 
-In simplest (and most common) scenario, where all of your work is done in a single file, adding to the repository will look something like this:
+1. `knowledge_repo create ipynb ~/Documents/my_post.ipynb`, which creates a template with required yaml headers. Templates can also be downloaded by clicking "Write a Post!" on air/knowledge. *Make sure your post has these headers with correct values for your post*
+2. Do your work in the generated my_post.ipynb file. *Make sure the post runs through from start to finish before attempting to add to the Knowledge Repo!*
+3. `knowledge_repo add ~/Documents/my_post.ipynb [-p projects/test_project] [--update]`
+4. `knowledge_repo preview projects/test_project`
+5. `knowledge_repo submit projects/test_project`
+6. Open a PR in GitHub
+7. After it has been reviewed, merge it in to master.
 
-`knowledge_repo --repo <knowledge_repo_path> add <source_filename> <project_path> --push`
+### Full Guide for Contributing:
 
-This will convert your post (see appendix for more format-specific options), add and commit your post to a folder in the knowledge repository at `<project_path>` on a git branch by the same name (or with '.kp' appended). It will create this branch if it does not exist, or append commits if it does. 
+The whole point of a knowledge repository is to host knowledge posts. Get started by first grabbing a stub that you'll use to do your research:
 
-Other useful options include `--src <file1> <folder1> <file2>...` which adds source files to your project. Note that you do not need to specify your original post as a source file; since it is added automatically as such. You can push this post upstream for review (in its branch) directly as is, if you are super confident, using the `--push` option.
+`knowledge_repo create ipynb ~/Documents/my_post.ipynb` OR navigate to "Write a Post!" on the knowledge web application.
 
-For a complete run down of options, look at:
+This stub will be the notebook you do research in. After coding your work into the notebook or markdown, you can add a knowledge post commit using:
 
-`knowledge_repo --repo <knowledge_repo_path> add --help`
+`knowledge_repo --repo <repo_path> add <supported knowledge format> [-p <location in knowledge repo>]`
 
-### 2. Preview your post locally
+For example, if my knowledge repository is in a folder named `test_repo`, and I have an IPython notebook at `Documents/notebook.ipynb`, and I want it to be added to the knowledge repository under `projects/test_knowledge`, I can run:
 
-While the knowledge repo does a good job converting your posts, there are always going to be small formatting differences between your local viewers and what gets rendered on the server. It is a good idea to check how it is going to render on the server using:
+`knowledge_repo --repo test_repo add Documents/notebook.ipynb -p projects/test_knowledge`
 
-`knowledge_repo --repo <knowledge_repo_path> preview <project_path>`
+If you look in `test_repo` you will see a new folder `test_repo/projects/test_knowledge.kp`, which is checked into the repository on a branch named `test_repo/projects/test_knowledge.kp`. To submit it for review, simply run `knowledge_repo --repo ... submit <path>`.
 
-This will spin up your own copy of the knowledge repository website, and load up your post in your browser.
+Note that the folder ends in '.kp'. This is added automatically to indicate that this folder is a knowledge post. Explicitly adding the '.kp' is optional.
 
-Note that this assumes that you are still checked out on your projects branch. If you have added or looked at others' posts, you need to check out your projects branch again using:
+To update an existing knowledge post, simply pass the `--update` option during the add step, which will allow the add operation to override existing knowledge posts. e.g.
 
-`knowledge_repo --repo <knowledge_repo_path> checkout <project_branch>`
+`knowledge_repo --repo <repo_path> add --update <supported knowledge format> <location in knowledge repo>`
 
-or manually using git. You can see which branch you are currently on using:
+### Handling Images
 
-`knowledge_repo --repo <knowledge_repo_path> status`
+The knowledge repo's default behavior is to add the markdown's contents as is to your knowledge post git repository. If you do not have git LFS set up, it may be in your interest to have these images hosted on some type of cloud storage, so that pulling the repo locally isn't cumbersome. 
 
-### 3. Push your changes upstream
+Configuring the knowledge repository to strip out images and upload them to some cloud service looks like defining a KnowledgePostProcessor in the .knowledge_repo_config.py on the master branch of the repository; and then referencing it in the postprocessors configuration key. An example KnowledgePostProcessor that uploads images to S3 is provided in resources/extract_images_to_s3.py. Getting it working in your set up may require some tweaking, which we are happy to help with. Once configured, the postprocessor's registry key can be added to the knowledge post git repository's .knowledge_repo_config postprocessor list.
 
-If you've been cautious and didn't shortcut the previewing process, and your post looks good, you can now push it upstream for review. You can do this manually in git or by using:
+## Running the web app
 
-`knowledge_repo --repo <knowledge_repo_path> push <project_branch>`
+Running the web app allows you to locally view all the knowledge posts in the repository, or to serve it for others to view. It is also useful when developing on the web app.
 
-### 4. [If applicable] Open a pull request in Github or other git web ui
+### Running the development server
 
-Visit this repo's git web ui and create a new pull request. In GitHub this is done from the yellow bar that appears above the files currently in the repo. The branch to be merged should have the same name as the path of your post.
+Running the web app in development/local/private mode is as simple as running:
 
-Be sure to **label your pull request** with the appropriate label. For example, your organization might use:
+`knowledge_repo --repo <repo_path> runserver`
 
-* **WIP** - _"this is a work in progress, don't look yet"_
-* **Review** - _"this is ready to be reviewed"_ - Someone in your organization should take a look as soon as possible, hopefully within a day or so.
-* **Urgent** - _"I need to sent this out asap, please ok it"_ - In case the review needs to get done quickly.
+Supported options are `--port` and `--dburi` which respectively change the local port on which the server is running, and the sqlalchemy uri where the database can be found and/or initiated. The default port is 7000, and the default dburi is `sqlite:////tmp/knowledge.db`. If the database does not exist, it is created (if that is possible) and initialised. Database migrations are automatic (unless disabled to prevent accidental data loss), but can be performed manually using:
 
-### 4. Have your post reviewed
+`knowledge_repo --repo <repo_path> db_upgrade --dburi <db>`
 
-To make sure your research is high quality, it is good to get it reviewed by peers. In general it's good practice to add anyone who might know something about your topic or might be interested to make them aware of your work. It is a good idea to create a pull request early on, so you get feedback early in the writing process!
+### Running the Web App on Multiple Repos
 
-The repository is set-up so that reviewers can comment directly on text files, but also render them in semi-completed format with Github's 'View' mode for the 'knowledge.md' files. Feedback and comments can be left either in-line or in the 'Conversation' section of the Github UI.
+The web application can be run on top of multiple knowledge repo backends. To do this, include each repo with a name and path, prefixed by --repo. For example:
 
+`knowledge_repo --repo {git}/path/to/git/repo --repo {webposts}sqlite:////tmp/dbrepo.db:mypostreftable runserver`
 
-### 5. Integrate the reviewers' comments and merge!
+If including a dbrepo, add the name of the dbrepo to the `WEB_EDITOR_PREFIXES` in the server config, and add it as config when running the app:
 
-Once you have received comments from your peers, integrated them and received an approval, you can merge your branch into master. Once the PR is merged it will appear on the knowledge repo website in the space of a few minutes. Remember that the `/feed` view sorts by date, so remember to correctly set the `updated-at` date in your post header; otherwise your post might appear lower down the list than it should.
+`knowledge_repo --repo {git}/path/to/git/repo --repo {webposts}sqlite:////tmp/dbrepo.db:mypostreftable runserver --config resources/server_config.py`
 
-## Appendix
+Note that this is required for the web application's internal post writing UI.
 
-#### R Markdown
+### Deploying the web app
 
-If you'd like to use R Markdown, you can set it up using the process below:
+Deploying the web app is much like running the development server, except that the web app is deployed on top of gunicorn. It also allows for enabling server-side components such as sending emails to subscribed users.
 
-1. Download, install and open RStudio
-2. Install R packages by running `install.packages`. For example, to install the R markdown package, execute `install.packages("rmarkdown")`.
-3. Copy the RMarkdown template
-`knowledge_repo --repo <repository_path> create Rmd <path>.Rmd`.
-4. When you're ready to build the file, use the knit button (shift+command+k).
+Deploying is as simple as:
+`knowledge_repo --repo <repo_path> deploy`
 
-#### IPython/Jupyter Notebook
+or if using multiple repos:
+`knowledge_repo --repo {git}/path/to/git/repo --repo {webposts}sqlite:////tmp/dbrepo.db:mypostreftable deploy --config resources/server_config.py`
 
-If you'd like to use a IPython Notebook, you can set it up using the process below:
+Supported options are `--port`, `--dburi`,`--workers`, `--timeout` and `--config`. The `--config` option allows you to specify a python config file from which to load the extended configuration. A template config file is provided in `resources/server_config.py`. The `--port` and `--dburi` options are as before, with the `--workers` and `--timeout` options specifying the number of threads to use when serving through gunicorn, and the timeout after which the threads are presumed to have died, and will be restarted.
 
-1. The easiest way to install all the required packages is to install [Anaconda](http://continuum.io/downloads).
-2. Alternatively, run `pip install "jupyter[notebook]"`
-3. Start IPython with `jupyter notebook`.
-4. Copy the IPython template
-`knowledge_repo --repo <repository_path> create ipynb <path>.ipynb`.
+## Contributing
 
-### Knowledge Repository Web UI Tips
+We would love to work with you to create the best knowledge repository software possible. If you have ideas or would like to have your own code included, add an issue or pull request and we will review it.
 
-* You can Subscribe to tags when hovering over them (after which you will receive emails for new posts with that tag).
-* You can like posts by clicking the heart icon. The posts you liked will be collected under the favorites tab.
+### Adding new filetype support
+
+Support for conversion of a particular filetype to a knowledge post is added by writing a new `KnowledgePostConverter` object. Each converter should live in its own file in `knowledge_repo/converters`. Refer to the implementation for ipynb, Rmd, and md for more details. If your conversion is site-specific, you can define these subclasses in `.knowledge_repo_config`, whereupon they will be picked up by the conversion code.
+
+### Adding extra structure and/or verifications to the knowledge post conversion process
+
+When a KnowledgePost is constructed by converting from support filetypes, the resulting post is then passed through a series of postprocessors (defined in `knowledge_repo/postprocessors`). This allows one to modify the knowledge post, upload images to remote storage facilities (such as S3), and/or verify some additional structure of the knowledge posts. As above, defining or importing these classes in `.knowledge_repo_config.py` allows for postprocessors to be used locally.
+
+### More
+
+Is the Knowledge Repository missing something else that you would like to see? Let us know, and we'll see if we cannot help you.
+
+## Technical Details
+
+### What is a Knowledge Repository
+
+A knowledge repository is a virtual filesystem (such as a git repository or database). A GitKnowledgeRepository, for example, has the following structure:
+
+	<repo>
+	    + .git  # The git repository metadata
+	    + .resources  # A folder into which the knowledge_repo repository is checked out (as a git submodule)
+	    - .knowledge_repo_config.py  # Local configuration for this knowledge repository
+	    - <knowledge posts>
+
+The use of a git submodule to checkout the knowledge_repo into `.resources` allows use to ensure that the client and server are using the same version of the code. When one uses the `knowledge_repo` script, it actually passes the options to the version of the `knowledge_repo` script in `.resources/scripts/knowledge_repo`. Thus, updating the version of knowledge_repo used by client and server alike is as simple as changing which revision is checked out by git submodule in the usual way. That is:
+
+	pushd .resources
+	git pull
+	git checkout <revision>/<branch>
+	popd
+	git commit -a -m 'Updated version of the knowledge_repo'
+	git push
+
+Then, all users and servers associated with this repository will be updated to the new version. This prevents version mismatches between client and server, and all users of the repository.
+
+In development, it is often useful to disable this chaining. To use the local code instead of the code in the checked out knowledge repository, pass the `--dev` option as:
+
+`knowledge_repo --repo <repo_path> --dev <action> ...`
+
+### What is a Knowledge Post?
+
+A knowledge post is a virtual directory, with the following structure:
+
+	<knowledge_post>
+		- knowledge.md
+		+ images/* [Optional]
+		+ orig_src/* [Optional; stores the original converted file]
 
