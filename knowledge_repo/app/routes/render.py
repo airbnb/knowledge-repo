@@ -53,38 +53,7 @@ def render():
         tmpl = "markdown-presentation.html"
 
     if not current_app.config.get('REPOSITORY_INDEXING_ENABLED', True):
-        post = None
-        if current_repo.has_post(path):
-            post = current_repo.post(path)
-        else:
-            knowledge_aliases = current_repo.config.aliases
-            if path in knowledge_aliases:
-                # TODO: reframe as redirect
-                post = current_repo.post(knowledge_aliases[path])
-
-        if not post:
-            raise Exception("unable to find post at {}".format(path))
-
-        html = render_post(post)
-        raw_post = render_post_raw(post) if raw else None
-
-        return render_template(tmpl,
-                               html=html,
-                               post_id=post.id,
-                               post_path=path,
-                               raw_post=raw_post,
-                               comments=[],
-                               username=username,
-                               post_author=', '.join(post.headers['authors']),
-                               title=post.headers['title'],
-                               page_views=0,
-                               unique_views=0,
-                               likes=1,
-                               total_likes=0,
-                               tags_list=','.join(post.headers.get('tags', [])),
-                               user_subscriptions=[],
-                               webeditor_buttons=False,
-                               table_id=None)
+        return _render_preview(path=path, tmpl=tmpl)
 
     post = (db_session.query(Post)
                       .filter(Post.path == path)
@@ -136,6 +105,41 @@ def render():
     return rendered
 
 
+def _render_preview(path, tmpl):
+    post = None
+    if current_repo.has_post(path):
+        post = current_repo.post(path)
+    else:
+        knowledge_aliases = current_repo.config.aliases
+        if path in knowledge_aliases:
+            # TODO: reframe as redirect
+            post = current_repo.post(knowledge_aliases[path])
+
+    if not post:
+        raise Exception("unable to find post at {}".format(path))
+
+    html = render_post(post)
+    raw_post = render_post_raw(post) if raw else None
+
+    return render_template(tmpl,
+                           html=html,
+                           post_id=None,
+                           post_path=path,
+                           raw_post=raw_post,
+                           comments=[],
+                           username=None,
+                           post_author=', '.join(post.headers['authors']),
+                           title=post.headers['title'],
+                           page_views=0,
+                           unique_views=0,
+                           likes=1,
+                           total_likes=0,
+                           tags_list=','.join(post.headers.get('tags', [])),
+                           user_subscriptions=[],
+                           webeditor_buttons=False,
+                           table_id=None)
+
+
 @render.object_extractor
 def render():
     post_path = request.args.get('markdown', '')
@@ -156,4 +160,4 @@ def about():
 @blueprint.route('/ajax_post_typeahead', methods=['GET', 'POST'])
 @PageView.logged
 def ajax_post_typehead():
-    return json.dumps(current_app.config['typeahead_data'])
+    return json.dumps(current_app.config.get('typeahead_data', {}))
