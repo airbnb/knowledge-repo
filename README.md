@@ -191,7 +191,7 @@ knowledge_repo --repo <repo_path> preview <path of knowledge post to preview>
 
 In the case from above, we would run:
 ```
-knowledge_repo --repo knowledge_data_repo preview knowledge_data_repo/projects/test_knowledge
+knowledge_repo --repo knowledge_data_repo preview projects/test_knowledge
 ```
 
 There are other arguments that can be passed to this command, adding the `-h` flag shows them all along with further information about them.
