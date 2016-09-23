@@ -308,7 +308,11 @@ class GitKnowledgeRepository(KnowledgeRepository):
     # ------------- Post submission / addition user flow ----------------------
     def _add_prepare(self, kp, path, update=False, branch=None, squash=False, message=None):
         target = os.path.abspath(os.path.join(self.path, path))
-        branch = branch or path
+        if self.__remote_uri:
+            branch = branch or path
+        else:
+            logger.warning("This repository does not have a remote, and so post review is being skipped. Adding post directly into published branch...")
+            branch = self.config.published_branch
 
         # Create or checkout the appropriate branch for this project
         logger.info("Checking out (and/or creating) a new branch `{}`...".format(branch))
