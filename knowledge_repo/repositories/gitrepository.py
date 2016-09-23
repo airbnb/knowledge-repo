@@ -131,7 +131,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         current_branch.checkout()
 
     def set_active_draft(self, path):  # TODO: deprecate
-        branch = self.git_branch_for_post(path)
+        branch = self.git_branch_for_post(self._kp_path(path))
         self.config.published_branch = branch.name
         branch.checkout()
 
@@ -440,6 +440,8 @@ class GitKnowledgeRepository(KnowledgeRepository):
             return f.write(data)
 
     def _kp_dir(self, path, parent=None, revision=None):  # TODO: Account for revision
+        if parent:
+            path = os.path.join(path, parent)
         for dirpath, dirnames, filenames in os.walk(os.path.join(self.path, path)):
             for filename in filenames:
                 if dirpath == "" and filename == "REVISION":
