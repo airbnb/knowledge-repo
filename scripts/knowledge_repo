@@ -89,11 +89,11 @@ parser.add_argument('--knowledge-branch', dest='knowledge_branch', help='The bra
 parser.add_argument('--dev', action='store_true', help='Whether to skip passing control to version of code checked out in knowledge repository.')
 parser.add_argument('--debug', action='store_true', help='Whether to enable debug mode.')
 parser.add_argument('--noupdate', dest='update', action='store_false', help='Whether script should update the repository before performing actions.')
-parser.add_argument('--main-help', action='store_true', help='Show help and exit.')
+parser.add_argument('-h', '--help', action='store_true', help='Show help and exit.')
 
-args = parser.parse_known_args()[0]
+args, remaining_args = parser.parse_known_args()
 
-if args.main_help:
+if args.help and not remaining_args:
     parser.print_help()
     sys.exit(0)
 
