@@ -126,17 +126,17 @@ class ReferenceCache(object):
         except KeyError:
             return False
 
-    def dir(self, parent='', cache=None):
+    def dir(self, parent=None, cache=None):
         if cache is None:
             cache = self._cache
             if parent:
-                cache = cache[parent]
+                cache = cache.get(parent, {})
         for key in cache:
             if isinstance(cache[key], dict):
-                for path in self.dir(parent=posixpath.join(parent, key), cache=cache[key]):
+                for path in self.dir(parent=posixpath.join(parent or '', key), cache=cache[key]):
                     yield path
             else:
-                yield posixpath.join(parent, key)
+                yield posixpath.join(parent or '', key)
 
 
 class KnowledgePost(object):
@@ -196,12 +196,12 @@ class KnowledgePost(object):
     def _has_ref(self, ref):
         return (ref in self.__cache) or (self.repository is not None) and self.repository._kp_has_ref(self.path, ref)
 
-    def _dir(self):
-        for ref in self.__cache.dir():
+    def _dir(self, parent=None):
+        for ref in self.__cache.dir(parent=parent):
             if self.__cache[ref] is not None:
                 yield ref
         if self.repository is not None:
-            for ref in self.repository._kp_dir(self.path, revision=self.revision):
+            for ref in self.repository._kp_dir(self.path, parent=parent, revision=self.revision):
                 if ref not in self.__cache:
                     yield ref
 
@@ -225,7 +225,7 @@ class KnowledgePost(object):
 
     @property
     def image_paths(self):
-        return ['images/{}'.format(image_name) for image_name in list(self.__cache.get('images', {}).keys())]
+        return ['images/{}'.format(image_name) for image_name in self._dir(parent='images')]
 
     def read_image(self, name):
         return self._read_ref('image/' + name)

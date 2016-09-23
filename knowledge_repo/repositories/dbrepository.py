@@ -1,6 +1,7 @@
 from builtins import object
 
 import logging
+import posixpath
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session, mapper
@@ -204,6 +205,8 @@ class DbKnowledgeRepository(KnowledgeRepository):
         return data
 
     def _kp_dir(self, path, parent=None, revision=None):
+        if parent:
+            path = posixpath.join(path, parent)
         revision = revision or self._kp_get_revision(path, enforce_exists=True)
         refs = (self.session.query(self.PostRef.ref)
                             .filter(self.PostRef.path == path)

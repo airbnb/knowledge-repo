@@ -186,6 +186,7 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         if not path:
             raise ValueError("Post path not provided for Knowledge Post, and one is not specified within the knowledge post. Either add the path to post headers using `path: <path>` or specify the project path on the command line adding `-p <path>` to the current command.")
         path = self._kp_path(path)
+        path = self.config.path_parse(path)
 
         current_datetime = datetime.datetime.now()
         authors = kp.headers['authors']
@@ -267,7 +268,6 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         path = os.path.relpath(os.path.abspath(os.path.join(rel, path)), rel)
         if os.name == 'nt':
             path = path.replace(os.path.sep, os.path.altsep)
-        path = self.config.path_parse(path)
         assert all([not segment.endswith('.kp') for segment in path.split(
             '/')[:-1]]), "The post path may not contain a directory named '*.kp'."
         if path == '.' or path.startswith('..'):

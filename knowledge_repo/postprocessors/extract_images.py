@@ -39,17 +39,17 @@ class ExtractImages(KnowledgePostProcessor):
             if cls.skip_image(kp, image):
                 continue
             orig_path = os.path.join(kp.orig_context, image['src'])
+
+            new_path = None
             if kp._has_ref(image['src']):
                 new_path = cls.copy_image(kp, image['src'], is_ref=True)
-                md = cls.replace_image_locations(md, image['offset'], image[
-                                                 'tag'], image['src'], new_path)
             elif os.path.exists(orig_path):
                 new_path = cls.copy_image(kp, orig_path)
-                md = cls.replace_image_locations(md, image['offset'], image[
-                                                 'tag'], image['src'], new_path)
             else:
-                logger.warning(
-                    "Could not find an image at: {}".format(image['src']))
+                logger.warning("Could not find an image at: {}".format(image['src']))
+            if not new_path:
+                continue
+            md = cls.replace_image_locations(md, image['offset'], image['tag'], image['src'], new_path)
         kp.write(md)
 
     @classmethod
@@ -62,7 +62,8 @@ class ExtractImages(KnowledgePostProcessor):
 
     @classmethod
     def copy_image(cls, kp, path, is_ref=False):
-        assert not is_ref, "This method only supports copy from a filesystem into the knowledge post."
+        if is_ref:
+            return
         with open(path) as f:
             kp.write_image(os.path.basename(path), f.read())
         return os.path.join('images', os.path.basename(path))

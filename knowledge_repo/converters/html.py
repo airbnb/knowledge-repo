@@ -93,8 +93,7 @@ class HTMLConverter(KnowledgePostConverter):
         html = ''
         if not skip_headers:
             html += self.render_headers()
-        html += markdown.Markdown(extensions=MARKDOWN_EXTENSTIONS).convert(
-            self.kp.read())
+        html += markdown.Markdown(extensions=MARKDOWN_EXTENSTIONS).convert(self.kp.read())
 
         return self.apply_url_remapping(html, urlmappers)
 
@@ -144,5 +143,5 @@ class HTMLConverter(KnowledgePostConverter):
                 image_data = base64.b64encode(self.kp_images[url])
                 image_mimetype = mimetypes.guess_type(url)[0]
                 if image_mimetype is not None:
-                    return 'data:{};base64, '.format(image_mimetype) + image_data
+                    return 'data:{};base64, '.format(image_mimetype) + image_data.decode('utf-8')
         return None

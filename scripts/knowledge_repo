@@ -280,7 +280,7 @@ if args.action in ['preview', 'runserver']:
         url = 'http://127.0.0.1:{}/render?markdown={}'.format(args.port, kp_path)
         threading.Timer(1.25, lambda: webbrowser.open(url)).start()
 
-    use_reloader = args.dev and args.action == 'runserver'
+    use_reloader = args.debug and args.action == 'runserver'
     threaded = True
     # Check if in-memory databases are being used, and if so, avoid using threading
     uris = []
@@ -300,7 +300,7 @@ if args.action in ['preview', 'runserver']:
             threaded = False
             break
 
-    app.run(debug=args.dev,
+    app.run(debug=args.debug,
             host='0.0.0.0',
             port=args.port,
             use_reloader=use_reloader,
