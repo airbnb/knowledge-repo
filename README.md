@@ -84,24 +84,44 @@ Note that the web application can live on top of multiple Knowledge Repo backend
  - Web Application SQL db
 
 ## Getting started
+There are two repositories associated with the Knowledge Repository project.
+1. This repository, which will be installed first. This is referred to as the knowledge repository tooling.
+2. A knowledge data repository, which is created second. This is where the knowledge posts are stored.
 
-### Installation
+### Installation of the knowledge repository tooling
 To install the knowledge repository tooling, simply run:
 
 `pip install git+ssh://git@github.com/airbnb/knowledge-repo.git`
 
-### Setup
+The `knowledge_repo` script is the one that is used for all of the following actions. It requires the `--repo` flag to be passed to it, with the location of the knowledge data repository.
+
+You can drop the `--repo` option by setting the `$KNOWLEDGE_REPO` environment variable with the location of the  knowledge data repo in your bash/zsh/shell configuration. In bash, this would be done as such:
+```
+export $KNOWLEDGE_REPO=repo_path
+```
+
+### Setup of the knowledge data repositories
+There are two different ways to do this, depending on whether your organization already has a knowledge data repository or not:
+
+#### Your organization already has a knowledge data repository setup
 If your organization already has a knowledge data repository setup, check it out onto your computer as you normally would; for example:
 
 `git clone git@example.com:example_data_repo.git`
 
-If not, or for fun, you can create a new knowledge repository using:
-
-`knowledge_repo --repo <repo_path> init`
-
 Running this same script if a repo already exists at `<repo_path>` will allow you to update it to be a knowledge data repository. This is useful if you are starting a repository on a remote service like GitHub, as this allows you to clone the remote repository as per normal; run this script; and then push the initialization back into the remote service using `git push`.
 
-You can drop the `--repo` option if you set the `$KNOWLEDGE_REPO` environment variable to the location of that repository.
+#### Your organization does not have knowledge data repository setup
+The following command will create a new repository at `<repo_path>`
+```
+knowledge_repo --repo <repo_path> init
+```
+
+If you are hosting this repository on a remote service like Github, and you've created the knowledge data repository using the `init` flag, you must push that to that remote service in order for the later commands to work. On Git, this can be done by creating the remote repository through Git and then running
+
+```
+git remote add origin url_of_the_repository_on_github
+git push -u origin master
+```
 
 For more details about the structure of a knowledge repository, see the technical details section below.
 
@@ -121,25 +141,79 @@ If you have already set up your system as described below, here is a snapshot of
 
 ### Full Guide for Contributing:
 
-The whole point of a knowledge repository is to host knowledge posts. Get started by first grabbing a stub that you'll use to do your research:
+#### Creating knowledge
+Once the knowledge data repository has been initialized, it is possible to start adding posts. Each post in the knowledge repository requires a specific header format, used for metadata formatting.
+To create a new post using a provided template, which has both the header information and example content, run the following command:
+```
+knowledge_repo --repo <repo_path> create {ipynb, Rmd, md} filename
+```
 
-`knowledge_repo create ipynb ~/Documents/my_post.ipynb` OR navigate to "Write a Post!" on the knowledge web application.
+The first argument indicates the type of the file that you want created, while the second argument indicates where the file should be created.
 
-This stub will be the notebook you do research in. After coding your work into the notebook or markdown, you can add a knowledge post commit using:
+If the knowledge data repository is created at `knowledge_data_repo`, running
+```
+knowledge_repo --repo knowledge_data_repo create md ~/Documents/my_first_knowledge_post.md
+```
+will create a file, `~/Documents/my_first_knowledge_post.md`, the contents of which will be the boilerplate template of the knowledge post.
 
-`knowledge_repo --repo <repo_path> add <supported knowledge format> [-p <location in knowledge repo>]`
+The help menu for this command (and all following commands) can be reached by adding the `-h` flag, `knowledge_repo --repo <repo_path> create -h`.
 
-For example, if my knowledge repository is in a folder named `test_repo`, and I have an IPython notebook at `Documents/notebook.ipynb`, and I want it to be added to the knowledge repository under `projects/test_knowledge`, I can run:
+Alternatively, by going to the `/create` route in the webapp, you can click the button for whichever template you would like to have,
+and that will download the correct template.
 
-`knowledge_repo --repo test_repo add Documents/notebook.ipynb -p projects/test_knowledge`
+#### Adding knowledge
+Once you've finished writing a post, the next step is to add it to the knowledge data repository.
+To do this, run the following command:
+```
+knowledge_repo --repo <repo_path> add <file with format {ipynb, Rmd, md}> [-p <location in knowledge repo>]
+```
 
-If you look in `test_repo` you will see a new folder `test_repo/projects/test_knowledge.kp`, which is checked into the repository on a branch named `test_repo/projects/test_knowledge.kp`. To submit it for review, simply run `knowledge_repo --repo ... submit <path>`.
+Using the example from above, if we wanted to add the post `~/Documents/my_first_knowledge_post.md` to `knowledge_data_repo`,
+we would run:
+```
+knowledge_repo --repo knowledge_data_repo add ~/Documents/my_first_knowledge_post.md -p projects/test_knowledge
+```
 
-Note that the folder ends in '.kp'. This is added automatically to indicate that this folder is a knowledge post. Explicitly adding the '.kp' is optional.
+The `-p` flag specifies the location of the post in the knowledge data repository - in this case, `knowledge_data_repo/projects/test_knowledge`.
+The `-p` flag does not need to be specified if `path` is included in the header of the knowledge post.
 
-To update an existing knowledge post, simply pass the `--update` option during the add step, which will allow the add operation to override existing knowledge posts. e.g.
+#### Updating knowledge
+To update an existing knowledge post, pass the `--update` flag to the `add` command. This will allow the add operation to override exiting knowledge posts.
+```
+knowledge_repo --repo <repo_path> add --update <file with format {ipynb, Rmd, md}> <location in knowledge repo>
+```
 
-`knowledge_repo --repo <repo_path> add --update <supported knowledge format> <location in knowledge repo>`
+#### Previewing Knowledge
+If you would like to see how the post would render on the web app before submitting the post for review, run the following command:
+```
+knowledge_repo --repo <repo_path> preview <path of knowledge post to preview>
+```
+
+In the case from above, we would run:
+```
+knowledge_repo --repo knowledge_data_repo preview knowledge_data_repo/projects/test_knowledge
+```
+
+There are other arguments that can be passed to this command, adding the `-h` flag shows them all along with further information about them.
+
+#### Submitting knowledge
+After running the add command, two things should have happened:
+1. A new folder should have been created at the path specified in the add command, which ends in `.kp`. This is added automatically to indicate that the folder is a knowledge post.
+2. This folder will have been committed to the repository on the branch named `<repo_path>/path_in_add_command`
+
+Running the example command: `knowledge_repo --repo knowledge_data_repo add ~/Documents/my_first_knowledge_post.md -p projects/test_knowledge`, we would have seen:
+1. A new folder: `knowledge_data_repo/projects/test_knowledge.kp` which was committed on
+2. A branch (that you are now on), called `knowledge_data_repo/projects/test_knowledge`
+
+To submit this post for review, simply run the command:
+```
+knowledge_repo --repo <repo_path> submit <the path of the knowledge post>
+```
+
+In this case, we would run:
+```
+knowledge_repo --repo knowledge_data_repo submit knowledge_data_repo/projects/test_knowledge.kp
+```
 
 ### Handling Images
 
