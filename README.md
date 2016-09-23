@@ -1,8 +1,34 @@
-# The Knowledge Repository
+# The Knowledge Repository (BETA)
+
+The Knowledge Repository project is focussed on facilitating the sharing of knowledge between data scientists and other technical roles using data formats and tools that make sense in these professions. It provides various data stores (and utilities to manage them) for "knowledge posts"
 
 **Note:** The Knowledge Repository is a work in progress. There are lots of code cleanups and feature extensions TBD. Your assistance and involvement is more than encouraged.
 
-## Beta Release Information
+## Quickstart
+
+1\. Install the knowledge-repo tooling
+```
+pip install git+ssh://git@github.com/airbnb/knowledge-repo.git
+```
+2\. Initialize a knowledge repository - your posts will get added here
+```
+knowledge_repo --repo ./example_repo init
+```
+3\. Create a post template
+```
+knowledge_repo --repo ./example_repo create ipynb example_post.ipynb
+```
+4\. Edit the notebook file `example_post.ipynb` as you normally would.
+
+
+5\. Add your post to the repo with path `project/example`
+```
+knowledge_repo --repo ./example_repo add example_post.ipynb -p project/example
+```
+6\. Preview the added post
+```
+knowledge_repo --repo ./example_repo preview project/example
+```
 
 ### Feedback for Beta
 
@@ -117,7 +143,7 @@ To update an existing knowledge post, simply pass the `--update` option during t
 
 ### Handling Images
 
-The knowledge repo's default behavior is to add the markdown's contents as is to your knowledge post git repository. If you do not have git LFS set up, it may be in your interest to have these images hosted on some type of cloud storage, so that pulling the repo locally isn't cumbersome. 
+The knowledge repo's default behavior is to add the markdown's contents as is to your knowledge post git repository. If you do not have git LFS set up, it may be in your interest to have these images hosted on some type of cloud storage, so that pulling the repo locally isn't cumbersome.
 
 To add support for pushing images to cloud storage, we provide a [postprocessor](https://github.com/airbnb/knowledge-repo/blob/master/resources/extract_images_to_s3.py). This file needs one line to be configured for your organization's cloud storage. Once configured, the postprocessor's registry key can be added to the knowledge git repository's configuration file as a postprocessor.
 
