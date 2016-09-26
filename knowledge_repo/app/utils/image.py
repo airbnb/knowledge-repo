@@ -2,6 +2,9 @@ import imghdr
 import io
 import os
 
+from knowledge_repo.utils.dependencies import check_dependencies
+from knowledge_repo._version import __optional_dependencies__
+
 ALLOWED_IMAGE_TYPES = ('png', 'jpeg', 'gif')
 
 
@@ -26,6 +29,7 @@ def pdf_page_to_png(src_pdf, pagenum=0, resolution=154):
     :param int resolution: Resolution for resulting png in DPI.
     """
 
+    check_dependencies(__optional_dependencies__['pdf'])
     # Import libraries within this function so as to avoid import-time dependence
     import PyPDF2
     from wand.image import Image  # TODO: When we start using this again, document which system-level libraries are required.

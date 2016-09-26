@@ -8,8 +8,9 @@ The Knowledge Repository project is focussed on facilitating the sharing of know
 
 1\. Install the knowledge-repo tooling
 ```
-pip install git+ssh://git@github.com/airbnb/knowledge-repo.git
+pip install git+ssh://git@github.com/airbnb/knowledge-repo.git[ipynb]
 ```
+
 2\. Initialize a knowledge repository - your posts will get added here
 ```
 knowledge_repo --repo ./example_repo init
@@ -88,10 +89,15 @@ There are two repositories associated with the Knowledge Repository project.
 1. This repository, which will be installed first. This is referred to as the knowledge repository tooling.
 2. A knowledge data repository, which is created second. This is where the knowledge posts are stored.
 
-### Installation of the knowledge repository tooling
-To install the knowledge repository tooling, simply run:
+### Installation
+To install the knowledge repository tooling (and all its dependencies), simply run:
 
-`pip install git+ssh://git@github.com/airbnb/knowledge-repo.git`
+`pip install git+ssh://git@github.com/airbnb/knowledge-repo.git[all]`
+
+You can also skip installing dependencies which are only required in special cases by replacing `all` with one or more of the following (separated by commas):
+- `ipynb` : Installs the dependencies required for adding/converting Jupyter notebook files
+- `pdf` : Installs the dependencies required for uploading PDFs using the web editor
+- `dev`: Installs the dependencies required for doing development, including running the tests
 
 The `knowledge_repo` script is the one that is used for all of the following actions. It requires the `--repo` flag to be passed to it, with the location of the knowledge data repository.
 

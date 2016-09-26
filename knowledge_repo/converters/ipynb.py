@@ -1,10 +1,7 @@
 import os
-import nbformat
-from nbconvert import MarkdownExporter
-from jinja2 import DictLoader
-from traitlets.config import Config
 
 from ..converter import KnowledgePostConverter
+from .._version import __optional_dependencies__
 
 TEMPLATE = '''
 {%- extends 'markdown.tpl' -%}
@@ -36,7 +33,15 @@ TEMPLATE = '''
 class IpynbFormat(KnowledgePostConverter):
     _registry_keys = ['ipynb']
 
+    @property
+    def dependencies(self):
+        return __optional_dependencies__['ipynb']
+
     def from_file(self, filename):
+        import nbformat
+        from nbconvert import MarkdownExporter
+        from jinja2 import DictLoader
+        from traitlets.config import Config
 
         c = Config()
         # c.ExtractOutputPreprocessor.extract_output_types = set()

@@ -7,6 +7,11 @@ class StubConverter(KnowledgePostConverter):
     '''
     _registry_keys = None
 
+    @property
+    def dependencies(self):
+        # Dependencies required for this converter on top of core knowledge-repo dependencies
+        return []
+
     def from_file(self, filename, **opts):
         raise NotImplementedError
 

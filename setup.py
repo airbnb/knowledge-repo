@@ -65,6 +65,7 @@ setup(
     include_package_data=True,  # See included paths in MANIFEST.in
     scripts=['scripts/knowledge_repo'],
     install_requires=version_info['__dependencies__'],
+    extras_require=version_info['__optional_dependencies__'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',
@@ -73,9 +74,5 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2.7',
     ],
-    extras_require={
-        'all': ['coverage'],
-        'dev': ['coverage'],
-    },
     cmdclass={'install_scripts': install_scripts_windows_wrapper}
 )
