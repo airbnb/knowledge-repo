@@ -5,6 +5,7 @@ from functools import wraps
 
 from .postprocessor import KnowledgePostProcessor
 from .utils.registry import SubclassRegisteringABCMeta
+from .utils.dependencies import check_dependencies
 from future.utils import with_metaclass
 
 
@@ -20,12 +21,17 @@ class KnowledgePostConverter(with_metaclass(SubclassRegisteringABCMeta, object))
     _registry_keys = None  # File extensions
 
     def __init__(self, kp, format=None, postprocessors=None, **kwargs):
+        check_dependencies(self.dependencies, "Whoops! You are missing some dependencies required to use `{}` instances.".format(self.__class__.__name__))
         self.kp = kp
         self.format = format
         if postprocessors is None:
             postprocessors = ['extract_images', 'format_checks']
         self.postprocessors = postprocessors
         self.init(**kwargs)
+
+    @property
+    def dependencies(self):
+        return []
 
     def init(self):
         pass
