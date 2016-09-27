@@ -254,8 +254,7 @@ if args.action in ['preview', 'runserver']:
     app = repo.get_app(debug=args.debug,
                        db_uri=args.dburi,
                        config=args.config,
-                       REPOSITORY_INDEXING_ENABLED=(args.action == 'runserver'),
-                       REPOS=args.repo)
+                       REPOSITORY_INDEXING_ENABLED=(args.action == 'runserver'))
 
     if args.action == 'preview':
         kp_path = repo._kp_path(args.path)
@@ -309,7 +308,7 @@ elif args.action == 'deploy':
 import sys
 sys.path.insert(0, '{}')
 import knowledge_repo
-app = knowledge_repo.KnowledgeRepository.for_uri({}).get_app(db_uri={}, debug={}, config={}, REPOS={})
+app = knowledge_repo.KnowledgeRepository.for_uri({}).get_app(db_uri={}, debug={}, config={})
         '''.format(kr_path, uris, db_uri, str(args.debug),
                    '"' + os.path.abspath(args.config) + '"' if args.config is not None else "None",
                    args.repo))

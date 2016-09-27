@@ -155,9 +155,10 @@ class KnowledgeFlask(Flask):
             return response
 
         @self.context_processor
-        def webeditng_enabled():
-            repos = self.config.get('REPOS')
-            return {"webeditor_enabled": 'webposts' in repos if repos else False}
+        def webediting_enabled():
+            # TODO: Link this more to KnowledgeRepository capability and
+            # configuration rather than a specific name.
+            return {"webeditor_enabled": 'webposts' in current_repo.uris}
 
     @property
     def repository(self):

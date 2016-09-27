@@ -87,6 +87,32 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         assert isinstance(config, KnowledgeRepositoryConfig), "`config` should be a `KnowledgeRepositoryConfig` instance."
         self._config = config
 
+    @property
+    def uris(self):
+        # This translates KnowledgeRepository.uri to a consistent format
+        # across all KnowledgeRepository instances: a dictionary of form
+        # {<mountpoint>: <uri>}
+        # It assumes that self.uri is either a string or a dictionary mapping
+        # of form:
+        # {<mountpoint>: <KnowledgeRepositoryInstance>}
+        if isinstance(self.uri, str):
+            return {'': self.uri}
+        elif isinstance(self.uri, dict):
+            uri_dict = {}
+
+            def add_uris(uri_dict, uris, parent=''):
+                assert isinstance(uris, dict)
+                for mountpoint, uri in uris.items():
+                    if isinstance(uri, (str, KnowledgeRepository)):
+                        uri_dict[posixpath.join(parent, mountpoint)] = uri if isinstance(uri, str) else uri.uri
+                    elif isinstance(uri, dict):
+                        add_uris(uri_dict, uri, parent=posixpath.join(parent, mountpoint))
+                    else:
+                        raise ValueError("Unrecognised uri: {}".format(uri))
+            add_uris(uri_dict, self.uri)
+            return uri_dict
+        raise ValueError("Unrecognised KnowledgeRepository.uri: {}".format(self.uri))
+
     # ------------- Repository actions / state ------------------------------------
 
     def session_begin(self):
@@ -255,12 +281,12 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
 
     # ----------- Knowledge Post Data Retrieval/Pushing Methods --------------------
 
+    def _kp_repository_uri(self, path):
+        return self.uri
+
     @abstractmethod
     def _kp_uuid(self, path):
         raise NotImplementedError
-
-    def _kp_repository_uri(self, path):
-        return self.uri
 
     def _kp_path(self, path, rel='/'):
         if path is None:
