@@ -158,6 +158,5 @@ def about():
 
 
 @blueprint.route('/ajax_post_typeahead', methods=['GET', 'POST'])
-@PageView.logged
 def ajax_post_typehead():
     return json.dumps(current_app.config.get('typeahead_data', {}))
