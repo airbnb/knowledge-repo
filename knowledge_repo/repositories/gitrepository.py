@@ -120,14 +120,22 @@ class GitKnowledgeRepository(KnowledgeRepository):
         self.git.branches.master.checkout()
         self.git.remote().pull(branch)
         try:
-            self.git.submodule('embedded_knowledge_repo').update(init=True)
+            sm = self.git.submodule('embedded_knowledge_repo')
         except ValueError:  # This repository does not use embedded knowledge_repo tools or it is misnamed
             # Check for misnamed submodule
-            tree = self.git.tree()
-            if '.resources' in tree and isinstance(tree['.resources'], git.Submodule):
-                sm = tree['.resources']
-                sm._name = 'embedded_knowledge_repo'
-                sm.update(init=True)
+            sm = None
+            for submodule in self.git.submodules:
+                if submodule.path == '.resources':
+                    sm = submodule
+                    break
+        if sm is not None:
+            sm_target_url = sm.config_reader().get_value('url')
+            sm_actual_url = sm.module().git.config('--get', 'remote.origin.url')
+            if sm_target_url != sm_actual_url:
+                logging.info('Migrating embedded tooling from {} to {}.'.format(sm_actual_url, sm_target_url))
+                self.git.git.submodule('sync')
+                self.git.git.submodule('update', '--init', '--recursive', '--remote', '--force', '--checkout')
+            sm.update(init=True, force=True)
         current_branch.checkout()
 
     def set_active_draft(self, path):  # TODO: deprecate
