@@ -32,3 +32,15 @@ before_script:
   - "pep8 --exclude knowledge_repo/app/migrations,build --ignore=E501 ."
 script:
   - bash run_tests.sh
+
+# Deploy to pypi automatically from tagged releases on the stable branch
+deploy:
+  provider: pypi
+  user: nikkiray
+  password:
+    secure: YN2r3txhbQI+hZUhUrKy4/dANHKTOz+fzLdHTwhjtPEjTUZvcmxhx582qc4rmPO1qvKH+bzjq2YhhO0J+uN7PmYAvMGPDu1Cjn46GiDogfq3C2+vkM+iovXmXXW+/pd5GRSD2I0+P7s3z1BG2iMwHXrynlxCa9mDApN4kJvEs98Z8SlpUpsOSvv/BhMTMaS1BXUR14ZDedvwK7YJmUbCfdnHufT1T8egRqxbwVyFXQujLpXCv1XDo0mNYjYMjh6DKkn/loT9ZAFSpNYFPdf/ljZIaWbNEqbJ//xXqStW4ix8dVgItN2sNJXPoEAKKptofqzGmmevph0FwBO0aeNmy+nV0tZHmzGk24ofJhjdYuwJTeKSYJBrK0Hye7sQV19G7rba9ZdMp8fO/pLEW6d6g20tABrLxJDtPM+dCL8Tqhy+G0XTY5lKC3x9o+RldGrJCdecL1g4G05DCNeA4YeEdn3/dKt9JjlSXIxwWAFGXhQQtpY3GBKknDIW5gvdxcIk/ktLg80M7IZ5vd/6urN63jGmffawiMJ2Fv+Gx4c1Twm9CA0H8yKH2fV5mepFplpYUPkFjCNP8P5P6VyePSVFa2Re4+UXgzncoupDhG/FDW+skvqRk3S+ga68cNSzDKi2WcdTpRLhS7bvb8yHzshZ2JBMko06mJtpoKfZ8tI8iZg=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: airbnb/knowledge-repo
+    condition: $TRAVIS_PYTHON_VERSION = "3.4"
