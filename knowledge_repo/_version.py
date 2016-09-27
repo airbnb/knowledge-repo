@@ -6,7 +6,8 @@ __author__ = "Nikki Ray (maintainer), Robert Chang, Dan Frank,  Chetan Sharma,  
 __author_email__ = "nikki.ray@airbnb.com, robert.chang@airbnb.com, dan.frank@airbnb.com, chetan.sharma@airbnb.com, matthew.wardrop@airbnb.com"
 __version__ = "0.6.1"
 try:
-    __version__ += '_' + subprocess.check_output(['git', 'rev-parse', 'HEAD'], shell=False).decode('utf-8').replace('\n', '')
+    with open(os.devnull, 'w') as devnull:
+        __version__ += '_' + subprocess.check_output(['git', 'rev-parse', 'HEAD'], shell=False, stderr=devnull).decode('utf-8').replace('\n', '')
 except:
     pass
 __git_uri__ = "git@github.com:airbnb/knowledge-repo.git"
