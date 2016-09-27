@@ -9,7 +9,6 @@ from datetime import datetime
 from flask import request, render_template, Blueprint, current_app, url_for, send_from_directory, g
 from sqlalchemy import or_
 from werkzeug import secure_filename
-from PyPDF2 import PdfFileReader
 
 from knowledge_repo.post import KnowledgePost
 from ..proxies import db_session, current_repo
@@ -338,6 +337,7 @@ def file_upload():
                     return json.dumps({'error_msg': error_msg, 'success': False})
 
             elif is_pdf(filename):
+                from PyPDF2 import PdfFileReader
                 try:
                     src_pdf = PdfFileReader(img_file)
                     filename = os.path.splitext(filename)[0]
