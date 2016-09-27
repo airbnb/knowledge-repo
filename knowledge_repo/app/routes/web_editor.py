@@ -274,7 +274,7 @@ def save_post():
     headers['created_at'] = datetime.strptime(data['created_at'], '%Y-%m-%d')
     headers['updated_at'] = datetime.strptime(data['updated_at'], '%Y-%m-%d')
     headers['title'] = str(data['title'])
-    headers['path'] = post.path
+    headers['path'] = str(post.path)
     headers['project'] = str(data['project'])
     # TODO: thumbnail header not working currently, as feed image set with kp
     # method not based on header
