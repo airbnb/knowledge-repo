@@ -137,7 +137,7 @@ For more details about the structure of a knowledge repository, see the technica
 
 If you have already set up your system as described below, here is a snapshot of the commands you need to run to upload your knowledge post stored in ~/Documents/my_post.ipynb. It assumes you have configured the KNOWLEDGE_REPO environment variable to point to your local copy of the knowledge repository.
 
-1. `knowledge_repo create ipynb ~/Documents/my_post.ipynb`, which creates a template with required yaml headers. Templates can also be downloaded by clicking "Write a Post!" on air/knowledge. *Make sure your post has these headers with correct values for your post*
+1. `knowledge_repo create ipynb ~/Documents/my_post.ipynb`, which creates a template with required yaml headers. Templates can also be downloaded by clicking "Write a Post!" the web application. *Make sure your post has these headers with correct values for your post*
 2. Do your work in the generated my_post.ipynb file. *Make sure the post runs through from start to finish before attempting to add to the Knowledge Repo!*
 3. `knowledge_repo add ~/Documents/my_post.ipynb [-p projects/test_project] [--update]`
 4. `knowledge_repo preview projects/test_project`
