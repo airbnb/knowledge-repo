@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %} About the Knowledge Repo {% endblock %}
+{% block title %} {% endblock %}
 
 {% block content %}
 
@@ -9,196 +9,196 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/codehilite.css') }}">
     <div class='container'>
       <div id="renderedAbout">
-        <h3 id="the-knowledge-repository">The Knowledge Repository</h3>
-        <h4 id="introduction">Introduction</h4>
-        <p>The knowledge repository is a git repository, web app, and set of tools
-        that enables the sharing of knowledge between data scientists and other
-        technical roles. The idea is to act as a hub whereby people can submit
-        their work, and go through a standard QA review process, using data formats
-        that make sense in these professions. Currently, the knowledge repository
-        supports the following formats:</p>
+        <h1>The Knowledge Repository (BETA)</h1>
+        <p>The Knowledge Repository project is focused on facilitating the sharing of knowledge between data scientists and other technical roles using data formats and tools that make sense in these professions. It provides various data stores (and utilities to manage them) for “knowledge posts”, with a particular focus on notebooks (R Markdown and Jupyter / iPython Notebook) to better promote reproducible research.</p>
+        <h2><a id="Quickstart_6"></a>Quickstart</h2>
+        <p>1. Install the knowledge-repo tooling</p>
+        <pre><code>pip install git+ssh://git@github.com/airbnb/knowledge-repo.git[ipynb]</code></pre>
+        <p>2. Initialize a knowledge repository - your posts will get added here</p>
+        <pre><code>knowledge_repo --repo ./example_repo init</code></pre>
+        <p>3. Create a post template</p>
+        <p>for R Markdown:</p>
+        <pre><code>knowledge_repo --repo ./example_repo create Rmd example_post.Rmd</code></pre>
+        <p>for Jupyter / iPython Notebook:</p>
+        <pre><code>knowledge_repo --repo ./example_repo create ipynb example_post.ipynb</code></pre>
+        <p>4. Edit the notebook file, <code>example_post.Rmd</code> or <code>example_post.ipynb</code>, as you normally would.</p>
+        <p>5. Add your post to the repo with path <code>project/example</code></p>
+        <pre><code>knowledge_repo --repo ./example_repo add example_post.ipynb -p project/example</code></pre>
+        <p>6. Preview the added post</p>
+        <pre><code>knowledge_repo --repo ./example_repo preview project/example</code></pre>
+        <h2><a id="Introduction_52"></a>Introduction</h2>
+        <p>Knowledge posts are a general markdown format that is automatically generated from the following common formats:</p>
         <ul>
-            <li>Jupyter/Ipython notebooks</li>
-            <li>Rmd notebooks</li>
-            <li>Markdown files</li>
+        <li>Jupyter/Ipython notebooks</li>
+        <li>Rmd notebooks</li>
+        <li>Markdown files</li>
         </ul>
-        <p>Users add these notebooks to the knowledge repository through the
-        <code>knowledge_repo</code> tool, as described below, which converts them
-        into a standard format; and allows them to be rendered and curated in the
-        web app.</p>
-        <h4 id="getting-started">Getting started</h4>
-        <h5 id="installation">Installation</h5>
-        <p>To install the knowledge repository tooling, simply run:</p>
-        <p><code>pip install
-        git+ssh://git@github.com/airbnb/knowledge-repo.git</code></p>
-        <h5 id="setup">Setup</h5>
-        <p>If your organization already has a knowledge data repository setup,
-        check it out onto your computer as you normally would; for example:</p>
+        <p>The Jupyter, Rmd, and Markdown files are required to have a specific set of yaml style headers which are used to organize and discover research:</p>
+        <pre><code>---
+        title: I Found that Lemurs Do Funny Dances
+        authors:
+        - sally_smarts
+        - wesley_wisdom
+        tags:
+        - knowledge
+        - example
+        created_at: 2016-06-29
+        updated_at: 2016-06-30
+        tldr: This is short description of the content and findings of the post.
+        ---</code></pre>
+        <p>Users add these notebooks/files to the knowledge repository through the <code>knowledge_repo</code> tool, as described below; which allows them to be rendered and curated in the knowledge repository’s web app.</p>
+        <p>If your favourite format is missing, we welcome contributions; and are happy to work with you to get it supported. See the “Contributing” section below to see how to add support for more formats.</p>
+        <p>Note that the web application can live on top of multiple Knowledge Repo backends. Supported types so far are:</p>
+        <ul>
+        <li>Github Repo (Primary Use Case)</li>
+        <li>Web Application SQL db</li>
+        </ul>
+        <h2><a id="Getting_started_86"></a>Getting started</h2>
+        <p>There are two repositories associated with the Knowledge Repository project.</p>
+        <ol>
+        <li>This repository, which will be installed first. This is referred to as the knowledge repository tooling.</li>
+        <li>A knowledge data repository, which is created second. This is where the knowledge posts are stored.</li>
+        </ol>
+        <h3><a id="Installation_91"></a>Installation</h3>
+        <p>To install the knowledge repository tooling (and all its dependencies), simply run:</p>
+        <p><code>pip install git+ssh://git@github.com/airbnb/knowledge-repo.git[all]</code></p>
+        <p>You can also skip installing dependencies which are only required in special cases by replacing <code>all</code> with one or more of the following (separated by commas):</p>
+        <ul>
+        <li><code>ipynb</code> : Installs the dependencies required for adding/converting Jupyter notebook files</li>
+        <li><code>pdf</code> : Installs the dependencies required for uploading PDFs using the web editor</li>
+        <li><code>dev</code>: Installs the dependencies required for doing development, including running the tests</li>
+        </ul>
+        <p>The <code>knowledge_repo</code> script is the one that is used for all of the following actions. It requires the <code>--repo</code> flag to be passed to it, with the location of the knowledge data repository.</p>
+        <p>You can drop the <code>--repo</code> option by setting the <code>$KNOWLEDGE_REPO</code> environment variable with the location of the  knowledge data repo in your bash/zsh/shell configuration. In bash, this would be done as such:</p>
+        <pre><code>export $KNOWLEDGE_REPO=repo_path</code></pre>
+        <h3><a id="Setup_of_the_knowledge_data_repositories_108"></a>Setup of the knowledge data repositories</h3>
+        <p>There are two different ways to do this, depending on whether your organization already has a knowledge data repository or not:</p>
+        <h4><a id="Your_organization_already_has_a_knowledge_data_repository_setup_111"></a>Your organization already has a knowledge data repository setup</h4>
+        <p>If your organization already has a knowledge data repository setup, check it out onto your computer as you normally would; for example:</p>
         <p><code>git clone git@example.com:example_data_repo.git</code></p>
-        <p>If not, or for fun, you can create a new knowledge repository using:</p>
-        <p><code>knowledge_repo --repo &lt;repo_path&gt; init</code></p>
-        <p>Running this same script if a repo already exists at
-        <code>&lt;repo_path&gt;</code> will have no effect.</p>
-        <p>You can drop the <code>--repo</code> option if you set the
-        <code>$KNOWLEDGE_REPO</code> environment variable to the location of that
-        repository.</p>
-        <p>For more details about the structure of a knowledge repository, see the
-        technical details section below.</p>
-        <h5 id="adding-knowledge">Adding knowledge</h5>
-        <p>The whole point of a knowledge repository is to host knowledge posts.
-        You can add a knowledge post using:</p>
-        <p><code>knowledge_repo --repo &lt;repo_path&gt; add &lt;supported
-        knowledge format&gt; &lt;location in knowledge repo&gt;</code></p>
-        <p>For example, if my knowledge repository is in a folder named
-        <code>test_repo</code>, and I have an IPython notebook at
-        <code>Documents/notebook.ipynb</code>, and I want it to be added to the
-        knowledge repository under <code>projects/test_knowledge</code>, I can
-        run:</p>
-        <p><code>knowledge_repo --repo test_repo add Documents/notebook.ipynb
-        projects/test_knowledge</code></p>
-        <p>If you look in <code>test_repo</code> you will see a new folder
-        <code>test_repo/projects/test_knowledge.kp</code>, and you are set to use
-        <code>git commit</code> and <code>git push</code> to submit it for review.
-        Note that the folder ends in &lsquo;.kp&rsquo;. This is added automatically
-        to indicate that this folder is a knowledge post. Explicitly adding the
-        &lsquo;.kp&rsquo; is optional. Also note that <code>knowledge_repo</code>
-        does not automatically create a branch for you; so if that is the way in
-        which your organisation works, be sure to manually create a branch before
-        pushing into the repo.</p>
-        <p>Currently &lsquo;ipynb&rsquo;, &lsquo;Rmd&rsquo; and &lsquo;md&rsquo;
-        files are supported. See the &ldquo;Contributing&rdquo; section below to
-        see how to add support for more formats.</p>
-        <p>To update an existing knowledge post, simply pass the
-        <code>--update</code> option, which will allow the add operation to
-        override existing knowledge posts. e.g.</p>
-        <p><code>knowledge_repo --repo &lt;repo_path&gt; add --update &lt;supported
-        knowledge format&gt; &lt;location in knowledge repo&gt;</code></p>
-        <h5 id="running-the-web-app">Running the web app</h5>
-        <p>Running the web app allows you to locally view all the knowledge posts
-        in the repository, or to serve it for others to view. It is also useful
-        when developing on the web app.</p>
-        <h6 id="running-the-development-server">Running the development server</h6>
-        <p>Running the web app in development/local/private mode is as simple as
-        running:</p>
+        <p>Running this same script if a repo already exists at <code>&lt;repo_path&gt;</code> will allow you to update it to be a knowledge data repository. This is useful if you are starting a repository on a remote service like GitHub, as this allows you to clone the remote repository as per normal; run this script; and then push the initialization back into the remote service using <code>git push</code>.</p>
+        <h4><a id="Your_organization_does_not_have_knowledge_data_repository_setup_118"></a>Your organization does not have knowledge data repository setup</h4>
+        <p>The following command will create a new repository at <code>&lt;repo_path&gt;</code></p>
+        <pre><code>knowledge_repo --repo &lt;repo_path&gt; init</code></pre>
+        <p>If you are hosting this repository on a remote service like Github, and you’ve created the knowledge data repository using the <code>init</code> flag, you must push that to that remote service in order for the later commands to work. On Git, this can be done by creating the remote repository through Git and then running</p>
+        <pre><code>git remote add origin url_of_the_repository_on_github
+        git push -u origin master</code></pre>
+        <p>For more details about the structure of a knowledge repository, see the technical details section below.</p>
+        <h2><a id="Writing_Knowledge_Posts_133"></a>Writing Knowledge Posts</h2>
+        <h3><a id="TLDR_Guide_For_Contributing_135"></a>TLDR Guide For Contributing</h3>
+        <p>If you have already set up your system as described below, here is a snapshot of the commands you need to run to upload your knowledge post stored in ~/Documents/my_post.Rmd. For Jupyter / iPython Notebooks, the commands are the same, replacing all instances of <code>Rmd</code> with <code>ipynb</code>. It assumes you have configured the KNOWLEDGE_REPO environment variable to point to your local copy of the knowledge repository. The code is written for producing and contributing an ipynb file to make the examples clear, R Markdown files are run by using <code>Rmd</code> in place of <code>ipynb</code> in each command.</p>
+        <ol>
+        <li><code>knowledge_repo create Rmd ~/Documents/my_post.Rmd</code>, which creates a template with required yaml headers. Templates can also be downloaded by clicking “Write a Post!” the web application. <em>Make sure your post has these headers with correct values for your post</em></li>
+        <li>Do your work in the generated my_post.Rmd file. <em>Make sure the post runs through from start to finish before attempting to add to the Knowledge Repo!</em></li>
+        <li><code>knowledge_repo add ~/Documents/my_post.Rmd [-p projects/test_project] [--update]</code></li>
+        <li><code>knowledge_repo preview projects/test_project</code></li>
+        <li><code>knowledge_repo submit projects/test_project</code></li>
+        <li>Open a PR in GitHub</li>
+        <li>After it has been reviewed, merge it in to master.</li>
+        </ol>
+        <h3><a id="Full_Guide_for_Contributing_147"></a>Full Guide for Contributing:</h3>
+        <h4><a id="Creating_knowledge_149"></a>Creating knowledge</h4>
+        <p>Once the knowledge data repository has been initialized, it is possible to start adding posts. Each post in the knowledge repository requires a specific header format, used for metadata formatting.
+        To create a new post using a provided template, which has both the header information and example content, run the following command:</p>
+        <pre><code>knowledge_repo --repo &lt;repo_path&gt; create {ipynb, Rmd, md} filename</code></pre>
+        <p>The first argument indicates the type of the file that you want created, while the second argument indicates where the file should be created.</p>
+        <p>If the knowledge data repository is created at <code>knowledge_data_repo</code>, running</p>
+        <pre><code>knowledge_repo --repo knowledge_data_repo create md ~/Documents/my_first_knowledge_post.md</code></pre>
+        <p>will create a file, <code>~/Documents/my_first_knowledge_post.md</code>, the contents of which will be the boilerplate template of the knowledge post.</p>
+        <p>The help menu for this command (and all following commands) can be reached by adding the <code>-h</code> flag, <code>knowledge_repo --repo &lt;repo_path&gt; create -h</code>.</p>
+        <p>Alternatively, by going to the <code>/create</code> route in the webapp, you can click the button for whichever template you would like to have,
+        and that will download the correct template.</p>
+        <h4><a id="Adding_knowledge_169"></a>Adding knowledge</h4>
+        <p>Once you’ve finished writing a post, the next step is to add it to the knowledge data repository.
+        To do this, run the following command:</p>
+        <pre><code>knowledge_repo --repo &lt;repo_path&gt; add &lt;file with format {ipynb, Rmd, md}&gt; [-p &lt;location in knowledge repo&gt;]</code></pre>
+        <p>Using the example from above, if we wanted to add the post <code>~/Documents/my_first_knowledge_post.md</code> to <code>knowledge_data_repo</code>,
+        we would run:</p>
+        <pre><code>knowledge_repo --repo knowledge_data_repo add ~/Documents/my_first_knowledge_post.md -p projects/test_knowledge</code></pre>
+        <p>The <code>-p</code> flag specifies the location of the post in the knowledge data repository - in this case, <code>knowledge_data_repo/projects/test_knowledge</code>.
+        The <code>-p</code> flag does not need to be specified if <code>path</code> is included in the header of the knowledge post.</p>
+        <h4><a id="Updating_knowledge_185"></a>Updating knowledge</h4>
+        <p>To update an existing knowledge post, pass the <code>--update</code> flag to the <code>add</code> command. This will allow the add operation to override exiting knowledge posts.</p>
+        <pre><code>knowledge_repo --repo &lt;repo_path&gt; add --update &lt;file with format {ipynb, Rmd, md}&gt; &lt;location in knowledge repo&gt;</code></pre>
+        <h4><a id="Previewing_Knowledge_191"></a>Previewing Knowledge</h4>
+        <p>If you would like to see how the post would render on the web app before submitting the post for review, run the following command:</p>
+        <pre><code>knowledge_repo --repo &lt;repo_path&gt; preview &lt;path of knowledge post to preview&gt;</code></pre>
+        <p>In the case from above, we would run:</p>
+        <pre><code>knowledge_repo --repo knowledge_data_repo preview projects/test_knowledge</code></pre>
+        <p>There are other arguments that can be passed to this command, adding the <code>-h</code> flag shows them all along with further information about them.</p>
+        <h4><a id="Submitting_knowledge_204"></a>Submitting knowledge</h4>
+        <p>After running the add command, two things should have happened:</p>
+        <ol>
+        <li>A new folder should have been created at the path specified in the add command, which ends in <code>.kp</code>. This is added automatically to indicate that the folder is a knowledge post.</li>
+        <li>This folder will have been committed to the repository on the branch named <code>&lt;repo_path&gt;/path_in_add_command</code></li>
+        </ol>
+        <p>Running the example command: <code>knowledge_repo --repo knowledge_data_repo add ~/Documents/my_first_knowledge_post.md -p projects/test_knowledge</code>, we would have seen:</p>
+        <ol>
+        <li>A new folder: <code>knowledge_data_repo/projects/test_knowledge.kp</code> which was committed on</li>
+        <li>A branch (that you are now on), called <code>knowledge_data_repo/projects/test_knowledge</code></li>
+        </ol>
+        <p>To submit this post for review, simply run the command:</p>
+        <pre><code>knowledge_repo --repo &lt;repo_path&gt; submit &lt;the path of the knowledge post&gt;</code></pre>
+        <p>In this case, we would run:</p>
+        <pre><code>knowledge_repo --repo knowledge_data_repo submit knowledge_data_repo/projects/test_knowledge.kp</code></pre>
+        <h3><a id="Handling_Images_223"></a>Handling Images</h3>
+        <p>The knowledge repo’s default behavior is to add the markdown’s contents as is to your knowledge post git repository. If you do not have git LFS set up, it may be in your interest to have these images hosted on some type of cloud storage, so that pulling the repo locally isn’t cumbersome.</p>
+        <p>To add support for pushing images to cloud storage, we provide a <a href="https://github.com/airbnb/knowledge-repo/blob/master/resources/extract_images_to_s3.py">postprocessor</a>. This file needs one line to be configured for your organization’s cloud storage. Once configured, the postprocessor’s registry key can be added to the knowledge git repository’s configuration file as a postprocessor.</p>
+        <h2><a id="Running_the_web_app_229"></a>Running the web app</h2>
+        <p>Running the web app allows you to locally view all the knowledge posts in the repository, or to serve it for others to view. It is also useful when developing on the web app.</p>
+        <h3><a id="Running_the_development_server_233"></a>Running the development server</h3>
+        <p>Running the web app in development/local/private mode is as simple as running:</p>
         <p><code>knowledge_repo --repo &lt;repo_path&gt; runserver</code></p>
-        <p>Supported options are <code>--port</code> and <code>--dburi</code> which
-        respectively change the local port on which the server is running, and the
-        sqlalchemy uri where the database can be found and/or initiated. The
-        default port is 7000, and the default dburi is
-        <code>sqlite:////tmp/knowledge.db</code>. If the database does not exist,
-        it is created (if that is possible) and initialised. Database migrations
-        are not automatic (to prevent accidental data loss), but can be performed
-        using:</p>
-        <p><code>knowledge_repo --repo &lt;repo_path&gt; db_migrate --dburi
-        &lt;db&gt;</code></p>
-        <h6 id="deploying-the-web-app">Deploying the web app</h6>
-        <p>Deploying the web app is much like running the development server,
-        except that the web app is deployed on top of gunicorn. It also allows for
-        enabling server-side components such as sending emails to subscribed
-        users.</p>
-        <p>Deploying is as simple as: <code>knowledge_repo --repo &lt;repo_path&gt;
-        deploy</code></p>
-        <p>Supported options are <code>--port</code>,
-        <code>--dburi</code>,<code>--workers</code>, <code>--timeout</code> and
-        <code>--config</code>. The <code>--config</code> option allows you to
-        specify a python config file from which to load the extended configuration.
-        A template config file is provided in
-        <code>resources/server_config.py</code>. The <code>--port</code> and
-        <code>--dburi</code> options are as before, with the <code>--workers</code>
-        and <code>--timeout</code> options specifying the number of threads to use
-        when serving through gunicorn, and the timeout after which the threads are
-        presumed to have died, and will be restarted.</p>
-        <h4 id="contributing">Contributing</h4>
-        <p>We would love to work with you to create the best knowledge repository
-        software possible. If you have ideas or would like to have your own code
-        included, add an issue or pull request and we will review it.</p>
-        <h5 id="adding-new-filetype-support">Adding new filetype support</h5>
-        <p>Support for conversion of a particular filetype to a knowledge post is
-        added by writing a new <code>KnowledgePostConverter</code> object. Each
-        converter should live in its own file in
-        <code>knowledge_repo/converters</code>. Refer to the implementation for
-        ipynb, Rmd, and md for more details. If your conversion is site-specific,
-        you can define these subclasses in <code>.knowledge_repo_config</code>,
-        whereupon they will be picked up by the conversion code.</p>
-        <h5 id=
-        "adding-extra-structure-andor-verifications-to-the-knowledge-post-conversion-process">
-        Adding extra structure and/or verifications to the knowledge post
-        conversion process</h5>
-        <p>When a KnowledgePost is constructed by converting from support
-        filetypes, the resulting post is then passed through a series of
-        postprocessors (defined in <code>knowledge_repo/postprocessors</code>).
-        This allows one to modify the knowledge post, upload images to remote
-        storage facilities (such as S3), and/or verify some additional structure of
-        the knowledge posts. As above, defining these classes in
-        <code>.knowledge_repo_config</code> allows for postprocessors to be used
-        locally.</p>
-        <h5 id="more">More</h5>
-        <p>Is the Knowledge Repository missing something else that you would like
-        to see? Let us know, and we&rsquo;ll see if we cannot help you.</p>
-        <h4 id="technical-details">Technical Details</h4>
-        <h5 id="what-is-a-knowledge-repository">What is a Knowledge Repository</h5>
-        <p>A knowledge repository is a git repository with the following
-        structure:</p>
-        <div class="codehilite">
-            <pre><span class="nt">&lt;repo&gt;</span>
-        + .git  # The git repository metadata
-        + .resources  # A folder into which the knowledge_repo repository is checked out (as a git submodule)
-        - .knowledge_repo_config  # Local configuration for this knowledge repository
-        - <span class="nt">&lt;knowledge</span> <span class=
-    "na">posts</span><span class="nt">&gt;</span>
-    </pre>
-        </div>
-        <p>The use of a git submodule to checkout the knowledge_repo into
-        <code>.resources</code> allows use to ensure that the client and server are
-        using the same version of the code. When one uses the
-        <code>knowledge_repo</code> script, it actually passes the options to the
-        version of the <code>knowledge_repo</code> script in
-        <code>.resources/scripts/knowledge_repo</code>. Thus, updating the version
-        of knowledge_repo used by client and server alike is as simple as changing
-        which revision is checked out by git submodule in the usual way. That
-        is:</p>
-        <div class="codehilite">
-            <pre><span class="nx">pushd</span> <span class="bp">.</span><span class=
-            "nb">resources</span>
-    <span class="nx">git</span> <span class="nx">pull</span>
-    <span class="nx">git</span> <span class="nx">checkout</span> <span class=
-    "o">&lt;</span><span class="nx">revision</span><span class=
-    "o">&gt;/&lt;</span><span class="nx">branch</span><span class="o">&gt;</span>
-    <span class="nx">popd</span>
-    <span class="nx">git</span> <span class="nx">commit</span> <span class=
-    "na">-a</span> <span class="na">-m</span> <span class=
-    "s1">&#39;Updated version of the knowledge_repo&#39;</span>
-    <span class="nx">git</span> <span class="nb">push</span>
-    </pre>
-        </div>
-        <p>Then, all users and servers associated with this repository will be
-        updated to the new version. This prevents version mismatches between client
-        and server, and all users of the repository.</p>
-        <p>In development, it is often useful to disable this chaining. To use the
-        local code instead of the code in the checked out knowledge repository,
-        pass the <code>--dev</code> option as:</p>
-        <p><code>knowledge_repo --repo &lt;repo_path&gt; --dev &lt;action&gt;
-        ...</code></p>
-        <h5 id="what-is-a-knowledge-post">What is a Knowledge Post?</h5>
+        <p>Supported options are <code>--port</code> and <code>--dburi</code> which respectively change the local port on which the server is running, and the sqlalchemy uri where the database can be found and/or initiated. The default port is 7000, and the default dburi is <code>sqlite:////tmp/knowledge.db</code>. If the database does not exist, it is created (if that is possible) and initialised. Database migrations are automatic (unless disabled to prevent accidental data loss), but can be performed manually using:</p>
+        <p><code>knowledge_repo --repo &lt;repo_path&gt; db_upgrade --dburi &lt;db&gt;</code></p>
+        <h3><a id="Running_the_Web_App_on_Multiple_Repos_243"></a>Running the Web App on Multiple Repos</h3>
+        <p>The web application can be run on top of multiple knowledge repo backends. To do this, include each repo with a name and path, prefixed by --repo. For example:</p>
+        <p><code>knowledge_repo --repo {git}/path/to/git/repo --repo {webposts}sqlite:////tmp/dbrepo.db:mypostreftable runserver</code></p>
+        <p>If including a dbrepo, add the name of the dbrepo to the <code>WEB_EDITOR_PREFIXES</code> in the server config, and add it as config when running the app:</p>
+        <p><code>knowledge_repo --repo {git}/path/to/git/repo --repo {webposts}sqlite:////tmp/dbrepo.db:mypostreftable runserver --config resources/server_config.py</code></p>
+        <p>Note that this is required for the web application’s internal post writing UI.</p>
+        <h3><a id="Deploying_the_web_app_255"></a>Deploying the web app</h3>
+        <p>Deploying the web app is much like running the development server, except that the web app is deployed on top of gunicorn. It also allows for enabling server-side components such as sending emails to subscribed users.</p>
+        <p>Deploying is as simple as:
+        <code>knowledge_repo --repo &lt;repo_path&gt; deploy</code></p>
+        <p>or if using multiple repos:
+        <code>knowledge_repo --repo {git}/path/to/git/repo --repo {webposts}sqlite:////tmp/dbrepo.db:mypostreftable deploy --config resources/server_config.py</code></p>
+        <p>Supported options are <code>--port</code>, <code>--dburi</code>,<code>--workers</code>, <code>--timeout</code> and <code>--config</code>. The <code>--config</code> option allows you to specify a python config file from which to load the extended configuration. A template config file is provided in <code>resources/server_config.py</code>. The <code>--port</code> and <code>--dburi</code> options are as before, with the <code>--workers</code> and <code>--timeout</code> options specifying the number of threads to use when serving through gunicorn, and the timeout after which the threads are presumed to have died, and will be restarted.</p>
+        <h2><a id="Contributing_267"></a>Contributing</h2>
+        <p>We would love to work with you to create the best knowledge repository software possible. If you have ideas or would like to have your own code included, add an issue or pull request and we will review it.</p>
+        <h3><a id="Adding_new_filetype_support_271"></a>Adding new filetype support</h3>
+        <p>Support for conversion of a particular filetype to a knowledge post is added by writing a new <code>KnowledgePostConverter</code> object. Each converter should live in its own file in <code>knowledge_repo/converters</code>. Refer to the implementation for ipynb, Rmd, and md for more details. If your conversion is site-specific, you can define these subclasses in <code>.knowledge_repo_config</code>, whereupon they will be picked up by the conversion code.</p>
+        <h3><a id="Adding_extra_structure_andor_verifications_to_the_knowledge_post_conversion_process_275"></a>Adding extra structure and/or verifications to the knowledge post conversion process</h3>
+        <p>When a KnowledgePost is constructed by converting from support filetypes, the resulting post is then passed through a series of postprocessors (defined in <code>knowledge_repo/postprocessors</code>). This allows one to modify the knowledge post, upload images to remote storage facilities (such as S3), and/or verify some additional structure of the knowledge posts. As above, defining or importing these classes in <code>.knowledge_repo_config.py</code> allows for postprocessors to be used locally.</p>
+        <h3><a id="More_279"></a>More</h3>
+        <p>Is the Knowledge Repository missing something else that you would like to see? Let us know, and we’ll see if we cannot help you.</p>
+        <h2><a id="Technical_Details_283"></a>Technical Details</h2>
+        <h3><a id="What_is_a_Knowledge_Repository_285"></a>What is a Knowledge Repository</h3>
+        <p>A knowledge repository is a virtual filesystem (such as a git repository or database). A GitKnowledgeRepository, for example, has the following structure:</p>
+        <pre><code>&lt;repo&gt;
+            + .git  # The git repository metadata
+            + .resources  # A folder into which the knowledge_repo repository is checked out (as a git submodule)
+            - .knowledge_repo_config.py  # Local configuration for this knowledge repository
+            - &lt;knowledge posts&gt;</code></pre>
+        <p>The use of a git submodule to checkout the knowledge_repo into <code>.resources</code> allows use to ensure that the client and server are using the same version of the code. When one uses the <code>knowledge_repo</code> script, it actually passes the options to the version of the <code>knowledge_repo</code> script in <code>.resources/scripts/knowledge_repo</code>. Thus, updating the version of knowledge_repo used by client and server alike is as simple as changing which revision is checked out by git submodule in the usual way. That is:</p>
+        <pre><code>pushd .resources
+        git pull
+        git checkout &lt;revision&gt;/&lt;branch&gt;
+        popd
+        git commit -a -m 'Updated version of the knowledge_repo'
+        git push</code></pre>
+        <p>Then, all users and servers associated with this repository will be updated to the new version. This prevents version mismatches between client and server, and all users of the repository.</p>
+        <p>In development, it is often useful to disable this chaining. To use the local code instead of the code in the checked out knowledge repository, pass the <code>--dev</code> option as:</p>
+        <p><code>knowledge_repo --repo &lt;repo_path&gt; --dev &lt;action&gt; ...</code></p>
+        <h3><a id="What_is_a_Knowledge_Post_310"></a>What is a Knowledge Post?</h3>
         <p>A knowledge post is a directory, with the following structure:</p>
-        <div class="codehilite">
-            <pre><span class="nt">&lt;knowledge</span><span class=
-            "na">_post</span><span class="nt">&gt;</span>
-        - knowledge.md
-        + images/* <span class="cp">[</span><span class=
-    "nx">Optional</span><span class="cp">]</span>
-        + orig_src/* <span class="cp">[</span><span class=
-    "nx">Optional</span><span class="p">;</span> <span class=
-    "nx">stores</span> <span class="nx">the</span> <span class=
-    "nx">original</span> <span class="nx">converted</span> <span class=
-    "nb">file</span><span class="cp">]</span>
-    </pre>
-        </div>
-        <p>Images are automatically extracted from the local paths on your
-        computer, and placed into images. <code>orig_src</code> contains the
-        file(s) from which the knowledge post was converted from.</p>
+        <pre><code>&lt;knowledge_post&gt;
+            - knowledge.md
+            + images/* [Optional]
+            + orig_src/* [Optional; stores the original converted file]</code></pre>
+        <p>Images are automatically extracted from the local paths on your computer, and placed into images. <code>orig_src</code> contains the file(s) from which the knowledge post was converted from.</p>
+
       </div>
-    </div>
 
     <hr/>
 {% endblock %}
@@ -228,7 +228,6 @@ $(document).on('ready', function(){
   // Initialize headers
   helpersJx.linkifyHeaders();
 })
-
 //Turn all the headers to be links
 //h1 = Title, don't want that
 var all_headers = [$("h2"), $("h3"), $("h4"), $("h5"), $("h6")]
@@ -240,8 +239,6 @@ $.each(all_headers, function(index, value){
     v.innerHTML = "<a href='" + inner_link + "' class=link-reset>" + inner_html + "</a>"
   })
 })
-
 </script>
 {% endblock %}
-
 
