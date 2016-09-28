@@ -1,6 +1,6 @@
 # The Knowledge Repository (BETA)
 
-The Knowledge Repository project is focussed on facilitating the sharing of knowledge between data scientists and other technical roles using data formats and tools that make sense in these professions. It provides various data stores (and utilities to manage them) for "knowledge posts"
+The Knowledge Repository project is focused on facilitating the sharing of knowledge between data scientists and other technical roles using data formats and tools that make sense in these professions. It provides various data stores (and utilities to manage them) for "knowledge posts", with a particular focus on notebooks (R Markdown and Jupyter / iPython Notebook) to better promote reproducible research.
 
 **Note:** The Knowledge Repository is a work in progress. There are lots of code cleanups and feature extensions TBD. Your assistance and involvement is more than encouraged.
 
@@ -16,10 +16,17 @@ pip install git+ssh://git@github.com/airbnb/knowledge-repo.git[ipynb]
 knowledge_repo --repo ./example_repo init
 ```
 3\. Create a post template
+
+for Rmd:
+```
+knowledge_repo --repo ./example_repo create Rmd example_post.Rmd
+```
+
+for ipynb
 ```
 knowledge_repo --repo ./example_repo create ipynb example_post.ipynb
 ```
-4\. Edit the notebook file `example_post.ipynb` as you normally would.
+4\. Edit the notebook file `example_post.ipynb` or `example_post.Rmd` as you normally would.
 
 
 5\. Add your post to the repo with path `project/example`
@@ -52,7 +59,7 @@ Here's a running list of known issues we are working on:
 
 ## Introduction
 
-The Knowledge Repository project is focussed on facilitating the sharing of knowledge between data scientists and other technical roles using data formats and tools that make sense in these professions. It provides various data stores (and utilities to manage them) for "knowledge posts". These knowledge posts are a general markdown format that is automatically generated from the following common formats:
+Knowledge posts are a general markdown format that is automatically generated from the following common formats:
 
  - Jupyter/Ipython notebooks
  - Rmd notebooks
@@ -135,11 +142,11 @@ For more details about the structure of a knowledge repository, see the technica
 
 ### TLDR Guide For Contributing
 
-If you have already set up your system as described below, here is a snapshot of the commands you need to run to upload your knowledge post stored in ~/Documents/my_post.ipynb. It assumes you have configured the KNOWLEDGE_REPO environment variable to point to your local copy of the knowledge repository.
+If you have already set up your system as described below, here is a snapshot of the commands you need to run to upload your knowledge post stored in ~/Documents/my_post.Rmd. For Jupyter / iPython Notebooks, the commands are the same, replacing all instances of `Rmd` with `ipynb`. It assumes you have configured the KNOWLEDGE_REPO environment variable to point to your local copy of the knowledge repository. The code is written for producing and contributing an ipynb file to make the examples clear, R Markdown files are run by using `Rmd` in place of `ipynb` in each command.
 
-1. `knowledge_repo create ipynb ~/Documents/my_post.ipynb`, which creates a template with required yaml headers. Templates can also be downloaded by clicking "Write a Post!" the web application. *Make sure your post has these headers with correct values for your post*
-2. Do your work in the generated my_post.ipynb file. *Make sure the post runs through from start to finish before attempting to add to the Knowledge Repo!*
-3. `knowledge_repo add ~/Documents/my_post.ipynb [-p projects/test_project] [--update]`
+1. `knowledge_repo create Rmd ~/Documents/my_post.Rmd`, which creates a template with required yaml headers. Templates can also be downloaded by clicking "Write a Post!" the web application. *Make sure your post has these headers with correct values for your post*
+2. Do your work in the generated my_post.Rmd file. *Make sure the post runs through from start to finish before attempting to add to the Knowledge Repo!*
+3. `knowledge_repo add ~/Documents/my_post.Rmd [-p projects/test_project] [--update]`
 4. `knowledge_repo preview projects/test_project`
 5. `knowledge_repo submit projects/test_project`
 6. Open a PR in GitHub
