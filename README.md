@@ -2,7 +2,13 @@
 
 The Knowledge Repository project is focused on facilitating the sharing of knowledge between data scientists and other technical roles using data formats and tools that make sense in these professions. It provides various data stores (and utilities to manage them) for "knowledge posts", with a particular focus on notebooks (R Markdown and Jupyter / iPython Notebook) to better promote reproducible research.
 
+Check out this [Medium Post](https://medium.com/airbnb-engineering/scaling-knowledge-at-airbnb-875d73eff091) for the inspiration for the project.
+
 **Note:** The Knowledge Repository is a work in progress. There are lots of code cleanups and feature extensions TBD. Your assistance and involvement is more than encouraged.
+
+![](https://cloud.githubusercontent.com/assets/20175104/18972198/116861be-864d-11e6-9850-5a6cdad7ce54.png)
+
+![](https://cloud.githubusercontent.com/assets/20175104/18972218/264f4c00-864d-11e6-8153-3e9833563784.png)
 
 ## Quickstart
 
@@ -88,7 +94,7 @@ If your favourite format is missing, we welcome contributions; and are happy to 
 
 Note that the web application can live on top of multiple Knowledge Repo backends. Supported types so far are:
 
- - Github Repo (Primary Use Case)
+ - Git Repo + Remote Git Hosting Service (Primary Use Case)
  - Web Application SQL db
 
 ## Getting started
@@ -132,7 +138,7 @@ knowledge_repo --repo <repo_path> init
 If you are hosting this repository on a remote service like Github, and you've created the knowledge data repository using the `init` flag, you must push that to that remote service in order for the later commands to work. On Git, this can be done by creating the remote repository through Git and then running
 
 ```
-git remote add origin url_of_the_repository_on_github
+git remote add origin url_of_the_repository
 git push -u origin master
 ```
 
@@ -149,8 +155,8 @@ If you have already set up your system as described below, here is a snapshot of
 3. `knowledge_repo add ~/Documents/my_post.Rmd [-p projects/test_project] [--update]`
 4. `knowledge_repo preview projects/test_project`
 5. `knowledge_repo submit projects/test_project`
-6. Open a PR in GitHub
-7. After it has been reviewed, merge it in to master.
+6. From your remote git hosting service, request a review for merging the post. (ie. open a pull request on Github)
+7. After it has been reviewed, merge it in to the master branch.
 
 ### Full Guide for Contributing:
 
