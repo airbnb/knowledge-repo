@@ -119,7 +119,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
     def update(self, branch=None):
         branch = branch or self.config.published_branch
-        if not self.has_remote:
+        if not self.git_has_remote:
             return
         if not self.__remote_available:
             logger.warning("Cannot connect to remote repository hosted on {}. Continuing locally with potentially outdated code.".format(
