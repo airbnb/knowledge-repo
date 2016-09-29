@@ -61,6 +61,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
     def init(self, config='git:////.knowledge_repo_config.py', auto_create=False):
         self.config.update_defaults(published_branch='master')
+        self.config.update_defaults(remote_name='origin')
         self.auto_create = auto_create
         self.path = self.uri.replace('git://', '')
 
@@ -101,6 +102,16 @@ class GitKnowledgeRepository(KnowledgeRepository):
             self._git = git.Repo(self.path)
         return self._git
 
+    @property
+    def git_has_remote(self):
+        return hasattr(self.git.remotes, self.config.remote_name)
+
+    @property
+    def git_remote(self):
+        if self.git_has_remote:
+            return self.git.remote(self.config.remote_name)
+        return None
+
     # ----------- Repository actions / state ------------------------------------
     @property
     def revision(self):
@@ -108,17 +119,17 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
     def update(self, branch=None):
         branch = branch or self.config.published_branch
-        if len(self.git.remotes) == 0:
+        if not self.has_remote:
             return
         if not self.__remote_available:
             logger.warning("Cannot connect to remote repository hosted on {}. Continuing locally with potentially outdated code.".format(
                 self.__remote_host))
             return
         logger.info("Fetching updates to the knowledge repository...")
-        self.git.remote().fetch()
+        self.git_remote.fetch()
         current_branch = self.git.active_branch
         self.git.branches.master.checkout()
-        self.git.remote().pull(branch)
+        self.git_remote.pull(branch)
         try:
             sm = self.git.submodule('embedded_knowledge_repo')
         except ValueError:  # This repository does not use embedded knowledge_repo tools or it is misnamed
@@ -270,14 +281,13 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
         if reset or branch not in [b.name for b in self.git.branches]:
             ref_head = None
-            if len(self.git.remotes) > 0:
-                for ref in self.git.remote().refs:
+            if self.git_has_remote:
+                for ref in self.git_remote.refs:
                     if ref.name == branch:
                         ref_head = ref
                         break
             if not ref_head:
-                ref_head = self.git.remote().refs.master if len(
-                    self.git.remotes) > 0 else self.git.branches.master
+                ref_head = self.git_remote.refs.master if self.git_has_remote else self.git.branches.master
             else:
                 logger.warning(
                     "The branch `{}` already exists as upstream, and you maybe clobbering someone's work. Please check.".format(ref_head.name))
@@ -316,7 +326,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
     # ------------- Post submission / addition user flow ----------------------
     def _add_prepare(self, kp, path, update=False, branch=None, squash=False, message=None):
         target = os.path.abspath(os.path.join(self.path, path))
-        if self.__remote_uri:
+        if self.git_has_remote:
             branch = branch or path
         else:
             logger.warning("This repository does not have a remote, and so post review is being skipped. Adding post directly into published branch...")
@@ -355,8 +365,8 @@ class GitKnowledgeRepository(KnowledgeRepository):
             raise e
 
     def _submit(self, path=None, branch=None, force=False):
-        if len(self.git.remotes) == 0:
-            raise RuntimeError("No remote repositories exist into which this branch can be submitted.")
+        if self.git_has_remote:
+            raise RuntimeError("Could not find remote repository `{}` into which this branch should be submitted.".format(self.config.remote_name))
         if branch is None and path is None:
             raise ValueError("To submit a knowledge post, a path to the post and/or a git branch must be specified.")
         if branch is None:
@@ -365,9 +375,9 @@ class GitKnowledgeRepository(KnowledgeRepository):
             raise ValueError("It does not appear that you have any drafts in progress for '{}'.".format(path))
 
         if not self.__remote_available:
-            raise RuntimeError("Cannot connect to remote repository {}. Please check your connection, and then try again.".format(self.__remote_uri))
+            raise RuntimeError("Cannot connect to remote repository {} ({}). Please check your connection, and then try again.".format(self.config.remote_name, self.git_remote.url))
 
-        self.git.remote().push(branch, force=force)
+        self.git_remote.push(branch, force=force)
         logger.info("Pushed local branch `{}` to upstream branch `{}`. Please consider starting a pull request, or otherwise merging into master.".format(branch, branch))
 
     def _publish(self, path):  # Publish a post for general perusal
@@ -412,8 +422,8 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
         if branch.name == self.config.published_branch:
             status = self.PostStatus.PUBLISHED, None
-        elif self.__remote_uri and branch.name in self.git.remote().refs:
-            remote_branch = self.git.remote().refs[branch.name].name
+        elif self.git_has_remote and branch.name in self.git_remote.refs:
+            remote_branch = self.git_remote.refs[branch.name].name
             behind = len(list(self.git.iter_commits('{}..{}'.format(branch, remote_branch))))
             ahead = len(list(self.git.iter_commits('{}..{}'.format(remote_branch, branch))))
 
@@ -480,17 +490,10 @@ class GitKnowledgeRepository(KnowledgeRepository):
         return os.path.abspath(os.path.join(self.path, path))
 
     @property
-    def __remote_uri(self):
-        try:
-            return self.git.git.remote('get-url', self.git.remote().name)
-        except:
-            return None
-
-    @property
     def __remote_host(self):
-        if self.__remote_uri:
+        if self.git_has_remote:
             # TODO: support more types of hosts
-            m = re.match('.*?@(.*?):\.*?', self.__remote_uri)
+            m = re.match('.*?@(.*?):\.*?', self.git_remote.url)
             if m:  # shorthand ssh uri
                 return m.group(1)
         return None
