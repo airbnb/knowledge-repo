@@ -365,7 +365,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
             raise e
 
     def _submit(self, path=None, branch=None, force=False):
-        if self.git_has_remote:
+        if not self.git_has_remote:
             raise RuntimeError("Could not find remote repository `{}` into which this branch should be submitted.".format(self.config.remote_name))
         if branch is None and path is None:
             raise ValueError("To submit a knowledge post, a path to the post and/or a git branch must be specified.")
