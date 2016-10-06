@@ -88,3 +88,10 @@ MAIL_DEFAULT_SENDER = "knowledge_editors"  # default = None
 # WEB_EDITOR_PREFIXES to a list of supported path prefixes.
 # e.g. ['webposts', 'projects']
 WEB_EDITOR_PREFIXES = None
+
+# ---------------------------------------------------
+# Tag configuration
+# ---------------------------------------------------
+# Posts with certain tags can be excluded from showing up
+# in the app. This can be useful for security purposes
+EXCLUDED_TAGS = ['private']
