@@ -17,6 +17,9 @@ DB_AUTO_CREATE = True
 # performed using `knowledge_repo --repo <> db_upgrade ...`.
 DB_AUTO_UPGRADE = False
 
+# Interval, in seconds, between refreshes of the typeahead index. A value less than or equal to 0
+# means "never refresh", i.e. only populate the typeahead index at startup.
+TYPEAHEAD_UPDATE_PERIOD_SEC = 600
 
 # ---------------------------------------------------
 # Repository configuration
@@ -36,6 +39,8 @@ DB_AUTO_UPGRADE = False
 # For example, if your server instance is sitting atop
 # a meta-repository, it may make sense to update the meta-repository
 # configuration with that of one of its children.
+
+
 def prepare_repo(repo):
     return repo
 

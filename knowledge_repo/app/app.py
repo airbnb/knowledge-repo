@@ -2,6 +2,7 @@ from __future__ import absolute_import
 import os
 import imp
 import logging
+import threading
 import traceback
 
 from flask import Flask, current_app, render_template, g, request
@@ -10,9 +11,9 @@ from flask_migrate import Migrate
 from alembic import command
 from alembic.migration import MigrationContext
 
-from .proxies import db_session, current_repo
+from .proxies import db_session, background_db_session, current_repo
 from .index import update_index
-from .models import db as sqlalchemy_db, Post, User
+from .models import db as sqlalchemy_db, Post, User, Tag
 from . import routes
 
 logging.basicConfig(level=logging.INFO)
@@ -25,7 +26,6 @@ class KnowledgeFlask(Flask):
         Flask.__init__(self, __name__,
                        template_folder='templates',
                        static_folder='static')
-
         # Load configuration
         if config:
             if isinstance(config, str):
@@ -83,6 +83,10 @@ class KnowledgeFlask(Flask):
         self.register_blueprint(routes.stats.blueprint)
         self.register_blueprint(routes.web_editor.blueprint)
 
+        # Initialize background worker and lock for typeahead data
+        self.background_worker = None
+        self.typeahead_lock = threading.Lock()
+
         # Register error handler
         @self.errorhandler(500)
         def show_traceback(self):
@@ -96,41 +100,13 @@ class KnowledgeFlask(Flask):
 
         @self.before_first_request
         def update_index_and_typeahead_data():
-            """ Function to call all of the steps we want to run recurrently
+            """ Function to call all of the steps we want to run recurrently.
                 Ideally, these functions would be in a background job, but
                 running them on each user's first request is a workable
                 solution for now.
-
-                Putting these functions in a function wrapper also helps
-                because before_first_request decorated functions cannot be
-                imported, so this style allows the functions to be used
-                across the app in addition to being run at first.
             """
-
-            if not current_app.config.get('REPOSITORY_INDEXING_ENABLED', True):
-                return
-
-            typeahead_data = {}
-
-            def update_typeahead_data(post):
-                """ Create the typeahead entry for a given knowledge post """
-                if post.authors and post.title and post.path:
-                    authors_str = [author.format_name for author in post.authors]
-                    typeahead_entry = {'author': authors_str,
-                                       'title': str(post.title),
-                                       'path': str(post.path),
-                                       'updated_at': str(post.updated_at)}
-                    typeahead_data[str(post.title)] = typeahead_entry
-
-            update_index()
-            posts = (db_session.query(Post)
-                     .filter(Post.is_published)
-                     .all())
-
-            for post in posts:
-                update_typeahead_data(post)
-
-            current_app.config['typeahead_data'] = typeahead_data
+            self.update_index()
+            self.update_typeahead_data(self.config.get('TYPEAHEAD_UPDATE_PERIOD_SEC'))
 
         @self.before_request
         def set_user_information():
@@ -154,11 +130,59 @@ class KnowledgeFlask(Flask):
                 current_repo.session_end()
             return response
 
-        @self.context_processor
-        def webediting_enabled():
-            # TODO: Link this more to KnowledgeRepository capability and
-            # configuration rather than a specific name.
-            return {"webeditor_enabled": 'webposts' in current_repo.uris}
+    def update_index(self):
+        if not current_app.config.get('REPOSITORY_INDEXING_ENABLED', True):
+            return
+
+        update_index()
+
+    def update_typeahead_data(self, update_period_sec):
+        # Explicitly create app context to support periodic background work
+        with self.app_context():
+            if not current_app.config.get('REPOSITORY_INDEXING_ENABLED', True):
+                return
+
+            logger.info('Starting to update typeahead data')
+
+            typeahead_data = {}
+
+            # For every tag in the excluded tags, create the tag object if it doesn't exist
+            # We need it here because we don't want the posts with the excluded tags
+            # to show up in the typeahead search
+            excluded_tags = current_app.config.get('EXCLUDED_TAGS')
+
+            for tag in excluded_tags:
+                tag_exists = (background_db_session.query(Tag)
+                                                   .filter(Tag.name == tag)
+                                                   .all())
+                if not tag_exists:
+                    tag_exists = Tag(name=tag)
+                    background_db_session.add(tag_exists)
+                    background_db_session.commit()
+
+            posts = (background_db_session.query(Post)
+                                          .filter(Post.is_published)
+                                          .filter(~Post.tags.any(Tag.name.in_(excluded_tags)))
+                                          .all())
+
+            for post in posts:
+                if post.authors and post.title and post.path:
+                    authors_str = [author.format_name for author in post.authors]
+                    typeahead_entry = {'author': authors_str,
+                                       'title': str(post.title),
+                                       'path': str(post.path),
+                                       'updated_at': str(post.updated_at)}
+                    typeahead_data[str(post.title)] = typeahead_entry
+
+            with self.typeahead_lock:
+                current_app.config['typeahead_data'] = typeahead_data
+
+            logger.info('Finished update to typeahead data')
+
+            if update_period_sec is not None and update_period_sec > 0:
+                self.background_worker = threading.Timer(
+                    update_period_sec, self.update_typeahead_data, (update_period_sec, ))
+                self.background_worker.start()
 
     @property
     def repository(self):

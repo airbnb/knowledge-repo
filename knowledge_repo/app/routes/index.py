@@ -5,10 +5,11 @@ This includes:
   - /cluster
   - /table
   - /favorites
+  - /update
 """
 import os
 import posixpath
-from flask import request, render_template, redirect, Blueprint, current_app, make_response
+from flask import request, render_template, redirect, Blueprint, current_app, make_response, Response
 
 from ..app import db_session
 from ..utils.posts import get_posts
@@ -116,8 +117,6 @@ def render_cluster():
     request_tag = request.args.get('tag')
     sort_desc = not bool(request.args.get('sort_asc', ''))
 
-    post_query = db_session.query(Post).filter(Post.is_published)
-
     if filters:
         filter_set = filters.split(" ")
         for elem in filter_set:
@@ -140,7 +139,7 @@ def render_cluster():
         for tag in all_tags:
             tag_posts = [post for post in tag.posts if post.is_published]
             if tag_posts:
-                tags_to_posts[tag.name] = tag.posts
+                tags_to_posts[tag.name] = tag_posts
         tuples = [(k, v) for (k, v) in tags_to_posts.items()]
 
     elif group_by == "folder":
@@ -189,3 +188,11 @@ def create(knowledge_format=None):
     response = make_response(open(filename).read())
     response.headers["Content-Disposition"] = "attachment; filename=" + knowledge_template
     return response
+
+
+@blueprint.route('/update')
+def update_index_handler():
+    """Update index to pick up repo changes without restarting app."""
+    current_app.update_index()
+
+    return Response('OK', mimetype='text/plain')
