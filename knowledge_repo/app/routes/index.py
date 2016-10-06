@@ -116,7 +116,10 @@ def render_cluster():
     request_tag = request.args.get('tag')
     sort_desc = not bool(request.args.get('sort_asc', ''))
 
-    post_query = db_session.query(Post).filter(Post.is_published)
+    excluded_tags = current_app.config.get('EXCLUDED_TAGS')
+    post_query = (db_session.query(Post)
+                            .filter(Post.is_published)
+                            .filter(~Post.tags.any(Tag.name.in_(excluded_tags))))
 
     if filters:
         filter_set = filters.split(" ")
@@ -128,17 +131,23 @@ def render_cluster():
         author_to_posts = {}
         authors = (db_session.query(User).all())
         for author in authors:
-            author_posts = [post for post in author.posts if post.is_published]
+            author_posts = [post for
+                            post in author.posts
+                            if post.is_published and not post.contains_excluded_tag]
             if author_posts:
                 author_to_posts[author.format_name] = author_posts
         tuples = [(k, v) for (k, v) in author_to_posts.items()]
 
     elif group_by == "tags":
         tags_to_posts = {}
-        all_tags = (db_session.query(Tag).all())
+        all_tags = (db_session.query(Tag)
+                              .filter(~Tag.name.in_(excluded_tags))
+                              .all())
 
         for tag in all_tags:
-            tag_posts = [post for post in tag.posts if post.is_published]
+            tag_posts = [post for
+                         post in tag.posts
+                         if post.is_published and not post.contains_excluded_tag]
             if tag_posts:
                 tags_to_posts[tag.name] = tag.posts
         tuples = [(k, v) for (k, v) in tags_to_posts.items()]

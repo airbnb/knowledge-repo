@@ -83,3 +83,11 @@ USER_GROUP_TO_PROJECT = {}  # TODO: Deprecate?
 # WEB_EDITOR_PREFIXES to a list of supported path prefixes.
 # e.g. ['webposts', 'projects']
 WEB_EDITOR_PREFIXES = ['webposts']
+
+
+# ---------------------------------------------------
+# Tag configuration
+# ---------------------------------------------------
+# Posts with certain tags can be excluded from showing up
+# in the app. This can be useful for security purposes
+EXCLUDED_TAGS = ['private']
