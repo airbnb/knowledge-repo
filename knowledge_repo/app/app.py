@@ -12,7 +12,7 @@ from alembic.migration import MigrationContext
 
 from .proxies import db_session, current_repo
 from .index import update_index
-from .models import db as sqlalchemy_db, Post, User
+from .models import db as sqlalchemy_db, Post, User, Tag
 from . import routes
 
 logging.basicConfig(level=logging.INFO)
@@ -123,8 +123,22 @@ class KnowledgeFlask(Flask):
                     typeahead_data[str(post.title)] = typeahead_entry
 
             update_index()
+
+            # For every tag in the excluded tags, create the tag object if it doesn't exist
+            # To ensure that posts with the excluded tags do not show up in the typeahead
+            excluded_tags = current_app.config.get('EXCLUDED_TAGS')
+            for tag in excluded_tags:
+                tag_exists = (db_session.query(Tag)
+                                        .filter(Tag.name == tag)
+                                        .all())
+                if not tag_exists:
+                    tag_exists = Tag(name=tag)
+                    db_session.add(tag_exists)
+                    db_session.commit()
+
             posts = (db_session.query(Post)
                      .filter(Post.is_published)
+                     .filter(~Post.tags.any(Tag.name.in_(excluded_tags)))
                      .all())
 
             for post in posts:

@@ -11,7 +11,7 @@ This includes:
   - /toggle_tag_subscription
   - /tag_list
 """
-from flask import request, render_template, Blueprint, g
+from flask import current_app, request, render_template, Blueprint, g
 from sqlalchemy import and_
 import logging
 
@@ -42,7 +42,7 @@ def render_batch_tags():
     sort_desc = not sort_asc
     feed_params = from_request_get_feed_params(request)
 
-    # get all tags
+    excluded_tags = current_app.config.get('EXCLUDED_TAGS')
     all_tags = db_session.query(Tag).all()
     tags_to_posts = {}
     nonzero_tags = []
@@ -54,7 +54,8 @@ def render_batch_tags():
             db_session.delete(tag)
             db_session.commit()
 
-        tags_to_posts[tag.id] = [(post.path, post.title) for post in posts]
+        tags_to_posts[tag.id] = [(post.path, post.title) for post in posts if
+                                 post.is_published and not post.contains_excluded_tags]
         nonzero_tags.append(tag)
         # so that we can use the tag in the jinja template
         db_session.expunge(tag)
@@ -118,6 +119,9 @@ def render_tag_pages():
 
     if tag[0] == '#':
         tag = tag[1:]
+
+    if tag in current_app.config.get('EXCLUDED_TAGS'):
+        return render_template('error.html')
 
     tag_obj = (db_session.query(Tag)
                .filter(Tag.name == tag)
@@ -211,6 +215,11 @@ def toggle_tag_subscription():
     try:
         # retrieve relevant tag and user args from request
         tag_name = request.args.get('tag_name', '')
+
+        if tag_name in current_app.config.get('EXCLUDED_TAGS'):
+            logging.warning("Trying to subscribe to an excluded tag")
+            return ""
+
         subscribe_action = request.args.get('subscribe_action', '')
         if subscribe_action not in ['unsubscribe', 'subscribe']:
             logging.warning("ERROR processing request")

@@ -14,9 +14,6 @@ from ..utils.render import render_post
 
 logger = logging.getLogger(__name__)
 
-# TODO move me to config
-TAGS_EXCLUDED_FROM_SUBSCRIPTION_EMAILS = ['other/private', 'private']
-
 
 def usernames_to_emails(usernames):
     username_to_email = current_repo.config.username_to_email
@@ -62,7 +59,7 @@ def send_subscription_emails(post):
     # if this post is tagged as private - send no emails
     post_full_tags = [tag.name for tag in post.tags]
     for full_tag in post_full_tags:
-        if full_tag in TAGS_EXCLUDED_FROM_SUBSCRIPTION_EMAILS:
+        if full_tag in current_app.config.get("EXCLUDED_TAGS"):
             return
     for tag in post.tags:
         send_subscription_email(post, tag)

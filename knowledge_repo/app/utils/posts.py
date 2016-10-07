@@ -4,6 +4,7 @@ Functions include:
     - get_posts
     - get_all_post_stats
 """
+from flask import current_app
 from sqlalchemy import func, distinct, or_
 
 from ..app import db_session
@@ -33,12 +34,10 @@ def get_posts(feed_params):
     # make sure post is published
     query = (db_session.query(Post).filter(Post.is_published))
 
-    # if a private tag exists, make sure that post
-    private_tag = (db_session.query(Tag)
-                   .filter(Tag.name == 'other/private')
-                   .first())
-    if private_tag is not None:
-        query = query.filter(~Post.tags.contains(private_tag))
+    # posts returned should not include any posts in the excluded tags
+    excluded_tags = current_app.config.get('EXCLUDED_TAGS')
+    if excluded_tags:
+        query = query.filter(~Post.tags.any(Tag.name.in_(excluded_tags)))
 
     # filter out based on feed param filters
     filters = feed_params['filters']
