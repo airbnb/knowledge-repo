@@ -141,7 +141,10 @@ class GitKnowledgeRepository(KnowledgeRepository):
                     break
         if sm is not None:
             sm_target_url = sm.config_reader().get_value('url')
-            sm_actual_url = sm.module().git.config('--get', 'remote.origin.url')
+            try:
+                sm_actual_url = sm.module().git.config('--get', 'remote.origin.url')
+            except git.InvalidGitRepositoryError:
+                sm_actual_url = "the uninitialized state"
             if sm_target_url != sm_actual_url:
                 logging.info('Migrating embedded tooling from {} to {}.'.format(sm_actual_url, sm_target_url))
                 self.git.git.submodule('sync')
