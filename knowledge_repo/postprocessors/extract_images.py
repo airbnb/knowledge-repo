@@ -38,7 +38,7 @@ class ExtractImages(KnowledgePostProcessor):
         for image in images:
             if cls.skip_image(kp, image):
                 continue
-            orig_path = os.path.join(kp.orig_context, image['src'])
+            orig_path = os.path.join(kp.orig_context, os.path.expanduser(image['src']))
 
             new_path = None
             if kp._has_ref(image['src']):
