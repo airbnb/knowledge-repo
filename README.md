@@ -14,7 +14,7 @@ Check out this [Medium Post](https://medium.com/airbnb-engineering/scaling-knowl
 
 1\. Install the knowledge-repo tooling
 ```
-pip install git+ssh://git@github.com/airbnb/knowledge-repo.git[ipynb]
+pip install  --upgrade "git+https://github.com/airbnb/knowledge-repo.git@stable#egg=knowledge_repo[ipynb]"
 ```
 
 2\. Initialize a knowledge repository - your posts will get added here
