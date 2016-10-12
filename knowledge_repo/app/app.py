@@ -126,7 +126,7 @@ class KnowledgeFlask(Flask):
 
             # For every tag in the excluded tags, create the tag object if it doesn't exist
             # To ensure that posts with the excluded tags do not show up in the typeahead
-            excluded_tags = current_app.config.get('EXCLUDED_TAGS', []) 
+            excluded_tags = current_app.config.get('EXCLUDED_TAGS', [])
             for tag in excluded_tags:
                 tag_exists = (db_session.query(Tag)
                                         .filter(Tag.name == tag)
