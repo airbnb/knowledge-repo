@@ -10,7 +10,7 @@ try:
         __version__ += '_' + subprocess.check_output(['git', 'rev-parse', 'HEAD'], shell=False, stderr=devnull).decode('utf-8').replace('\n', '')
 except:
     pass
-__git_uri__ = "git@github.com:airbnb/knowledge-repo.git"
+__git_uri__ = "https://github.com/airbnb/knowledge-repo.git"
 
 # These are the core dependencies, and should include all packages needed for accessing repositories
 # and running a non-server-side instance of the flask application. Optional dependencies for converters/etc
