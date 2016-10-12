@@ -72,9 +72,13 @@ parser.add_argument('--knowledge-branch', dest='knowledge_branch', help='The bra
 parser.add_argument('--dev', action='store_true', help='Whether to skip passing control to version of code checked out in knowledge repository.')
 parser.add_argument('--debug', action='store_true', help='Whether to enable debug mode.')
 parser.add_argument('--noupdate', dest='update', action='store_false', help='Whether script should update the repository before performing actions.')
+parser.add_argument('--version', dest='version', action='store_true', help='Show version and exit.')
 parser.add_argument('-h', '--help', action='store_true', help='Show help and exit.')
 
 args, remaining_args = parser.parse_known_args()
+
+if args.version:
+    print('Local version: {}'.format(knowledge_repo.__version__))
 
 if args.help and not remaining_args:
     parser.print_help()
@@ -183,6 +187,10 @@ db_upgrade.add_argument('-c', '--config', default=None, help="The config file fr
 db_upgrade.add_argument('-m', '--message', help="The message to use for the database revision.")
 db_upgrade.add_argument('--autogenerate', action='store_true', help="Whether alembic should automatically populate the migration script.")
 
+# Show version and exit
+if args.version:
+    print('Embedded/active version: {}'.format(knowledge_repo.__version__))
+    sys.exit(0)
 
 # Only show db_migrate option if running in development mode, and in a git repository.
 if args.dev and os.path.exists(os.path.join(os.path.dirname(__file__), '..', '.git')):
