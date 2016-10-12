@@ -22,7 +22,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
     _registry_keys = ['', 'git']
 
     @classmethod
-    def create(cls, uri, embed_tooling=True):
+    def create(cls, uri, embed_tooling=False):
         path = uri.replace('git://', '')
         if os.path.exists(path):
             response = input('Repository already exists. Do you want to convert it to a knowledge data repository? Note that this will override any existing `README.md` and `.knowledge_repo_config.py` files, and replace any submodule at `.resources`. (y/n) ')
