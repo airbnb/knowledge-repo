@@ -105,7 +105,7 @@ There are two repositories associated with the Knowledge Repository project.
 ### Installation
 To install the knowledge repository tooling (and all its dependencies), simply run:
 
-`pip install git+ssh://git@github.com/airbnb/knowledge-repo.git[all]`
+`pip install --upgrade "knowledge-repo[all]"`
 
 You can also skip installing dependencies which are only required in special cases by replacing `all` with one or more of the following (separated by commas):
 - `ipynb` : Installs the dependencies required for adding/converting Jupyter notebook files
