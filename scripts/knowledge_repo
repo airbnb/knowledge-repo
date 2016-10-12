@@ -124,9 +124,9 @@ subparsers = parser.add_subparsers(help='sub-commands')
 
 init = subparsers.add_parser('init', help='Initialise a new git knowledge repository.')
 init.set_defaults(action='init')
-init.add_argument('--tooling-skip', action='store_true', help='Disable embedding of knowledge_repo tooling.')
+init.add_argument('--tooling-embed', action='store_true', help='Embed a reference version knowledge_repo tooling in the repository.')
 init.add_argument('--tooling-repo', help='The repository to use (if not the default).')
-init.add_argument('--tooling-branch', help='The branch to use when embedding the tools as a submodule.')
+init.add_argument('--tooling-branch', help='The branch to use when embedding the tools as a submodule (default is "master").')
 
 create = subparsers.add_parser('create', help='Start a new knowledge post based on a template.')
 create.set_defaults(action='create')
@@ -204,14 +204,14 @@ args = parser.parse_args()
 
 # If init, use this code to create a new repository.
 if args.action == 'init':
-    if args.tooling_skip:
-        embed_tooling = False
-    else:
+    if args.tooling_embed:
         embed_tooling = {}
         if args.tooling_repo is not None:
             embed_tooling['repository'] = args.tooling_repo
         if args.tooling_branch is not None:
             embed_tooling['branch'] = args.tooling_branch
+    else:
+        embed_tooling = False
     kr = knowledge_repo.KnowledgeRepository.create_for_uri(args.repo, embed_tooling=embed_tooling)
     if kr is not None:
         print("Knowledge repository created for uri `{}`.".format(kr.uri))
