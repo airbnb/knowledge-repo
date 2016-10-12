@@ -7,7 +7,7 @@ RUN apt-get -y install git
 RUN apt-get -y install ssh
 
 RUN pip install --upgrade pip
-RUN pip install knowledge-repo
+RUN pip install knowledge-repo[all]
 
 WORKDIR /knowledge
 
