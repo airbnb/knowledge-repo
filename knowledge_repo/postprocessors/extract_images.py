@@ -64,7 +64,7 @@ class ExtractImages(KnowledgePostProcessor):
     def copy_image(cls, kp, path, is_ref=False):
         if is_ref:
             return
-        with open(path) as f:
+        with open(path, 'rb') as f:
             kp.write_image(os.path.basename(path), f.read())
         return os.path.join('images', os.path.basename(path))
 
