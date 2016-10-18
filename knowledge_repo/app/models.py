@@ -312,9 +312,10 @@ class Post(db.Model):
     @property
     def contains_excluded_tag(self):
         excluded_tags = current_app.config.get('EXCLUDED_TAGS')
-        for tag in self.tags:
-            if tag.name in excluded_tags:
-                return True
+        if excluded_tags is not None:
+            for tag in self.tags:
+                if tag.name in excluded_tags:
+                    return True
         return False
 
     _status = db.Column('status', db.Integer(), default=0)
