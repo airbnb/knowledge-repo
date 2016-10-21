@@ -190,7 +190,7 @@ class User(db.Model):
                  .filter(Vote.user_id == self.id)
                  .all())
         post_ids = [vote.object_id for vote in votes]
-        excluded_tags = current_app.config.get('EXCLUDED_TAGS')
+        excluded_tags = current_app.config.get('EXCLUDED_TAGS', [])
         posts = (db.session.query(Post)
                  .filter(Post.id.in_(post_ids))
                  .filter(~Post.tags.any(Tag.name.in_(excluded_tags)))
@@ -311,11 +311,8 @@ class Post(db.Model):
 
     @property
     def contains_excluded_tag(self):
-        excluded_tags = current_app.config.get('EXCLUDED_TAGS')
-        for tag in self.tags:
-            if tag.name in excluded_tags:
-                return True
-        return False
+        excluded_tags = current_app.config.get('EXCLUDED_TAGS', [])
+        return any([tag.name in excluded_tags for tag in self.tags])
 
     _status = db.Column('status', db.Integer(), default=0)
 
