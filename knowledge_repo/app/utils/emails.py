@@ -59,7 +59,7 @@ def send_subscription_emails(post):
     # if this post is tagged as private - send no emails
     post_full_tags = [tag.name for tag in post.tags]
     for full_tag in post_full_tags:
-        if full_tag in current_app.config.get("EXCLUDED_TAGS"):
+        if full_tag in current_app.config.get("EXCLUDED_TAGS", []):
             return
     for tag in post.tags:
         send_subscription_email(post, tag)
