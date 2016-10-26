@@ -35,7 +35,7 @@ def get_posts(feed_params):
     query = (db_session.query(Post).filter(Post.is_published))
 
     # posts returned should not include any posts in the excluded tags
-    excluded_tags = current_app.config.get('EXCLUDED_TAGS')
+    excluded_tags = current_app.config.get('EXCLUDED_TAGS', [])
     if excluded_tags:
         query = query.filter(~Post.tags.any(Tag.name.in_(excluded_tags)))
 

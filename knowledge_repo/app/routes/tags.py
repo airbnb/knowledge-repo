@@ -42,7 +42,7 @@ def render_batch_tags():
     sort_desc = not sort_asc
     feed_params = from_request_get_feed_params(request)
 
-    excluded_tags = current_app.config.get('EXCLUDED_TAGS')
+    excluded_tags = current_app.config.get('EXCLUDED_TAGS', [])
     all_tags = db_session.query(Tag).all()
     tags_to_posts = {}
     nonzero_tags = []
@@ -120,7 +120,7 @@ def render_tag_pages():
     if tag[0] == '#':
         tag = tag[1:]
 
-    if tag in current_app.config.get('EXCLUDED_TAGS'):
+    if tag in current_app.config.get('EXCLUDED_TAGS', []):
         return render_template('error.html')
 
     tag_obj = (db_session.query(Tag)
@@ -216,7 +216,7 @@ def toggle_tag_subscription():
         # retrieve relevant tag and user args from request
         tag_name = request.args.get('tag_name', '')
 
-        if tag_name in current_app.config.get('EXCLUDED_TAGS'):
+        if tag_name in current_app.config.get('EXCLUDED_TAGS', []):
             logging.warning("Trying to subscribe to an excluded tag")
             return ""
 

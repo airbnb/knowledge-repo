@@ -116,7 +116,7 @@ def render_cluster():
     request_tag = request.args.get('tag')
     sort_desc = not bool(request.args.get('sort_asc', ''))
 
-    excluded_tags = current_app.config.get('EXCLUDED_TAGS')
+    excluded_tags = current_app.config.get('EXCLUDED_TAGS', [])
     post_query = (db_session.query(Post)
                             .filter(Post.is_published)
                             .filter(~Post.tags.any(Tag.name.in_(excluded_tags))))
