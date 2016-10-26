@@ -120,7 +120,7 @@ def render_tag_pages():
     if tag[0] == '#':
         tag = tag[1:]
 
-    if tag in current_app.config.get('EXCLUDED_TAGS'):
+    if tag in current_app.config.get('EXCLUDED_TAGS', []):
         return render_template('error.html')
 
     tag_obj = (db_session.query(Tag)
