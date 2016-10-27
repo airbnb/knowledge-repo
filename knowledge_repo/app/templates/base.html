@@ -104,61 +104,36 @@
     {% block scripts %}
     <script type='text/javascript'>
     $("#searchbar")[0].setSelectionRange(1000, 1000);
-    var substringMatcher = function(pageMeta) {
-      return function findMatches(q, cb) {
-        var matches, substringRegex;
 
-        // an array that will be populated with substring matches
-        matches = [];
-
-        // regex used to determine if a string contains the substring `q`
-        substrRegex = new RegExp(q, 'i');
-
-        // iterate through the pool of strings and for any string that
-        // contains the substring `q`, add it to the `matches` array
-        $.each(pageMeta, function(i, meta) {
-          var match = false;
-          if (substrRegex.test(meta.title)) {
-            match = true;
-          };
-          if (substrRegex.test(meta.author)) {
-            match = true;
-          };
-          if (match) {
-            matches.push(meta);
-          }
-        });
-
-        cb(matches);
-      };
-    };
-
-
-    $.get('/ajax_post_typeahead', function(typeahead_post_info) {
-      typeahead_post_info = JSON.parse(typeahead_post_info);
-      $('#searchbar').typeahead({
-          hint: false,
-          highlight: true,
-          minLength: 1
+    $('#searchbar').typeahead({
+        hint: false,
+        highlight: true,
+        minLength: 1
+      },
+      {
+        name: 'knowledge_posts',
+        limit: 10,
+        display: function (item) {
+          return item;
         },
-        {
-          name: 'knowledge_posts',
-          display: function (item) {
-            return item.title;
-          },
-          templates: {
-            empty: Handlebars.compile(
-              '<div class="tt-not-found">' +
-                'Unable to find any posts that match the current query' +
-                '</div>'
-            ),
-            suggestion: function(data) {
-              return '<p><strong class="text-rausch">' + data.author + '</strong> – ' + data.title + '</p>';
-            }
-          },
-          source: substringMatcher(typeahead_post_info)
+        templates: {
+          empty: Handlebars.compile(
+            '<div class="tt-not-found">' +
+              'Unable to find any posts that match the current query' +
+              '</div>'
+          ),
+          suggestion: function(data) {
+            return '<p style="overflow-wrap:break-word"><strong class="text-rausch">' + data.title + '</strong> – ' + data.author + '</p>';
+          }
+        },
+        source: function(q, sync, async) {
+          $.ajax('/ajax_post_typeahead?search=' + q,
+          {
+            success: function(data,status){ async(JSON.parse(data)); }
+          })
         }
-    );
+      });
+
 
     $('#searchbar').bind('typeahead:select', function(obj, datum, name) {
       window.location = '/render?markdown=' + encodeURIComponent(datum.path);
@@ -174,8 +149,6 @@
 
     var padding = $('.tt-menu').outerWidth()
     $('.tt-menu').width($('#searchbar').width() + padding + "px")
-    });
-
 
     </script>
     {% endblock %}

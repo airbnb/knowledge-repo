@@ -110,22 +110,9 @@ class KnowledgeFlask(Flask):
             if not current_app.config.get('REPOSITORY_INDEXING_ENABLED', True):
                 return
 
-            typeahead_data = {}
-
-            def update_typeahead_data(post):
-                """ Create the typeahead entry for a given knowledge post """
-                if post.authors and post.title and post.path:
-                    authors_str = [author.format_name for author in post.authors]
-                    typeahead_entry = {'author': authors_str,
-                                       'title': str(post.title),
-                                       'path': str(post.path),
-                                       'updated_at': str(post.updated_at)}
-                    typeahead_data[str(post.title)] = typeahead_entry
-
             update_index()
 
             # For every tag in the excluded tags, create the tag object if it doesn't exist
-            # To ensure that posts with the excluded tags do not show up in the typeahead
             excluded_tags = current_app.config.get('EXCLUDED_TAGS', [])
             for tag in excluded_tags:
                 tag_exists = (db_session.query(Tag)
@@ -135,16 +122,6 @@ class KnowledgeFlask(Flask):
                     tag_exists = Tag(name=tag)
                     db_session.add(tag_exists)
                     db_session.commit()
-
-            posts = (db_session.query(Post)
-                     .filter(Post.is_published)
-                     .filter(~Post.tags.any(Tag.name.in_(excluded_tags)))
-                     .all())
-
-            for post in posts:
-                update_typeahead_data(post)
-
-            current_app.config['typeahead_data'] = typeahead_data
 
         @self.before_request
         def set_user_information():

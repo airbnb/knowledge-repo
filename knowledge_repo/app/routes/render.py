@@ -2,6 +2,7 @@ import json
 import logging
 
 from flask import request, url_for, redirect, render_template, current_app, Blueprint, g
+from sqlalchemy import case, desc
 
 from ..proxies import db_session, current_repo
 from ..models import User, Post, PageView
@@ -162,5 +163,28 @@ def about():
 
 
 @blueprint.route('/ajax_post_typeahead', methods=['GET', 'POST'])
-def ajax_post_typehead():
-    return json.dumps(current_app.config.get('typeahead_data', {}))
+def ajax_post_typeahead():
+    # this a string of the search term
+    search_terms = request.args.get('search', '')
+    search_terms = search_terms.split(" ")
+    case_statements = []
+    for term in search_terms:
+        case_stmt = case([(Post.keywords.ilike('%' + term.strip() + '%'), 1)], else_=0)
+        case_statements += [case_stmt]
+
+    match_score = sum(case_statements).label("match_score")
+
+    posts = (db_session.query(Post, match_score)
+                       .order_by(desc(match_score))
+                       .limit(5)
+                       .all())
+
+    matches = []
+    for (post, count) in posts:
+        authors_str = [author.format_name for author in post.authors]
+        typeahead_entry = {'author': authors_str,
+                           'title': str(post.title),
+                           'path': str(post.path),
+                           'keywords': str(post.keywords)}
+        matches += [typeahead_entry]
+    return json.dumps(matches)
