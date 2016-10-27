@@ -15,6 +15,7 @@ from knowledge_repo._version import __version__
 from knowledge_repo.repository import KnowledgeRepository
 from .proxies import current_repo, db_session
 from .utils.models import unique_constructor
+from .utils.search import get_keywords
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -445,7 +446,9 @@ class Post(db.Model):
         self.revision = kp.revision
         self.title = headers['title']
         self.tldr = headers['tldr']
-        self.keywords = ",".join(headers.get('keywords', []))
+        self.authors = headers.get('authors', [])
+        self.tags = headers.get('tags', [])
+        self.keywords = get_keywords(self)
         self.thumbnail = kp.thumbnail_uri
 
         self.created_at = headers['created_at']
@@ -453,8 +456,6 @@ class Post(db.Model):
         if self.created_at > self.updated_at:
             self.updated_at = self.created_at
 
-        self.authors = headers.get('authors', [])
-        self.tags = headers.get('tags', [])
         self.status = kp.status
 
 

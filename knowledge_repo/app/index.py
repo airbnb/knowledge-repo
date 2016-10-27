@@ -3,6 +3,7 @@ import logging
 from .proxies import db_session, current_repo
 from .models import Post
 from .utils.emails import send_subscription_emails
+from .utils.search import get_keywords
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,6 +29,10 @@ def update_index():
             logger.info('Recording unpublished status for post at {}'.format(post.path))
             post.status = current_repo.PostStatus.UNPUBLISHED
             continue
+
+        # TODO(nikki_ray): This is to support the backfilling of this column. Remove this.
+        if not post.keywords:
+            post.keywords = get_keywords(post)
 
         # Update database according to current state of existing knowledge post and
         # remove from kp_dir. This means that when this loop finishes, kr_dir will
