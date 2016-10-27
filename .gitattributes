@@ -1,0 +1,9 @@
+knowledge-repo/knowledge_repo/app/static/modules/* linguist-vendored
+
+knowledge-repo/knowledge_repo/app/static/js/handlebars.js linguist-vendored
+knowledge-repo/knowledge_repo/app/static/js/highlight.pack.js linguist-vendored
+knowledge-repo/knowledge_repo/app/static/js/select2.min.js linguist-vendored
+
+knowledge-repo/knowledge_repo/app/static/css/highlight/* linguist-vendored
+knowledge-repo/knowledge_repo/app/static/css/codehilite.css linguist-vendored
+knowledge-repo/knowledge_repo/app/static/css/select2.min.css lingust-vendored
