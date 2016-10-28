@@ -114,7 +114,7 @@
         name: 'knowledge_posts',
         limit: 10,
         display: function (item) {
-          return item;
+          return item.title + " - " + item.author;
         },
         templates: {
           empty: Handlebars.compile(
