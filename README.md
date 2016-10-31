@@ -144,6 +144,22 @@ git push -u origin master
 
 For more details about the structure of a knowledge repository, see the technical details section below.
 
+### Configuration
+
+There are two types of configuration files, one for knowledge-data git repos that holds posts, and another for the web application.
+
+#### Knowledge Data Git Repo Configuration
+
+When running `knowledge_repo init` to make a folder a knowledge-data git repo, a `.knowledge_repo_config` file will be created in the folder. The file will be a copy of the default repo configuration file located [here](https://github.com/airbnb/knowledge-repo/blob/master/knowledge_repo/config_defaults.py).
+
+This configuration file will allow you to add postprocessors to post contributions from the repo, add rules for which subdirectories posts can be added to, and check the format of author names at contribution time. See the file itself for more detail.
+
+#### Knowledge Web Application Configuration
+
+Specify a configuration file when running the web application by adding the flag `--config path/to/config_file.py`. An example configuration file is provided [here](https://github.com/airbnb/knowledge-repo/blob/master/resources/server_config.py). 
+
+This configuration file lets you specify details specific to the web server. For instance, one can specify the database connection string or the request header that contains usernames. See the file itself for more detail.
+
 ## Writing Knowledge Posts
 
 ### TLDR Guide For Contributing
