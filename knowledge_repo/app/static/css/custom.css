@@ -16,6 +16,10 @@
  cursor:pointer;
 }
 
+.tt-suggestion.tt-cursor {
+  background-color: #f5f5f5;
+}
+
 .tt-input, .tt-hint {
   width: 250px;
 }
