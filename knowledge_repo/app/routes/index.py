@@ -149,7 +149,7 @@ def render_cluster():
                          post in tag.posts
                          if post.is_published and not post.contains_excluded_tag]
             if tag_posts:
-                tags_to_posts[tag.name] = tag.posts
+                tags_to_posts[tag.name] = tag_posts
         tuples = [(k, v) for (k, v) in tags_to_posts.items()]
 
     elif group_by == "folder":

@@ -203,3 +203,19 @@ class KnowledgeFlask(Flask):
     def db_migrate(self, message, autogenerate=True):
         with self.app_context():
             command.revision(self._alembic_config, message=message, autogenerate=autogenerate)
+
+    @property
+    def supports_threads(self):
+        # If index database is an sqlite database, it will lock on any write action, and so breaks on multiple threads
+        # Repository uris will break as above (but less often since they are not often written too), but will also
+        # end up being a separate repository per thread; breaking consistency of presented content.
+
+        index_db = self.config['SQLALCHEMY_DATABASE_URI']
+        if index_db.startswith('sqlite://') and ':memory:' not in index_db:
+            return False
+
+        for uri in self.repository.uris.values():
+            if uri.startswith('sqlite://') or ':memory:' in uri:
+                return False
+
+        return True
