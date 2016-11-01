@@ -90,9 +90,14 @@ class HTMLConverter(KnowledgePostConverter):
         if images_base64_encode:
             urlmappers.insert(0, self.base64_encode_image_mapper)
 
+        # proxy posts are assumed to be embeddable links
+        if 'proxy' in self.kp.headers:
+            return '<iframe width=100% height=100% src="{}"></iframe>'.format(self.kp.headers['proxy'].strip())
+
         html = ''
         if not skip_headers:
             html += self.render_headers()
+
         html += markdown.Markdown(extensions=MARKDOWN_EXTENSTIONS).convert(self.kp.read())
 
         return self.apply_url_remapping(html, urlmappers)
