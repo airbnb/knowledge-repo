@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 __all__ = ['__author__', '__author_email__', '__version__', '__git_uri__', '__dependencies__', '__optional_dependencies__']

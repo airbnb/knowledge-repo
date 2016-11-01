@@ -50,6 +50,14 @@
   width: 250px;
 }
 
+/* footer elements */
+
+.footer {
+    text-align: center;
+    color: #565a5c;
+    padding: 20px;
+}
+
 .panel {
   border: 1px solid #dce0e0;
   color: #565a5c;

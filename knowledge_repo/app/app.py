@@ -10,6 +10,7 @@ from flask_migrate import Migrate
 from alembic import command
 from alembic.migration import MigrationContext
 
+import knowledge_repo
 from .proxies import db_session, current_repo
 from .index import update_index
 from .models import db as sqlalchemy_db, Post, User, Tag
@@ -150,6 +151,14 @@ class KnowledgeFlask(Flask):
             # TODO: Link this more to KnowledgeRepository capability and
             # configuration rather than a specific name.
             return {"webeditor_enabled": 'webposts' in current_repo.uris}
+
+        @self.context_processor
+        def inject_version():
+            version = knowledge_repo.__version__
+            version_revision = None
+            if '_' in knowledge_repo.__version__:
+                version, version_revision = version.split('_')
+            return dict(version=version, version_revision=version_revision)
 
     @property
     def repository(self):
