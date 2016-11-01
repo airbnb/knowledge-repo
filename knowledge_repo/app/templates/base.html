@@ -1,161 +1,165 @@
-<!-- js includes at the top as post embedded js colliding >
-<!-->
-<script src="{{ url_for('static', filename='modules/jquery/jquery.min.js')}}"></script>
-<script src="{{ url_for('static', filename='modules/tether/js/tether.min.js')}}"></script>
-<script src="{{ url_for('static', filename='modules/bootstrap/js/bootstrap.min.js')}}"></script>
-<script src="{{ url_for('static', filename='modules/bootstrap-slider/js/bootstrap-slider.min.js')}}"></script>
-<script src="{{ url_for('static', filename='modules/typeahead.js/typeahead.bundle.min.js')}}"></script>
-<script src="{{ url_for('static', filename='modules/handlebars/js/handlebars.js')}}"></script>
-<script src="{{ url_for('static', filename='js/helpers.js')}}"></script>
-<script src="{{ url_for('static', filename='modules/select2/js/select2.min.js')}}"></script>
-<script src="{{ url_for('static', filename='modules/hightlight.pack.js/highlight.pack.js')}}"></script>
-<script src="{{ url_for('static', filename='modules/marked.js/marked.js')}}"></script>
-<!-- require js used for plotly, but has a bunch of collisions with other js packages
-     make sure to have it be last js package imported ><!-- >
-<script src="{{ url_for('static', filename='modules/require.js/require.min.js')}}"></script>
-
+<!DOCTYPE html>
 <html>
 
-  <head>
-    <meta charset="utf-8">
-    <title> {% block title %} {% endblock %}  </title>
-      <!--[if lt IE 9]>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6.2/html5shiv.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/2.1.0/es5-shim.min.js"></script>
-    <![endif]-->
-    <link rel="stylesheet" href="{{ url_for('static', filename='modules/bootstrap/css/bootstrap.min.css')}}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='modules/bootstrap-slider/css/bootstrap-slider.min.css')}}">
-    <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='css/custom.css') }}">
-    <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='modules/select2/css/select2.min.css') }}">
-    <link href='https://fonts.googleapis.com/css?family=Lato:400,900|Playfair+Display|Source+Serif+Pro:400,700' rel='stylesheet' type='text/css'>
-    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <head>
+        <meta charset="utf-8">
 
-    <style>
-        .spinner {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            margin-left: -50px; /* half width of the spinner gif */
-            margin-top: -50px; /* half height of the spinner gif */
-            text-align:center;
-            z-index:1234;
-            overflow: auto;
-            width: 100px; /* width of the spinner gif */
-            height: 102px; /*hight of the spinner gif +2px to fix IE8 issue */
-        }
+        <title>{% block title %}{% endblock %}</title>
 
-        .table {
-          font-size: 14px;
-        }
+        <!-- js includes at the top as post embedded js colliding -->
+        <script src="{{ url_for('static', filename='modules/jquery/jquery.min.js')}}"></script>
+        <script src="{{ url_for('static', filename='modules/tether/js/tether.min.js')}}"></script>
+        <script src="{{ url_for('static', filename='modules/bootstrap/js/bootstrap.min.js')}}"></script>
+        <script src="{{ url_for('static', filename='modules/bootstrap-slider/js/bootstrap-slider.min.js')}}"></script>
+        <script src="{{ url_for('static', filename='modules/typeahead.js/typeahead.bundle.min.js')}}"></script>
+        <script src="{{ url_for('static', filename='modules/handlebars/js/handlebars.js')}}"></script>
+        <script src="{{ url_for('static', filename='js/helpers.js')}}"></script>
+        <script src="{{ url_for('static', filename='modules/select2/js/select2.min.js')}}"></script>
+        <script src="{{ url_for('static', filename='modules/hightlight.pack.js/highlight.pack.js')}}"></script>
+        <script src="{{ url_for('static', filename='modules/marked.js/marked.js')}}"></script>
 
-        .modal-content {
-          max-width: 1024px;
-        }
+        <!-- require js is used for plotly, but has a bunch of collisions with other js packages
+             make sure to have it be last js package imported -->
+        <script src="{{ url_for('static', filename='modules/require.js/require.min.js')}}"></script>
 
-        {% block style %} {% endblock %}
+        <!--[if lt IE 9]>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6.2/html5shiv.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/2.1.0/es5-shim.min.js"></script>
+        <![endif]-->
 
-      </style>
+        <link rel="stylesheet" href="{{ url_for('static', filename='modules/bootstrap/css/bootstrap.min.css')}}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='modules/bootstrap-slider/css/bootstrap-slider.min.css')}}">
+        <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='css/custom.css') }}">
+        <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='modules/select2/css/select2.min.css') }}">
+        <link href='https://fonts.googleapis.com/css?family=Lato:400,900|Playfair+Display|Source+Serif+Pro:400,700' rel='stylesheet' type='text/css'>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}">
 
-  </head>
+        <style>
+            .spinner {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                margin-left: -50px; /* half width of the spinner gif */
+                margin-top: -50px; /* half height of the spinner gif */
+                text-align:center;
+                z-index:1234;
+                overflow: auto;
+                width: 100px; /* width of the spinner gif */
+                height: 102px; /*hight of the spinner gif +2px to fix IE8 issue */
+            }
+
+            .table {
+              font-size: 14px;
+            }
+
+            .modal-content {
+              max-width: 1024px;
+            }
+
+            {% block style %} {% endblock %}
+
+          </style>
+
+    </head>
 
 
-  <body>
+    <body>
 
-    <div class="navbar navbar-knowledge" role="navigation">
-      <div class="container page-container">
-        <a  href="/" aria-selected="false" class="logo-image navbar-text" style='margin-top:20px; margin-left: -7px'>
-          <img width="125" src='{{ url_for("static", filename = "images/logo-white.svg")}}'></img>
-        </a>
-        <a id="feed_tab" href="/" aria-selected="false" class="navbar-text" style='margin-top:18px'>
-          Home
-        </a>
-        <a id="favorites_tab" href="/favorites" aria-selected="false" class="navbar-text" style='margin-top:18px'>
-          Favorites
-        </a>
-        <a id="help_tab" href="/about" aria-selected="false" class="navbar-text" style='margin-top:18px'>
-         About
-        </a>
-        <a id="stats_tab" href="/stats" aria-selected="false" class="navbar-text" style='margin-top:18px'>
-         Stats
-        </a>
-        {% if webeditor_enabled %}
-          <a id="webposts_tab" href="/create"
-           class="btn btn-primary navbar-text pull-right"
-           style='border-radius:4px; margin-top:10px; margin-right:-10px; background-color: #00a699; color:white; border-color: #00a699'>
-            Write a Post!
-          </a>
-        {% endif %}
-        <div class="pull-right">
-          <div class="form-group">
-            <input class="form-control" id="searchbar" placeholder="Search for Knowledge" style="text-align:right">
-          </div>
+        <div class="navbar navbar-knowledge" role="navigation">
+            <div class="container page-container">
+                <a  href="/" aria-selected="false" class="logo-image navbar-text" style='margin-top:20px; margin-left: -7px'>
+                    <img width="125" src='{{ url_for("static", filename = "images/logo-white.svg")}}'></img>
+                </a>
+                <a id="feed_tab" href="/" aria-selected="false" class="navbar-text" style='margin-top:18px'>
+                    Home
+                </a>
+                <a id="favorites_tab" href="/favorites" aria-selected="false" class="navbar-text" style='margin-top:18px'>
+                    Favorites
+                </a>
+                <a id="help_tab" href="/about" aria-selected="false" class="navbar-text" style='margin-top:18px'>
+                    About
+                </a>
+                <a id="stats_tab" href="/stats" aria-selected="false" class="navbar-text" style='margin-top:18px'>
+                    Stats
+                </a>
+                {% if webeditor_enabled %}
+                <a id="webposts_tab" href="/create"
+                   class="btn btn-primary navbar-text pull-right"
+                   style='border-radius:4px; margin-top:10px; margin-right:-10px; background-color: #00a699; color:white; border-color: #00a699'>
+                    Write a Post!
+                </a>
+                {% endif %}
+                <div class="pull-right">
+                    <div class="form-group">
+                        <input class="form-control" id="searchbar" placeholder="Search for Knowledge" style="text-align:right">
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <div class="container page-container">
+        <div class="container page-container">
 
-    {% block content %} {% endblock %}
+            {% block content %} {% endblock %}
 
-     </div>
+        </div>
 
-  <div class="footer">
-      Served with ♥ by <a href="https://github.com/airbnb/knowledge-repo">Knowledge Repo</a> <a title='{{version_revision}}' href="https://github.com/airbnb/knowledge-repo/releases/tag/v{{ version }}">{{ version }}</a>
-  </div>
+        <div class="footer">
+            Served with ♥ by <a href="https://github.com/airbnb/knowledge-repo">Knowledge Repo</a> <a title='{{version_revision}}' href="https://github.com/airbnb/knowledge-repo/releases/tag/v{{ version }}">{{ version }}</a>
+        </div>
+
+        {% block scripts %}
+        <script type='text/javascript'>
+            $("#searchbar")[0].setSelectionRange(1000, 1000);
+
+            $('#searchbar').typeahead({
+                hint: false,
+                highlight: true,
+                minLength: 1
+              },
+              {
+                name: 'knowledge_posts',
+                limit: 10,
+                display: function (item) {
+                  return item.title + " - " + item.author;
+                },
+                templates: {
+                  empty: Handlebars.compile(
+                    '<div class="tt-not-found">' +
+                      'Unable to find any posts that match the current query' +
+                      '</div>'
+                  ),
+                  suggestion: function(data) {
+                    return '<p style="overflow-wrap:break-word"><strong class="text-rausch">' + data.title + '</strong> – ' + data.author + '</p>';
+                  }
+                },
+                source: function(q, sync, async) {
+                  $.ajax('/ajax_post_typeahead?search=' + q,
+                  {
+                    success: function(data,status){ async(JSON.parse(data)); }
+                  })
+                }
+              });
+
+
+            $('#searchbar').bind('typeahead:select', function(obj, datum, name) {
+              window.location = '/render?markdown=' + encodeURIComponent(datum.path);
+            });
+
+            $('#searchbar').keypress(function(event){
+              var keycode = (event.keyCode ? event.keyCode : event.which);
+              if(keycode == '13'){
+                var path = document.location.pathname;
+                window.location = path + '?filters=' + $('#searchbar').val()
+              }
+            });
+
+            var padding = $('.tt-menu').outerWidth()
+            $('.tt-menu').width($('#searchbar').width() + padding + "px")
+
+        </script>
+        {% endblock %}
 
     </body>
-
-    {% block scripts %}
-    <script type='text/javascript'>
-    $("#searchbar")[0].setSelectionRange(1000, 1000);
-
-    $('#searchbar').typeahead({
-        hint: false,
-        highlight: true,
-        minLength: 1
-      },
-      {
-        name: 'knowledge_posts',
-        limit: 10,
-        display: function (item) {
-          return item.title + " - " + item.author;
-        },
-        templates: {
-          empty: Handlebars.compile(
-            '<div class="tt-not-found">' +
-              'Unable to find any posts that match the current query' +
-              '</div>'
-          ),
-          suggestion: function(data) {
-            return '<p style="overflow-wrap:break-word"><strong class="text-rausch">' + data.title + '</strong> – ' + data.author + '</p>';
-          }
-        },
-        source: function(q, sync, async) {
-          $.ajax('/ajax_post_typeahead?search=' + q,
-          {
-            success: function(data,status){ async(JSON.parse(data)); }
-          })
-        }
-      });
-
-
-    $('#searchbar').bind('typeahead:select', function(obj, datum, name) {
-      window.location = '/render?markdown=' + encodeURIComponent(datum.path);
-    });
-
-    $('#searchbar').keypress(function(event){
-      var keycode = (event.keyCode ? event.keyCode : event.which);
-      if(keycode == '13'){
-        var path = document.location.pathname;
-        window.location = path + '?filters=' + $('#searchbar').val()
-      }
-    });
-
-    var padding = $('.tt-menu').outerWidth()
-    $('.tt-menu').width($('#searchbar').width() + padding + "px")
-
-    </script>
-    {% endblock %}
 
 </html>
 
