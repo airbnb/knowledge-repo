@@ -5,7 +5,7 @@ from flask import request, url_for, redirect, render_template, current_app, Blue
 from sqlalchemy import case, desc
 
 from ..proxies import db_session, current_repo
-from ..models import User, Post, PageView
+from ..models import User, Post, PageView, Permission
 from ..utils.render import render_post, render_comment, render_post_raw
 
 
@@ -70,8 +70,18 @@ def render():
         raise Exception("unable to find post at {}".format(path))
 
     if post.contains_excluded_tag:
-        # It's possilbe that someone gets a direct link to a post that has an excluded tag
-        return render_template("error.html")
+        if post.special_permissions:
+            perms = (db_session.query(Permission)
+                               .filter(Permission.post_uuid == post.uuid)
+                               .all())
+            userids_in_perms = [perm.user_id for perm in perms]
+
+            if user_id not in userids_in_perms and username not in current_repo.config.editors:
+                author_names = [author.format_name for author in post.authors]
+                author_names = ", ".join(author_names)
+                return render_template('permission_ask.html', authors=author_names)
+        else:
+            return render_template("error.html")
 
     html = render_post(post)
     raw_post = render_post_raw(post) if raw else None

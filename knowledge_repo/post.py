@@ -28,6 +28,7 @@ tags:
 - example
 created_at: 2016-06-29
 updated_at: 2016-06-30
+users_allowed_to_view: sally_smarts, wesly_wisdom
 tldr: |
     You can write any markdown you want here (the '|' character makes this an escaped section)
 

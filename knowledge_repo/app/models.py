@@ -247,6 +247,8 @@ class Post(db.Model):
     keywords = db.Column(db.Text)
     thumbnail = db.Column(db.Text())
 
+    special_permissions = db.Column(db.Integer, default=0)
+
     created_at = db.Column(db.DateTime, default=func.now())
     updated_at = db.Column(db.DateTime, default=func.now())
 
@@ -458,6 +460,19 @@ class Post(db.Model):
 
         self.status = kp.status
 
+        if headers.get('users_allowed_to_view', ''):
+            self.special_permissions = 1
+            # comma separated list, add it into the Permission table
+            users_allowed_to_view = headers.get('users_allowed_to_view')
+            for user in users_allowed_to_view.split(","):
+                user = (db_session.query(User).filter(User.username == user.strip()).first())
+                if not user:
+                    user = User(username=user)
+                    db_session.add(user)
+                perm = Permission(user_id=user.id, post_uuid=self.uuid)
+                db_session.add(perm)
+                db_session.commit()
+
 
 class Email(db.Model):
 
@@ -472,3 +487,12 @@ class Email(db.Model):
     sent_at = db.Column(db.DateTime, default=func.now())
     subject = db.Column(db.Text)
     text = db.Column(db.Text)
+
+
+class Permission(db.Model):
+
+    __tablename__ = 'permissions'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    post_uuid = db.Column(db.Integer)

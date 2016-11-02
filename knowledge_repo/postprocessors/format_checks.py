@@ -12,7 +12,8 @@ REQUIRED_FIELD_TYPES = {
 
 OPTIONAL_FIELD_TYPES = {
     'path': str,
-    'updated_at': datetime.datetime
+    'updated_at': datetime.datetime,
+    'users_allowed_to_view': str,
 }
 
 
