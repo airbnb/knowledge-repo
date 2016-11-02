@@ -154,32 +154,32 @@ def send_internal_error_email(subject_line, **kwargs):
     current_app.config['mail'].send(msg)
 
 
-def send_reviewer_request_email(post_id, reviewer):
+def send_reviewer_request_email(path, reviewer):
     if 'mail' not in current_app.config:
         logger.warning('Mail subsystem is not configured. Silently dropping email.')
         return
     subject = "Someone requested a web post review from you!"
     msg = Message(subject, [reviewer])
     msg.body = render_template("email_templates/reviewer_request_email.txt",
-                               post_id=post_id)
+                               path=path)
     current_app.config['mail'].send(msg)
 
 
-def send_review_email(post_id, comment_text, commenter='Someone'):
+def send_review_email(path, comment_text, commenter='Someone'):
     if 'mail' not in current_app.config:
         logger.warning('Mail subsystem is not configured. Silently dropping email.')
         return
-    webpost = (db_session.query(Post)
-               .filter(Post.id == post_id)
-               .first())
-    post_title = webpost.title
-    authors = [author.username for author in webpost.authors]
+
+    kp = current_repo.post(path)
+    headers = kp.headers
+    post_title = headers['title']
+    authors = headers['authors']
     post_author_emails = usernames_to_emails(authors)
-    subject = "Someone reviewed your web post!"
+    subject = "Someone reviewed your post!"
     msg = Message(subject, post_author_emails)
     msg.body = render_template("email_templates/review_email.txt",
                                commenter=commenter,
                                comment_text=comment_text,
                                post_title=post_title,
-                               post_id=post_id)
+                               path=path)
     current_app.config['mail'].send(msg)

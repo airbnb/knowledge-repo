@@ -7,7 +7,7 @@ import os
 from collections import defaultdict
 from datetime import datetime
 from flask import request, render_template, Blueprint, current_app, url_for, send_from_directory, g
-from sqlalchemy import or_
+from sqlalchemy import or_, distinct
 from werkzeug import secure_filename
 
 from knowledge_repo.post import KnowledgePost
@@ -16,6 +16,7 @@ from ..models import Post, PostAuthorAssoc, Tag, Comment, User, PageView
 from ..utils.emails import send_review_email, send_reviewer_request_email
 from ..utils.image import pdf_page_to_png, is_pdf, is_allowed_image_format
 
+from ..index import update_index
 
 if sys.version_info.major > 2:
     from urllib.parse import unquote as urlunquote
@@ -35,43 +36,19 @@ blueprint = Blueprint('web_editor', __name__,
 
 @blueprint.route('/ajax_tags_typeahead', methods=['GET'])
 def generate_tags_typeahead():
-    tag_objs = (db_session.query(Tag).all())
-    tags_typeahead = [str(tag_obj.name) for tag_obj in tag_objs]
-    return json.dumps(tags_typeahead)
+    return json.dumps([t[0] for t in db_session.query(Tag.name).all()])
 
 
 @blueprint.route('/ajax_users_typeahead', methods=['GET'])
 def generate_users_typeahead():
-    user_objs = (db_session.query(User).all())
-    users_typeahead = [str(user_obj.username) for user_obj in user_objs]
-    return json.dumps(users_typeahead)
+    return json.dumps([u[0] for u in db_session.query(User.username).all()])
 
 
-@blueprint.route('/ajax_projects_typeahead', methods=['GET'])
+@blueprint.route('/ajax_paths_typeahead', methods=['GET'])
 def generate_projects_typeahead():
-    posts = db_session.query(Post).all()
-    projects = []
-    for p in posts:
-        if p.project:
-            projects.append(p.project)
-        elif p.path:
-            projects.append(from_path_get_project(p.path))
-    return json.dumps(list(set(projects)))
-
-
-def from_path_get_project(path):
-    """
-    To maintain an organization of webposts beyond a top-level
-    grouping, we keep track of a "project" for each post
-    :param: path of the post
-    :type path: string
-    """
-    folder_list = path.split("/")
-    # All posts are under the "projects/" folder
-    # We assume the next folder is the project
-    if len(folder_list) >= 2:
-        return folder_list[1]
-    return ""
+    # return path stubs for all repositories
+    stubs = ['/'.join(p.split('/')[:-1]) for p in current_repo.dir()]
+    return json.dumps(list(set(stubs)))
 
 
 @blueprint.route('/webposts', methods=['GET'])
@@ -88,228 +65,198 @@ def gitless_drafts():
         query = (query.outerjoin(PostAuthorAssoc, PostAuthorAssoc.post_id == Post.id)
                       .filter(PostAuthorAssoc.user_id == g.user.id))
 
-    webposts = query.all()
-
-    return render_template("web_posts.html", posts=webposts)
+    return render_template("web_posts.html", posts=query.all())
 
 
 @blueprint.route('/posteditor', methods=['GET', 'POST'])
 @PageView.logged
 def post_editor():
-    """ Render the web post editor, either with the default settings
-        or if the post already exists, with what has been saved
-    """
-    post_id = request.args.get('post_id', None)
+    """ Render the web post editor, either with the default values
+        or if the post already exists, with what has been saved """
+    path = request.args.get('path', None)
+    # set defaults
+    data = {'title': None,
+            'status': current_repo.PostStatus.DRAFT.value,
+            'markdown': None,
+            'comments': None,
+            'thumbnail': '',
+            'can_approve': 0,
+            'username': g.user.username,
+            'created_at': datetime.now(),
+            'updated_at': datetime.now(),
+            'authors': [g.user.username],
+            'comments': []}
 
-    headers = defaultdict(lambda: None)
-    status = current_repo.PostStatus.DRAFT
-    markdown = None
-    comments = None
-    thumbnail = ''
-    if post_id and post_id != 'None':
-        webpost = (db_session.query(Post)
-                             .filter(Post.id == post_id)
-                             .first())
-        webpost_path = webpost.path
-        thumbnail = webpost.thumbnail
-        kp = current_repo.post(webpost_path)
-        status = current_repo.post_status(webpost_path)
-        headers = kp.headers
-        markdown = kp.read(images=False, headers=False)
-        comments = (db_session.query(Comment)
-                              .filter(Comment.post_id == post_id)
-                              .filter(Comment.type == "review")
-                              .all())
+    if path is not None and path in current_repo:
+        kp = current_repo.post(path)
+        data.update(kp.headers)
 
-    can_approve = 0
-    authors_str = ''
-    if 'authors' in headers:
-        authors_str = ', '.join(headers['authors'])
-        if g.user.username not in authors_str:
-            can_approve = 1
+        data['status'] = kp.status.value
+        data['path'] = path
+        data['markdown'] = kp.read(images=False, headers=False)
 
-    tags_str = ''
-    if 'tags' in headers:
-        tags_str = ', '.join(headers['tags'])
+        # retrieve reviews
+        post = db_session.query(Post).filter(Post.path == path).first()
+        if post:  # post may have not been indexed yet
+            data['comments'] = (db_session.query(Comment)
+                                          .filter(Comment.post_id == post.id)
+                                          .filter(Comment.type == "review")
+                                          .all())
 
-    # get created at and updated at, or default to now
-    created_at = (headers['created_at'] or datetime.now()).strftime('%Y-%m-%d')
-    updated_at = (headers['updated_at'] or datetime.now()).strftime('%Y-%m-%d')
+    if g.user.username not in data['authors'] or g.user.username in current_repo.config.editors:
+        data['can_approve'] = 1
+
+    data['created_at'] = data['created_at'].strftime('%Y-%m-%d')
+    data['updated_at'] = data['updated_at'].strftime('%Y-%m-%d')
+    data['authors'] = json.dumps(data.get('authors'))
+    data['tags'] = json.dumps(data.get('tags', []))
 
     return render_template('post_editor.html',
-                           title=headers['title'],
-                           project=headers.get('project', ''),
-                           created_at=created_at,
-                           updated_at=updated_at,
-                           author=authors_str,
-                           tags=tags_str,
-                           tldr=headers['tldr'],
-                           markdown=markdown,
-                           post_id=post_id,
-                           status=status.value,
-                           comments=comments,
-                           feed_image=thumbnail,
-                           can_approve=can_approve,
-                           username=g.user.username)
-
-
-@blueprint.route('/submit', methods=['GET', 'POST'])
-@PageView.logged
-def submit_for_review():
-    """ Change the status of a gitless post
-        And if there are reviewers assigned, email them
-    """
-    post_id = request.args.get('post_id', None)
-    data = request.get_json()
-    post = (db_session.query(Post)
-                      .filter(Post.id == post_id)
-                      .first())
-    post.status = current_repo.PostStatus.SUBMITTED
-    db_session.commit()
-
-    path = post.path
-    current_repo.submit(path)
-
-    # email the reviewers
-    if not data['post_reviewers']:
-        return
-    reviewers = data['post_reviewers'].split(",")
-    if reviewers:
-        for r in reviewers:
-            send_reviewer_request_email(post_id=post_id, reviewer=r)
-    return ""
-
-
-@blueprint.route('/publish_post', methods=['GET', 'POST'])
-@PageView.logged
-def publish_post():
-    """ Publish the gitless post by changing the status """
-    post_id = request.args.get('post_id', None)
-    post = (db_session.query(Post)
-                      .filter(Post.id == post_id)
-                      .first())
-    if not post:
-        error_msg = "Unable to retrieve post with id = {}!".format(str(post_id))
-        json_str = json.dumps({'msg': error_msg, 'success': False})
-        return json_str
-
-    post.status = current_repo.PostStatus.PUBLISHED
-    db_session.commit()
-
-    path = post.path
-    current_repo.publish(path)
-    return ""
-
-
-@blueprint.route('/unpublish_post', methods=['GET', 'POST'])
-@PageView.logged
-def unpublish_post():
-    """ Unpublish the post, going back to the in_review status """
-    post_id = request.args.get('post_id', None)
-    post = (db_session.query(Post)
-                      .filter(Post.id == post_id)
-                      .first())
-    post.status = current_repo.PostStatus.UNPUBLISHED
-    db_session.commit()
-
-    path = post.path
-    current_repo.unpublish(path)
-    return ""
-
-
-@blueprint.route('/author_publish', methods=['POST'])
-@PageView.logged
-def change_author_publish():
-    """ Allow the author to publish their own webpost if the
-        editor allows them to
-    """
-    post_id = request.args.get('post_id', None)
-    post = (db_session.query(Post)
-                      .filter(Post.id == post_id)
-                      .first())
-    post.status = current_repo.PostStatus.UNPUBLISHED
-    db_session.commit()
-
-    path = post.path
-    current_repo.accept(path)
-    return ""
+                           **data)
 
 
 @blueprint.route('/save_post', methods=['GET', 'POST'])
 @PageView.logged
 def save_post():
-    """ Save the gitless post """
-    post_id = request.args.get('post_id', None)
+    """ Save the post """
+
     data = request.get_json()
-    post = (db_session.query(Post)
-            .filter(Post.id == post_id)
-            .first())
-    new_post = False
-    if not post:
-        new_post = True
-        path = "{}/{}.kp".format(data['project'],
-                                 data['title'].encode('utf8').lower().replace(' ', '_'))
-        if current_app.config.get('WEB_EDITOR_PREFIXES', None):
-            # TODO: Include dropdown on webeditor to have user specify repo
-            path = "{}/{}".format(current_app.config['WEB_EDITOR_PREFIXES'][0], path)
+    path = data['path']
 
-        post = (db_session.query(Post)
-                          .filter(Post.path == path)
-                          .first())
-        if post:
-            error_msg = "Post with project {} and title {} already exists!".format(data['project'], data['title'])
-
-            json_str = json.dumps({'msg': error_msg, 'success': False})
-            return json_str
-        else:
-            post = Post()
-            post.path = path
-    else:
-        path = post.path
+    # TODO better handling of overwriting
+    kp = None
+    if path in current_repo:
+        kp = current_repo.post(path)
+        if g.user.username not in kp.headers['authors']:
+            return json.dumps({'msg': "Post with path already exists!".format(path), 'success': False})
 
     # create the knowledge post
-    kp = KnowledgePost(path=path)
+    kp = kp or KnowledgePost(path=path)
 
     headers = {}
-    headers['created_at'] = datetime.strptime(data['created_at'], '%Y-%m-%d')
-    headers['updated_at'] = datetime.strptime(data['updated_at'], '%Y-%m-%d')
-    headers['title'] = str(data['title'])
-    headers['path'] = str(post.path)
-    headers['project'] = str(data['project'])
+    headers['created_at'] = datetime.strptime(data['created_at'], '%Y-%m-%d').date()
+    headers['updated_at'] = datetime.strptime(data['updated_at'], '%Y-%m-%d').date()
+    headers['title'] = data['title']
+    headers['path'] = data['path']
     # TODO: thumbnail header not working currently, as feed image set with kp
     # method not based on header
-    headers['thumbnail'] = str(data['feed_image'])
-    headers['authors'] = [str(auth).strip() for auth in data['author']]
-    headers['tldr'] = str(data['tldr'])
-    headers['tags'] = [str(tag).strip() for tag in data['tags']]
-    kp.write(urlunquote(str(data['markdown'])), headers=headers)
+    headers['thumbnail'] = data.get('feed_image', '')
+    headers['authors'] = [auth.strip() for auth in data['author']]
+    headers['tldr'] = data['tldr']
+    headers['tags'] = [tag.strip() for tag in data.get('tags', [])]
+    kp.write(urlunquote(data['markdown']), headers=headers)
 
     # add to repo
-    current_repo.add(kp, update=True)  # THIS IS DANGEROUS
-    db_session.commit()
+    current_repo.add(kp, update=True, message=headers['title'])  # THIS IS DANGEROUS
 
-    # add to index
-    post.update_metadata_from_kp(kp)
-    if new_post:
-        db_session.add(post)
-    db_session.commit()
+    update_index()
+    return json.dumps({'path': path})
 
-    return json.dumps({'post_id': str(post.id)})
+
+@blueprint.route('/submit', methods=['GET', 'POST'])
+@PageView.logged
+def submit_for_review():
+    """ Submit post and if there are reviewers assigned, email them"""
+    path = request.args.get('path', None)
+    data = request.get_json()
+    current_repo.submit(path)
+
+    # email the reviewers
+    reviewers = data.get('post_reviewers', None)
+    if reviewers:
+        for r in reviewers.split(','):
+            send_reviewer_request_email(path=path, reviewer=r)
+
+    update_index()
+    return 'OK'
+
+
+@blueprint.route('/publish_post', methods=['GET', 'POST'])
+@PageView.logged
+def publish_post():
+    """ Publish the post by changing the status """
+    path = request.args.get('path', None)
+    if path not in current_repo:
+        return json.dumps({'msg': "Unable to retrieve post with path = {}!".format(path), 'success': False})
+    current_repo.publish(path)
+
+    update_index()
+    return 'OK'
+
+
+@blueprint.route('/unpublish_post', methods=['GET', 'POST'])
+@PageView.logged
+def unpublish_post():
+    """ Unpublish the post """
+    path = request.args.get('path', None)
+    if path not in current_repo:
+        return json.dumps({'msg': "Unable to retrieve post with path = {}!".format(path), 'success': False})
+    current_repo.unpublish(path)
+
+    update_index()
+    return 'OK'
+
+
+@blueprint.route('/accept_post', methods=['POST'])
+@PageView.logged
+def accept():
+    """ Accept the post """
+    path = request.args.get('path', None)
+    if path not in current_repo:
+        return json.dumps({'msg': "Unable to retrieve post with path = {}!".format(path), 'success': False})
+    current_repo.accept(path)
+    update_index()
+    return 'OK'
 
 
 @blueprint.route('/delete_post', methods=['GET'])
 @PageView.logged
 def delete_post():
     """ Delete a post """
-    post_id = request.args.get('post_id', None)
-    item = (db_session.query(Post)
-                      .filter(Post.id == post_id)
-                      .first())
-    db_session.delete(item)
+    path = request.args.get('path', None)
+    if path not in current_repo:
+        return json.dumps({'msg': "Unable to retrieve post with path = {}!".format(path), 'success': False})
+    kp = current_repo.post(path)
+    if g.user.username not in kp.headers['authors']:
+        return json.dumps({'msg': "You can only delete a post where you are an author!", 'success': False})
+    current_repo.remove(path)
+
+    update_index()
+    return 'OK'
+
+
+@blueprint.route('/review', methods=['POST'])
+@PageView.logged
+def review_comment():
+    """ Saves a review and sends an email that the post has been reviewed to the author of the post """
+    path = request.args.get('path', None)
+    post_id = db_session.query(Post).filter(Post.path == path).first().id
+
+    comment = Comment()
+    comment.text = request.get_json()['text']
+    comment.user_id = g.user.id
+    comment.post_id = post_id
+    comment.type = "review"
+    db_session.add(comment)
     db_session.commit()
-    return ""
+
+    send_review_email(path=path,
+                      commenter=g.user.username,
+                      comment_text=comment.text)
 
 
+@blueprint.route('/delete_review', methods=['GET', 'POST'])
+@PageView.logged
+def delete_review():
+    """ Delete a review """
+    comment = Comment.query.get(int(request.args.get('comment_id', '')))
+    if comment and g.user.id == comment.user_id:
+        db_session.delete(comment)
+        db_session.commit()
+    return 'OK'
+
+
+# DEPRECATED
 @blueprint.route('/file_upload', methods=['POST', 'GET'])
 @PageView.logged
 def file_upload():
@@ -353,43 +300,3 @@ def file_upload():
                     return json.dumps({'error_msg': error_msg, 'success': False})
 
     return json.dumps({'links': uploadedFiles, 'success': True})
-
-
-@blueprint.route('/review', methods=['POST'])
-@PageView.logged
-def review_comment():
-    """ Saves the comments underneath a Gitless Post to a table
-        and sends an email that the post has been reviewed to the
-        author of the post
-    """
-    post_id = request.args.get('post_id', None)
-    commenter, commenter_id = g.user.username, g.user.id
-    data = request.get_json()   # just the comment text
-    comment = Comment()
-    comment.text = data['text']
-    comment.user_id = commenter_id
-    comment.post_id = post_id
-    comment.type = "review"
-    db_session.add(comment)
-    db_session.commit()
-
-    send_review_email(post_id=post_id, commenter=commenter,
-                      comment_text=comment.text)
-    return ""
-
-
-@blueprint.route('/delete_review', methods=['GET', 'POST'])
-@PageView.logged
-def delete_review():
-    """ Delete a comment that was made underneath a gitless contribution post """
-    try:
-        comment_id = int(request.args.get('comment_id', ''))
-        items = db_session.query(Comment).filter(
-            Comment.id == comment_id).all()
-        for item in items:
-            db_session.delete(item)
-        db_session.commit()
-    except:
-        logging.warning("ERROR processing request")
-        pass
-    return ""

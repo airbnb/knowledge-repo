@@ -142,6 +142,8 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
     # -------------- Post retrieval methods --------------------------------------
 
     def post(self, path, revision=None):
+        if path is None:
+            raise ValueError("path is None")
         path = self._kp_path(path)
         if not self.has_post(path, revision=revision) and path in self.config.aliases:
             path = self.config.aliases[path]
@@ -156,7 +158,7 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         else:
             prefixes = prefix
         assert all([prefix is None or isinstance(prefix, str) for prefix in prefixes]), "All path prefixes must be strings."
-        prefixes = [prefix if prefix is None else posixpath.relpath(prefix, '/') for prefix in prefixes]
+        prefixes = [prefix if prefix is None else posixpath.relpath(prefix) for prefix in prefixes]
         if isinstance(status, str):
             if status == 'all':
                 status = [self.PostStatus.DRAFT, self.PostStatus.SUBMITTED, self.PostStatus.PUBLISHED, self.PostStatus.UNPUBLISHED]
