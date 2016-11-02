@@ -111,6 +111,34 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
                         raise ValueError("Unrecognised uri: {}".format(uri))
             add_uris(uri_dict, self.uri)
             return uri_dict
+
+        raise ValueError("Unrecognised KnowledgeRepository.uri: {}".format(self.uri))
+
+    @property
+    def revisions(self):
+        # This method provides a mapping from uri to revision for this repository
+        # and/or any nested repositories. This is most useful when checking if an
+        # update is required server side.
+        if isinstance(self.uri, str):
+            return {self.uri: self.revision}
+
+        elif isinstance(self.uri, dict):
+            revision_dict = {}
+
+            def add_revisions(revision_dict, uris):
+                assert isinstance(uris, dict)
+                for mountpoint, uri in uris.items():
+                    if isinstance(uri, str):
+                        revision_dict[uri] = KnowledgeRepository.for_uri(uri).revision
+                    elif isinstance(uri, KnowledgeRepository):
+                        revision_dict[uri] = uri.revision
+                    elif isinstance(uri, dict):
+                        add_revisions(revision_dict, uri)
+                    else:
+                        raise ValueError("Unrecognised uri: {}".format(uri))
+            add_revisions(revision_dict, self.uri)
+            return revision_dict
+
         raise ValueError("Unrecognised KnowledgeRepository.uri: {}".format(self.uri))
 
     # ------------- Repository actions / state ------------------------------------
