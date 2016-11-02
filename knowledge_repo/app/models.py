@@ -44,6 +44,20 @@ assoc_post_tag = db.Table(
     db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'))
 )
 
+assoc_post_group = db.Table(
+    'assoc_post_group',
+    db.Model.metadata,
+    db.Column('post_id', db.Integer, db.ForeignKey('posts.id')),
+    db.Column('group_id', db.Integer, db.ForeignKey('groups.id'))
+)
+
+assoc_group_user = db.Table(
+    'assoc_group_user',
+    db.Model.metadata,
+    db.Column('group_id', db.Integer, db.ForeignKey('groups.id')),
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'))
+)
+
 
 class Comment(db.Model):
     __tablename__ = 'comments'
@@ -247,7 +261,7 @@ class Post(db.Model):
     keywords = db.Column(db.Text)
     thumbnail = db.Column(db.Text())
 
-    special_permissions = db.Column(db.Integer, default=0)
+    private = db.Column(db.Integer())
 
     created_at = db.Column(db.DateTime, default=func.now())
     updated_at = db.Column(db.DateTime, default=func.now())
@@ -316,6 +330,29 @@ class Post(db.Model):
     def contains_excluded_tag(self):
         excluded_tags = current_app.config.get('EXCLUDED_TAGS', [])
         return any([tag.name in excluded_tags for tag in self.tags])
+
+    _groups = db.relationship("Group", secondary=assoc_post_group, backref='posts',
+                              lazy='subquery')
+
+    @hybrid_property
+    def groups(self):
+        return self._groups
+
+    @groups.setter
+    def groups(self, groups):
+        # given a list of group_names, we add it.
+        group_objs = []
+
+        for group in groups:
+            if not isinstance(group, Group):
+                group = Group(name=group.strip())
+            group_objs.append(group)
+
+        # create an implicit group, group_post.id, to add
+        # single users to
+        group = Group(name="group_" + self.id)
+        group_objs.append(group)
+        self._groups = group_objs
 
     _status = db.Column('status', db.Integer(), default=0)
 
@@ -460,18 +497,9 @@ class Post(db.Model):
 
         self.status = kp.status
 
-        if headers.get('users_allowed_to_view', ''):
-            self.special_permissions = 1
-            # comma separated list, add it into the Permission table
-            users_allowed_to_view = headers.get('users_allowed_to_view')
-            for user in users_allowed_to_view.split(","):
-                user = (db_session.query(User).filter(User.username == user.strip()).first())
-                if not user:
-                    user = User(username=user)
-                    db_session.add(user)
-                perm = Permission(user_id=user.id, post_uuid=self.uuid)
-                db_session.add(perm)
-                db_session.commit()
+        if headers.get('private', ''):
+            self.private = 0
+            self.groups = headers.get('allowed_groups')
 
 
 class Email(db.Model):
@@ -489,10 +517,13 @@ class Email(db.Model):
     text = db.Column(db.Text)
 
 
-class Permission(db.Model):
+@unique_constructor(
+    lambda name: name,
+    lambda query, name: query.filter(Group.name == name)
+)
+class Group(db.Model):
 
-    __tablename__ = 'permissions'
+    __tablename__ = 'groups'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
-    post_uuid = db.Column(db.Integer)
+    name = db.Column(db.String(128), unique=True)
