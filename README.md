@@ -1,4 +1,7 @@
 # The Knowledge Repository (BETA)
+[![Build Status](https://travis-ci.org/airbnb/knowledge-repo.svg?branch=master)](https://travis-ci.org/airbnb/knowledge-repo)
+[![PyPI version](https://badge.fury.io/py/knowledge-repo.svg)](https://badge.fury.io/py/knowledge-repo)
+[![Python](https://img.shields.io/pypi/pyversions/knowledge-repo.svg?maxAge=2592000)](https://pypi.python.org/pypi/knowledge-repo)
 
 The Knowledge Repository project is focused on facilitating the sharing of knowledge between data scientists and other technical roles using data formats and tools that make sense in these professions. It provides various data stores (and utilities to manage them) for "knowledge posts", with a particular focus on notebooks (R Markdown and Jupyter / iPython Notebook) to better promote reproducible research.
 
