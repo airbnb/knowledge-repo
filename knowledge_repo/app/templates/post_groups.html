@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %} Knowledge {% endblock %}
+
+{% block content %}
+<div class="row col-12">
+  <div class="panel">
+    <div class="panel-header">
+      Groups associated with this post
+    </div>
+    <div class="panel-body">
+      <ul style='list-style-type:none'>
+        {% for group in groups %}
+        <li> {{ group.name }} -
+            <a href='/view_group_users?group_id={{group.id}}'> View Users </a>,
+            <a href='/add_group_users?group_id={{group.id}}'> Add Users </a>
+        </li>
+        <br>
+        {% endfor %}
+      <ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

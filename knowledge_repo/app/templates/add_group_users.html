@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %} Knowledge {% endblock %}
+
+{% block content %}
+<style>
+.select2.select2-container.select2-container--default {
+  width: 80% !important;
+}
+</style>
+
+<div class="row col-12">
+  <div class="panel">
+    <div class="panel-header">
+      Users associated with group: {{ group.name }}
+    </div>
+    <div class="panel-body">
+      <div class="col-12">
+        <select id="users_to_add"
+                class="js-example-tags form-control col-8"
+                type="text"
+                multiple
+                data-tags='true'>
+        </select>
+        <button class="btn btn-large btn-default" id="btn_submit"> Add users </button>
+      </div>
+      <br> <br>
+      <h4> Existing Users </h4>
+      <ul style='list-style-type:none'>
+        {% for user in group.users %}
+        <li> {{ user.format_name }} -
+            <a href="javascript:void(0)" onclick="delete_user({{user.id}});">  Delete User </a>
+        </li>
+        <br>
+        {% endfor %}
+      <ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super () }}
+<script>
+$.get('/ajax_users_typeahead', function(typeahead_users_info){
+  var all_users = JSON.parse(typeahead_users_info);
+  $.each(all_users, function(i, user){
+    var option_tag = new Option;
+    option_tag.value = user;
+    option_tag.text = user;
+    $("#users_to_add")[0].appendChild(option_tag);
+  })
+
+  $('#users_to_add').select2({
+    placeholder: "Users to add"
+  });
+});
+
+$("#btn_submit").on("click", function(){
+    users_to_add = $('#users_to_add').select2().val();
+    $.ajax({
+      type: "POST",
+      dataType: "json",
+      data: JSON.stringify(users_to_add),
+      contentType: "application/json",
+      url: '/add_users_to_group?group_id={{group.id}}',
+      async: false,
+    });
+    location.reload();
+});
+
+function delete_user(user_id){
+  $.ajax({
+      type: "POST",
+      dataType: "json",
+      data: JSON.stringify(user_id),
+      contentType: "application/json",
+      url: '/delete_user_from_group?group_id={{group.id}}',
+      async: false,
+    });
+    location.reload();
+}
+
+</script>
+{% endblock %}
