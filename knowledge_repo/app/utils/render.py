@@ -1,3 +1,5 @@
+import sys
+
 import markdown
 from flask import url_for
 from knowledge_repo.post import KnowledgePost
@@ -59,9 +61,14 @@ def render_post_header(post):
 
 def render_post_raw(post):
     if isinstance(post, KnowledgePost):
-        return post.read().encode('ascii', 'ignore')
+        raw_post = post.read().encode('ascii', 'ignore')
     else:
-        return post.text.encode('ascii', 'ignore')
+        raw_post = post.text.encode('ascii', 'ignore')
+
+    # NOTE: `str.encode()` returns a `bytes` object in Python 3
+    if sys.version_info.major >= 3:
+        return raw_post.decode('ascii', 'ignore')
+    return raw_post
 
 
 def render_post(post):
