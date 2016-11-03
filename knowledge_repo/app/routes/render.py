@@ -5,7 +5,7 @@ from flask import request, url_for, redirect, render_template, current_app, Blue
 from sqlalchemy import case, desc
 
 from ..proxies import db_session, current_repo
-from ..models import User, Post, PageView
+from ..models import User, Post, PageView, assoc_group_user
 from ..utils.render import render_post, render_comment, render_post_raw
 
 
@@ -72,6 +72,16 @@ def render():
     if post.contains_excluded_tag:
         # It's possible that someone gets a direct link to a post that has an excluded tag
         return render_template("error.html")
+
+    if post.private:
+        groups = post.groups
+        users = set()
+        for group in groups:
+            user_ids = [user.id for user in group.users]
+            users.update(user_ids)
+
+        if user_id not in users:
+            return render_template("permission_ask.html", authors=post.authors_string)
 
     html = render_post(post)
     raw_post = render_post_raw(post) if raw else None
