@@ -350,7 +350,7 @@ class Post(db.Model):
 
         # create an implicit group, group_post.id, to add
         # single users to
-        group = Group(name="group_" + str(self.id))
+        group = Group(name=":post_group_" + str(self.id))
 
         # this created group should have the author associated with it
         # so they can add people to the post
@@ -502,6 +502,8 @@ class Post(db.Model):
 
         self.status = kp.status
 
+        self.private = 0
+        # we do this check so that no header (None) and False are treated the same
         if headers.get('private', ''):
             self.private = 1
             self.groups = headers.get('allowed_groups', [])
@@ -542,4 +544,4 @@ class Group(db.Model):
 
     @users.setter
     def users(self, user_objs):
-        self._users = user_objs
+        self._users = self._users + user_objs

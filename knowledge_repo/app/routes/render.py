@@ -5,7 +5,7 @@ from flask import request, url_for, redirect, render_template, current_app, Blue
 from sqlalchemy import case, desc
 
 from ..proxies import db_session, current_repo
-from ..models import User, Post, PageView, assoc_group_user
+from ..models import User, Post, PageView
 from ..utils.render import render_post, render_comment, render_post_raw
 
 
@@ -79,8 +79,7 @@ def render():
         for group in groups:
             user_ids = [user.id for user in group.users]
             users.update(user_ids)
-
-        if user_id not in users:
+        if user_id not in users and username not in current_repo.config.editors:
             return render_template("permission_ask.html", authors=post.authors_string)
 
     html = render_post(post)
@@ -99,6 +98,8 @@ def render():
     tags_list = [str(t.name) for t in post.tags]
     user_subscriptions = [str(s) for s in user_obj.get_subscriptions]
 
+    is_author = user_id in [author.id for author in post.authors]
+
     rendered = render_template(tmpl,
                                html=html,
                                post_id=post.id,
@@ -116,7 +117,9 @@ def render():
                                user_subscriptions=user_subscriptions,
                                webeditor_buttons=False,
                                web_uri=post.kp.web_uri,
-                               table_id=None)
+                               table_id=None,
+                               is_private=(post.private == 1),
+                               is_author=is_author)
     return rendered
 
 
