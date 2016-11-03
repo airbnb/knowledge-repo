@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %} Knowledge {% endblock %}
+
+{% block content %}
+<div class="row col-12">
+  <div class="panel">
+    <div class="panel-header">
+      All Groups
+    </div>
+    <div class="panel-body">
+      <div class="col-12">
+        <textarea style='width: 80%; vertical-align:middle'
+                  placeholder=' Add new group names, separated by commas'
+                  id='add_groups'></textarea>
+        <button class="btn btn-large btn-default" style='vertical-align:bottom' id="btn_submit">Add groups</button>
+      </div>
+      <br> <br>
+      <h4> Existing Groups </h4>
+      <ul style='list-style-type:none'>
+        {% for group in groups %}
+        <li> <a href="/add_group_users?group_id={{group.id}}"> {{ group.name }}</a></li>
+        <br>
+        {% endfor %}
+      <ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super () }}
+<script>
+$("#btn_submit").on("click", function(){
+    groups = $('#add_groups')[0].value.split(",")
+    $.ajax({
+      type: "POST",
+      dataType: "json",
+      data: JSON.stringify(groups),
+      contentType: "application/json",
+      url: '/add_groups',
+      async: false,
+    });
+    location.reload();
+});
+</script>
+{% endblock %}

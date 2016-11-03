@@ -55,6 +55,7 @@ def update_index():
         logger.info('creating new post from path {}'.format(kp_path))
         post = Post()
         db_session.add(post)
+        db_session.flush()
         post.update_metadata_from_kp(kp)
         send_subscription_emails(post)
 

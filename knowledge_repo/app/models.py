@@ -350,8 +350,13 @@ class Post(db.Model):
 
         # create an implicit group, group_post.id, to add
         # single users to
-        group = Group(name="group_" + self.id)
+        group = Group(name=":post_group_" + str(self.id))
+
+        # this created group should have the author associated with it
+        # so they can add people to the post
+        group.users = self.authors
         group_objs.append(group)
+
         self._groups = group_objs
 
     _status = db.Column('status', db.Integer(), default=0)
@@ -497,9 +502,11 @@ class Post(db.Model):
 
         self.status = kp.status
 
+        self.private = 0
+        # we do this check so that no header (None) and False are treated the same
         if headers.get('private', ''):
-            self.private = 0
-            self.groups = headers.get('allowed_groups')
+            self.private = 1
+            self.groups = headers.get('allowed_groups', [])
 
 
 class Email(db.Model):
@@ -527,3 +534,14 @@ class Group(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), unique=True)
+
+    _users = db.relationship("User", secondary=assoc_group_user, backref='users',
+                             lazy='subquery')
+
+    @hybrid_property
+    def users(self):
+        return self._users
+
+    @users.setter
+    def users(self, user_objs):
+        self._users = self._users + user_objs
