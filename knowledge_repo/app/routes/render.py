@@ -70,7 +70,7 @@ def render():
         raise Exception("unable to find post at {}".format(path))
 
     if post.contains_excluded_tag:
-        # It's possilbe that someone gets a direct link to a post that has an excluded tag
+        # It's possible that someone gets a direct link to a post that has an excluded tag
         return render_template("error.html")
 
     html = render_post(post)

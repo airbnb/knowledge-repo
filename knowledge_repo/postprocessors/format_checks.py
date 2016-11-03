@@ -12,7 +12,9 @@ REQUIRED_FIELD_TYPES = {
 
 OPTIONAL_FIELD_TYPES = {
     'path': str,
-    'updated_at': datetime.datetime
+    'updated_at': datetime.datetime,
+    'private': bool,   # If false, this post starts out private
+    'allowed_groups': list
 }
 
 
