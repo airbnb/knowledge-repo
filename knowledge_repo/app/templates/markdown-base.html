@@ -58,6 +58,11 @@
             <i class='glyphicon glyphicon-new-window'></i>
           </a>
         {% endif %}
+        {% if is_author and is_private %}
+        <a href='post_groups?post_id={{post_id}}'>
+          Add permissions for users
+        </a>
+        {% endif %}
       </div>
     </div>
     <br>

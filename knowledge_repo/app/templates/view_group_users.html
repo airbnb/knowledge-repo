@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %} Knowledge {% endblock %}
+
+{% block content %}
+<div class="row col-12">
+  <div class="panel">
+    <div class="panel-header">
+      Users associated with group: {{ group.name }}
+    </div>
+    <div class="panel-body">
+      <ul style='list-style-type:none'>
+        {% for user in group.users %}
+        <li> {{ user.format_name }} -
+            <a href="javascript:void(0)" onclick="delete_user({{user.id}});"> Delete User </a>
+        </li>
+        <br>
+        {% endfor %}
+      <ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+function delete_user(user_id){
+  $.ajax({
+      type: "POST",
+      dataType: "json",
+      data: JSON.stringify(user_id),
+      contentType: "application/json",
+      url: '/delete_user_from_group?group_id={{group.id}}',
+      async: false,
+    });
+    location.reload();
+}
+</script>
+{% endblock %}

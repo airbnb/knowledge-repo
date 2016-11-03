@@ -73,6 +73,15 @@ def render():
         # It's possible that someone gets a direct link to a post that has an excluded tag
         return render_template("error.html")
 
+    if post.private:
+        groups = post.groups
+        users = set()
+        for group in groups:
+            user_ids = [user.id for user in group.users]
+            users.update(user_ids)
+        if user_id not in users and username not in current_repo.config.editors:
+            return render_template("permission_ask.html", authors=post.authors_string)
+
     html = render_post(post)
     raw_post = render_post_raw(post) if raw else None
 
@@ -88,6 +97,8 @@ def render():
 
     tags_list = [str(t.name) for t in post.tags]
     user_subscriptions = [str(s) for s in user_obj.get_subscriptions]
+
+    is_author = user_id in [author.id for author in post.authors]
 
     rendered = render_template(tmpl,
                                html=html,
@@ -106,7 +117,9 @@ def render():
                                user_subscriptions=user_subscriptions,
                                webeditor_buttons=False,
                                web_uri=post.kp.web_uri,
-                               table_id=None)
+                               table_id=None,
+                               is_private=(post.private == 1),
+                               is_author=is_author)
     return rendered
 
 
