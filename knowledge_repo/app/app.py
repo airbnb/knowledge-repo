@@ -288,6 +288,10 @@ class KnowledgeFlask(Flask):
         with self.app_context():
             command.upgrade(self._alembic_config, "head")
 
+    def db_downgrade(self, revision):
+        with self.app_context():
+            command.downgrade(self._alembic_config, revision)
+
     def db_migrate(self, message, autogenerate=True):
         with self.app_context():
             command.revision(self._alembic_config, message=message, autogenerate=autogenerate)

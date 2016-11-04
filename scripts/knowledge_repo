@@ -210,6 +210,12 @@ db_upgrade.add_argument('-c', '--config', default=None, help="The config file fr
 db_upgrade.add_argument('-m', '--message', help="The message to use for the database revision.")
 db_upgrade.add_argument('--autogenerate', action='store_true', help="Whether alembic should automatically populate the migration script.")
 
+db_downgrade = subparsers.add_parser('db_downgrade', help='Downgrade the database to the schema identified by a revision number.')
+db_downgrade.set_defaults(action='db_downgrade')
+db_downgrade.add_argument('revision', help="The target database revision. Use '-1' for the previous version.")
+db_downgrade.add_argument('-db', '--dburi', help='The SQLAlchemy database uri.')
+db_downgrade.add_argument('-c', '--config', default=None, help="The config file from which to read server configuration.")
+
 reindex = subparsers.add_parser('reindex', help='Update the index, updating all posts even if they exist in the database already; but will not lose post views and other usage metadata.')
 reindex.set_defaults(action='reindex')
 reindex.add_argument('-db', '--dburi', help='The SQLAlchemy database uri.')
@@ -331,6 +337,10 @@ elif args.action == 'deploy':
 elif args.action == 'db_upgrade':
     app = repo.get_app(db_uri=args.dburi, debug=args.debug, config=args.config)
     app.db_upgrade()
+
+elif args.action == 'db_downgrade':
+    app = repo.get_app(db_uri=args.dburi, debug=args.debug, config=args.config)
+    app.db_downgrade(revision=args.revision)
 
 elif args.action == 'db_migrate':
     app = repo.get_app(debug=args.debug, db_uri=args.dburi)
