@@ -397,8 +397,7 @@ class Post(db.Model):
 
         for author in authors:
             if not isinstance(author, User):
-                author = author.strip()
-                author = User(identifier=author)
+                author = User(identifier=author.strip())
             user_objs.append(author)
 
         self._authors = user_objs
@@ -613,10 +612,10 @@ class Post(db.Model):
 
         self.status = kp.status
 
-        self.private = 0
+        self.private = True
         # we do this check so that no header (None) and False are treated the same
-        if headers.get('private', ''):
-            self.private = 1
+        if headers.get('private', False):
+            self.private = False
             self.groups = headers.get('allowed_groups', [])
 
 
@@ -649,10 +648,26 @@ class Group(db.Model):
     _users = db.relationship("User", secondary=assoc_group_user, backref='users',
                              lazy='subquery')
 
+    def _prepare_users(self, users):
+        user_objs = []
+
+        for user in users:
+            if not isinstance(user, User):
+                user = User(username=user.strip())
+            user_objs.append(user)
+
+        return user_objs
+
     @hybrid_property
     def users(self):
         return self._users
 
     @users.setter
-    def users(self, user_objs):
-        self._users = self._users + user_objs
+    def users(self, users):
+        self._users = self._prepare_users(users)
+
+    def users_add(self, users):
+        self._users += self._prepare_users(users)
+
+    def users_remove(self, users):
+        self._users = list(set(self._users).difference(self._prepare_users(users)))
