@@ -25,7 +25,7 @@ def post_comment():
     """ Post a comment underneath a post """
 
     path = request.args.get('path', '')
-    comment_id = request.args.get('comment_id', '')
+    comment_id = request.args.get('comment_id')
     data = request.get_json()
 
     post = (db_session.query(Post)
@@ -35,9 +35,13 @@ def post_comment():
     if not post:
         raise Exception('Unable to find post')
 
-    comment = (db_session.query(Comment)
-                         .filter(Comment.id == comment_id)
-                         .first())
+    if comment_id:
+        comment = (db_session.query(Comment)
+                             .filter(Comment.id == comment_id)
+                             .first())
+    else:
+        comment = None
+
     if not comment:
         comment = Comment(post_id=post.id)
 
