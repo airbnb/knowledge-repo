@@ -22,7 +22,7 @@ class RmdConverter(KnowledgePostConverter):
                                                                     os.path.abspath(filename),
                                                                     tmp_path)
 
-            # Replace '\' with '\\' on Windows machines
+            # Replace '\' with '\\' on Windows machines so R happy with filepath
             if os.name == 'nt':
                 runcmd = runcmd.replace("\\", "\\\\")
 
