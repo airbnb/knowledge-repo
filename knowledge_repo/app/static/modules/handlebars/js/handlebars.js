@@ -456,7 +456,7 @@ var __module6__ = (function(__dependency1__, __dependency2__, __dependency3__) {
     }
 
     // Note: Using env.VM references rather than local var references throughout this section to allow
-    // for external users to override these as psuedo-supported APIs.
+    // for external users to override these as pseudo-supported APIs.
     env.VM.checkRevision(templateSpec.compiler);
 
     var invokePartialWrapper = function(partial, indent, name, context, hash, helpers, partials, data, depths) {
