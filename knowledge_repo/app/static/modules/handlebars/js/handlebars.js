@@ -1566,7 +1566,7 @@ var __module10__ = (function(__dependency1__) {
       return;
     }
 
-    // We omit the last node if it's whitespace only and not preceeded by a non-content node.
+    // We omit the last node if it's whitespace only and not preceded by a non-content node.
     var original = current.string;
     current.string = current.string.replace(multiple ? (/\s+$/) : (/[ \t]+$/), '');
     current.leftStripped = current.string !== original;
