@@ -76,7 +76,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
     @path.setter
     def path(self, path):
-        assert isinstance(path, str), "The path specified must be a string."
+        assert isinstance(path, str_types), "The path specified must be a string."
         path = os.path.abspath(os.path.expanduser(path))
         if not os.path.exists(path):
             path = os.path.abspath(path)
