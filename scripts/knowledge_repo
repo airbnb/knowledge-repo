@@ -13,264 +13,238 @@ import shutil
 import argparse
 import subprocess
 from tabulate import tabulate
+import click
 
-# Register handler for SIGTERM, so we can run cleanup code if we are terminated
-signal.signal(signal.SIGTERM, lambda signum, frame: sys.exit(0))
-
-# If this script is being run out of a checked out repository, we need to make sure
-# the appropriate knowledge_repo is being used. To do this, we add the parent directory
-# of the folder containing this script if it contains a python package named "knowledge_repo".
-script_dir = os.path.dirname(__file__)
-if os.path.exists(os.path.join(os.path.dirname(script_dir), 'knowledge_repo', '__init__.py')):
-    sys.path.insert(0, os.path.join(script_dir, '..'))
 import knowledge_repo  # nopep8
 from knowledge_repo.repositories.gitrepository import GitKnowledgeRepository  # nopep8
 
-# If there's a contrib folder, add this as well and import it
-contrib_dir = os.path.join(os.path.dirname(__file__), os.pardir, 'contrib')
-if os.path.exists(os.path.join(contrib_dir, '__init__.py')):
-    sys.path.insert(0, os.path.join(contrib_dir, '..'))
+def _click_exit_with_message(context, message, code=1):
+    click.echo(message, err=True)
+    context.exit(code)
 
-# We first check whether this script actually the one we are going to be using,
-# or whether it should delegate tasks to a different script: namely the one hosted
-# in a knowledge data repo (so that client and server both use the same version of the code,
-# and updates can be done simultaneously and seamlessly). We do this by partially
-# constructing the argument parser, and checking the provided repo. We do this before
-# we finish constructing the entire parser so that the syntax and arguments can change
-# from version to version of this script.
-
-class ParseRepositories(argparse.Action):
-
-    def __init__(self, **kwargs):
-        super(ParseRepositories, self).__init__(**kwargs)
-        self.prefix_pattern = re.compile('^(?:\{(?P<name>[a-zA-Z_0-9]*)\})?(?P<uri>.*)$')
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        if not getattr(namespace, self.dest) or getattr(namespace, self.dest) == self.default:
-            self._repo_dict = {}
-        repo = values
-        prefix = self.prefix_pattern.match(repo)
+def parse_repositories(context, param, values):
+    prefix_pattern = re.compile('^(?:\{(?P<name>[a-zA-Z_0-9]*)\})?(?P<uri>.*)$')
+    repos = {}
+    for r in values:
+        prefix = prefix_pattern.match(r)
         if not prefix:
-            raise ValueError("Be sure to specify repositories in form {name}uri when specifying more than one repository.")
+            _click_exit_with_message("Be sure to specify repositories in form {name}uri when specifying more than one repository.")
         name, uri = prefix.groups()
-        if name in self._repo_dict:
-            raise ValueError("Multiple repositories with the name ({}) have been specified. Please ensure all referenced repositories have a unique name.".format(name))
+        if name in repos:
+            _click_exit_with_message("Multiple repositories with the name ({}) have been specified. Please ensure all referenced repositories have a unique name.".format(name))
+        repos[name] = uri
 
-        self._repo_dict[name] = uri
-
-        if None in self._repo_dict and len(self._repo_dict) > 1:
-            raise ValueError("Make sure you specify names for all repositories.".format(name))
-
-        if None in self._repo_dict:
-            setattr(namespace, self.dest, self._repo_dict[None])
+    if None in repos:
+        if len(repos) == 1: # Allow a unnamed repository if it's the only one.
+            return repos[None]
         else:
-            setattr(namespace, self.dest, self._repo_dict)
+            _click_exit_with_message("Make sure you specify names for all repositories.".format(name))
 
-parser = argparse.ArgumentParser(add_help=False, description='Script to simplify management of the knowledge data repo.')
-parser.add_argument('--repo', action=ParseRepositories, help='The repository(ies) to use.', default=os.environ.get('KNOWLEDGE_REPO', None))
-parser.add_argument('--knowledge-branch', dest='knowledge_branch', help='The branch of the repository from which to source the knowledge_repo tools.', default='master')
-parser.add_argument('--dev', action='store_true', help='Whether to skip passing control to version of code checked out in knowledge repository.')
-parser.add_argument('--debug', action='store_true', help='Whether to enable debug mode.')
-parser.add_argument('--noupdate', dest='update', action='store_false', help='Whether script should update the repository before performing actions.')
-parser.add_argument('--version', dest='version', action='store_true', help='Show version and exit.')
-parser.add_argument('-h', '--help', action='store_true', help='Show help and exit.')
+    return repos
 
-args, remaining_args = parser.parse_known_args()
 
-if args.version:
-    print('Local version: {}'.format(knowledge_repo.__version__))
+@click.group()
+@click.option('--repo', callback=parse_repositories, help='The repository(ies) to use.', envvar='KNOWLEDGE_REPO', multiple=True, default=None, required=True)
+@click.option('--knowledge-branch', help='The branch of the repository from which to source the knowledge_repo tools.', default='master')
+@click.option('--dev', help='Whether to skip passing control to version of code checked out in knowledge repository.', is_flag=True)
+@click.option('--debug', help='Whether to enable debug mode.', is_flag=True)
+@click.option('--noupdate', help='Whether script should update the repository before performing actions.', default=True, type=click.BOOL)
+@click.version_option(knowledge_repo.__version__, message='Local version: %(version)')
+@click.pass_context
+def cli(context, repo, knowledge_branch, dev, debug, noupdate):
+    """Script to simplify management of the knowledge data repo."""
+    if repo == None:
+        _click_exit_with_message("No repository specified. Please set the --repo flag, or the KNOWLEDGE_REPO environment variable.")
+    context.obj = {}
+    context.obj['dev'] = dev
+    context.obj['repo'] = knowledge_repo.KnowledgeRepository.for_uri(repo)
+    context.obj['debug'] = debug
 
-if args.help and not remaining_args:
-    parser.print_help()
-    sys.exit(0)
+    # Update repository so that we can ensure git repository configuration is up to date
+    # We wrap this in a try/except block because failing to update a repository can
+    # happen for all sorts of reasons that should not inhibit other actions
+    # For example: if the repository does not exist and the action will be 'init'
+    if not noupdate:
+        try:
+            kr = knowledge_repo.KnowledgeRepository.for_uri(repo)
+            if isinstance(kr, GitKnowledgeRepository):
+                kr.update(branch=knowledge_branch)
+        except:
+            pass
 
-if args.repo is None:
-    raise ValueError("No repository specified. Please set the --repo flag, \
-                      or the KNOWLEDGE_REPO environment variable.")
+    # If not running in dev mode, and the specified repo exists, along with a knowledge_repo
+    # script in the .resources/scripts folder, pass execution to this script in the
+    # knowledge data repo. If this *is* that script, do nothing. This still allows the `init`
+    # action to be run by this script in any case. Instances of this script in a data repo
+    # are assumed to be in the: '.resources/scripts/knowledge_repo', and be part of a checked
+    # out instance of the complete "knowledge-repo" repository.
+    if (isinstance(repo, str) and not dev
+            and os.path.exists(os.path.join(repo, '.resources', 'scripts', 'knowledge_repo'))
+            and os.path.abspath(repo) != os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))):
+        cmdline_args = ['--noupdate'] + [arg.replace(' ', '\ ') for arg in sys.argv[1:]]
+        subprocess.call('{} {}'.format(os.path.join(os.path.abspath(repo), '.resources/scripts/knowledge_repo'), ' '.join(cmdline_args)), shell=True)
+        context.exit(0)
 
-# Update repository so that we can ensure git repository configuration is up to date
-# We wrap this in a try/except block because failing to update a repository can
-# happen for all sorts of reasons that should not inhibit other actions
-# For example: if the repository does not exist and the action will be 'init'
-if args.update:
-    try:
-        kr = knowledge_repo.KnowledgeRepository.for_uri(args.repo)
-        if isinstance(kr, GitKnowledgeRepository):
-            kr.update(branch=args.knowledge_branch)
-    except:
-        pass
-
-# If not running in dev mode, and the specified repo exists, along with a knowledge_repo
-# script in the .resources/scripts folder, pass execution to this script in the
-# knowledge data repo. If this *is* that script, do nothing. This still allows the `init`
-# action to be run by this script in any case. Instances of this script in a data repo
-# are assumed to be in the: '.resources/scripts/knowledge_repo', and be part of a checked
-# out instance of the complete "knowledge-repo" repository.
-if (isinstance(args.repo, str) and not args.dev
-        and os.path.exists(os.path.join(args.repo, '.resources', 'scripts', 'knowledge_repo'))
-        and os.path.abspath(args.repo) != os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))):
-    cmdline_args = ['--noupdate'] + [arg.replace(' ', '\ ') if ' ' in arg else arg for arg in sys.argv[1:]]
-    subprocess.call('{} {}'.format(os.path.join(os.path.abspath(args.repo), '.resources/scripts/knowledge_repo'), ' '.join(cmdline_args)), shell=True)
-    sys.exit(0)
-
-# ---------------------------------------------------------------------------------------
-# Everything below this line pertains to actual actions to be performed on the repository
-# By now, we are guaranteed to be the script that is to perform actions on the repository,
-# so we have freedom to change and/or add options at whim, without affecting
-# interoperability.
-
-# Add the action parsers
-subparsers = parser.add_subparsers(help='sub-commands')
-
-init = subparsers.add_parser('init', help='Initialise a new git knowledge repository.')
-init.set_defaults(action='init')
-init.add_argument('--tooling-embed', action='store_true', help='Embed a reference version knowledge_repo tooling in the repository.')
-init.add_argument('--tooling-repo', help='The repository to use (if not the default).')
-init.add_argument('--tooling-branch', help='The branch to use when embedding the tools as a submodule (default is "master").')
-
-create = subparsers.add_parser('create', help='Start a new knowledge post based on a template.')
-create.set_defaults(action='create')
-create.add_argument('format', choices=['ipynb', 'Rmd', 'md'], help='The format of the knowledge post to be created.')
-create.add_argument('filename', help='Where this file should be created.')
-#
-drafts = subparsers.add_parser('drafts', help='Show the posts which have local work that has not been published upstream.')
-drafts.set_defaults(action='drafts')
-
-status = subparsers.add_parser('status', help='Provide information on the state of the repository. Useful mainly for debugging.')
-status.set_defaults(action='status')
-
-add = subparsers.add_parser('add', help='Add a knowledge post to the repository based on the supplied file. Can be a *.ipynb, *.Rmd, or *.md file.')
-add.set_defaults(action='add')
-add.add_argument('filename', help='The filename to add.')
-add.add_argument('-p', '--path', help='The path of the destination post to be added in the knowledge repo. Required if the knowledge post does not specify "path" in its headers.')
-add.add_argument('--update', action='store_true', help='Whether this should update an existing post of the same name.')
-add.add_argument('--branch', help='The branch to use for this addition, if not the default (which is the path of the knowledge post).')
-add.add_argument('--squash', action='store_true', help='Automatically suppress all previous commits, and replace it with this version.')
-add.add_argument('--submit', action='store_true', help='Submit newly added post')
-add.add_argument('-m', '--message', help='The commit message to be used when committing into the repo.')
-add.add_argument('--src', nargs='+', help='Specify additional source files to add to <knowledge_post>/orig_src.')
-
-submit = subparsers.add_parser('submit', help='Submit a knowledge post for review.')
-submit.set_defaults(action='submit')
-submit.add_argument('path', help='The path of the knowledge post to submit for review.')
-
-push = subparsers.add_parser('push', help='DEPRECATED: Use `submit` instead.')
-push.set_defaults(action='push')
-push.add_argument('path', help='The path of the knowledge post to submit for review.')
-
-preview = subparsers.add_parser('preview', help='Run the knowledge repo app, and preview the specified post. It is assumed it is available on the currently checked out branch.')
-preview.set_defaults(action='preview')
-preview.add_argument('path', help="The path of the knowledge post to preview.")
-preview.add_argument('--port', default=7000, type=int, help="Specify the port on which to run the web server")
-preview.add_argument('--dburi', help='The SQLAlchemy database uri.')
-preview.add_argument('--config', default=None)
-
-# Developer and server side actions
-runserver = subparsers.add_parser('runserver', help='Run the knowledge repo app.')
-runserver.set_defaults(action='runserver')
-runserver.add_argument('--port', default=7000, type=int, help="Specify the port on which to run the web server")
-runserver.add_argument('--dburi', help='The SQLAlchemy database uri.')
-runserver.add_argument('--config', default=None)
-
-deploy = subparsers.add_parser('deploy', help='Deploy the knowledge repo app using gunicorn.')
-deploy.set_defaults(action='deploy')
-deploy.add_argument('-p', '--port', default=7000, type=int, help="Specify the port on which to run the web server")
-deploy.add_argument('-w', '--workers', default=4, type=int, help="Number of gunicorn worker threads to spin up.")
-deploy.add_argument('-t', '--timeout', default=60, type=int, help="Specify the timeout (seconds) for the gunicorn web server")
-deploy.add_argument('-db', '--dburi', help='The SQLAlchemy database uri.')
-deploy.add_argument('-c', '--config', default=None, help="The config file from which to read server configuration.")
-
-db_upgrade = subparsers.add_parser('db_upgrade', help='Upgrade the database to the latest schema. Only necessary if you have disabled automatic migrations in your deployment.')
-db_upgrade.set_defaults(action='db_upgrade')
-db_upgrade.add_argument('-db', '--dburi', help='The SQLAlchemy database uri.')
-db_upgrade.add_argument('-c', '--config', default=None, help="The config file from which to read server configuration.")
-db_upgrade.add_argument('-m', '--message', help="The message to use for the database revision.")
-db_upgrade.add_argument('--autogenerate', action='store_true', help="Whether alembic should automatically populate the migration script.")
-
-# Show version and exit
-if args.version:
-    print('Embedded/active version: {}'.format(knowledge_repo.__version__))
-    sys.exit(0)
-
-# Only show db_migrate option if running in development mode, and in a git repository.
-if args.dev and os.path.exists(os.path.join(os.path.dirname(__file__), '..', '.git')):
-    db_migrate = subparsers.add_parser('db_migrate', help='Create a new alembic revision.')
-    db_migrate.set_defaults(action='db_migrate')
-    db_migrate.add_argument('message', help="The message to use for the database revision.")
-    db_migrate.add_argument('-db', '--dburi', help='The SQLAlchemy database uri.')
-    db_migrate.add_argument('--autogenerate', action='store_true', help="Whether alembic should automatically populate the migration script.")
-
-args = parser.parse_args()
-
-# If init, use this code to create a new repository.
-if args.action == 'init':
-    if args.tooling_embed:
+@cli.command()
+@click.option('--tooling-embed', help='Embed a reference version knowledge_repo tooling in the repository.', is_flag=True)
+@click.option('--tooling-repo', help='The repository to use (if not the default).')
+@click.option('--tooling-branch', help='The branch to use when embedding the tools as a submodule (default is "master").')
+@click.pass_context
+def init(context, tooling_embed, tooling_repo, tooling_branch):
+    """Initialise a new git knowledge repository."""
+    repo = context.obj['repo']
+    if tooling_embed:
         embed_tooling = {}
-        if args.tooling_repo is not None:
-            embed_tooling['repository'] = args.tooling_repo
-        if args.tooling_branch is not None:
-            embed_tooling['branch'] = args.tooling_branch
+        if tooling_repo is not None:
+            embed_tooling['repository'] = tooling_repo
+        if tooling_branch is not None:
+            embed_tooling['branch'] = tooling_branch
     else:
         embed_tooling = False
-    kr = knowledge_repo.KnowledgeRepository.create_for_uri(args.repo, embed_tooling=embed_tooling)
+    kr = knowledge_repo.KnowledgeRepository.create_for_uri(repo, embed_tooling=embed_tooling)
     if kr is not None:
-        print("Knowledge repository created for uri `{}`.".format(kr.uri))
-    sys.exit(0)
+        click.echo("Knowledge repository created for uri `{}`.".format(kr.uri))
+    context.exit(0)
 
-# All subsequent actions perform an action on the repository, and so we instantiate
-# a KnowledgeRepository object here.
-repo = knowledge_repo.KnowledgeRepository.for_uri(args.repo)
 
-# Create a new knowledge post from a template
-if args.action == 'create':
-    src = os.path.join(os.path.dirname(knowledge_repo.__file__), 'templates', 'knowledge_template.{}'.format(args.format))
-    if os.path.exists(args.filename):
-        raise ValueError("File already exists at '{}'. Please choose a different filename and try again.".format(args.filename))
-    shutil.copy(src, args.filename)
-    print("Created a {format} knowledge post template at {filename}.".format(format=args.format, filename=args.filename))
+@cli.command()
+@click.argument('format', type=click.Choice(['ipynb', 'Rmd', 'md']))
+@click.argument('filename')
+@click.pass_context
+def create(context, format, filename):
+    """Start a new knowledge post based on a template."""
+    repo = context.obj['repo']
+    src = os.path.join(os.path.dirname(knowledge_repo.__file__), 'templates', 'knowledge_template.{}'.format(format))
+    if os.path.exists(filename):
+        context.fail("File already exists at '{}'. Please choose a different filename and try again.".format(filename))
+    shutil.copy(src, filename)
+    click.echo("Created a {format} knowledge post template at {filename}.".format(format=format, filename=filename))
+    context.exit(0)
 
-# # Check which branches have local work
-if args.action == 'drafts':
+
+@cli.command()
+@click.pass_context
+def drafts(context):
+    """Show the posts which have local work that has not been published upstream."""
+    repo = context.obj['repo']
     statuses = repo.post_statuses(repo.dir(status=[repo.PostStatus.DRAFT, repo.PostStatus.SUBMITTED, repo.PostStatus.UNPUBLISHED]), detailed=True)
-    print(tabulate([[path, status.name, details] for path, (status, details) in statuses.items()], ['Post', 'Status', 'Details'], 'fancy_grid'))
-    sys.exit(0)
+    click.echo(tabulate([[path, status.name, details] for path, (status, details) in statuses.items()], ['Post', 'Status', 'Details'], 'fancy_grid'))
+    context.exit(0)
 
-if args.action == 'status':
+@cli.command()
+@click.pass_context
+def status(context):
+    """Provide information on the state of the repository. Useful mainly for debugging."""
+    repo = context.obj['repo']
     status = repo.status_message
-    if isinstance(args.repo, dict):
-        print("\n-----\n".join(['Repository: {name}\n{message}'.format(name=name, message=message) for name, message in status.items()]))
+    if isinstance(repo, dict):
+        click.echo("\n-----\n".join(['Repository: {name}\n{message}'.format(name=name, message=message) for name, message in status.items()]))
     else:
-        print(repo.status_message)
-    sys.exit(0)
+        click.echo(repo.status_message)
+    context.exit(0)
 
-# Add a document to the data repository
-if args.action == 'add':
-    kp = knowledge_repo.KnowledgePost.from_file(args.filename, src_paths=args.src)
-    repo.add(kp, path=args.path, update=args.update, branch=args.branch, message=args.message, squash=args.squash)
-    if not args.submit:
-        sys.exit(0)
 
-if args.action in ['submit', 'push'] or (args.action == 'add' and args.submit):
-    if args.action == 'push':
-        print("WARNING: The `push` action is deprecated, and you are encouraged to use `knowledge_repo submit <path>` instead.")
-    repo.submit(path=args.path)
-    sys.exit(0)
+@cli.command()
+@click.argument('filename')
+@click.option('-p', '--path', help='The path of the destination post to be added in the knowledge repo. Required if the knowledge post does not specify "path" in its headers.')
+@click.option('--update', help='Whether this should update an existing post of the same name.', is_flag=True)
+@click.option('--branch', help='The branch to use for this addition, if not the default (which is the path of the knowledge post).')
+@click.option('--squash', help='Automatically suppress all previous commits, and replace it with this version.', is_flag=True)
+@click.option('--submit', help='Submit newly added post', is_flag=True)
+@click.option('-m', '--message', help='The commit message to be used when committing into the repo.')
+@click.option('--src', multiple=True, help='Specify additional source files to add to <knowledge_post>/orig_src.')
+@click.pass_context
+def add(context, filename, path, update, branch, squash, submit, message, src):
+    """Add a knowledge post to the repository based on the supplied file. Can be a *.ipynb, *.Rmd, or *.md file."""
+    repo = context.obj['repo']
+    kp = knowledge_repo.KnowledgePost.from_file(filename, src_paths=src)
+    repo.add(kp, path=path, update=update, branch=branch, message=message, squash=squash)
+    if submit:
+        repo.submit(path=path)
+    context.exit(0)
 
-# Everything below this point has to do with running and/or managing the web app
 
-if args.action in ['preview', 'runserver']:
-    app = repo.get_app(debug=args.debug,
-                       db_uri=args.dburi,
-                       config=args.config,
-                       REPOSITORY_INDEXING_ENABLED=(args.action == 'runserver'))
+@cli.command()
+@click.argument('path')
+@click.pass_context
+def submit(context, path):
+    """Submit a knowledge post for review."""
+    repo = context.obj['repo']
+    repo.submit(path=path)
+    context.exit(0)
 
-    if args.action == 'preview':
-        kp_path = repo._kp_path(args.path)
-        repo.set_active_draft(kp_path)  # TODO: Deprecate
-        url = 'http://127.0.0.1:{}/render?markdown={}'.format(args.port, kp_path)
-        threading.Timer(1.25, lambda: webbrowser.open(url)).start()
+@cli.command()
+@click.argument('path')
+@click.pass_context
+def push(context, path):
+    """DEPRECATED: Use `submit` instead."""
+    click.echo("WARNING: The `push` action is deprecated, and you are encouraged to use `knowledge_repo submit <path>` instead.")
+    repo = context.obj['repo']
+    repo.submit(path=path)
+    context.exit(0)
 
-    use_reloader = args.debug and args.action == 'runserver'
+
+@cli.command()
+@click.argument('path')
+@click.option('--port', default=7000, help="Specify the port on which to run the web server", type=click.INT)
+@click.option('--dburi', help='The SQLAlchemy database uri.')
+@click.option('--config', default=None)
+@click.pass_context
+def preview(context, path, port, dburi, config):
+    """Run the knowledge repo app, and preview the specified post. It is assumed it is available on the currently checked out branch."""
+    repo = context.obj['repo']
+    debug = context.obj['debug']
+    app = repo.get_app(debug=debug,
+                       db_uri=dburi,
+                       config=config,
+                       REPOSITORY_INDEXING_ENABLED=False)
+
+    kp_path = repo._kp_path(path)
+    repo.set_active_draft(kp_path)  # TODO: Deprecate
+    url = 'http://127.0.0.1:{}/render?markdown={}'.format(port, kp_path)
+    threading.Timer(1.25, lambda: webbrowser.open(url)).start()
+    threaded = True
+    uris = []
+    def get_uris(uri):
+        if isinstance(uri, str):
+            uris.append(uri)
+            return
+        elif isinstance(uri, knowledge_repo.KnowledgeRepository):
+            get_uris(uri.uri)
+        elif isinstance(uri, dict):
+            for u in uri.values():
+                get_uris(u)
+    get_uris(repo)
+    for u in itertools.chain(uris, [app.config['SQLALCHEMY_DATABASE_URI']]):
+        if ':memory:' in u or u.startswith('sqlite://:'):
+            use_reloader = False
+            threaded = False
+            break
+
+    app.run(debug=debug,
+            host='0.0.0.0',
+            port=port,
+            use_reloader=use_reloader,
+            threaded=threaded)
+    context.exit(0)
+
+
+@cli.command()
+@click.option('--port', default=7000, type=click.INT, help="Specify the port on which to run the web server")
+@click.option('--dburi', help='The SQLAlchemy database uri.')
+@click.option('--config', default=None)
+@click.pass_context
+def runserver(context, port, dburi, config):
+    """Run the knowledge repo app."""
+    repo = context.obj['repo']
+    debug = context.obj['debug']
+    app = repo.get_app(debug=debug,
+                       db_uri=dburi,
+                       config=config,
+                       REPOSITORY_INDEXING_ENABLED=True)
+
+
+    use_reloader = debug
     threaded = True
     # Check if in-memory databases are being used, and if so, avoid using threading
     uris = []
@@ -290,14 +264,24 @@ if args.action in ['preview', 'runserver']:
             threaded = False
             break
 
-    app.run(debug=args.debug,
+    app.run(debug=debug,
             host='0.0.0.0',
-            port=args.port,
+            port=port,
             use_reloader=use_reloader,
             threaded=threaded)
 
+@cli.command()
+@click.option('-p', '--port', default=7000, type=click.INT, help="Specify the port on which to run the web server")
+@click.option('-w', '--workers', default=4, type=click.INT, help="Number of gunicorn worker threads to spin up.")
+@click.option('-t', '--timeout', default=60, type=click.INT, help="Specify the timeout (seconds) for the gunicorn web server")
+@click.option('-db', '--dburi', help='The SQLAlchemy database uri.')
+@click.option('-c', '--config', default=None, help="The config file from which to read server configuration.")
+@click.pass_context
+def deploy(context, port, workers, timeout, dburi, config):
+    """Deploy the knowledge repo app using gunicorn."""
+    repo = context.obj['repo']
+    debug = context.obj['debug']
 
-elif args.action == 'deploy':
     import tempfile
     tmp_dir = tempfile.mkdtemp()
     tmp_path = os.path.join(tmp_dir, 'server.py')
@@ -309,7 +293,7 @@ elif args.action == 'deploy':
     else:
         uris = str({prefix: repo.uri for prefix, repo in repo.uri.items()})
 
-    db_uri = "'{}'".format(args.dburi.replace("'", "\\'")) if isinstance(args.dburi, str) else str(args.dburi)
+    db_uri = "'{}'".format(dburi.replace("'", "\\'")) if isinstance(dburi, str) else str(dburi)
 
     with open(tmp_path, 'w') as f:
         f.write('''
@@ -317,23 +301,64 @@ import sys
 sys.path.insert(0, '{}')
 import knowledge_repo
 app = knowledge_repo.KnowledgeRepository.for_uri({}).get_app(db_uri={}, debug={}, config={})
-        '''.format(kr_path, uris, db_uri, str(args.debug),
-                   '"' + os.path.abspath(args.config) + '"' if args.config is not None else "None",
-                   args.repo))
+        '''.format(kr_path, uris, db_uri, str(debug),
+                   '"' + os.path.abspath(config) + '"' if config is not None else "None",
+                   repo))
 
     try:
         # Run gunicorn server
         cmd = "cd {}; gunicorn -w {} --timeout {} -b 0.0.0.0:{} server:app"
-        cmd = cmd.format(tmp_dir, args.workers, args.timeout, args.port)
+        cmd = cmd.format(tmp_dir, workers, timeout, port)
         # logger.info("Starting server with command:  " + " ".join(cmd))
         subprocess.check_output(cmd, shell=True)
     finally:
         shutil.rmtree(tmp_dir)
 
-elif args.action == 'db_upgrade':
-    app = repo.get_app(db_uri=args.dburi, debug=args.debug, config=args.config)
+@cli.command()
+@click.option('-db', '--dburi', help='The SQLAlchemy database uri.')
+@click.option('-c', '--config', default=None, help="The config file from which to read server configuration.")
+@click.option('-m', '--message', help="The message to use for the database revision.")
+@click.option('--autogenerate', help="Whether alembic should automatically populate the migration script.", is_flag=True)
+@click.pass_context
+def db_upgrade(context, dburi, config, message, autogenerate):
+    """Upgrade the database to the latest schema. Only necessary if you have disabled automatic migrations in your deployment."""
+    repo = context.obj['repo']
+    debug = context.obj['debug']
+    app = repo.get_app(db_uri=dburi, debug=debug, config=config)
     app.db_upgrade()
 
-elif args.action == 'db_migrate':
-    app = repo.get_app(debug=args.debug, db_uri=args.dburi)
-    app.db_migrate(args.message, autogenerate=args.autogenerate)
+
+@cli.command()
+@click.argument('message')
+@click.option('-db', '--dburi', help='The SQLAlchemy database uri.')
+@click.option('--autogenerate', help="Whether alembic should automatically populate the migration script.", is_flag=True)
+@click.pass_context
+def db_migrate(context, message, dburi, autogenerate):
+    """Create a new alembic revision."""
+    dev = context.obj['dev']
+    debug = context.obj['debug']
+    if dev and os.path.exists(os.path.join(os.path.dirname(__file__), '..', '.git')):
+        app = repo.get_app(debug=debug, db_uri=dburi)
+        app.db_migrate(message, autogenerate=autogenerate)
+
+
+def main():
+    # Register handler for SIGTERM, so we can run cleanup code if we are terminated
+    signal.signal(signal.SIGTERM, lambda signum, frame: sys.exit(0))
+
+    # If this script is being run out of a checked out repository, we need to make sure
+    # the appropriate knowledge_repo is being used. To do this, we add the parent directory
+    # of the folder containing this script if it contains a python package named "knowledge_repo".
+    script_dir = os.path.dirname(__file__)
+    if os.path.exists(os.path.join(os.path.dirname(script_dir), 'knowledge_repo', '__init__.py')):
+        sys.path.insert(0, os.path.join(script_dir, '..'))
+
+    # If there's a contrib folder, add this as well and import it
+    contrib_dir = os.path.join(os.path.dirname(__file__), os.pardir, 'contrib')
+    if os.path.exists(os.path.join(contrib_dir, '__init__.py')):
+        sys.path.insert(0, os.path.join(contrib_dir, '..'))
+
+    cli()
+
+if __name__ == '__main__':
+    main()
