@@ -34,6 +34,7 @@ __dependencies__ = [
     'werkzeug',  # Development webserver
     'gunicorn',  # Deployed webserver
     'inflection',  # String transformation library
+    'click',  # argument parsing and command dispatching
 ]
 
 __optional_dependencies__ = {
