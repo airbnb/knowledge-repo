@@ -80,13 +80,10 @@ args, remaining_args = parser.parse_known_args()
 if args.version:
     print('Local version: {}'.format(knowledge_repo.__version__))
 
-if args.help and not remaining_args:
-    parser.print_help()
-    sys.exit(0)
-
 if args.repo is None:
+    parser.print_help()
     raise ValueError("No repository specified. Please set the --repo flag, \
-                      or the KNOWLEDGE_REPO environment variable.")
+or the KNOWLEDGE_REPO environment variable.")
 
 # Update repository so that we can ensure git repository configuration is up to date
 # We wrap this in a try/except block because failing to update a repository can
@@ -110,8 +107,9 @@ if (isinstance(args.repo, str) and not args.dev
         and os.path.exists(os.path.join(args.repo, '.resources', 'scripts', 'knowledge_repo'))
         and os.path.abspath(args.repo) != os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))):
     cmdline_args = ['--noupdate'] + [arg.replace(' ', '\ ') if ' ' in arg else arg for arg in sys.argv[1:]]
-    subprocess.call('{} {}'.format(os.path.join(os.path.abspath(args.repo), '.resources/scripts/knowledge_repo'), ' '.join(cmdline_args)), shell=True)
-    sys.exit(0)
+    proc = subprocess.call('{} {}'.format(os.path.join(os.path.abspath(args.repo), '.resources/scripts/knowledge_repo'), ' '.join(cmdline_args)), shell=True)
+    return_code = proc.wait()
+    sys.exit(return_code)
 
 # ---------------------------------------------------------------------------------------
 # Everything below this line pertains to actual actions to be performed on the repository
@@ -201,6 +199,10 @@ if args.dev and os.path.exists(os.path.join(os.path.dirname(__file__), '..', '.g
     db_migrate.add_argument('--autogenerate', action='store_true', help="Whether alembic should automatically populate the migration script.")
 
 args = parser.parse_args()
+
+if not hasattr(args, 'action'):
+    parser.print_help()
+    sys.exit(1)
 
 # If init, use this code to create a new repository.
 if args.action == 'init':
