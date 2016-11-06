@@ -28,17 +28,17 @@ def parse_repositories(context, param, values):
     for r in values:
         prefix = prefix_pattern.match(r)
         if not prefix:
-            _click_exit_with_message("Be sure to specify repositories in form {name}uri when specifying more than one repository.")
+            _click_exit_with_message(context, "Be sure to specify repositories in form {name}uri when specifying more than one repository.")
         name, uri = prefix.groups()
         if name in repos:
-            _click_exit_with_message("Multiple repositories with the name ({}) have been specified. Please ensure all referenced repositories have a unique name.".format(name))
+            _click_exit_with_message(context, "Multiple repositories with the name ({}) have been specified. Please ensure all referenced repositories have a unique name.".format(name))
         repos[name] = uri
 
     if None in repos:
         if len(repos) == 1: # Allow a unnamed repository if it's the only one.
             return repos[None]
         else:
-            _click_exit_with_message("Make sure you specify names for all repositories.".format(name))
+            _click_exit_with_message(context, "Make sure you specify names for all repositories.".format(name))
 
     return repos
 
@@ -54,7 +54,7 @@ def parse_repositories(context, param, values):
 def cli(context, repo, knowledge_branch, dev, debug, noupdate):
     """Script to simplify management of the knowledge data repo."""
     if repo == None:
-        _click_exit_with_message("No repository specified. Please set the --repo flag, or the KNOWLEDGE_REPO environment variable.")
+        _click_exit_with_message(context, "No repository specified. Please set the --repo flag, or the KNOWLEDGE_REPO environment variable.")
     context.obj = {}
     context.obj['dev'] = dev
     context.obj['repo'] = knowledge_repo.KnowledgeRepository.for_uri(repo)
