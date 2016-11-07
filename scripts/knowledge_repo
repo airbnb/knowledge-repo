@@ -82,8 +82,8 @@ if args.version:
 
 if args.repo is None:
     parser.print_help()
-    raise ValueError("No repository specified. Please set the --repo flag, \
-or the KNOWLEDGE_REPO environment variable.")
+    raise ValueError("No repository specified. Please set the --repo flag, "
+                     "or the KNOWLEDGE_REPO environment variable.")
 
 # Update repository so that we can ensure git repository configuration is up to date
 # We wrap this in a try/except block because failing to update a repository can
