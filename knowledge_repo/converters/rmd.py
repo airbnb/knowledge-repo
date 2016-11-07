@@ -21,6 +21,11 @@ class RmdConverter(KnowledgePostConverter):
                         x = knit('{1}', '{2}', quiet=T)" """.format(os.path.abspath(os.path.dirname(filename)),
                                                                     os.path.abspath(filename),
                                                                     tmp_path)
+
+            # Replace '\' with '\\' on Windows machines so R happy with filepath
+            if os.name == 'nt':
+                runcmd = runcmd.replace("\\", "\\\\")
+
             subprocess.check_output(runcmd, shell=True)
             Rmd_filename = tmp_path
 
