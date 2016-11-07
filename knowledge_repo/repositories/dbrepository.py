@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session, mapper
 from sqlalchemy.sql import func
 
-from sqlalchemy import Table, Column, Integer, String, DateTime, BLOB, MetaData
+from sqlalchemy import Table, Column, Integer, String, DateTime, LargeBinary, MetaData
 from ..repository import KnowledgeRepository
 
 logger = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
                               Column('revision', Integer, default=0),
                               Column('status', Integer, default=self.PostStatus.DRAFT.value),
                               Column('ref', String(512)),
-                              Column('data', BLOB))
+                              Column('data', LargeBinary))
         self.engine = create_engine(engine_uri)
         self.session = scoped_session(sessionmaker(bind=self.engine))
         if auto_create:
