@@ -97,18 +97,22 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         # {<mountpoint>: <KnowledgeRepositoryInstance>}
         if isinstance(self.uri, str):
             return {'': self.uri}
+
         elif isinstance(self.uri, dict):
             uri_dict = {}
 
-            def add_uris(uri_dict, uris, parent=''):
-                assert isinstance(uris, dict)
-                for mountpoint, uri in uris.items():
-                    if isinstance(uri, (str, KnowledgeRepository)):
-                        uri_dict[posixpath.join(parent, mountpoint)] = uri if isinstance(uri, str) else uri.uri
-                    elif isinstance(uri, dict):
-                        add_uris(uri_dict, uri, parent=posixpath.join(parent, mountpoint))
-                    else:
-                        raise ValueError("Unrecognised uri: {}".format(uri))
+            def add_uris(uri_dict, uri, parent=''):
+                if isinstance(uri, str):
+                    uri_dict[parent] = uri
+                elif isinstance(uri, dict):
+                    for mountpoint, u in uri.items():
+                        add_uris(uri_dict, u, parent=posixpath.join(parent, mountpoint))
+                elif isinstance(uri, KnowledgeRepository):
+                    for mountpoint, u in uri.uris.items():
+                        uri_dict[posixpath.join(parent, mountpoint)] = u
+                else:
+                    raise ValueError("Unrecognised uri: {}".format(uri))
+
             add_uris(uri_dict, self.uri)
             return uri_dict
 
@@ -125,18 +129,18 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         elif isinstance(self.uri, dict):
             revision_dict = {}
 
-            def add_revisions(revision_dict, uris):
-                assert isinstance(uris, dict)
-                for mountpoint, uri in uris.items():
-                    if isinstance(uri, str):
-                        revision_dict[uri] = KnowledgeRepository.for_uri(uri).revision
-                    elif isinstance(uri, KnowledgeRepository):
-                        revision_dict[uri] = uri.revision
-                    elif isinstance(uri, dict):
-                        add_revisions(revision_dict, uri)
-                    else:
-                        raise ValueError("Unrecognised uri: {}".format(uri))
-            add_revisions(revision_dict, self.uri)
+            def add_revisions(revision_dict, uri):
+                if isinstance(uri, str):
+                    revision_dict[uri] = KnowledgeRepository.for_uri(uri).revision
+                elif isinstance(uri, dict):
+                    for u in uri.values():
+                        add_revisions(revision_dict, u)
+                elif isinstance(uri, KnowledgeRepository):
+                    revision_dict.update(uri.revisions)
+                else:
+                    raise ValueError("Unrecognised uri: {}".format(uri))
+
+            add_revisions(revision_dict, self.uris)
             return revision_dict
 
         raise ValueError("Unrecognised KnowledgeRepository.uri: {}".format(self.uri))
