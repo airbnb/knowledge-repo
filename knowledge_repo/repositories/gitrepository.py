@@ -115,7 +115,8 @@ class GitKnowledgeRepository(KnowledgeRepository):
     # ----------- Repository actions / state ------------------------------------
     @property
     def revision(self):
-        return self.git.commit().hexsha
+        c = self.git.commit()
+        return "{}_{}".format(str(c.committed_date), c.hexsha)
 
     def update(self, branch=None):
         branch = branch or self.config.published_branch

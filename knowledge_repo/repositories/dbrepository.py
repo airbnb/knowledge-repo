@@ -187,7 +187,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
             revision = revision[0]
         if enforce_exists and revision is None:
             raise ValueError('No post found at {} (with status of {})'.format(path, status))
-        return revision
+        return revision or 0
 
     def _kp_get_revisions(self, path):
         revisions = (self.session.query(self.PostRef.revision)

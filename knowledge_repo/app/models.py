@@ -6,9 +6,10 @@ from flask import current_app, request, g
 from flask_sqlalchemy import SQLAlchemy
 import functools
 from collections import defaultdict
+import datetime
 
 from werkzeug.local import LocalProxy
-from sqlalchemy import func, distinct, and_, select
+from sqlalchemy import func, distinct, and_, select, UniqueConstraint
 import logging
 
 from knowledge_repo._version import __version__
@@ -24,6 +25,42 @@ logger = logging.getLogger(__name__)
 
 db = SQLAlchemy()
 db_session = LocalProxy(lambda: current_app.db.session)
+
+
+class IndexMetadata(db.Model):
+    __tablename__ = 'index_metadata'
+    __table_args__ = (
+        UniqueConstraint('type', 'name', name='_uc_type_name'),
+    )
+
+    id = db.Column(db.Integer, nullable=False, primary_key=True)
+    type = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(512), nullable=False)
+    value = db.Column(db.String(512), nullable=True)
+    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+    @classmethod
+    def get(cls, type, name, default=None):
+        m = db_session.query(IndexMetadata).filter(IndexMetadata.type == type).filter(IndexMetadata.name == name).first()
+        if m is not None:
+            return m.value
+        return default
+
+    @classmethod
+    def set(cls, type, name, value):
+        m = db_session.query(IndexMetadata).filter(IndexMetadata.type == type).filter(IndexMetadata.name == name).first()
+        if m is not None:
+            m.value = value
+        else:
+            m = IndexMetadata(type=type, name=name, value=value)
+            db_session.add(m)
+
+    @classmethod
+    def get_last_update(cls, type, name):
+        m = db_session.query(IndexMetadata).filter(IndexMetadata.type == type).filter(IndexMetadata.name == name).first()
+        if m is not None:
+            return m.updated_at
+        return None
 
 
 class PostAuthorAssoc(db.Model):
