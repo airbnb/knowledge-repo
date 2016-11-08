@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session, mapper
 from sqlalchemy.sql import func
 
-from sqlalchemy import Table, Column, Integer, String, DateTime, BLOB, MetaData
+from sqlalchemy import Table, Column, Integer, String, DateTime, LargeBinary, MetaData
 from ..repository import KnowledgeRepository
 
 logger = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
                               Column('revision', Integer, default=0),
                               Column('status', Integer, default=self.PostStatus.DRAFT.value),
                               Column('ref', String(512)),
-                              Column('data', BLOB))
+                              Column('data', LargeBinary))
         self.engine = create_engine(engine_uri)
         self.session = scoped_session(sessionmaker(bind=self.engine))
         if auto_create:
@@ -98,11 +98,10 @@ class DbKnowledgeRepository(KnowledgeRepository):
                 yield prefix
 
     # -------------- Post submission / addition user flow --------------------
-
-    def _add_prepare(self, kp, path, update=False):
+    def _add_prepare(self, kp, path, update=False, **kwargs):
         pass
 
-    def _add_cleanup(self, kp, path, update=False):
+    def _add_cleanup(self, kp, path, update=False, **kwargs):
         self.__set_post_status(path, self.PostStatus.DRAFT, kp.revision)
 
     def _submit(self, path):  # Submit a post for review
@@ -188,7 +187,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
             revision = revision[0]
         if enforce_exists and revision is None:
             raise ValueError('No post found at {} (with status of {})'.format(path, status))
-        return revision
+        return revision or 0
 
     def _kp_get_revisions(self, path):
         revisions = (self.session.query(self.PostRef.revision)

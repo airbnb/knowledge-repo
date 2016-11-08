@@ -111,6 +111,34 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
                         raise ValueError("Unrecognised uri: {}".format(uri))
             add_uris(uri_dict, self.uri)
             return uri_dict
+
+        raise ValueError("Unrecognised KnowledgeRepository.uri: {}".format(self.uri))
+
+    @property
+    def revisions(self):
+        # This method provides a mapping from uri to revision for this repository
+        # and/or any nested repositories. This is most useful when checking if an
+        # update is required server side.
+        if isinstance(self.uri, str):
+            return {self.uri: self.revision}
+
+        elif isinstance(self.uri, dict):
+            revision_dict = {}
+
+            def add_revisions(revision_dict, uris):
+                assert isinstance(uris, dict)
+                for mountpoint, uri in uris.items():
+                    if isinstance(uri, str):
+                        revision_dict[uri] = KnowledgeRepository.for_uri(uri).revision
+                    elif isinstance(uri, KnowledgeRepository):
+                        revision_dict[uri] = uri.revision
+                    elif isinstance(uri, dict):
+                        add_revisions(revision_dict, uri)
+                    else:
+                        raise ValueError("Unrecognised uri: {}".format(uri))
+            add_revisions(revision_dict, self.uri)
+            return revision_dict
+
         raise ValueError("Unrecognised KnowledgeRepository.uri: {}".format(self.uri))
 
     # ------------- Repository actions / state ------------------------------------
@@ -142,6 +170,8 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
     # -------------- Post retrieval methods --------------------------------------
 
     def post(self, path, revision=None):
+        if path is None:
+            raise ValueError("path is None")
         path = self._kp_path(path)
         if not self.has_post(path, revision=revision) and path in self.config.aliases:
             path = self.config.aliases[path]
@@ -156,7 +186,7 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         else:
             prefixes = prefix
         assert all([prefix is None or isinstance(prefix, str) for prefix in prefixes]), "All path prefixes must be strings."
-        prefixes = [prefix if prefix is None else posixpath.relpath(prefix, '/') for prefix in prefixes]
+        prefixes = [prefix if prefix is None else posixpath.relpath(prefix) for prefix in prefixes]
         if isinstance(status, str):
             if status == 'all':
                 status = [self.PostStatus.DRAFT, self.PostStatus.SUBMITTED, self.PostStatus.PUBLISHED, self.PostStatus.UNPUBLISHED]

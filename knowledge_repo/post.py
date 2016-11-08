@@ -61,7 +61,7 @@ def setup_yaml():
     def dict_constructor(loader, node):
         return collections.OrderedDict(loader.construct_pairs(node))
 
-    yaml.add_representer(collections.OrderedDict, dict_representer)
+    yaml.SafeDumper.add_representer(collections.OrderedDict, dict_representer)
     yaml.add_constructor(_mapping_tag, dict_constructor)
 
 
@@ -244,7 +244,7 @@ class KnowledgePost(object):
         if headers is not None:
             md = re.sub('^---\n[\s\S]+?---\n', '', md, count=1)
             md = '---\n' + \
-                yaml.dump(headers, default_flow_style=False) + '---\n' + md
+                yaml.safe_dump(headers, default_flow_style=False) + '---\n' + md
         md += '\n'
 
         self._write_ref('knowledge.md', encode(md))

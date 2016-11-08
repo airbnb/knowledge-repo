@@ -14,7 +14,7 @@
       width:100% !important;
     }
 
-    #post_project {
+    #post_path {
       vertical-align:inherit !important;
     }
 
@@ -114,21 +114,23 @@
                    value="{{ title if title else '' }}"></input>
             <br>
 
-            <label for="post_author"> Author </label>
+            <label for="post_author"> Authors </label>
             <select id="post_author"
                     class="js-example-tags form-control"
                     type="text"
                     multiple
                     data-tags='true'>
-              <option value='{{username}}'> {{username}} </option>
+              <option value='{{ username }}'> {{ username }} </option>
             </select>
             <br>
 
-            <label for="post_project"> Project </label>
-            <input id="post_project"
+            <br>
+
+            <label for="post_path"> Path </label>
+            <input id="post_path"
                    class="form-control typeahead"
                    type="text"
-                   value="{{ project if project else '' }}"></input>
+                   value="{{ path if path else '' }}"></input>
             <br>
 
             <label for="post_image_feed"> Feed Image</label>
@@ -275,7 +277,7 @@
 {% block scripts %}
 {{ super() }}
 <script>
-var all_form_fields = ['#post_title', '#post_project',
+var all_form_fields = ['#post_title', '#post_path',
                        '#post_created_at', '#post_updated_at',
                        '#post_author', '#post_image_feed', '#post_tags']
 
@@ -316,20 +318,20 @@ var substringMatcher = function(pageMeta) {
   };
 };
 
-$.get('/ajax_projects_typeahead', function(typeahead_projects_info) {
-    typeahead_projects_info = JSON.parse(typeahead_projects_info);
-    $('#post_project').typeahead({
+$.get('/ajax_paths_typeahead', function(paths) {
+    paths = JSON.parse(paths);
+    $('#post_path').typeahead({
       hint: false,
       highlight: true,
       minLength: 1,
-      value: '{{ project if project else '' }}'
+      value: '{{ path if path else '' }}'
     },
     {
-      name: 'Projects',
+      name: 'Paths',
       display: function (item) {
         return item;
       },
-      source: substringMatcher(typeahead_projects_info)
+      source: substringMatcher(paths)
     }
   );
 });
@@ -344,12 +346,8 @@ $.get('/ajax_tags_typeahead', function(typeahead_tags_info) {
   });
 
   var tags_default_text =  "Tags are in the form: #tag_type/tag_name. Start typing to see suggestions!"
-  var tags = '{{ tags if tags else '' }}'
-  var tags_in_list = tags.split(",")
+  var tags_in_list = {{ tags|safe }}
 
-  $.each(tags_in_list, function(i,v){
-    tags_in_list[i] = v.trim()
-  });
 
   $('#post_tags').select2({
     placeholder: tags_default_text
@@ -395,10 +393,9 @@ $.get('/ajax_users_typeahead', function(typeahead_users_info){
     }
   })
   var authors_default_text =  "Users contributing to the post."
-  var authors = '{{ author if author else '' }}'
-  var authors_in_list = authors.split(",")
-  $.each(authors_in_list, function(i,v){
-    authors_in_list[i] = v.trim()
+  var authors = {{ authors |safe}}
+  $.each(authors, function(i,v){
+    authors[i] = v.trim()
   });
 
   $('#post_author').select2({
@@ -406,7 +403,7 @@ $.get('/ajax_users_typeahead', function(typeahead_users_info){
   });
 
   $("#post_author").select2()
-                   .val(authors_in_list)
+                   .val(authors)
                    .trigger("change")
 })
 
@@ -495,17 +492,17 @@ $(submission_close).on("click", function(){
     dataType: "json",
     data: JSON.stringify(data),
     contentType: 'application/json',
-    url: '/submit?post_id={{ post_id }}',
+    url: '/submit?path={{ path }}',
     async: true,
     success:function(response_data){
       alert("The status has been changed!")
-      window.location = '/posteditor?post_id={{ post_id }}'
+      window.location = '/posteditor?path={{ path }}'
     },
     error: function(response_data){
       console.log("ERROR")
       console.log(JSON.stringify(response_data))
       if (response_data['status'] == 200){
-        window.location = '/posteditor?post_id={{ post_id }}'
+        window.location = '/posteditor?path={{ path }}'
       } else {
         alert("Your post wasn't submitted for review, please try again!")
       }
@@ -520,10 +517,10 @@ if ( status == 2 || status == 3 ) {
     var publish_button_text = publish_button.textContent.trim();
     var url = '';
     if (publish_button_text == "Unpublish"){
-      url = '/unpublish_post?post_id={{ post_id }}';
+      url = '/unpublish_post?path={{ path }}';
       alert_text = 'Your post has been unpublished!';
     } else {
-      url = '/publish_post?post_id={{post_id}}';
+      url = '/publish_post?path={{ path }}';
       alert_text = "Your post has been published!";
     }
 
@@ -547,8 +544,8 @@ if ( status == 2 || status == 3 ) {
 var author_publish_checkbox = $("#author_can_publish")[0]
 $(author_publish_checkbox).on("click", function(){
   var checked = this.can_approve;
-  var url = "/author_publish";
-  url += "?post_id={{post_id}}"
+  var url = "/accept_post";
+  url += "?path={{ path }}"
   $.ajax({
     type: "POST",
     contentType: "application/json",
@@ -556,7 +553,7 @@ $(author_publish_checkbox).on("click", function(){
     async: true,
     success: function(response_data){
       alert("The publishing status was changed!");
-      window.location = '/posteditor?post_id={{ post_id }}';
+      window.location = '/posteditor?path={{ path }}';
     },
     error: function(response_data){
       alert("The publishing status was NOT changed");
@@ -568,7 +565,9 @@ $(save_button).on("click", function(){
   save_button.setAttribute("class", "btn btn-large btn-primary");
   var error = false;
   var title = $("#post_title")[0].value;
-  var project = $('#post_project').typeahead('val');
+  var path = $('#post_path').typeahead('val');
+
+
   // Currently, the tags from the post_tags are in a list
   var tags = $("#post_tags").select2().val()
   var tldr = $("#post_tldr")[0].value;
@@ -578,7 +577,7 @@ $(save_button).on("click", function(){
   var markdown = $("#post_text")[0].value;
   var feed_image = $("#post_image_feed")[0].value;
 
-  if (title === '' || project === '' || tags === null ||
+  if (title === '' || path === '' || tags === null ||
       tldr === '' || author === null || markdown === ''){
     alert("One of the fields was left empty! Your post was not saved, please try again")
     error = true;
@@ -625,7 +624,7 @@ $(save_button).on("click", function(){
 
     postContent = {
       'title': title,
-      'project': project,
+      'path': path,
       'feed_image': feed_image,
       'tags': tags,
       'tldr': tldr,
@@ -643,7 +642,7 @@ $(save_button).on("click", function(){
           dataType: "json",
           data: JSON.stringify(postContent),
           contentType: "application/json",
-          url: '/save_post?post_id={{ post_id }}',
+          url: '/save_post',
           async: true,
           success: function(response_data) {
             if (response_data['success'] == 0) {
@@ -651,9 +650,9 @@ $(save_button).on("click", function(){
             }
             else {
               save_button.setAttribute("class", "btn btn-large");
-              var post_id = response_data['post_id']
+              var path = response_data['path']
               alert("The post was successfully saved!")
-              window.location = '/posteditor?post_id=' + post_id
+              window.location = '/posteditor?path=' + path
             }
           },
           error: function(response_data) {
@@ -671,7 +670,7 @@ $(save_button).on("click", function(){
 function deleteReview(commentId) {
   $.ajax({
       type: "GET",
-      url: '/delete_review?post_id={{ post_id|urlencode }}&comment_id=' + commentId,
+      url: '/delete_review?path={{ path|urlencode }}&comment_id=' + commentId,
       async: false
   });
   location.reload();
@@ -690,7 +689,7 @@ function postReview() {
       dataType: "json",
       data: JSON.stringify(postContent),
       contentType: "application/json",
-      url: '/review?post_id={{ post_id|urlencode }}',
+      url: '/review?path={{ path|urlencode }}',
       async: false
   });
   location.reload();
@@ -845,7 +844,7 @@ function refreshRenderedMarkdown() {
   });
 
 
-  $("#post_project")[0].setSelectionRange(1000, 1000);
+  $("#post_path")[0].setSelectionRange(1000, 1000);
 
 
 // uploads images dropped in the textbox, and returns the marked-down links
@@ -915,4 +914,3 @@ $("#post_text").on("drop", function (event) {
 </script>
 
 {% endblock %}
-
