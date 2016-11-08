@@ -40,12 +40,14 @@ knowledge_repo --repo ./example_repo create ipynb example_post.ipynb
 
 5\. Add your post to the repo with path `project/example`
 ```
-knowledge_repo --repo ./ipynb_example_repo add example_post.ipynb -p project/example
-knowledge_repo --repo ./rmd_example_repo add example_post.Rmd -p project/example
+knowledge_repo --repo ./example_repo add example_post.Rmd -p project/example_rmd
+knowledge_repo --repo ./example_repo add example_post.ipynb -p project/example_ipynb
 ```
 6\. Preview the added post
 ```
-knowledge_repo --repo ./example_repo preview project/example
+knowledge_repo --repo ./example_repo preview project/example_rmd
+#or
+knowledge_repo --repo ./example_repo preview project/example_ipynb
 ```
 
 ### Feedback for Beta
