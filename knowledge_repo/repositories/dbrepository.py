@@ -98,11 +98,10 @@ class DbKnowledgeRepository(KnowledgeRepository):
                 yield prefix
 
     # -------------- Post submission / addition user flow --------------------
-
-    def _add_prepare(self, kp, path, update=False):
+    def _add_prepare(self, kp, path, update=False, **kwargs):
         pass
 
-    def _add_cleanup(self, kp, path, update=False):
+    def _add_cleanup(self, kp, path, update=False, **kwargs):
         self.__set_post_status(path, self.PostStatus.DRAFT, kp.revision)
 
     def _submit(self, path):  # Submit a post for review

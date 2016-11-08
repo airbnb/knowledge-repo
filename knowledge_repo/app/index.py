@@ -40,7 +40,7 @@ def update_index():
         kp = kr_dir.pop(post.path)
 
         # Update metadata of post if required
-        if (kp.revision > post.revision or not post.is_published or kp.uuid != post.uuid):
+        if (post.revision is None or kp.revision > post.revision or not post.is_published or kp.uuid != post.uuid):
             if kp.is_valid():
                 logger.info('Recording update to post at: {}'.format(kp.path))
                 post.update_metadata_from_kp(kp)

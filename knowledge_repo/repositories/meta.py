@@ -23,7 +23,8 @@ class MetaKnowledgeRepository(KnowledgeRepository):
             if path.startswith(prefix):
                 relpath = posixpath.relpath(path, prefix or '.') if path else ''
                 return prefix, self.uri[prefix], relpath if relpath != '.' else None
-        raise ValueError("No KnowledgeRepository found for '{}'.".format(path))
+        raise ValueError(("No KnowledgeRepository found for '{}', "
+                          "paths must be prefixed with {}.").format(path, path_prefixes))
 
     def __distribute_method(self, method, **kwargs):
         return {name: getattr(repo, method)(**kwargs) for name, repo in list(self.uri.items())}
