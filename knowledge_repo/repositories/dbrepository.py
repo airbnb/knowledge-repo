@@ -64,7 +64,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
 
     @property
     def revision(self):
-        return self.session.query(func.max(self.PostRef.created_at)).first()[0]
+        return str(self.session.query(func.max(self.PostRef.created_at)).first()[0])
 
     def update(self):
         pass

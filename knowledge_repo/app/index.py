@@ -8,6 +8,7 @@ from .proxies import db_session, current_repo, current_app
 from .models import Post, IndexMetadata
 from .utils.emails import send_subscription_emails
 from .utils.search import get_keywords
+from .utils.time import time_since
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -17,51 +18,34 @@ def is_indexing():
     return int(IndexMetadata.get('lock', 'index', '0'))
 
 
-def seconds_since_index():
+def time_since_index(human_readable=False):
     last_update = IndexMetadata.get_last_update('lock', 'index')
-    if last_update is None:
-        return None
-    else:
-        return (datetime.datetime.utcnow() - last_update).total_seconds()
+    return time_since(last_update, human_readable=human_readable)
 
 
-def seconds_since_index_check():
+def time_since_index_check(human_readable=False):
     last_update = IndexMetadata.get_last_update('check', 'index')
-    if last_update is None:
-        return None
-    else:
-        return (datetime.datetime.utcnow() - last_update).total_seconds()
-
-
-def human_readable_time_since_index():
-    if is_indexing():
-        return 'Currently indexing'
-    seconds = seconds_since_index()
-    if seconds is None:
-        return "Never"
-    elif seconds < 60:
-        return "{:d} seconds ago".format(int(round(seconds)))
-    else:
-        return "{:d} minutes ago".format(int(round(seconds / 60)))
+    return time_since(last_update, human_readable=human_readable)
 
 
 def update_index_required():
     if not current_app.config.get('REPOSITORY_INDEXING_ENABLED', True):
         return False
 
-    seconds = seconds_since_index()
-    seconds_check = seconds_since_index_check()
+    seconds = time_since_index()
+    seconds_check = time_since_index_check()
 
-    if is_indexing() or (seconds is not None) and (seconds < 5 * 60) and (seconds_check < 5 * 60):
+    if is_indexing() or (seconds is not None and seconds_check is not None) and (seconds < 5 * 60 or seconds_check < 5 * 60):
         return False
     try:
         for uri, revision in current_repo.revisions.items():
             indexed_revision = IndexMetadata.get('repository_revision', uri)
-            if indexed_revision is None or indexed_revision < revision:
+            if indexed_revision is None or indexed_revision < str(revision):
                 return True
         return False
     finally:
-        IndexMetadata.set('check', 'index', False)
+        IndexMetadata.set('check', 'index', True)
+        db_session.commit()
 
 
 def update_index():
@@ -144,7 +128,7 @@ def _update_index(app):
 
     # Record revision
     for uri, revision in current_repo.revisions.items():
-        IndexMetadata.set('repository_revision', uri, revision)
+        IndexMetadata.set('repository_revision', uri, str(revision))
 
     IndexMetadata.set('lock', 'index', False)
     db_session.commit()
