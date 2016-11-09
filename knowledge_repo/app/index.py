@@ -51,6 +51,7 @@ def update_index_required():
 
     seconds = seconds_since_index()
     seconds_check = seconds_since_index_check()
+
     if is_indexing() or (seconds is not None) and (seconds < 5 * 60) and (seconds_check < 5 * 60):
         return False
     try:
