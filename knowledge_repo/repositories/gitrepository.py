@@ -508,8 +508,8 @@ class GitKnowledgeRepository(KnowledgeRepository):
         if self.git_has_remote:
             m = re.match(r'^(.*?)?@([^/:]*):?(\d+)?', self.git_remote.url)
             if m:
-               if m.group(3):
-                  port = m.group(3)
+                if m.group(3):
+                    port = m.group(3)
         return port
 
     @property
@@ -517,7 +517,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         # TODO: support more types of hosts
         host = self.__remote_host
         port = self.__remote_port
-        
+
         if host:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(0.5)
