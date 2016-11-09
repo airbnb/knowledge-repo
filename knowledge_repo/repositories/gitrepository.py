@@ -507,7 +507,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         port = 22
         if self.git_has_remote:
             m = re.match(r'^(.*?)?@([^/:]*):?(\d+)?', self.git_remote.url)
-            if m:  # shorthand ssh uri
+            if m:
                if m.group(3):
                   port = m.group(3)
         return port
