@@ -104,8 +104,8 @@
         </div>
 
         <div class="footer">
-            Served with ♥ by <a href="https://github.com/airbnb/knowledge-repo">Knowledge Repo</a> <a title='{{version_revision}}' href="https://github.com/airbnb/knowledge-repo/releases/tag/v{{ version }}">{{ version }}</a><br />
-            <i>Last indexed: {{last_index}}</i>
+            Served with <span class="glyphicon glyphicon-heart"></span> by <a href="https://github.com/airbnb/knowledge-repo">Knowledge Repo</a> <a {% if version_revision %}title='{{version_revision}}'{% endif %} href="https://github.com/airbnb/knowledge-repo/releases/tag/v{{ version }}">{{ version }}</a><br />
+            <i title="Last checked for updates: {{last_index_check}}">Last indexed: {{last_index}}</i>
         </div>
 
         {% block scripts %}
