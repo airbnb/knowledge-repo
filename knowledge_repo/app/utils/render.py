@@ -77,7 +77,7 @@ def render_post(post):
     """
     def intra_knowledge_urlmapper(name, url):
         if name == 'a' and url.startswith('knowledge:'):
-            return url_for('render.render', markdown=url.split('knowledge:')[1])
+            return url_for('render.render', markdown=url.split('knowledge:')[1]).replace('%2F', '/')  # Temporary fix before url revamp
         return None
 
     html = render_post_header(post) + (post if isinstance(post, KnowledgePost) else post.kp).to_string('html',
