@@ -190,7 +190,8 @@ def render_cluster():
 def create(knowledge_format=None):
     """ Renders the create knowledge view """
     if knowledge_format is None:
-        return render_template("create-knowledge.html")
+        return render_template("create-knowledge.html",
+                               web_editor_enabled=current_app.config['WEB_EDITOR_PREFIXES'] != [])
 
     cur_dir = os.path.dirname(os.path.realpath(__file__))
     knowledge_template = "knowledge_template.{}".format(knowledge_format)

@@ -1,13 +1,11 @@
-from builtins import range
-from builtins import str
 import json
 import logging
 import sys
 import os
-from collections import defaultdict
+from builtins import str
 from datetime import datetime
 from flask import request, render_template, Blueprint, current_app, url_for, send_from_directory, g
-from sqlalchemy import or_, distinct
+from sqlalchemy import or_
 from werkzeug import secure_filename
 
 from knowledge_repo.post import KnowledgePost
@@ -57,9 +55,13 @@ def gitless_drafts():
     """ Render the gitless posts that a user has created in table form
         Editors can see all the posts created via Gitless_Editing
     """
+    prefixes = current_app.config.get('WEB_EDITOR_PREFIXES', [])
+    if prefixes == []:
+        raise Exception("Web editing is not configured")
+
     query = (db_session.query(Post))
-    if current_app.config.get('WEB_EDITOR_PREFIXES', None):
-        query = query.filter(or_(*[Post.path.like(p + '%') for p in current_app.config['WEB_EDITOR_PREFIXES']]))
+    if prefixes is not None:
+        query = query.filter(or_(*[Post.path.like(p + '%') for p in prefixes]))
 
     if g.user.username not in current_repo.config.editors:
         query = (query.outerjoin(PostAuthorAssoc, PostAuthorAssoc.post_id == Post.id)
@@ -78,7 +80,6 @@ def post_editor():
     data = {'title': None,
             'status': current_repo.PostStatus.DRAFT.value,
             'markdown': None,
-            'comments': None,
             'thumbnail': '',
             'can_approve': 0,
             'username': g.user.username,
@@ -123,12 +124,23 @@ def save_post():
     data = request.get_json()
     path = data['path']
 
+    prefixes = current_app.config['WEB_EDITOR_PREFIXES']
+    if prefixes == []:
+        raise Exception("Web editing is not configured")
+
+    if prefixes is not None:
+        if not any([path.startswith(prefix) for prefix in prefixes]):
+            return json.dumps({'msg': ("Your post path must begin with one of {}").format(prefixes),
+                               'success': False})
+
     # TODO better handling of overwriting
     kp = None
     if path in current_repo:
         kp = current_repo.post(path)
         if g.user.username not in kp.headers['authors']:
-            return json.dumps({'msg': "Post with path already exists!".format(path), 'success': False})
+            return json.dumps({'msg': ("Post with path {} already exists and you are not an author!",
+                                       "\nPlease try a different path").format(path),
+                               'success': False})
 
     # create the knowledge post
     kp = kp or KnowledgePost(path=path)

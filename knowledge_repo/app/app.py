@@ -69,8 +69,11 @@ class KnowledgeFlask(Flask):
             self.config['mail'] = Mail(self)
 
         # Set config defaults if not included
+        # WEB_EDITOR_PREFIXES: Prefixes of repositories that can be edited via the web editor UI
+        # Defaults to no prefixes allowed. If None, all prefixes editable via the UI.
         server_config_defaults = {'SERVER_NAME': 'localhost',
-                                  'plugins': []}
+                                  'plugins': [],
+                                  'WEB_EDITOR_PREFIXES': []}
         for k, v in server_config_defaults.items():
             self.config[k] = self.config.get(k, v)
 
