@@ -14,14 +14,12 @@ OPTIONAL_FIELD_TYPES = {
     'path': str,
     'updated_at': datetime.datetime,
     'private': bool,   # If true, this post starts out private
-    'allowed_groups': list
+    'allowed_groups': list,
+    'thumbnail': (int, str)
 }
 
 
 class FormatChecks(KnowledgePostProcessor):
-    '''
-    Use this to bootstrap your own KnowledgePostProcessor.
-    '''
     _registry_keys = ['format_checks']
 
     @classmethod

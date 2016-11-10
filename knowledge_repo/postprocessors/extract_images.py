@@ -13,8 +13,38 @@ class ExtractImages(KnowledgePostProcessor):
     @classmethod
     def process(cls, kp):
         images = cls.find_images(kp.read())
-        cls.collect_images(kp, images)
+        image_mapping = cls.collect_images(kp, images)
+        cls.update_thumbnail_uri(kp, images, image_mapping)
         cls.cleanup(kp)
+
+    @classmethod
+    def update_thumbnail_uri(cls, kp, images, image_mapping):
+        thumbnail = kp.headers.get('thumbnail', 0)
+
+        # if thumbnail is a number, select the nth image in this post as the thumbnail
+        if isinstance(thumbnail, str) and thumbnail.isdigit():
+            thumbnail = int(thumbnail)
+        if isinstance(thumbnail, int):
+            if len(images) > 0:
+                image_index = 0
+                if thumbnail < len(images):
+                    image_index = thumbnail
+                thumbnail = images[image_index]['src']
+            else:
+                thumbnail = None
+
+        # if thumbnail is a url, copy it locally to the post unless already collected during collection
+        if thumbnail and not cls.skip_image(kp, {'src': thumbnail}):
+            orig_path = os.path.join(kp.orig_context, os.path.expanduser(thumbnail))
+            if thumbnail in image_mapping:
+                thumbnail = image_mapping[thumbnail]
+            elif os.path.exists(orig_path):
+                thumbnail = cls.copy_image(kp, orig_path)
+            else:
+                logger.warning("Could not find a thumbnail image at: {}".format(thumbnail))
+
+        # update post headers to point to new thumbnail image
+        kp.update_headers(thumbnail=thumbnail)
 
     @classmethod
     def find_images(cls, md):
@@ -31,17 +61,19 @@ class ExtractImages(KnowledgePostProcessor):
 
     @classmethod
     def collect_images(cls, kp, images):
+        image_mapping = {}
         if len(images) == 0:
-            return
+            return image_mapping
         md = kp.read()
         images = images[::-1]
         for image in images:
             if cls.skip_image(kp, image):
                 continue
             orig_path = os.path.join(kp.orig_context, os.path.expanduser(image['src']))
-
             new_path = None
-            if kp._has_ref(image['src']):
+            if image['src'] in image_mapping:
+                new_path = image_mapping[image['src']]
+            elif kp._has_ref(image['src']):
                 new_path = cls.copy_image(kp, image['src'], is_ref=True)
             elif os.path.exists(orig_path):
                 new_path = cls.copy_image(kp, orig_path)
@@ -49,8 +81,10 @@ class ExtractImages(KnowledgePostProcessor):
                 logger.warning("Could not find an image at: {}".format(image['src']))
             if not new_path:
                 continue
+            image_mapping[image['src']] = new_path
             md = cls.replace_image_locations(md, image['offset'], image['tag'], image['src'], new_path)
         kp.write(md)
+        return image_mapping
 
     @classmethod
     def skip_image(cls, kp, image):

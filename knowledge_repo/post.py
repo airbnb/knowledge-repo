@@ -28,6 +28,7 @@ tags:
 - example
 created_at: 2016-06-29
 updated_at: 2016-06-30
+thumbnail: 2
 tldr: |
     You can write any markdown you want here (the '|' character makes this an escaped section)
 
@@ -134,9 +135,9 @@ class ReferenceCache(object):
         for key in cache:
             if isinstance(cache[key], dict):
                 for path in self.dir(parent=posixpath.join(parent or '', key), cache=cache[key]):
-                    yield path
+                    yield posixpath.join(key, path)
             else:
-                yield posixpath.join(parent or '', key)
+                yield key
 
 
 class KnowledgePost(object):
@@ -198,7 +199,7 @@ class KnowledgePost(object):
 
     def _dir(self, parent=None):
         for ref in self.__cache.dir(parent=parent):
-            if self.__cache[ref] is not None:
+            if self.__cache[posixpath.join(parent or '', ref)] is not None:
                 yield ref
         if self.repository is not None:
             for ref in self.repository._kp_dir(self.path, parent=parent, revision=self.revision):
@@ -284,35 +285,37 @@ class KnowledgePost(object):
                 headers[key] = datetime.datetime.combine(value, datetime.time(0))
         return headers
 
+    @headers.setter
+    def headers(self, headers):
+        self.write(self.read(), headers=headers)
+
     def update_headers(self, **headers):
         h = self.headers
-        h.update(headers)
-        self.write(self.read(), headers=h)
+        for header, value in headers.items():
+            if value is None:
+                if header in h:
+                    h.pop(header)
+            else:
+                h[header] = value
+        self.headers = h
 
     @property
     def thumbnail_uri(self):
-        image_matches = ExtractImages.find_images(self.read())
-        if len(image_matches) == 0:
+        thumbnail = self.headers.get('thumbnail')
+
+        if not thumbnail:
             return None
 
-        i = 0
-        image_uri = None
-        while not image_uri:
-            if i == len(image_matches):
+        if ':' not in thumbnail:  # if thumbnail points to a local reference
+            if not self._has_ref(thumbnail):
                 return None
-            image_uri = image_matches[i]['src']
-            i += 1
-
-        if ':' not in image_uri:  # TODO: Check this works
-            if not os.path.exists(image_uri):
-                return None
-            with open(self.feed_image[7:]) as f:
-                data = base64.b64encode(f.read())
-            image_mimetype = mimetypes.guess_type(self.feed_image)[0]
+            data = base64.b64encode(self._read_ref(thumbnail))
+            image_mimetype = mimetypes.guess_type(thumbnail)[0]
             if image_mimetype is not None:
-                return 'data:{};base64,'.format(image_mimetype) + data
+                return 'data:{};base64,'.format(image_mimetype) + data.decode('utf-8')
+            return None
 
-        return image_uri
+        return thumbnail
 
     def is_valid(self):
         if not self._has_ref('knowledge.md'):
