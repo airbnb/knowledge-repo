@@ -506,11 +506,11 @@ class GitKnowledgeRepository(KnowledgeRepository):
     def __remote_port(self):
         port = 22
         if self.git_has_remote:
-            m = re.match(r'^(.*?)?@([^/:]*):?(\d+)?', self.git_remote.url)
+            m = re.match(r'^(.*?)?@([^/:]*):?([0-9]+)?', self.git_remote.url)
             if m:
                 if m.group(3):
                     port = m.group(3)
-        return port
+        return int(port)
 
     @property
     def __remote_available(self):
