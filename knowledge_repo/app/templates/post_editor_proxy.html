@@ -1,0 +1,17 @@
+{% extends "post_editor_base.html" %}
+
+{% block metadata_fields %}
+{{ super() }}
+<label for="post_proxy"> Proxy URL: </label>
+<input id="post_proxy"
+       class="form-control"
+       type="text"
+       value="{{ proxy if proxy else ''}}"></input>
+<br>
+{% endblock %}
+
+
+{% block render_block %}
+<a href="{{ proxy }}">Linked Post</a>
+<iframe width=100% height=800 src="{{ proxy }}"></iframe>'
+{% endblock render_block %}

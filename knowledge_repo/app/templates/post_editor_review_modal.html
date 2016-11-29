@@ -1,0 +1,35 @@
+<div class="modal"
+  id="webpost-send-for-review-modal"
+  role="dialog"
+  aria-hidden="true"
+  aria-labelledby="modal-body-label"
+  aria-describedby="modal-body">
+  <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">
+            Who should review this post?
+          </h4>
+        </div>
+
+        <div class="modal-body">
+          Comma-separate the emails, and the reviewers will get a post saying your post is ready to review!
+          <br><br>
+          <form style="padding-left:12px">
+            <text class="text-left" for="form-vert-text">
+            Emails of the Reviewers:
+            </text>
+          <input id="post_reviewers" type="text" value="...@emailext.com"
+                style="width:75%; display:inline-block">
+        </form>
+        <p>
+        <button class="btn btn-primary btn-email-reviewers"
+                data-behavior='modal-close'
+                id='submission_close'>
+          Email Reviewers!
+        </button>
+        </p>
+      </div>
+      </div>
+  </div>
+</div>
