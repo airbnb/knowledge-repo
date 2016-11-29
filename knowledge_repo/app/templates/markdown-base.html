@@ -48,12 +48,12 @@
       <div class="row col-md-12">
         {% if not webeditor_buttons and data_repo_git_root %}
           <a href='{{ data_repo_git_root}}/blob/master/{{post_path|urlencode}}'
-             target="_blank"
+             target="_blank" rel="noopener noreferrer"
              style='padding-right:10px;'>
             View on Github
             <i class='glyphicon glyphicon-new-window'></i>
           </a>
-          <a href='{{ data_repo_git_root}}/edit/master/{{post_path|urlencode}}' target="_blank">
+          <a href='{{ data_repo_git_root}}/edit/master/{{post_path|urlencode}}' target="_blank" rel="noopener noreferrer">
             Edit on Github
             <i class='glyphicon glyphicon-new-window'></i>
           </a>

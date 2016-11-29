@@ -21,7 +21,7 @@ def usernames_to_emails(usernames):
 
 
 def subscription_email_recipients(post, tag):
-    """Check who should recieve a subscription email about this post
+    """Check who should receive a subscription email about this post
     """
     db_session.expire_on_commit = False
 
