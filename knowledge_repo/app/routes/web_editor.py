@@ -112,7 +112,9 @@ def post_editor():
     data['authors'] = json.dumps(data.get('authors'))
     data['tags'] = json.dumps(data.get('tags', []))
 
-    return render_template('post_editor.html',
+    if 'proxy' in data or request.args.get('proxy', False):
+        return render_template('post_editor_proxy.html', **data)
+    return render_template('post_editor_markdown.html',
                            **data)
 
 
@@ -156,8 +158,10 @@ def save_post():
     headers['authors'] = [auth.strip() for auth in data['author']]
     headers['tldr'] = data['tldr']
     headers['tags'] = [tag.strip() for tag in data.get('tags', [])]
-    kp.write(urlunquote(data['markdown']), headers=headers)
+    if 'proxy' in data:
+        headers['proxy'] = data['proxy']
 
+    kp.write(urlunquote(data['markdown']), headers=headers)
     # add to repo
     current_repo.add(kp, update=True, message=headers['title'])  # THIS IS DANGEROUS
 

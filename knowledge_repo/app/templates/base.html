@@ -26,7 +26,6 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6.2/html5shiv.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/2.1.0/es5-shim.min.js"></script>
         <![endif]-->
-
         <link rel="stylesheet" href="{{ url_for('static', filename='modules/bootstrap/css/bootstrap.min.css')}}">
         <link rel="stylesheet" href="{{ url_for('static', filename='modules/bootstrap-slider/css/bootstrap-slider.min.css')}}">
         <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='css/custom.css') }}">
@@ -34,6 +33,7 @@
         <link href='https://fonts.googleapis.com/css?family=Lato:400,900|Playfair+Display|Source+Serif+Pro:400,700' rel='stylesheet' type='text/css'>
         <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}">
 
+        {% block style_links %} {% endblock %}
         <style>
             .spinner {
                 position: fixed;
@@ -59,6 +59,7 @@
             {% block style %} {% endblock %}
 
           </style>
+
 
     </head>
 
