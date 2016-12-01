@@ -55,7 +55,7 @@ def render_batch_tags():
             db_session.commit()
 
         tags_to_posts[tag.id] = [(post.path, post.title) for post in posts if
-                                 post.is_published and not post.contains_excluded_tags]
+                                 post.is_published and not post.contains_excluded_tag]
         nonzero_tags.append(tag)
         # so that we can use the tag in the jinja template
         db_session.expunge(tag)
