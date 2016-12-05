@@ -20,6 +20,8 @@ Check out this [Medium Post](https://medium.com/airbnb-engineering/scaling-knowl
 pip install  --upgrade knowledge-repo
 ```
 
+To install dependencies for iPython notebook, PDF uploading, and local development, use `pip install --upgrade knowledge-repo[all]`
+
 2\. Initialize a knowledge repository - your posts will get added here
 ```
 knowledge_repo --repo ./example_repo init
