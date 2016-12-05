@@ -310,7 +310,7 @@ class Post(db.Model):
     _authors = association_proxy('_authors_assoc', 'author',
                                  creator=lambda author: PostAuthorAssoc(author=author),)
 
-    @property
+    @hybrid_property
     def authors(self):
         return self._authors
 
