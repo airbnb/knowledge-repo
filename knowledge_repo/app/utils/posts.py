@@ -44,12 +44,9 @@ def get_posts(feed_params):
     if filters and str(filters):
         filter_set = get_query_param_set(filters)
         for elem in filter_set:
-            query = query.filter(or_(Post.title.like('%' + elem + '%'),
-                                     Post.title.like('%' + elem),
-                                     Post.title.like(elem + '%'),
-                                     Post.tldr.like('%' + elem + '%'),
-                                     Post.tldr.like('%' + elem),
-                                     Post.tldr.like(elem + '%')))
+            query = query.filter(or_(func.lower(Post.keywords).like('%' + elem + '%'),
+                                     func.lower(Post.keywords).like('%' + elem),
+                                     func.lower(Post.keywords).like(elem + '%')))
 
     author_names = feed_params['authors']
     if author_names:
