@@ -149,7 +149,7 @@
               var keycode = (event.keyCode ? event.keyCode : event.which);
               if(keycode == '13'){
                 var path = document.location.pathname;
-                window.location = path + '?filters=' + $('#searchbar').val()
+                window.location = '/feed?filters=' + $('#searchbar').val()
               }
             });
 
