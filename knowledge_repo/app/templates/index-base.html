@@ -125,7 +125,9 @@
     } else {
       next_parameters["start"] = next_parameters["results"];
     }
-    $(".next-btn")[0].href += "?" + $.param(next_parameters);
+    if ($(".next-btn").length) {
+      $(".next-btn")[0].href += "?" + $.param(next_parameters);
+    }
   });
 </script>
 {% endblock %}
