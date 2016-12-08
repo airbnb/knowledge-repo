@@ -107,9 +107,7 @@ if (isinstance(args.repo, str) and not args.dev
         and os.path.exists(os.path.join(args.repo, '.resources', 'scripts', 'knowledge_repo'))
         and os.path.abspath(args.repo) != os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))):
     cmdline_args = ['--noupdate'] + [arg.replace(' ', '\ ') if ' ' in arg else arg for arg in sys.argv[1:]]
-    proc = subprocess.call('{} {}'.format(os.path.join(os.path.abspath(args.repo), '.resources/scripts/knowledge_repo'), ' '.join(cmdline_args)), shell=True)
-    return_code = proc.wait()
-    sys.exit(return_code)
+    sys.exit(subprocess.call('{} {}'.format(os.path.join(os.path.abspath(args.repo), '.resources/scripts/knowledge_repo'), ' '.join(cmdline_args)), shell=True))
 
 # ---------------------------------------------------------------------------------------
 # Everything below this line pertains to actual actions to be performed on the repository
@@ -185,6 +183,11 @@ db_upgrade.add_argument('-db', '--dburi', help='The SQLAlchemy database uri.')
 db_upgrade.add_argument('-c', '--config', default=None, help="The config file from which to read server configuration.")
 db_upgrade.add_argument('-m', '--message', help="The message to use for the database revision.")
 db_upgrade.add_argument('--autogenerate', action='store_true', help="Whether alembic should automatically populate the migration script.")
+
+reindex = subparsers.add_parser('reindex', help='Update the index, updating all posts even if they exist in the database already; but will not lose post views and other usage metadata.')
+reindex.set_defaults(action='reindex')
+reindex.add_argument('-db', '--dburi', help='The SQLAlchemy database uri.')
+reindex.add_argument('-c', '--config', default=None, help="The config file from which to read server configuration.")
 
 # Show version and exit
 if args.version:
@@ -305,3 +308,7 @@ elif args.action == 'db_upgrade':
 elif args.action == 'db_migrate':
     app = repo.get_app(debug=args.debug, db_uri=args.dburi)
     app.db_migrate(args.message, autogenerate=args.autogenerate)
+
+elif args.action == 'reindex':
+    app = repo.get_app(db_uri=args.dburi, debug=args.debug, config=args.config)
+    app.db_update_index(reindex=True)

@@ -24,7 +24,7 @@ class ExtractImagesToS3(ExtractImages):
         # Copy image data to new file
         if is_ref:
             _, tmp_path = tempfile.mkstemp()
-            with open(tmp_path, 'w') as f:
+            with open(tmp_path, 'wb') as f:
                 f.write(kp._read_ref(img_path))
         else:
             tmp_path = img_path

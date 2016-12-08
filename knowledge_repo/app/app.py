@@ -12,7 +12,7 @@ from alembic.migration import MigrationContext
 
 import knowledge_repo
 from .proxies import db_session, current_repo
-from .index import update_index, time_since_index, time_since_index_check
+from .index import update_index, time_since_index, time_since_index_check, _update_index
 from .models import db as sqlalchemy_db, Post, User, Tag
 from . import routes
 
@@ -87,6 +87,9 @@ class KnowledgeFlask(Flask):
         self.register_blueprint(routes.stats.blueprint)
         self.register_blueprint(routes.web_editor.blueprint)
         self.register_blueprint(routes.groups.blueprint)
+
+        if self.config['DEBUG']:
+            self.register_blueprint(routes.debug.blueprint)
 
         # Register error handler
         @self.errorhandler(500)
@@ -192,6 +195,10 @@ class KnowledgeFlask(Flask):
     def db_migrate(self, message, autogenerate=True):
         with self.app_context():
             command.revision(self._alembic_config, message=message, autogenerate=autogenerate)
+
+    def db_update_index(self, reindex=True):
+        with self.app_context():
+            _update_index(current_app, force=True, reindex=reindex)
 
     @property
     def supports_threads(self):
