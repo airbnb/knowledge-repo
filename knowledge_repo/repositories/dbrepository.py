@@ -1,6 +1,7 @@
 from builtins import object
 
 import logging
+import os
 import posixpath
 
 from sqlalchemy import create_engine
@@ -204,15 +205,15 @@ class DbKnowledgeRepository(KnowledgeRepository):
         return data
 
     def _kp_dir(self, path, parent=None, revision=None):
-        if parent:
-            path = posixpath.join(path, parent)
+        ref_prefix = parent + '/' if parent else ''
         revision = revision or self._kp_get_revision(path, enforce_exists=True)
         refs = (self.session.query(self.PostRef.ref)
                             .filter(self.PostRef.path == path)
+                            .filter(self.PostRef.ref.like(ref_prefix + '%'))
                             .filter(self.PostRef.revision == revision)).all()
         for (ref,) in refs:
             if ref is not None:
-                yield ref
+                yield os.path.relpath(ref, parent)
 
     def _kp_has_ref(self, path, reference, revision=None):
         revision = revision or self._kp_get_revision(path, enforce_exists=True)
