@@ -266,7 +266,7 @@ Here is a full list of headers used in the YAML section of knowledge posts:
 
 |header         |required |purpose                                                                            |example                                                                                   |
 |:--------------|:--------|:----------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------|
-|title          |required |String at top of post                                                              |This post proves that 2+2=4                                                               |
+|title          |required |String at top of post                                                              |title: This post proves that 2+2=4                                                               |
 |authors        |required |User entity that wrote the post in organization specified format                   |authors: <br> - kanye_west<br> - beyonce_knowles                                          |
 |tags           |required |Topics, projects, or any other uniting principle across posts                      |tags: <br> - hiphop<br> - yeezy                                                           |
 |created_at     |required |Date when post was written                                                         |created_at: 2016-04-03                                                                    |
