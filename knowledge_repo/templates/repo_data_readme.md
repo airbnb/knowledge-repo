@@ -27,6 +27,8 @@ tldr: This is short description of the content and findings of the post.
 ---
 ```
 
+See the full list of post header options below.
+
 Users add these notebooks/files to the knowledge repository through the `knowledge_repo` tool, as described below; which allows them to be rendered and curated in the knowledge repository's web app.
 
 If your favourite format is missing, we welcome contributions; and are happy to work with you to get it supported. See the "Contributing" section below to see how to add support for more formats.
@@ -93,6 +95,23 @@ Note that the folder ends in '.kp'. This is added automatically to indicate that
 To update an existing knowledge post, simply pass the `--update` option during the add step, which will allow the add operation to override existing knowledge posts. e.g.
 
 `knowledge_repo --repo <repo_path> add --update <supported knowledge format> <location in knowledge repo>`
+
+### Post Headers
+
+Here is a full list of headers used in the YAML section of knowledge posts:
+
+|header         |required |purpose                                                                            |example                                                                                   |
+|:--------------|:--------|:----------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------|
+|title          |required |String at top of post                                                              |title: This post proves that 2+2=4                                                               |
+|authors        |required |User entity that wrote the post in organization specified format                   |authors: <br> - kanye_west<br> - beyonce_knowles                                          |
+|tags           |required |Topics, projects, or any other uniting principle across posts                      |tags: <br> - hiphop<br> - yeezy                                                           |
+|created_at     |required |Date when post was written                                                         |created_at: 2016-04-03                                                                    |
+|updated_at     |optional |Date when post was last updated                                                    |created_at: 2016-10-10                                                                    |
+|tldr           |required |Summary of post takeaways that will be visible in /feed                            |tldr: I'ma let you finish, but Beyonce had one of the best videos of all time!            |
+|path           |optional |Instead of specifying post path in the CLI, specify with this post header          |path: projects/path/to/post/on/repo                                                       |
+|thumbnail      |optional |Specify which image is shown in /feed                                              |thumbnail: 3 OR thumbnail: http://cdn.pcwallart.com/images/giraffe-tongue-wallpaper-1.jpg |
+|private        |optional |If included, post is only visible to authors and editors set in repo configuration |private: true                                                                             |
+|allowed_groups |optional |If the post is private, specify additional users or groups who can see the post    |allowed_groups: ['jay_z', 'taylor_swift', 'rap_community']                                |
 
 ### Handling Images
 
