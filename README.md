@@ -162,7 +162,16 @@ There are two types of configuration files, one for knowledge-data git repos tha
 
 When running `knowledge_repo init` to make a folder a knowledge-data git repo, a `.knowledge_repo_config` file will be created in the folder. The file will be a copy of the default repo configuration file located [here](https://github.com/airbnb/knowledge-repo/blob/master/knowledge_repo/config_defaults.py).
 
-This configuration file will allow you to add postprocessors to post contributions from the repo, add rules for which subdirectories posts can be added to, and check the format of author names at contribution time. See the file itself for more detail.
+This configuration file will allow you to:
+
+ - Add postprocessors to post contributions from the repo. (see the `postprocessors` array of functions)
+ - Add rules for which subdirectories posts can be added to. (see the `path_parse()` function)
+ - Check and manage the format of author names at contribution time
+    - Add logic to `username_parse()` to check post author names and raise exceptions when they don't match
+    - Add logic to `username_to_name()` to manage how user/author names are displayed, ex. "sally_smarts" --> "Sally Smarts"
+    - Add logic to `username_to_email()` to manage how user/author names are matched to emails, ex. "sally_smarts" --> "sally.smarts@mycompany.com"
+
+See the file itself for more detail.
 
 #### Knowledge Web Application Configuration
 
@@ -282,6 +291,15 @@ Here is a full list of headers used in the YAML section of knowledge posts:
 The knowledge repo's default behavior is to add the markdown's contents as is to your knowledge post git repository. If you do not have git LFS set up, it may be in your interest to have these images hosted on some type of cloud storage, so that pulling the repo locally isn't cumbersome.
 
 To add support for pushing images to cloud storage, we provide a [postprocessor](https://github.com/airbnb/knowledge-repo/blob/master/resources/extract_images_to_s3.py). This file needs one line to be configured for your organization's cloud storage. Once configured, the postprocessor's registry key can be added to the knowledge git repository's configuration file as a postprocessor.
+
+### Managing and Viewing Tags
+
+Tags are one of the main organizing principles of the knowledge repo web app, and it is important to have high integrity on these tag names. For example, having one post tagged as "my_project" and another as "my-project" or "my_projects" prevents these posts from being organized together.
+
+We currently have two ways to maintain tag integrity:
+
+ - Browse the `/cluster?group_by=tags` endpoint to find and match existing tags.
+ - After contributing, organize tags in batch with the `/batch_tags` end point.
 
 ## Running the web app
 

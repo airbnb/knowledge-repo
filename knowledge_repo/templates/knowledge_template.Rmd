@@ -1,8 +1,8 @@
 ---
 title: This is a Knowledge Template Header
 authors:
-- Sally Smarts
-- Wesley Wisdom
+- sally_smarts
+- wesley_wisdom
 tags:
 - knowledge
 - example
