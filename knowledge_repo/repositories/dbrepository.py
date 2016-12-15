@@ -1,7 +1,6 @@
 from builtins import object
 
 import logging
-import os
 import posixpath
 
 from sqlalchemy import create_engine
@@ -213,7 +212,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
                             .filter(self.PostRef.revision == revision)).all()
         for (ref,) in refs:
             if ref is not None:
-                yield os.path.relpath(ref, parent)
+                yield posix.relpath(ref, parent)
 
     def _kp_has_ref(self, path, reference, revision=None):
         revision = revision or self._kp_get_revision(path, enforce_exists=True)
