@@ -57,6 +57,16 @@ echo "Synchronising database index"
 echo "-----------------------------"
 echo
 `dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" reindex --config `dirname $0`/tests/config_server.py
+ipynb_file=$(mktemp).ipynb
+sed "s/&current_date/$(date "+%Y-%m-%d")/g" `dirname $0`/knowledge_repo/templates/knowledge_template.ipynb > $ipynb_file
+rmd_file=$(mktemp).Rmd
+sed "s/&current_date/$(date "+%Y-%m-%d")/g" `dirname $0`/knowledge_repo/templates/knowledge_template.Rmd > $rmd_file
+md_file=$(mktemp).md
+sed "s/&current_date/$(date "+%Y-%m-%d")/g" `dirname $0`/knowledge_repo/templates/knowledge_template.md > $md_file
+
+`dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add $ipynb_file -p projects/test/ipynb_test -m "Test commit" --branch master
+`dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add $rmd_file -p projects/test/Rmd_test -m "Test commit" --branch master
+`dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add $md_file -p projects/test/md_test -m "Test commit" --branch master
 
 echo
 echo "Running regression test suite"
