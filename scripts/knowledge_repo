@@ -12,6 +12,8 @@ import webbrowser
 import shutil
 import argparse
 import subprocess
+import tempfile
+import datetime
 from tabulate import tabulate
 
 # Register handler for SIGTERM, so we can run cleanup code if we are terminated
@@ -232,7 +234,17 @@ if args.action == 'create':
     src = os.path.join(os.path.dirname(knowledge_repo.__file__), 'templates', 'knowledge_template.{}'.format(args.format))
     if os.path.exists(args.filename):
         raise ValueError("File already exists at '{}'. Please choose a different filename and try again.".format(args.filename))
-    shutil.copy(src, args.filename)
+    
+    # Replace the current timestamp
+    tmpfile = tempfile.mktemp()
+    shutil.copy(src, tmpfile)
+    with open(tmpfile) as f:
+        out = open(args.filename, "w")
+        for line in f:
+            out.write(re.sub('&current_date', '{:%Y-%m-%d}'.format(datetime.datetime.now()), line))
+        out.close()
+
+    #shutil.copy(src, args.filename)
     print("Created a {format} knowledge post template at {filename}.".format(format=args.format, filename=args.filename))
 
 # # Check which branches have local work

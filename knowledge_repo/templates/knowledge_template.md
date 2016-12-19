@@ -6,8 +6,8 @@ authors:
 tags:
 - knowledge
 - example
-created_at: 2016-06-29
-updated_at: 2016-06-30
+created_at: &current_date
+updated_at: &current_date
 tldr: This is short description of the content and findings of the post.
 ---
 
