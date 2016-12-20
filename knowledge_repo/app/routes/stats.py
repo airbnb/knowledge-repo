@@ -70,7 +70,7 @@ def stats():
     # cumulative weekly post created
     weekly_cumulative_posts = {}
     cum_created_val = 0
-    for week in all_week_keys:
+    for week in sorted(all_week_keys):
         cum_created_val += created_at_counts.get(week, 0)
         weekly_cumulative_posts[week] = cum_created_val
 
