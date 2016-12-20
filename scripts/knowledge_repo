@@ -16,6 +16,7 @@ import gitdb
 import webbrowser
 import tempfile
 
+import jinja2
 from tabulate import tabulate
 
 # Register handler for SIGTERM, so we can run cleanup code if we are terminated
@@ -273,13 +274,10 @@ if args.action == 'create':
 =======
     
     # Replace the current timestamp
-    tmpfile = tempfile.mktemp()
-    shutil.copy(src, tmpfile)
-    with open(tmpfile) as f:
-        out = open(args.filename, "w")
-        for line in f:
-            out.write(re.sub('&current_date', '{:%Y-%m-%d}'.format(datetime.datetime.now()), line))
-        out.close()
+    with open(src) as f:
+        result = jinja2.Template(f.read()).render(current_date='{:%Y-%m-%d}'.format(datetime.datetime.now()), author=os.getlogin())
+        with open(args.filename, "w") as out:
+            out.write(result)
 
     #shutil.copy(src, args.filename)
     print("Created a {format} knowledge post template at {filename}.".format(format=args.format, filename=args.filename))
