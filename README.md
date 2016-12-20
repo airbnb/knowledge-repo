@@ -126,7 +126,7 @@ The `knowledge_repo` script is the one that is used for all of the following act
 
 You can drop the `--repo` option by setting the `$KNOWLEDGE_REPO` environment variable with the location of the  knowledge data repo in your bash/zsh/shell configuration. In bash, this would be done as such:
 ```
-export $KNOWLEDGE_REPO=repo_path
+export KNOWLEDGE_REPO=repo_path
 ```
 
 ### Setup of the knowledge data repositories
