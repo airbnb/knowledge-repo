@@ -212,7 +212,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
                             .filter(self.PostRef.revision == revision)).all()
         for (ref,) in refs:
             if ref is not None:
-                yield posix.relpath(ref, parent)
+                yield posixpath.relpath(ref, parent)
 
     def _kp_has_ref(self, path, reference, revision=None):
         revision = revision or self._kp_get_revision(path, enforce_exists=True)
