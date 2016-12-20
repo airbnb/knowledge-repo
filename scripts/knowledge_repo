@@ -275,7 +275,8 @@ if args.action == 'create':
     
     # Replace the current timestamp
     with open(src) as f:
-        result = jinja2.Template(f.read()).render(current_date='{:%Y-%m-%d}'.format(datetime.datetime.now()), author=os.getlogin())
+        #result = jinja2.Template(f.read()).render(current_date='{:%Y-%m-%d}'.format(datetime.datetime.now()), author=os.getlogin())
+        result = jinja2.Template(f.read()).render(current_date='{:%Y-%m-%d}'.format(datetime.datetime.now()), author='krepo')
         with open(args.filename, "w") as out:
             out.write(result)
 
