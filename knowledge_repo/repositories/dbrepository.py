@@ -45,7 +45,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
                               Column('status', Integer, default=self.PostStatus.DRAFT.value),
                               Column('ref', String(512)),
                               Column('data', LargeBinary))
-        self.engine = create_engine(engine_uri)
+        self.engine = create_engine(engine_uri, pool_recycle=3600)
         self.session = scoped_session(sessionmaker(bind=self.engine))
         if auto_create:
             postref_table.create(self.engine, checkfirst=True)
