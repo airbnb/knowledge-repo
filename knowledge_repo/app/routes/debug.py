@@ -81,4 +81,3 @@ def force_reindex():
     logger.info("Index Updated")
 
     return "Git Repo Updated, SQL Index Updated"
-
