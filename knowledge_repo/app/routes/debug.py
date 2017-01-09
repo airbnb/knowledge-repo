@@ -62,23 +62,23 @@ def show_versions():
 def force_reindex():
 
     # Refresh the git repository
-    print "Starting Repo Refresh: " + current_repo.uris.values()[0]
+    logger.info("Starting Repo Refresh: " + current_repo.uris.values()[0])
 
     try:
         kr = knowledge_repo.KnowledgeRepository.for_uri(current_repo.uris.values()[0])
         if isinstance(kr, GitKnowledgeRepository):
-            print 'Updating Repo...'
-            kr.update()        # Updates master branch by default. Didn't find how to retrieve args.knowledge_branch
-            print 'Repo updated'
+            logger.info('Updating Repo...')
+            kr.update()            # Updates master branch by default. Didn't find how to retrieve args.knowledge_branch
+            logger.info('Repo updated')
 
     except:
-        print 'Repo Update Failed!'
+        logger.warning('Repo Update Failed!')
         pass
 
     # Then the SQL index
-    print "Updating Index..."
+    logger.info("Updating Index...")
     current_app.db_update_index(reindex=True)
-    print "Index Updated"
+    logger.info("Index Updated")
 
     return "Git Repo Updated, SQL Index Updated"
 
