@@ -4,11 +4,13 @@ import types
 import logging
 import tabulate
 import knowledge_repo
+import subprocess
+import os
 
 from flask import request, current_app, Blueprint
 from ..proxies import current_repo
 from ..index import get_indexed_revisions, is_indexing
-
+from knowledge_repo.repositories.gitrepository import GitKnowledgeRepository
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -60,6 +62,25 @@ def show_versions():
 
 @blueprint.route('/debug/force_reindex', methods=['GET'])
 def force_reindex():
-    reindex = bool(request.args.get('reindex', ''))
-    current_app.db_update_index(reindex=reindex)
-    return "Index Updated"
+
+    # Refresh the git repository
+    print "Starting Repo Refresh: " + current_repo.uris.values()[0]
+
+    try:
+        kr = knowledge_repo.KnowledgeRepository.for_uri(current_repo.uris.values()[0])
+        if isinstance(kr, GitKnowledgeRepository):
+            print 'Updating Repo...'
+            kr.update()        # Updates master branch by default. Didn't find how to retrieve args.knowledge_branch
+            print 'Repo updated'
+
+    except:
+        print 'Repo Update Failed!'
+        pass
+
+    # Then the SQL index
+    print "Updating Index..."
+    current_app.db_update_index(reindex=True)
+    print "Index Updated"
+
+    return "Git Repo Updated, SQL Index Updated"
+
