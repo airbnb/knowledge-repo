@@ -98,7 +98,7 @@ body {
   color: #565a5c;
   background-color: whitesmoke;
   font-size: 14px;
-  font-family: 'Lato';
+  font-family: 'Lato', sans-serif;
   /*background-color: #F8F8F8;*/
 }
 
@@ -118,28 +118,13 @@ ul {
     margin-bottom: 10px;
 }
 
-h1 {
-  font-size: 44px;
-}
-h2 {
-  margin-top: 0;
-  margin-bottom: 0;
-  color: #484848;
-  font-size: 32px;
-  font-weight: bolder;
-}
-h3 {
-  font-size: 24px;
-}
-h4 {
-  font-size: 18px;
-}
-h5 {
-  font-size: 16px;
-}
-h6 {
-  font-size: 14px;
-}
+h1              { font-size: 2em; margin: .67em 0 }
+h2              { font-size: 1.5em; margin: .75em 0 }
+h3              { font-size: 1.17em; margin: .83em 0 }
+h5              { font-size: .83em; margin: 1.5em 0 }
+h6              { font-size: .75em; margin: 1.67em 0 }
+h1, h2, h3, h4,
+h5, h6          { font-weight: bolder }
 
 img {
     max-width:100%;
@@ -256,29 +241,6 @@ a.label:focus, a.label:hover {
   color: #9CA299;
 }
 
-.feed-author {
-  padding-bottom: 5px;
-}
-
-.feed-date {
-  color: #565a5c;
-  padding-bottom: 10px;
-}
-
-.feed-date, .feed-tldr {
-  color: #565a5c;
-}
-
-.feed-post {
-  border-bottom: 1px solid #F8F8F8;
-}
-
-.feed-post-counts {
-  color: #aaa;
-  margin-right: 3px;
-  margin-left: 15px;
-}
-
 .content-offset {
   margin-left: 50px;
 }
@@ -366,14 +328,6 @@ a.label:focus, a.label:hover {
   margin-bottom: 0.5em;
   font-weight: bold;
 }
-
-h1              { font-size: 2em; margin: .67em 0 }
-h2              { font-size: 1.5em; margin: .75em 0 }
-h3              { font-size: 1.17em; margin: .83em 0 }
-h5              { font-size: .83em; margin: 1.5em 0 }
-h6              { font-size: .75em; margin: 1.67em 0 }
-h1, h2, h3, h4,
-h5, h6          { font-weight: bolder }
 
 #renderedMarkdown h1:nth-of-type(1) {
   margin-top: 1em;
