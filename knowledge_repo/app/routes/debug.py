@@ -4,8 +4,6 @@ import types
 import logging
 import tabulate
 import knowledge_repo
-import subprocess
-import os
 
 from flask import request, current_app, Blueprint
 from ..proxies import current_repo
