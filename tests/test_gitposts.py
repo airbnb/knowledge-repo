@@ -63,7 +63,7 @@ class PostTest(unittest.TestCase):
 
         data = rv.data.decode('utf-8')
         soup = BeautifulSoup(data, 'html.parser')
-        metadata = soup.findAll("p", {"id": "metadata"})
+        metadata = soup.findAll("div", {"class": "metadata"})
 
         assert metadata
 
@@ -75,7 +75,7 @@ class PostTest(unittest.TestCase):
 
         for (i, child) in enumerate(children):
             try:
-                metadata_elem = child.findAll("strong")
+                metadata_elem = child.findAll("span")
                 assert children[i + 1].contents
             except:
                 pass

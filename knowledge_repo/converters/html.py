@@ -24,7 +24,7 @@ MARKDOWN_EXTENSTIONS = ['markdown.extensions.extra',
                         'markdown.extensions.meta',
                         'markdown.extensions.sane_lists',
                         'markdown.extensions.smarty',
-                        'markdown.extensions.toc(baselevel=3)',
+                        'markdown.extensions.toc(baselevel=1)',
                         'markdown.extensions.wikilinks',
                         'knowledge_repo.converters.html:KnowledgeMetaExtension',
                         'knowledge_repo.converters.html:MathJaxExtension']

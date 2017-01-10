@@ -175,6 +175,13 @@ img {
   margin-bottom: 4px;
 }
 
+a.label:focus, a.label:hover {
+    color: #00A699;
+    border-color: #00A699;
+    background-color: #fff;
+    opacity: 1;
+}
+
 .label-primary {
   color: white;
   background-color: #FF5A5F;
@@ -339,53 +346,116 @@ img {
   font-size: 18px;
 }
 
+#renderedMarkdown {
+    border: 1px solid #bbb;
+    padding: 1.5em;
+    background: #fff;
+    color: #484848;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    position: relative;
+}
+
 #renderedMarkdown h1,
 #renderedMarkdown h2,
 #renderedMarkdown h3,
 #renderedMarkdown h4,
 #renderedMarkdown h5,
 #renderedMarkdown h6 {
-  margin-top: 50px;
-  margin-bottom: 25px;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
   font-weight: bold;
 }
 
-#renderedMarkdown h1 {
-  margin-top: 0;
-  font-weight: bold;
+h1              { font-size: 2em; margin: .67em 0 }
+h2              { font-size: 1.5em; margin: .75em 0 }
+h3              { font-size: 1.17em; margin: .83em 0 }
+h5              { font-size: .83em; margin: 1.5em 0 }
+h6              { font-size: .75em; margin: 1.67em 0 }
+h1, h2, h3, h4,
+h5, h6          { font-weight: bolder }
+
+#renderedMarkdown h1:nth-of-type(1) {
+  margin-top: 1em;
+  text-align: center;
+  display: block;
 }
 
-/*#renderedMarkdown p {
-  margin: 0 0 25px;
-}*/
-
-#renderedMarkdown p,
-#renderedMarkdown h1,
-#renderedMarkdown h2,
-#renderedMarkdown h3,
-#renderedMarkdown .codehilite,
-#renderedMarkdown ul {
-  width: 80%;
-  color: #484848;
+#renderedMarkdown h2 {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.3em;
 }
 
-#renderedMarkdown p > img {
-  margin-top: 25px;
-  margin-bottom: 25px;
-  margin-left: auto;
-  margin-right: auto;
+#renderedMarkdown div.metadata {
+    margin-bottom: 1em;
+}
+
+#renderedMarkdown .authors {
+    margin: auto;
+    display: block;
+    width: 80%;
+    text-align: center;
+    font-size: 1.5em;
+    padding-bottom: 0.8em;
+}
+
+#renderedMarkdown .date_created {
+    display: block;
+    margin: auto;
+    text-align: center;
+    font-size: 1.2em;
+}
+
+#renderedMarkdown .date_updated {
+    display: block;
+    margin: auto;
+    text-align: center;
+    font-size: 0.8em;
+    font-style: italic;
+}
+
+#renderedMarkdown .tldr {
+    width: 80%;
+    padding-top: 1em;
+    margin: auto;
+    display: block;
+    font-style: italic;
+    text-align: justify;
+}
+
+#renderedMarkdown .tags {
+    width: 80%;
+    display: block;
+    margin: auto;
+}
+
+#renderedMarkdown img {
+    display: block;
+    margin: auto;
+    max-width: 80%;
 }
 
 #renderedMarkdown table {
-  width: 80%;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin: 10px auto;
   display: block;
   overflow-x: auto;
   border-spacing: 10px;
+  border: transparent;
 }
 
-#renderedMarkdown th, #renderedMarkdown td {
+#renderedMarkdown table tr th {
+    background: #d8d8d8;
+}
+
+#renderedMarkdown table tr:nth-child(2n) th {
+    background: #e8e8e8;
+}
+
+#renderedMarkdown table tr:nth-child(2n+1) td {
+    background: #f8f8f8;
+}
+
+#renderedMarkdown table th, #renderedMarkdown table td {
   border: 1px solid grey;
   padding: 0.5em;
 }

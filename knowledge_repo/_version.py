@@ -22,6 +22,7 @@ __dependencies__ = [
     'enum34',  # Python 3.4+ enum object used for Post status
     'pyyaml',  # Yaml parser and utilities
     'markdown',  # Markdown conversion utilities
+    'pygments',  # Code highlighting support in markdown
     'gitpython',  # Git abstraction
     'tabulate',  # Rendering information prettily in knowledge_repo script
 
