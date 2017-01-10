@@ -12,7 +12,7 @@
 
     <div class="panel-webpost container">
       <div class="col-md-12"  id="#header-panel">
-        <h3> New Knowledge Post
+        <h3> {{ path if path else 'New Knowledge Post' }}
 
         <div class="btn-group pull-right" style='margin-right: 15px'>
           <button class="btn btn-large btn-default btn-webeditor" id="btn_save">
@@ -57,6 +57,16 @@
         <form>
           <div class="form-group webeditor-form">
             {% block metadata_fields %}
+
+            {% if not path %}
+            <label for="post_path"> Path </label>
+            <input id="post_path"
+            class="form-control typeahead"
+            type="text"
+            value=""></input>
+            <br>
+            {% endif %}
+
             <label for="post_title"> Title </label>
             <input id="post_title"
                    class="form-control"
@@ -76,14 +86,7 @@
 
             <br>
 
-            <label for="post_path"> Path </label>
-            <input id="post_path"
-                   class="form-control typeahead"
-                   type="text"
-                   value="{{ path if path else '' }}"></input>
-            <br>
-
-            <label for="post_image_feed"> Feed Image</label>
+            <label for="post_image_feed"> Feed Image (Optional)</label>
             <input id="post_image_feed"
                    class="form-control"
                    type="text"
@@ -428,9 +431,11 @@ $("#author_can_publish").on("click", function(){
 
 $("#btn_save").on("click", function(){
 
+  path = {% if path %} '{{ path }}' {% else %} $('#post_path').typeahead('val') {% endif %}
+
   data = {
     'title': $("#post_title").val(),
-    'path': $('#post_path').typeahead('val'),
+    'path': path,
     'feed_image': $("#post_image_feed").val(),
     'tags': $("#post_tags").select2().val(),
     'tldr': $("#post_tldr").val(),
@@ -546,8 +551,6 @@ function parseDate(ds, error_name){
 
   return true;
 }
-
-$("#post_path")[0].setSelectionRange(1000, 1000);
 
 </script>
 <script type="text/x-mathjax-config">
