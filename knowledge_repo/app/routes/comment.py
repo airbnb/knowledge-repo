@@ -40,9 +40,6 @@ def post_comment():
                              .filter(Comment.id == comment_id)
                              .first())
     else:
-        comment = None
-
-    if not comment:
         comment = Comment(post_id=post.id)
 
     comment.text = data['text']
@@ -50,10 +47,10 @@ def post_comment():
     db_session.add(comment)
     db_session.commit()
 
-    send_comment_email(post_id=post.id,
+    send_comment_email(path=path,
                        commenter=g.user.format_name,
                        comment_text=data['text'])
-    return ""
+    return "OK"
 
 
 @post_comment.object_extractor
