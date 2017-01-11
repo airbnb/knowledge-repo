@@ -65,7 +65,7 @@ class EmailTest(unittest.TestCase):
                 with self.app.test_request_context():
                     send_comment_email(commenter='test_commenter',
                                        comment_text=comment_text,
-                                       post_id=self.post_id)
+                                       path=self.post_path)
 
             assert len(outbox) == 1
             assert outbox[0].subject == "Someone commented on your post!"
