@@ -21,8 +21,7 @@ def usernames_to_emails(usernames):
 
 
 def subscription_email_recipients(post, tag):
-    """Check who should recieve a subscription email about this post
-    """
+    """Check who should recieve a subscription email about this post"""
     db_session.expire_on_commit = False
 
     subscriptions = (db_session.query(Subscription)
@@ -52,8 +51,7 @@ def send_subscription_emails(post):
         with that tag was published to the repo
     """
     if 'mail' not in current_app.config:
-        logger.warning(
-            'Mail subsystem is not configured. Silently dropping email.')
+        logger.warning('Mail subsystem is not configured. Silently dropping email.')
         return
 
     # if this post is tagged as private - send no emails
@@ -123,8 +121,7 @@ def send_subscription_email(post, tag):
 
 def send_comment_email(path, comment_text, commenter='Someone'):
     if 'mail' not in current_app.config:
-        logger.warning(
-            'Mail subsystem is not configured. Silently dropping email.')
+        logger.warning('Mail subsystem is not configured. Silently dropping email.')
         return
 
     kp = current_repo.post(path)
@@ -135,14 +132,13 @@ def send_comment_email(path, comment_text, commenter='Someone'):
                                commenter=commenter,
                                comment_text=comment_text,
                                post_title=headers['title'],
-                               post_url=url_for('render.render', markdown=path))
+                               post_url=url_for('render.render', markdown=path, _external=True))
     current_app.config['mail'].send(msg)
 
 
 def send_internal_error_email(subject_line, **kwargs):
     if 'mail' not in current_app.config:
-        logger.warning(
-            'Mail subsystem is not configured. Silently dropping email.')
+        logger.warning('Mail subsystem is not configured. Silently dropping email.')
         return
     recipients = usernames_to_emails(current_repo.config.editors)
     msg = Message(subject_line, recipients)
@@ -158,7 +154,7 @@ def send_reviewer_request_email(path, reviewer):
     subject = "Someone requested a web post review from you!"
     msg = Message(subject, [reviewer])
     msg.body = render_template("email_templates/reviewer_request_email.txt",
-                               post_url=url_for('web_editor.post_editor', path=path))
+                               post_url=url_for('web_editor.post_editor', path=path, _external=True))
     current_app.config['mail'].send(msg)
 
 
@@ -175,5 +171,5 @@ def send_review_email(path, comment_text, commenter='Someone'):
                                commenter=commenter,
                                comment_text=comment_text,
                                post_title=headers['title'],
-                               post_url=url_for('web_editor.post_editor', path=path))
+                               post_url=url_for('web_editor.post_editor', path=path, _external=True))
     current_app.config['mail'].send(msg)
