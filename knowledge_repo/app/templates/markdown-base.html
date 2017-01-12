@@ -15,6 +15,11 @@
             <button type="button" class="btn btn-default btn-raw">
               View Raw Markdown
             </button>
+            {% if is_author and show_webeditor_button %}
+            <button type="button" class="btn btn-default btn-webeditor">
+              View post in webeditor
+            </button>
+            {% endif %}
           </div>
         </div>
         <div class="col-md-2">
@@ -88,6 +93,10 @@ $("document").ready(function(){
 
   $(".btn-raw").on("click", function(){
     document.location.href = "/raw?markdown=" + encodeURI(post_path);
+  })
+
+  $(".btn-webeditor").on("click", function(){
+    document.location.href = "/posteditor?path=" + encodeURI(post_path);
   })
 });
 
