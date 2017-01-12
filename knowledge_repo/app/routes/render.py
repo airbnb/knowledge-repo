@@ -100,6 +100,11 @@ def render():
 
     is_author = user_id in [author.id for author in post.authors]
 
+    web_editor_prefixes = current_app.config['WEB_EDITOR_PREFIXES']
+    is_webpost = False
+    if web_editor_prefixes:
+        is_webpost = any(prefix for prefix in web_editor_prefixes if path.startswith(prefix))
+
     rendered = render_template(tmpl,
                                html=html,
                                post_id=post.id,
@@ -115,7 +120,8 @@ def render():
                                total_likes=post.vote_count,
                                tags_list=tags_list,
                                user_subscriptions=user_subscriptions,
-                               webeditor_buttons=False,
+                               show_webeditor_button=is_webpost and is_author,
+                               webeditor_buttons=is_webpost,
                                web_uri=post.kp.web_uri,
                                table_id=None,
                                is_private=(post.private == 1),
