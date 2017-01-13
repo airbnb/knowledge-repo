@@ -139,8 +139,8 @@ def save_post():
     kp = None
     if path in current_repo:
         kp = current_repo.post(path)
-        if g.user.username not in kp.headers['authors']:
-            return json.dumps({'msg': ("Post with path {} already exists and you are not an author!",
+        if g.user.username not in kp.headers['authors'] and g.user.username not in current_repo.config.editors:
+            return json.dumps({'msg': ("Post with path {} already exists and you are not an author!"
                                        "\nPlease try a different path").format(path),
                                'success': False})
 
