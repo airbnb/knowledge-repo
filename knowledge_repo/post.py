@@ -287,7 +287,7 @@ class KnowledgePost(object):
 
     @headers.setter
     def headers(self, headers):
-        self.write(self.read(), headers=headers)
+        self.write(self.read(headers=False), headers=headers)
 
     def update_headers(self, **headers):
         h = self.headers
