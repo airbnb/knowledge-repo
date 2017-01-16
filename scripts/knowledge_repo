@@ -275,7 +275,7 @@ if args.action in ['preview', 'runserver']:
     if args.action == 'preview':
         kp_path = repo._kp_path(args.path)
         repo.set_active_draft(kp_path)  # TODO: Deprecate
-        url = 'http://127.0.0.1:{}/render?markdown={}'.format(args.port, kp_path)
+        url = 'http://127.0.0.1:{}/post/{}'.format(args.port, kp_path)
         threading.Timer(1.25, lambda: webbrowser.open(url)).start()
 
     KnowledgeDeployer.using('flask')(

@@ -132,7 +132,7 @@ def send_comment_email(path, comment_text, commenter='Someone'):
                                commenter=commenter,
                                comment_text=comment_text,
                                post_title=headers['title'],
-                               post_url=url_for('render.render', markdown=path, _external=True))
+                               post_url=url_for('posts.render', path=path, _external=True))
     current_app.config['mail'].send(msg)
 
 

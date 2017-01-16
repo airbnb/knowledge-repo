@@ -21,11 +21,11 @@ class PostTest(unittest.TestCase):
                               .filter(Post.is_published)
                               .first())
             self.post_id = post.id
-            self.post_rendered_url = '/render?markdown={}'.format(post.path)
+            self.post_rendered_url = '/post/{}'.format(post.path)
 
     def test01_check_render_route(self):
         """
-        Check post path will render in /render?markdown=
+        Check post path will render in /post/<path>
         """
         rv = self.client.get(self.post_rendered_url)
         assert rv.status == "200 OK"

@@ -54,7 +54,7 @@
                 <ul>
                   {% for post in tags_to_posts[tag_id] %}
                   <li>
-                     <a href="{{'/render?markdown=' + post[0]|urlencode}}">
+                     <a href="{{'/post/' + post[0]|urlencode}}">
                       {{ post[1] }}
                     </a>
                   </li>
@@ -169,7 +169,7 @@
                       {% for post in tags_to_posts[tag_id] %}
                       <label>
                         <input type='checkbox' id='{{post[0]}}'>
-                          <a href="{{'/render?markdown=' + post[0]|urlencode}}">
+                          <a href="{{ url_for('posts.render', path=post[0]) }}">
                             {{ post[1] }}
                           </a>
                         </input>
