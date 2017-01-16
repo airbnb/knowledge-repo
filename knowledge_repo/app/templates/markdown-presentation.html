@@ -6,7 +6,7 @@
 
     {{ super() }}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/codehilite.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/codehilite-friendly.css') }}">
     <div id="renderedMarkdown">
       <textarea id="source">
         {{ html|safe }}
