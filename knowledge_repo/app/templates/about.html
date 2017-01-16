@@ -7,9 +7,10 @@
     {{ super() }}
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/codehilite-friendly.css') }}">
-    <div class='container'>
-      <div class="panel col-md-10">
-        <div id="renderedAbout">
+    <div class='container-fluid'>
+      <div class='row'>
+        <div class="col-md-12">
+          <div id="renderedMarkdown">
             <h1>The Knowledge Repository (BETA)</h1>
             <p>The Knowledge Repository project is focused on facilitating the sharing of knowledge between data scientists and other technical roles using data formats and tools that make sense in these professions. It provides various data stores (and utilities to manage them) for “knowledge posts”, with a particular focus on notebooks (R Markdown and Jupyter / iPython Notebook) to better promote reproducible research.</p>
             <h2><a id="Quickstart_6"></a>Quickstart</h2>
@@ -36,17 +37,17 @@
             </ul>
             <p>The Jupyter, Rmd, and Markdown files are required to have a specific set of yaml style headers which are used to organize and discover research:</p>
             <pre><code>---
-            title: I Found that Lemurs Do Funny Dances
-            authors:
-            - sally_smarts
-            - wesley_wisdom
-            tags:
-            - knowledge
-            - example
-            created_at: 2016-06-29
-            updated_at: 2016-06-30
-            tldr: This is short description of the content and findings of the post.
-            ---</code></pre>
+title: I Found that Lemurs Do Funny Dances
+authors:
+- sally_smarts
+- wesley_wisdom
+tags:
+- knowledge
+- example
+created_at: 2016-06-29
+updated_at: 2016-06-30
+tldr: This is short description of the content and findings of the post.
+---</code></pre>
             <p>Users add these notebooks/files to the knowledge repository through the <code>knowledge_repo</code> tool, as described below; which allows them to be rendered and curated in the knowledge repository’s web app.</p>
             <p>If your favourite format is missing, we welcome contributions; and are happy to work with you to get it supported. See the “Contributing” section below to see how to add support for more formats.</p>
             <p>Note that the web application can live on top of multiple Knowledge Repo backends. Supported types so far are:</p>
@@ -273,10 +274,10 @@
                 + orig_src/* [Optional; stores the original converted file]</code></pre>
             <p>Images are automatically extracted from the local paths on your computer, and placed into images. <code>orig_src</code> contains the file(s) from which the knowledge post was converted from.</p>
 
+          </div>
+
         </div>
-
       </div>
-
     </div>
 
     <hr/>
