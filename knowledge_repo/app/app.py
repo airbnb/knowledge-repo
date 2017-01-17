@@ -78,7 +78,7 @@ class KnowledgeFlask(Flask):
             self.config[k] = self.config.get(k, v)
 
         # Register routes to be served
-        self.register_blueprint(routes.render.blueprint)
+        self.register_blueprint(routes.posts.blueprint)
         self.register_blueprint(routes.health.blueprint)
         self.register_blueprint(routes.index.blueprint)
         self.register_blueprint(routes.tags.blueprint)

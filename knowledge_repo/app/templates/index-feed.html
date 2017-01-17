@@ -10,7 +10,7 @@
     <div class='row row-space-4 panel feed-post'>
       <div class='panel-header panel-light'>
         <div class = "col-md-10">
-          <a href="{{'/render?markdown=' + post.path|urlencode }}">
+          <a href="{{'/post/' + post.path|urlencode }}">
             {{ post.title |title }}
           </a>
         </div>
@@ -62,7 +62,7 @@
             <i>{{ post['tldr']|safe }}</i>
             <br>
             <br>
-            <a href="{{'/render?markdown=' + post.path|urlencode }}">Read post</a>
+            <a href="{{'/post/' + post.path|urlencode }}">Read post</a>
           </p>
         </div>
         <div class="col-md-6">

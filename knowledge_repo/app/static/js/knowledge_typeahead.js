@@ -47,7 +47,7 @@ knowledgeTypeahead = (function(){
   );
 
     $('#searchbar').bind('typeahead:select', function(obj, datum, name) {
-      window.location = '/render?markdown=' + encodeURIComponent(datum.path);
+      window.location = '/post/' + encodeURIComponent(datum.path);
     });
 
     $('#searchbar').keypress(function(event){

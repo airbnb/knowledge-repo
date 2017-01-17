@@ -1,5 +1,5 @@
 A knowledge post was just posted under tag {{ full_tag }}
 
-Link to post: {{ knowledge_app_base_url }}/render?markdown={{ page_id }}
+Link to post: {{ url_for('posts.render', path=page_id, _external=True) }}
 
 {{ post_text }}

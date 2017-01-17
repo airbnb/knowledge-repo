@@ -50,7 +50,7 @@
     {% set stats = post_stats[post.path] %}
     <tr class="table-post">
       <td id="path-{{ idx_item }}">
-        <a href="{{'/render?markdown=' + post.path|urlencode }}">
+        <a href="{{'/post/' + post.path|urlencode }}">
           {{ post.title|replace('_', ' ')|title }}
         </a>
 
@@ -74,7 +74,7 @@
             {%- set tldr = "(No TL;DR)" %}
           {%- endif %}
           <i>{{ tldr | truncate(100, True) }} </i>
-          <a href="{{'/render?markdown=' + post.path|urlencode }}">
+          <a href="{{'/post/' + post.path|urlencode }}">
             post.
           </a>
       </td>

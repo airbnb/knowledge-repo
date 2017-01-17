@@ -1,8 +1,5 @@
-import json
 import logging
-
 from flask import request, url_for, redirect, render_template, current_app, Blueprint, g
-from sqlalchemy import case, desc
 
 from ..proxies import db_session, current_repo
 from ..models import User, Post, PageView
@@ -13,38 +10,23 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-blueprint = Blueprint('render', __name__,
+blueprint = Blueprint('posts', __name__,
                       template_folder='../templates', static_folder='../static')
 
 
-@blueprint.route('/raw', methods=['GET'])
+@blueprint.route('/post/<path:path>', methods=['GET'])
 @PageView.logged
-def raw():
-    """ Show the raw markdown of a post """
-    return redirect(url_for('render.render', raw='true', **request.args))
-
-
-@blueprint.route('/presentation', methods=['GET'])
-@PageView.logged
-def presentation():
-    """ Render the knowledge post as a presentation """
-    return redirect(url_for('render.render', presentation='true', **request.args))
-
-
-@blueprint.route('/render', methods=['GET'])
-@PageView.logged
-def render():
+def render(path):
     """ Render the knowledge post with all the related formatting """
 
-    path = request.args.get('markdown', '')
-    raw = request.args.get('raw', False)
+    mode = request.args.get('render', 'html')
 
     username, user_id = g.user.username, g.user.id
 
     tmpl = 'markdown-rendered.html'
-    if raw:
+    if mode == 'raw':
         tmpl = 'markdown-raw.html'
-    elif request.args.get('presentation'):
+    elif mode == 'presentation':
         # TODO(dan?) fix presentation post
         # presentation_post = {}
         # presentation_post['authors_string'] = post.author_string
@@ -83,12 +65,12 @@ def render():
             return render_template("permission_ask.html", authors=post.authors_string)
 
     html = render_post(post)
-    raw_post = render_post_raw(post) if raw else None
+    raw_post = render_post_raw(post) if mode == 'raw' else None
 
     comments = post.comments
     for comment in comments:
         comment.author = db_session.query(User).filter(User.id == comment.user_id).first().username
-        if not raw:
+        if mode != 'raw':
             comment.text = render_comment(comment)
 
     user_obj = (db_session.query(User)
@@ -165,13 +147,20 @@ def _render_preview(path, tmpl):
 
 
 @render.object_extractor
-def render():
-    post_path = request.args.get('markdown', '')
+def render(path):
     return {
-        'id': Post.query.filter(Post.path == post_path).first().id,
+        'id': Post.query.filter(Post.path == path).first().id,
         'type': 'post',
         'action': 'view'
     }
+
+
+# DEPRECATED: Legacy route for the /render endpoint to allow old bookmarks to function
+@blueprint.route('/render', methods=['GET'])
+@PageView.logged
+def render_legacy():
+    path = request.args.get('markdown', '')
+    return redirect(url_for('.render', path=path), code=302)
 
 
 @blueprint.route('/about', methods=['GET'])
@@ -179,31 +168,3 @@ def render():
 def about():
     """Renders about page. This is the html version of REAMDE.md"""
     return render_template("about.html")
-
-
-@blueprint.route('/ajax_post_typeahead', methods=['GET', 'POST'])
-def ajax_post_typeahead():
-    # this a string of the search term
-    search_terms = request.args.get('search', '')
-    search_terms = search_terms.split(" ")
-    case_statements = []
-    for term in search_terms:
-        case_stmt = case([(Post.keywords.ilike('%' + term.strip() + '%'), 1)], else_=0)
-        case_statements += [case_stmt]
-
-    match_score = sum(case_statements).label("match_score")
-
-    posts = (db_session.query(Post, match_score)
-                       .order_by(desc(match_score))
-                       .limit(5)
-                       .all())
-
-    matches = []
-    for (post, count) in posts:
-        authors_str = [author.format_name for author in post.authors]
-        typeahead_entry = {'author': authors_str,
-                           'title': str(post.title),
-                           'path': str(post.path),
-                           'keywords': str(post.keywords)}
-        matches += [typeahead_entry]
-    return json.dumps(matches)
