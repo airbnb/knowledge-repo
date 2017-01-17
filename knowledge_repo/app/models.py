@@ -242,6 +242,8 @@ class User(db.Model):
                  .filter(Vote.user_id == self.id)
                  .all())
         post_ids = [vote.object_id for vote in votes]
+        if len(post_ids) == 0:
+            return []
         excluded_tags = current_app.config.get('EXCLUDED_TAGS', [])
         posts = (db.session.query(Post)
                  .filter(Post.id.in_(post_ids))

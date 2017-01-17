@@ -45,4 +45,4 @@ echo
 echo "Running regression test suite"
 echo "-----------------------------"
 echo
-nosetests --with-coverage --cover-package=knowledge_repo --verbosity=3 -a '!notest'
+nosetests --with-coverage --cover-package=knowledge_repo --verbosity=1 -a '!notest'
