@@ -30,7 +30,6 @@ class TableTest(unittest.TestCase):
                 if column == 'path':
                     path_link = elem[0].findAll("a")[0]
                     path_href = path_link['href']
-                    print(path_href)
                     assert self.app.get(
                         path_href, headers=self.headers).status == "200 OK"
 
