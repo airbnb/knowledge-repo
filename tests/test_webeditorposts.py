@@ -82,7 +82,7 @@ class WebEditorPostTest(unittest.TestCase):
         filled out with the correct values
         """
 
-        rv = self.client.get('/posteditor?path={}'.format(self.post_path))
+        rv = self.client.get('/edit/{}'.format(self.post_path))
         assert rv.status == "200 OK"
         data = rv.data.decode('utf-8')
         soup = BeautifulSoup(data, 'html.parser')
@@ -137,7 +137,7 @@ class WebEditorPostTest(unittest.TestCase):
                 'path': self.post_path
             }
 
-            rv = self.client.post("/save_post",
+            rv = self.client.post("/ajax/editor/save",
                                   data=json.dumps(data),
                                   content_type='application/json',
                                   headers={'user_header': 'webeditor_test_user'})
@@ -153,13 +153,13 @@ class WebEditorPostTest(unittest.TestCase):
         And that going back to the form editor changes the button text
         And a review comment area is added
         """
-        rv = self.client.post('/submit?path={}'.format(self.post_path),
+        rv = self.client.post('/ajax/editor/submit?path={}'.format(self.post_path),
                               data=json.dumps({'post_reviewers': 'test_post_reviewers'}),
                               content_type='application/json')
 
         assert rv.status == "200 OK"
 
-        rv = self.client.get('/posteditor?path={}'.format(self.post_path))
+        rv = self.client.get('/edit/{}'.format(self.post_path))
 
         assert rv.status == "200 OK"
 
@@ -178,7 +178,7 @@ class WebEditorPostTest(unittest.TestCase):
         Clicking the author_can_publish checkbox
         should change the relevant field in the db
         """
-        rv = self.client.post("/accept_post?path={}".format(self.post_path))
+        rv = self.client.post("/ajax/editor/accept?path={}".format(self.post_path))
         assert rv.status == "200 OK"
 
         with self.app.app_context():
@@ -199,14 +199,14 @@ class WebEditorPostTest(unittest.TestCase):
         and the button text
         """
         # test that clicking the publish button changes the status
-        rv = self.client.post('/publish_post?path={}'.format(self.post_path))
+        rv = self.client.post('/ajax/editor/publish?path={}'.format(self.post_path))
         assert rv.status == "200 OK"
 
         with self.app.app_context():
             kp = self.repo.post(self.post_path)
             assert kp.is_published is True
 
-            rv = self.client.get('/posteditor?path={}'.format(self.post_path))
+            rv = self.client.get('/edit/{}'.format(self.post_path))
             assert rv.status == "200 OK"
 
             data = rv.data.decode("utf-8")
@@ -216,14 +216,14 @@ class WebEditorPostTest(unittest.TestCase):
             btn_publish = soup.findAll("button", {"id": "btn_publish"})
             assert btn_publish and btn_publish[0].text.strip() == "Unpublish"
 
-            rv = self.client.post('/unpublish_post?path={}'.format(self.post_path))
+            rv = self.client.post('/ajax/editor/unpublish?path={}'.format(self.post_path))
             assert rv.status == "200 OK"
 
             # TODO(Dan) after manually kick of re-index
             # post = db_session.query(Post).get(self.post_id)
             # assert post.status == self.repo.PostStatus.UNPUBLISHED
 
-            rv = self.client.get('/posteditor?path={}'.format(self.post_path))
+            rv = self.client.get('/edit/{}'.format(self.post_path))
             assert rv.status == "200 OK"
 
             data = rv.data.decode("utf-8")
@@ -236,7 +236,7 @@ class WebEditorPostTest(unittest.TestCase):
     @unittest.skip("post deletion not implemented")
     def test07_test_delete_button(self):
         """Test post deletion."""
-        rv = self.client.get('/delete_post?path={}'.format(self.post_id))
+        rv = self.client.get('/ajax/editor/delete?path={}'.format(self.post_id))
         assert rv.status == "200 OK"
 
         with self.app.app_context():

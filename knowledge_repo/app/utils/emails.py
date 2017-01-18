@@ -154,7 +154,7 @@ def send_reviewer_request_email(path, reviewer):
     subject = "Someone requested a web post review from you!"
     msg = Message(subject, [reviewer])
     msg.body = render_template("email_templates/reviewer_request_email.txt",
-                               post_url=url_for('web_editor.post_editor', path=path, _external=True))
+                               post_url=url_for('editor.editor', path=path, _external=True))
     current_app.config['mail'].send(msg)
 
 
@@ -171,5 +171,5 @@ def send_review_email(path, comment_text, commenter='Someone'):
                                commenter=commenter,
                                comment_text=comment_text,
                                post_title=headers['title'],
-                               post_url=url_for('web_editor.post_editor', path=path, _external=True))
+                               post_url=url_for('editor.editor', path=path, _external=True))
     current_app.config['mail'].send(msg)
