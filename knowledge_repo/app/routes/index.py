@@ -12,7 +12,7 @@ import json
 from flask import request, render_template, redirect, Blueprint, current_app, make_response
 from sqlalchemy import case, desc
 
-from ..app import db_session
+from ..proxies import db_session, current_repo
 from ..utils.posts import get_posts
 from ..models import Post, Tag, User, PageView
 from ..utils.requests import from_request_get_feed_params
@@ -229,3 +229,23 @@ def ajax_post_typeahead():
                            'keywords': str(post.keywords)}
         matches += [typeahead_entry]
     return json.dumps(matches)
+
+
+@blueprint.route('/ajax/index/typeahead_tags')
+@blueprint.route('/ajax_tags_typeahead', methods=['GET'])
+def generate_tags_typeahead():
+    return json.dumps([t[0] for t in db_session.query(Tag.name).all()])
+
+
+@blueprint.route('/ajax/index/typeahead_users')
+@blueprint.route('/ajax_users_typeahead', methods=['GET'])
+def generate_users_typeahead():
+    return json.dumps([u[0] for u in db_session.query(User.username).all()])
+
+
+@blueprint.route('/ajax/index/typeahead_paths')
+@blueprint.route('/ajax_paths_typeahead', methods=['GET'])
+def generate_projects_typeahead():
+    # return path stubs for all repositories
+    stubs = ['/'.join(p.split('/')[:-1]) for p in current_repo.dir()]
+    return json.dumps(list(set(stubs)))

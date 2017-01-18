@@ -85,7 +85,7 @@ class KnowledgeFlask(Flask):
         self.register_blueprint(routes.vote.blueprint)
         self.register_blueprint(routes.comment.blueprint)
         self.register_blueprint(routes.stats.blueprint)
-        self.register_blueprint(routes.web_editor.blueprint)
+        self.register_blueprint(routes.editor.blueprint)
         self.register_blueprint(routes.groups.blueprint)
 
         if self.config['DEBUG']:

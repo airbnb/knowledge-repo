@@ -5,6 +5,6 @@ from . import posts
 from . import stats
 from . import tags
 from . import vote
-from . import web_editor
+from . import editor
 from . import groups
 from . import debug

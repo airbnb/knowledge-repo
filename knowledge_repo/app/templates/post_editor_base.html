@@ -362,17 +362,17 @@ $("#submission_close").on("click", function(){
     dataType: "json",
     data: JSON.stringify(data),
     contentType: 'application/json',
-    url: '/submit?path={{ path }}',
+    url: '/ajax/editor/submit?path={{ path }}',
     async: true,
     success:function(response_data){
       alert("The status has been changed!")
-      window.location = '/posteditor?path={{ path }}'
+      window.location = '{{ url_for('editor.editor', path=path) }}'
     },
     error: function(response_data){
       console.log("ERROR")
       console.log(JSON.stringify(response_data))
       if (response_data['status'] == 200){
-        window.location = '/posteditor?path={{ path }}'
+        window.location = '{{ url_for('editor.editor', path=path) }}'
       } else {
         alert("Your post wasn't submitted for review, please try again!")
       }
@@ -386,10 +386,10 @@ if ( status == 2 || status == 3 ) {
     var publish_button_text = this.textContent.trim();
     var url = '';
     if (publish_button_text == "Unpublish"){
-      url = '/unpublish_post?path={{ path }}';
+      url = '/ajax/editor/unpublish?path={{ path }}';
       alert_text = 'Your post has been unpublished!';
     } else {
-      url = '/publish_post?path={{ path }}';
+      url = '/ajax/editor/publish?path={{ path }}';
       alert_text = "Your post has been published!";
     }
 
@@ -415,11 +415,11 @@ $("#author_can_publish").on("click", function(){
   $.ajax({
     type: "POST",
     contentType: "application/json",
-    url: "/accept_post?path={{ path }}",
+    url: "/ajax/editor/accept?path={{ path }}",
     async: true,
     success: function(response_data){
       alert("The publishing status was changed!");
-      window.location = '/posteditor?path={{ path }}';
+      window.location = '{{ url_for('editor.editor', path=path) }}';
     },
     error: function(response_data){
       alert("The publishing status was NOT changed");
@@ -471,7 +471,7 @@ $("#btn_save").on("click", function(){
       dataType: "json",
       data: JSON.stringify(data),
       contentType: "application/json",
-      url: '/save_post',
+      url: '/ajax/editor/save',
       async: true,
       success: function(response_data) {
         if (response_data['success'] == 0) {
@@ -480,7 +480,7 @@ $("#btn_save").on("click", function(){
         else {
           $("#btn_save")[0].setAttribute("class", "btn btn-large");
           alert("The post was successfully saved!")
-          window.location = '/posteditor?path=' + response_data['path']
+          window.location = '/edit/' + response_data['path']
         }
       },
       error: function(response_data) {
@@ -495,8 +495,8 @@ $("#btn_save").on("click", function(){
 
 function deleteReview(commentId) {
   $.ajax({
-      type: "GET",
-      url: '/delete_review?path={{ path|urlencode }}&comment_id=' + commentId,
+      type: "DELETE",
+      url: '/ajax/editor/review?path={{ path|urlencode }}&comment_id=' + commentId,
       async: false
   });
   location.reload();
@@ -515,7 +515,7 @@ function postReview() {
       dataType: "json",
       data: JSON.stringify(postContent),
       contentType: "application/json",
-      url: '/review?path={{ path|urlencode }}',
+      url: '/ajax/editor/review?path={{ path|urlencode }}',
       async: false
   });
   location.reload();
