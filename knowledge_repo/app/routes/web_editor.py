@@ -79,14 +79,16 @@ def post_editor():
     # set defaults
     data = {'title': None,
             'status': current_repo.PostStatus.DRAFT.value,
-            'markdown': None,
+            'markdown': request.args.get('markdown'),
             'thumbnail': '',
             'can_approve': 0,
             'username': g.user.username,
             'created_at': datetime.now(),
             'updated_at': datetime.now(),
             'authors': [g.user.username],
-            'comments': []}
+            'comments': [],
+            'tldr': request.args.get('tldr'),
+            }
 
     if path is not None and path in current_repo:
         kp = current_repo.post(path)
