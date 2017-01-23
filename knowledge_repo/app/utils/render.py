@@ -19,7 +19,8 @@ MARKDOWN_EXTENSTIONS = ['markdown.extensions.extra',
                         'markdown.extensions.sane_lists',
                         'markdown.extensions.smarty',
                         'markdown.extensions.toc(baselevel=1)',
-                        'markdown.extensions.wikilinks']
+                        'markdown.extensions.wikilinks',
+                        'markdown.extensions.nl2br']
 
 
 def render_post_tldr(post):
@@ -31,7 +32,7 @@ def render_post_tldr(post):
 
 def render_post_header(post):
 
-    header_template = """
+    header_template = u"""
     <div class='metadata'>
     <h1>{title}</h1>
     <span class='authors'>{authors}</span>
