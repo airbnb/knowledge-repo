@@ -1,4 +1,5 @@
 import datetime
+from past.builtins import basestring
 
 from ..postprocessor import KnowledgePostProcessor
 
@@ -6,7 +7,7 @@ REQUIRED_FIELD_TYPES = {
     'title': str,
     'authors': list,
     'created_at': datetime.datetime,
-    'tldr': str,
+    'tldr': basestring,
     'tags': list
 }
 
