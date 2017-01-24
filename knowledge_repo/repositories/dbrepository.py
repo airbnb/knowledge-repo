@@ -2,6 +2,7 @@ from builtins import object
 
 import logging
 import posixpath
+import datetime
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session, mapper
@@ -136,6 +137,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
                                 .filter(self.PostRef.revision == revision)).all()
         for postref in postrefs:
             postref.status = status.value
+            postref.created_at = datetime.datetime.now()  # TODO eventually migrate to having an updated_at column
         self.session.commit()
 
     def __get_post_status(self, path, revision=None):
