@@ -46,15 +46,18 @@ def get_indexed_revisions():
     return indexed
 
 
-def update_index_required():
+def update_index_required(check_timeouts=True):
     if not current_app.config.get('REPOSITORY_INDEXING_ENABLED', True):
+        return False
+
+    if is_indexing():
         return False
 
     interval = current_app.config.get("INDEXING_INTERVAL", 5 * 60)  # Default to 6 minutes between indexing tasks
     seconds = time_since_index()
     seconds_check = time_since_index_check()
 
-    if is_indexing() or (seconds is not None and seconds_check is not None) and (seconds < interval or seconds_check < interval):
+    if check_timeouts and (seconds is not None and seconds_check is not None) and (seconds < interval or seconds_check < interval):
         return False
     try:
         for uri, revision in current_repo.revisions.items():
@@ -67,12 +70,12 @@ def update_index_required():
         db_session.commit()
 
 
-def update_index():
+def update_index(check_timeouts=True):
     """
     Initialize the db from a KnowledgeRepository object
     """
 
-    if not update_index_required():
+    if not update_index_required(check_timeouts=check_timeouts):
         return
 
     app = current_app._get_current_object()
