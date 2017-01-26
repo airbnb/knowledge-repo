@@ -190,7 +190,7 @@ def publish_post():
         return json.dumps({'msg': "Unable to retrieve post with path = {}!".format(path), 'success': False})
     current_repo.publish(path)
 
-    update_index()
+    update_index(check_timeouts=False)
     return 'OK'
 
 
@@ -203,7 +203,7 @@ def unpublish_post():
         return json.dumps({'msg': "Unable to retrieve post with path = {}!".format(path), 'success': False})
     current_repo.unpublish(path)
 
-    update_index()
+    update_index(check_timeouts=False)
     return 'OK'
 
 
@@ -231,7 +231,7 @@ def delete_post():
         return json.dumps({'msg': "You can only delete a post where you are an author!", 'success': False})
     current_repo.remove(path)
 
-    update_index()
+    update_index(check_timeouts=False)
     return 'OK'
 
 
