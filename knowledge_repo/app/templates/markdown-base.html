@@ -5,7 +5,9 @@
 {% block content %}
 
     <br>
-    <div class="container-fluid">
+    <div class="container-post container-fluid"
+         data-post-id="{{ post_id }}"
+         data-post-path="{{ post_path }}">
       <div class="row">
         <div class="col-md-6">
           <div class="btn-group" role="group">
@@ -33,7 +35,7 @@
           {% endif %}
           {% if likes %}
             <i class="glyphicon glyphicon-heart glyphicon-clickable pop" style="font-size:16pt" id="tooltip-unlike" data-placement="bottom"
-             data-trigger="#tooltip-like"
+             data-trigger="#tooltip-unlike"
              data-container="body"
              data-toggle="popover"
              data-content='<div>Unlike This Post</div>'></i>
@@ -50,18 +52,6 @@
         </div>
       </div>
       <div class="row col-md-12">
-        {% if not webeditor_buttons and data_repo_git_root %}
-          <a href='{{ data_repo_git_root}}/blob/master/{{post_path|urlencode}}'
-             target="_blank"
-             style='padding-right:10px;'>
-            View on Github
-            <i class='glyphicon glyphicon-new-window'></i>
-          </a>
-          <a href='{{ data_repo_git_root}}/edit/master/{{post_path|urlencode}}' target="_blank">
-            Edit on Github
-            <i class='glyphicon glyphicon-new-window'></i>
-          </a>
-        {% endif %}
         {% if is_author and is_private %}
         <a href='post_groups?post_id={{post_id}}'>
           Add permissions for users
@@ -77,15 +67,9 @@
 <script src="{{ url_for('static', filename='js/tooltips.js') }}" type="text/javascript"></script>
 <script type="text/javascript">
 $("document").ready(function(){
-  var is_webeditor = false;
-  {% if webeditor_buttons %}
-  var is_webeditor = true;
-  {% endif %}
-  var post_id = "{{ post_id|urlencode }}";
-  var id = "{{ table_id }}";
-  var post_path = "{{ post_path }}"
-  var data_repo_github_root = "{{ data_repo_git_root }}"
-  tooltipsJx.initializeTooltips(is_webeditor, post_id, id, data_repo_github_root);
+  var post_id = $(".container-post").data("post-id");
+  var post_path = $(".container-post").data("post-path")
+  tooltipsJx.initializeTooltips(post_id);
 
   $(".btn-rendered").on("click", function(){
     document.location.href = "/post/" + encodeURI(post_path);

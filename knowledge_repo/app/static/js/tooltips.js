@@ -1,44 +1,12 @@
 var tooltipsJx = (function(){
 
-function initializeTooltips(is_webeditor, post_id, id, data_repo_github_root){
-    var view_tooltip = $("#tooltip-view");
+function initializeTooltips(post_id){
     var post_id = encodeURI(post_id);
+    var raw_tooltip = $("#tooltip-raw");
 
-    if (view_tooltip[0] !== null){
-       view_tooltip.click(function() {
-            document.location.href = "/post/" + post_id;
-        });
-    };
-
-   var raw_tooltip = $("#tooltip-raw");
-
-   if (raw_tooltip[0] !== null){
+    if (raw_tooltip[0] !== null){
         raw_tooltip.click(function() {
             document.location.href = "/post/" + post_id + "?render=raw";
-        });
-    };
-
-    var edit_tooltip = $("#tooltip-edit");
-
-    if (edit_tooltip[0] !== null){
-        edit_tooltip.click(function(){
-          document.location.href =  "/edit/" + id;
-        });
-    }
-
-    var presentation_tooltip = $("#tooltip-presentation");
-
-    if (presentation_tooltip[0] !== null){
-        presentation_tooltip.click(function() {
-            document.location.href = "/presentation?markdown=" + post_id;
-        });
-    }
-
-    var github_tooltip = $("#tooltip-ghe");
-
-    if (github_tooltip[0] !== null){
-        github_tooltip.click(function() {
-            document.location.href = github_tooltip.attr('data-weburi');
         });
     };
 
