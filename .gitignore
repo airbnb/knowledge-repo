@@ -104,3 +104,5 @@ web/data/repo.json
 *.pyc
 /build
 /dist
+
+.DS_Store
