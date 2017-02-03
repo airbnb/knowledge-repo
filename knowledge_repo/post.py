@@ -303,7 +303,7 @@ class KnowledgePost(object):
     def thumbnail_uri(self):
         thumbnail = self.headers.get('thumbnail')
 
-        if not thumbnail:
+        if not thumbnail or not isinstance(thumbnail, str):
             return None
 
         if ':' not in thumbnail:  # if thumbnail points to a local reference
