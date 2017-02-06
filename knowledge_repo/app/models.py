@@ -107,6 +107,10 @@ class Comment(db.Model):
     created_at = db.Column(db.DateTime, default=func.now())
     updated_at = db.Column(db.DateTime, default=func.now(), onupdate=func.now())
 
+    @property
+    def format_created_at(self):
+        return datetime.datetime.strftime(self.created_at, "%Y-%m-%d")
+
 
 class PageView(db.Model):
     __tablename__ = 'pageviews'
