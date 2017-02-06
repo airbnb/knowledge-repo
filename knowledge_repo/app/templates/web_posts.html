@@ -26,7 +26,7 @@
             <tr>
               <td>{{ post.title }} </td>
               <td>{{ post.authors_string }} </td>
-              <td>{{ post.created_at.strftime('%Y-%m-%d')  }} </td>
+              <td>{{ post.created_at|format_date  }} </td>
               <td>
                 <i class="glyphicon glyphicon-edit" id="tooltip-edit-{{ post.id }}" data-toggle="tooltip" data-placement="top" title="Edit"></i>
                 <i class="glyphicon glyphicon-remove" id="tooltip-delete-{{ post.id }}" data-toggle="tooltip" data-placement="top" title="Delete"></i>

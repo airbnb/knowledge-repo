@@ -101,8 +101,8 @@ def editor(path=None):
     if g.user.username not in data['authors'] or g.user.username in current_repo.config.editors:
         data['can_approve'] = 1
 
-    data['created_at'] = data['created_at'].strftime('%Y-%m-%d')
-    data['updated_at'] = data['updated_at'].strftime('%Y-%m-%d')
+    data['created_at'] = data['created_at']
+    data['updated_at'] = data['updated_at']
     data['authors'] = json.dumps(data.get('authors'))
     data['tags'] = json.dumps(data.get('tags', []))
 
