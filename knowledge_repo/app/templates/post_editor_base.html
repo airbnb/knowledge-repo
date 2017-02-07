@@ -112,14 +112,14 @@
             <input id="post_created_at"
                    class="form-control"
                    type="text"
-                   value="{{ created_at if created_at else '' }}"></input>
+                   value="{{ created_at|format_date if created_at else '' }}"></input>
             <br>
 
             <label for="post_updated_at"> Updated At: </label>
             <input id="post_updated_at"
                    class="form-control"
                    type="text"
-                   value="{{ updated_at if updated_at else ''}}"></input>
+                   value="{{ updated_at|format_date if updated_at else ''}}"></input>
             <br>
             {% endblock %}
           </div>

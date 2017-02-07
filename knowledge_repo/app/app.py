@@ -9,6 +9,7 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 from alembic import command
 from alembic.migration import MigrationContext
+from datetime import datetime
 
 import knowledge_repo
 from .proxies import db_session, current_repo
@@ -152,6 +153,20 @@ class KnowledgeFlask(Flask):
                         version_revision=version_revision,
                         last_index=time_since_index(human_readable=True),
                         last_index_check=time_since_index_check(human_readable=True))
+
+        @self.template_filter('format_date')
+        def format_date(date):
+            """
+            This will be a Jinja filter that string formats a datetime object.
+            If we can't correctly format, we just return the object.
+            :type date: Datetime
+            :return: A string of the format of YYYY-MM-DD
+            :rtype: String
+            """
+            try:
+                return datetime.strftime(date, '%Y-%m-%d')
+            except:
+                return date
 
     @property
     def repository(self):
