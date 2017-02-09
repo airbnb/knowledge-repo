@@ -113,6 +113,8 @@ def render(path):
 
 def _render_preview(path, tmpl):
     post = None
+    mode = request.args.get('render', 'html')
+
     if current_repo.has_post(path):
         post = current_repo.post(path)
     else:
@@ -125,7 +127,7 @@ def _render_preview(path, tmpl):
         raise Exception("unable to find post at {}".format(path))
 
     html = render_post(post)
-    raw_post = render_post_raw(post) if raw else None
+    raw_post = render_post_raw(post) if (mode == 'raw') else None
 
     return render_template(tmpl,
                            html=html,
