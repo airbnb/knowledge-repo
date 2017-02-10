@@ -1,5 +1,10 @@
 /* This file defines the css styles for the index route */
 
+#feed-posts {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
 .feed-post {
     padding: 10px;
     border-radius: 10px;
@@ -31,6 +36,7 @@
     border-radius: 5px;
     box-shadow: 0px 1px 3px rgba(0,0,0,0.2);
     margin: 0px;
+    transition: border 0.4s, box-shadow 0.4s;
 }
 .feed-post .feed-thumbnail img {
     position: absolute;
