@@ -22,10 +22,9 @@
       {% set page_nums = pagination_pages(current_page=page, page_count=page_count, max_pages=max_pages, extremes=extremes) %}
 
       <div class='pagination-bar' role="group">
-        <a href="{{ "javascript:;" if (page == 1) else modify_query(start=(page-2)*results) }}" class="pagination-stepper {{ "disabled" if page == 1 }}">
+        <a href="{{ "#" if (page == 1) else modify_query(start=(page-2)*results) }}" class="pagination-stepper{% if page == 1 %} disabled{% endif %}"{% if page == 1 %} onclick="return false;"{% endif %}>
           <i class="glyphicon glyphicon-chevron-left"></i>
         </a>
-
         <ul class="pagination">
           {% for page_num in page_nums %}
             {% if loop.index0 > 0 and page_num - page_nums[loop.index0 - 1] > 1 %}
@@ -34,10 +33,8 @@
             <li {% if page == page_num %}class="active"{% endif %}><a href= "{{ modify_query(start=(page_num-1)*results) }}"> {{ page_num }} </a></li>
           {% endfor %}
         </ul>
-
-        {% set href = "#" if (page == 1) else modify_query(start=(page)*results) %}
-        <a href="{{ "javascript:;" if (page == page_count) else modify_query(start=(page)*results) }}" class="pagination-stepper {{ "disabled" if page == page_count }}">
-        <i class="glyphicon glyphicon-chevron-right"></i>
+        <a href="{{ "#" if (page == page_count) else modify_query(start=page*results) }}" class="pagination-stepper{% if page == page_count %} disabled{% endif %}"{% if page == page_count %} onclick="return false;"{% endif %}>
+          <i class="glyphicon glyphicon-chevron-right"></i>
         </a>
       </div>
 
