@@ -3,6 +3,7 @@ import os
 import imp
 import logging
 import traceback
+import math
 
 from flask import Flask, current_app, render_template, g, request
 from flask_mail import Mail
@@ -10,6 +11,7 @@ from flask_migrate import Migrate
 from alembic import command
 from alembic.migration import MigrationContext
 from datetime import datetime
+from werkzeug import url_encode
 
 import knowledge_repo
 from .proxies import db_session, current_repo
@@ -153,6 +155,37 @@ class KnowledgeFlask(Flask):
                         version_revision=version_revision,
                         last_index=time_since_index(human_readable=True),
                         last_index_check=time_since_index_check(human_readable=True))
+
+        @self.template_global()
+        def modify_query(**new_values):
+            args = request.args.copy()
+
+            for key, value in new_values.items():
+                args[key] = value
+
+            return '{}?{}'.format(request.path, url_encode(args))
+
+        @self.template_global()
+        def pagination_pages(current_page, page_count, max_pages=5, extremes=True):
+            page_min = int(max(1, current_page - math.floor(1.0 * max_pages // 2)))
+            page_max = int(min(page_count, current_page + math.floor(1.0 * max_pages / 2)))
+
+            to_acquire = max_pages - (page_max - page_min + 1)
+
+            while to_acquire > 0 and page_min > 1:
+                page_min -= 1
+                to_acquire -= 1
+            while to_acquire > 0 and page_max < page_count:
+                page_max += 1
+                to_acquire -= 1
+
+            pages = list(range(page_min, page_max + 1))
+            if extremes:
+                if 1 not in pages:
+                    pages[0] = 1
+                if page_count not in pages:
+                    pages[-1] = page_count
+            return pages
 
         @self.template_filter('format_date')
         def format_date(date):

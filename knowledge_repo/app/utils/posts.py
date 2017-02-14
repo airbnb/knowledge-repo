@@ -4,6 +4,7 @@ Functions include:
     - get_posts
     - get_all_post_stats
 """
+import math
 from flask import current_app
 from sqlalchemy import func, distinct, or_
 
@@ -103,6 +104,8 @@ def get_posts(feed_params):
         posts = [post[0] for post in posts]
 
     # get the right indexes
+    feed_params['posts_count'] = len(posts)
+    feed_params['page_count'] = int(math.ceil(float(len(posts)) / feed_params['results']))
     posts = posts[feed_params['start']:feed_params[
         'start'] + feed_params['results']]
 

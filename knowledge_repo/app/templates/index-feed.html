@@ -36,31 +36,33 @@
 
 {% block inner_content %}
 
-{% for post in posts %}
-<div class="row feed-post" data-path='{{post.path|urlencode}}' data-url="{{url_for('posts.render', path=post.path)}}">
-    <div class='feed-thumbnail'>
-        <img src="{{ post['thumbnail'] if post['thumbnail'] else '/static/images/default_thumbnail.png' }}" />
+<div id="feed-posts">
+    {% for post in posts %}
+    <div class="row feed-post" data-path='{{post.path|urlencode}}' data-url="{{url_for('posts.render', path=post.path)}}">
+        <div class='feed-thumbnail'>
+            <img src="{{ post['thumbnail'] if post['thumbnail'] else '/static/images/default_thumbnail.png' }}" />
+        </div>
+        <div class='feed-metadata'>
+                <span class="feed-title">{{ post.title }}</span>
+                <span class="feed-authors"> {{ format_authors(post.authors)|safe }}</span>
+                <span class="feed-tags">
+                    {% for tag_obj in post.tags %}
+                        {{ render_tag(tag_obj.name, loop.index0) }}
+                    {% endfor %}
+                </span>
+                <span class='feed-tldr'>{{ post['tldr']|safe }}</span>
+                <span class='feed-tldr-expander'>+ Show More</span>
+                <span class='feed-stats'>
+                    {% set stats = post_stats[post.path] %}
+                    <span title="Users who Viewed"><i class="glyphicon glyphicon-eye-open"> </i> {{ stats['distinct_views'] }}</span>
+                    <span title="Number of Favorites"><i class="glyphicon glyphicon-heart-empty"></i> {{ stats['total_likes']}}</span>
+                    <span title="Comments"><i class="glyphicon glyphicon-comment"></i> {{ stats['total_comments']}}</span>
+                </span>
+                <span class="feed-dates">Created on {{ post.created_at.strftime("%B %d, %Y") }} (last updated {{ post.updated_at.strftime("%B %d, %Y") }})</span>
+        </div>
     </div>
-    <div class='feed-metadata'>
-            <span class="feed-title">{{ post.title }}</span>
-            <span class="feed-authors"> {{ format_authors(post.authors)|safe }}</span>
-            <span class="feed-tags">
-                {% for tag_obj in post.tags %}
-                    {{ render_tag(tag_obj.name, loop.index0) }}
-                {% endfor %}
-            </span>
-            <span class='feed-tldr'>{{ post['tldr']|safe }}</span>
-            <span class='feed-tldr-expander'>+ Show More</span>
-            <span class='feed-stats'>
-                {% set stats = post_stats[post.path] %}
-                <span title="Users who Viewed"><i class="glyphicon glyphicon-eye-open"> </i> {{ stats['distinct_views'] }}</span>
-                <span title="Number of Favorites"><i class="glyphicon glyphicon-heart-empty"></i> {{ stats['total_likes']}}</span>
-                <span title="Comments"><i class="glyphicon glyphicon-comment"></i> {{ stats['total_comments']}}</span>
-            </span>
-            <span class="feed-dates">Created on {{ post.created_at.strftime("%B %d, %Y") }} (last updated {{ post.updated_at.strftime("%B %d, %Y") }})</span>
-    </div>
+    {% endfor %}
 </div>
-{% endfor %}
 
 {% endblock %}
 
