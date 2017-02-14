@@ -14,6 +14,7 @@ This includes:
 from flask import current_app, request, render_template, Blueprint, g
 from sqlalchemy import and_
 import logging
+import math
 
 from ..app import db_session
 from ..models import PageView, Post, assoc_post_tag, Subscription, Tag
@@ -135,6 +136,9 @@ def render_tag_pages():
     # get all files with given tag
     tag_posts = tag_obj.posts
     posts = [post for post in tag_posts if post.is_published]
+
+    feed_params['posts_count'] = len(posts)
+    feed_params['page_count'] = int(math.ceil(1.0 * len(posts) / feed_params['results']))
 
     posts = posts[start:min(start + num_results, len(posts))]
 
