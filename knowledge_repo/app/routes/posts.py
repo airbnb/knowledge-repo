@@ -1,5 +1,6 @@
 import logging
-from flask import request, url_for, redirect, render_template, current_app, Blueprint, g
+import os
+from flask import request, url_for, redirect, render_template, current_app, Blueprint, g, Response
 
 from ..proxies import db_session, current_repo
 from ..models import User, Post, PageView
@@ -19,7 +20,15 @@ blueprint = Blueprint('posts', __name__,
 def render(path):
     """ Render the knowledge post with all the related formatting """
 
+    action = request.args.get('action', 'render')
     mode = request.args.get('render', 'html')
+
+    if action == 'download':
+        post = current_repo.post(path)
+        return Response(
+            post.to_string(format='kp'),
+            mimetype="application/zip",
+            headers={"Content-disposition": "attachment; filename={}".format(os.path.basename(post.path))})
 
     username, user_id = g.user.username, g.user.id
 
