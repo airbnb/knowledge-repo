@@ -42,4 +42,4 @@ POPD
 %PYTHON%\\python.exe scripts/knowledge_repo --repo="%test_repo_path%" --dev add knowledge_repo/templates/knowledge_template.md -p projects/test/md_test -m "Test commit" --branch master
 
 REM "Running regression test suite"
-nosetests --with-coverage --cover-package=knowledge_repo --verbosity=1
+%PYTHON%\\python.exe -m nose --with-coverage --cover-package=knowledge_repo --verbosity=1

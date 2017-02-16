@@ -15,7 +15,8 @@ class RmdConverter(KnowledgePostConverter):
     def from_file(self, filename, rebuild=True):
         Rmd_filename = filename
         if rebuild:
-            _, tmp_path = tempfile.mkstemp()
+            tmp_fd, tmp_path = tempfile.mkstemp()
+            os.close(tmp_fd)
 
             runcmd = """R --vanilla --slave -e "library(knitr); setwd('{0}'); \
                         x = knit('{1}', '{2}', quiet=T)" """.format(os.path.abspath(os.path.dirname(filename)),
