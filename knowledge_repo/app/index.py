@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 LOCKED = CHECKED = '1'
 UNLOCKED = '0'
 
+
 def is_indexing():
     timeout = current_app.config.get("INDEXING_TIMEOUT", 10 * 60)  # Default index timeout to 10 minutes (after which indexing will be permitted to run again)
     last_update = time_since_index()
