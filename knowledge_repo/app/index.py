@@ -13,11 +13,14 @@ from .utils.time import time_since
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Some global aliases to be used below for enhanced readability
+LOCKED = CHECKED = '1'
+UNLOCKED = '0'
 
 def is_indexing():
     timeout = current_app.config.get("INDEXING_TIMEOUT", 10 * 60)  # Default index timeout to 10 minutes (after which indexing will be permitted to run again)
     last_update = time_since_index()
-    return bool(int(IndexMetadata.get('lock', 'index', '0'))) and last_update is not None and (last_update < timeout)
+    return IndexMetadata.get('lock', 'index', UNLOCKED) == LOCKED and last_update is not None and (last_update < timeout)
 
 
 def time_since_index(human_readable=False):
@@ -66,7 +69,7 @@ def update_index_required(check_timeouts=True):
                 return True
         return False
     finally:
-        IndexMetadata.set('check', 'index', True)
+        IndexMetadata.set('check', 'index', CHECKED)
         db_session.commit()
 
 
@@ -98,7 +101,7 @@ def _update_index(app, force=False, reindex=False):
 
     if not force and is_indexing():
         return
-    IndexMetadata.set('lock', 'index', True)
+    IndexMetadata.set('lock', 'index', LOCKED)
     db_session.commit()
 
     kr_dir = {kp.path: kp for kp in current_repo.posts()}
@@ -148,7 +151,7 @@ def _update_index(app, force=False, reindex=False):
     for uri, revision in current_repo.revisions.items():
         IndexMetadata.set('repository_revision', uri, str(revision))
 
-    IndexMetadata.set('lock', 'index', False)
+    IndexMetadata.set('lock', 'index', UNLOCKED)
     db_session.commit()
 
     if context is not None:
