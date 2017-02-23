@@ -8,9 +8,11 @@ This includes:
 """
 import os
 import posixpath
+import json
 from flask import request, render_template, redirect, Blueprint, current_app, make_response
+from sqlalchemy import case, desc
 
-from ..app import db_session
+from ..proxies import db_session, current_repo
 from ..utils.posts import get_posts
 from ..models import Post, Tag, User, PageView
 from ..utils.requests import from_request_get_feed_params
@@ -199,3 +201,51 @@ def create(knowledge_format=None):
     response = make_response(open(filename).read())
     response.headers["Content-Disposition"] = "attachment; filename=" + knowledge_template
     return response
+
+
+@blueprint.route('/ajax/index/typeahead', methods=['GET', 'POST'])
+def ajax_post_typeahead():
+    # this a string of the search term
+    search_terms = request.args.get('search', '')
+    search_terms = search_terms.split(" ")
+    case_statements = []
+    for term in search_terms:
+        case_stmt = case([(Post.keywords.ilike('%' + term.strip() + '%'), 1)], else_=0)
+        case_statements += [case_stmt]
+
+    match_score = sum(case_statements).label("match_score")
+
+    posts = (db_session.query(Post, match_score)
+                       .order_by(desc(match_score))
+                       .limit(5)
+                       .all())
+
+    matches = []
+    for (post, count) in posts:
+        authors_str = [author.format_name for author in post.authors]
+        typeahead_entry = {'author': authors_str,
+                           'title': str(post.title),
+                           'path': str(post.path),
+                           'keywords': str(post.keywords)}
+        matches += [typeahead_entry]
+    return json.dumps(matches)
+
+
+@blueprint.route('/ajax/index/typeahead_tags')
+@blueprint.route('/ajax_tags_typeahead', methods=['GET'])
+def generate_tags_typeahead():
+    return json.dumps([t[0] for t in db_session.query(Tag.name).all()])
+
+
+@blueprint.route('/ajax/index/typeahead_users')
+@blueprint.route('/ajax_users_typeahead', methods=['GET'])
+def generate_users_typeahead():
+    return json.dumps([u[0] for u in db_session.query(User.username).all()])
+
+
+@blueprint.route('/ajax/index/typeahead_paths')
+@blueprint.route('/ajax_paths_typeahead', methods=['GET'])
+def generate_projects_typeahead():
+    # return path stubs for all repositories
+    stubs = ['/'.join(p.split('/')[:-1]) for p in current_repo.dir()]
+    return json.dumps(list(set(stubs)))

@@ -66,7 +66,7 @@ class CommentTest(unittest.TestCase):
             assert post.status == self.repo.PostStatus.PUBLISHED
 
             # check that the number of comments rendered increased by 1
-            rv = self.app.get('/render?markdown=' + post.path,
+            rv = self.app.get('/post/' + post.path,
                               headers=self.headers)
             soup = BeautifulSoup(rv.data.decode('utf-8'), 'html.parser')
             comments = soup.findAll("div", {"class": "post_comment"})

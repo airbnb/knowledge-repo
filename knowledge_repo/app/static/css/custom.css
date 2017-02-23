@@ -98,7 +98,7 @@ body {
   color: #565a5c;
   background-color: whitesmoke;
   font-size: 14px;
-  font-family: 'Lato';
+  font-family: 'Lato', sans-serif;
   /*background-color: #F8F8F8;*/
 }
 
@@ -118,28 +118,13 @@ ul {
     margin-bottom: 10px;
 }
 
-h1 {
-  font-size: 44px;
-}
-h2 {
-  margin-top: 0;
-  margin-bottom: 0;
-  color: #484848;
-  font-size: 32px;
-  font-weight: bolder;
-}
-h3 {
-  font-size: 24px;
-}
-h4 {
-  font-size: 18px;
-}
-h5 {
-  font-size: 16px;
-}
-h6 {
-  font-size: 14px;
-}
+h1              { font-size: 2em; margin: .67em 0 }
+h2              { font-size: 1.5em; margin: .75em 0 }
+h3              { font-size: 1.17em; margin: .83em 0 }
+h5              { font-size: .83em; margin: 1.5em 0 }
+h6              { font-size: .75em; margin: 1.67em 0 }
+h1, h2, h3, h4,
+h5, h6          { font-weight: bolder }
 
 img {
     max-width:100%;
@@ -173,6 +158,13 @@ img {
   font-weight: normal;
   display: inline-block;
   margin-bottom: 4px;
+}
+
+a.label:focus, a.label:hover {
+    color: #00A699;
+    border-color: #00A699;
+    background-color: #fff;
+    opacity: 1;
 }
 
 .label-primary {
@@ -249,29 +241,6 @@ img {
   color: #9CA299;
 }
 
-.feed-author {
-  padding-bottom: 5px;
-}
-
-.feed-date {
-  color: #565a5c;
-  padding-bottom: 10px;
-}
-
-.feed-date, .feed-tldr {
-  color: #565a5c;
-}
-
-.feed-post {
-  border-bottom: 1px solid #F8F8F8;
-}
-
-.feed-post-counts {
-  color: #aaa;
-  margin-right: 3px;
-  margin-left: 15px;
-}
-
 .content-offset {
   margin-left: 50px;
 }
@@ -327,10 +296,6 @@ img {
   opacity: 0.5;
 }
 
-.feed-post-counts, .glyphicon:first-child {
-  margin-left: 0px;
-}
-
 .content {
   border-left: 1px solid #F8F8F8;
   background-color: white;
@@ -339,53 +304,108 @@ img {
   font-size: 18px;
 }
 
+#renderedMarkdown {
+    border: 1px solid #bbb;
+    padding: 1.5em;
+    background: #fff;
+    color: #484848;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    position: relative;
+}
+
 #renderedMarkdown h1,
 #renderedMarkdown h2,
 #renderedMarkdown h3,
 #renderedMarkdown h4,
 #renderedMarkdown h5,
 #renderedMarkdown h6 {
-  margin-top: 50px;
-  margin-bottom: 25px;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
   font-weight: bold;
 }
 
-#renderedMarkdown h1 {
-  margin-top: 0;
-  font-weight: bold;
+#renderedMarkdown h1:nth-of-type(1) {
+  margin-top: 1em;
+  text-align: center;
+  display: block;
 }
 
-/*#renderedMarkdown p {
-  margin: 0 0 25px;
-}*/
-
-#renderedMarkdown p,
-#renderedMarkdown h1,
-#renderedMarkdown h2,
-#renderedMarkdown h3,
-#renderedMarkdown .codehilite,
-#renderedMarkdown ul {
-  width: 80%;
-  color: #484848;
+#renderedMarkdown h2 {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.3em;
 }
 
-#renderedMarkdown p > img {
-  margin-top: 25px;
-  margin-bottom: 25px;
-  margin-left: auto;
-  margin-right: auto;
+#renderedMarkdown div.metadata {
+    margin-bottom: 1em;
+}
+
+#renderedMarkdown .authors {
+    margin: auto;
+    display: block;
+    width: 80%;
+    text-align: center;
+    font-size: 1.5em;
+    padding-bottom: 0.8em;
+}
+
+#renderedMarkdown .date_created {
+    display: block;
+    margin: auto;
+    text-align: center;
+    font-size: 1.2em;
+}
+
+#renderedMarkdown .date_updated {
+    display: block;
+    margin: auto;
+    text-align: center;
+    font-size: 0.8em;
+    font-style: italic;
+}
+
+#renderedMarkdown .tldr {
+    width: 80%;
+    padding-top: 1em;
+    margin: auto;
+    display: block;
+    font-style: italic;
+    text-align: justify;
+}
+
+#renderedMarkdown .tags {
+    width: 80%;
+    display: block;
+    margin: auto;
+}
+
+#renderedMarkdown img {
+    display: block;
+    margin: auto;
+    max-width: 80%;
 }
 
 #renderedMarkdown table {
-  width: 80%;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin: 10px auto;
   display: block;
   overflow-x: auto;
   border-spacing: 10px;
+  border: transparent;
 }
 
-#renderedMarkdown th, #renderedMarkdown td {
+#renderedMarkdown table tr th {
+    background: #d8d8d8;
+}
+
+#renderedMarkdown table tr:nth-child(2n) th {
+    background: #e8e8e8;
+}
+
+#renderedMarkdown table tr:nth-child(2n+1) td {
+    background: #f8f8f8;
+}
+
+#renderedMarkdown table th, #renderedMarkdown table td {
   border: 1px solid grey;
   padding: 0.5em;
 }
@@ -483,8 +503,34 @@ span.index-view-name {
   opacity: 1;
 }
 
-.pagination-group > a {
-  border: 0;
+.pagination-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.pagination-stepper.disabled {
+    color: #9CA299;
+    opacity: 0.5;
+    cursor: default;
+}
+
+.pagination {
+margin: 0px;
+}
+.pagination-stepper {
+  padding: 8px;
+  display: block;
+}
+.pagination li a {
+  color: #00a699;
+}
+.pagination .active a {
+background-color: #00a699;
+border-color: #00a699;
+}
+.pagination .active a:hover {
+background-color: #11b6a2;
+border-color: #11b6aa;
 }
 
 .page-btn {
@@ -495,37 +541,11 @@ span.index-view-name {
   background-color: inherit;
 }
 
-.pagination-group > a:hover,
-.pagination-group > a:active,
-.pagination-group > a:focus,
-.pagination-group > a:active:focus,
-.pagination-group > a:active:hover {
-  background-color: inherit;
-  border: 0px;
-  opacity: inherit;
-  outline: none;
-  box-shadow: none;
-  color: inherit;
-}
-
 .page-btn:hover, .page-btn:active {
   background-color: inherit;
   border: 0px;
   opacity: inherit;
   outline: none;
-}
-
-.active-page, .active-page:hover {
-  color: #00a699;
-  padding-bottom: 2px;
-  background-color: inherit;
-  border: 0px;
-  opacity: inherit;
-}
-
-.feed-post-counts > .glyphicon-heart-empty,
-.feed-post-counts > .glyphicon-comment {
-  padding-left: 10px;
 }
 
 .cluster-header {

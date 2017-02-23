@@ -13,11 +13,15 @@ from .utils.time import time_since
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Some global aliases to be used below for enhanced readability
+LOCKED = CHECKED = '1'
+UNLOCKED = '0'
+
 
 def is_indexing():
     timeout = current_app.config.get("INDEXING_TIMEOUT", 10 * 60)  # Default index timeout to 10 minutes (after which indexing will be permitted to run again)
     last_update = time_since_index()
-    return bool(int(IndexMetadata.get('lock', 'index', '0'))) and last_update is not None and (last_update < timeout)
+    return IndexMetadata.get('lock', 'index', UNLOCKED) == LOCKED and last_update is not None and (last_update < timeout)
 
 
 def time_since_index(human_readable=False):
@@ -46,15 +50,18 @@ def get_indexed_revisions():
     return indexed
 
 
-def update_index_required():
+def update_index_required(check_timeouts=True):
     if not current_app.config.get('REPOSITORY_INDEXING_ENABLED', True):
+        return False
+
+    if is_indexing():
         return False
 
     interval = current_app.config.get("INDEXING_INTERVAL", 5 * 60)  # Default to 6 minutes between indexing tasks
     seconds = time_since_index()
     seconds_check = time_since_index_check()
 
-    if is_indexing() or (seconds is not None and seconds_check is not None) and (seconds < interval or seconds_check < interval):
+    if check_timeouts and (seconds is not None and seconds_check is not None) and (seconds < interval or seconds_check < interval):
         return False
     try:
         for uri, revision in current_repo.revisions.items():
@@ -63,16 +70,16 @@ def update_index_required():
                 return True
         return False
     finally:
-        IndexMetadata.set('check', 'index', True)
+        IndexMetadata.set('check', 'index', CHECKED)
         db_session.commit()
 
 
-def update_index():
+def update_index(check_timeouts=True):
     """
     Initialize the db from a KnowledgeRepository object
     """
 
-    if not update_index_required():
+    if not update_index_required(check_timeouts=check_timeouts):
         return
 
     app = current_app._get_current_object()
@@ -95,7 +102,7 @@ def _update_index(app, force=False, reindex=False):
 
     if not force and is_indexing():
         return
-    IndexMetadata.set('lock', 'index', True)
+    IndexMetadata.set('lock', 'index', LOCKED)
     db_session.commit()
 
     kr_dir = {kp.path: kp for kp in current_repo.posts()}
@@ -145,7 +152,7 @@ def _update_index(app, force=False, reindex=False):
     for uri, revision in current_repo.revisions.items():
         IndexMetadata.set('repository_revision', uri, str(revision))
 
-    IndexMetadata.set('lock', 'index', False)
+    IndexMetadata.set('lock', 'index', UNLOCKED)
     db_session.commit()
 
     if context is not None:

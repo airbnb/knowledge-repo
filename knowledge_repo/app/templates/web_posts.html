@@ -26,7 +26,7 @@
             <tr>
               <td>{{ post.title }} </td>
               <td>{{ post.authors_string }} </td>
-              <td>{{ post.created_at.strftime('%Y-%m-%d')  }} </td>
+              <td>{{ post.created_at|format_date  }} </td>
               <td>
                 <i class="glyphicon glyphicon-edit" id="tooltip-edit-{{ post.id }}" data-toggle="tooltip" data-placement="top" title="Edit"></i>
                 <i class="glyphicon glyphicon-remove" id="tooltip-delete-{{ post.id }}" data-toggle="tooltip" data-placement="top" title="Delete"></i>
@@ -55,20 +55,20 @@
 $('[data-toggle="tooltip"]').tooltip();
 
 $("#new-post").click(function() {
-  document.location.href = "/posteditor";
+  document.location.href = "{{ url_for('editor.editor') }}";
 });
 
 {% for post in posts %}
 
   $("#tooltip-edit-{{ post.id }}").click(function() {
-    document.location.href = "/posteditor?post_id={{ post.id }}";
+    document.location.href = "{{ url_for('editor.editor', path=post.id) }}";
   });
 
   $("#tooltip-delete-{{ post.id }}").click(function() {
     if (confirm("Are you sure you want to delete this post? You won't be able to recover it if you do.")) {
       $.ajax({
         type: "GET",
-        url: '/delete_post?post_id={{ post.id }}',
+        url: '/ajax/editor/delete?post_id={{ post.id }}',
         async: false
       });
     }

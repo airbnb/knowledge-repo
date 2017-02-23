@@ -6,7 +6,7 @@ function initializeTooltips(is_webeditor, post_id, id, data_repo_github_root){
 
     if (view_tooltip[0] !== null){
        view_tooltip.click(function() {
-            document.location.href = "/render?markdown=" + post_id;
+            document.location.href = "/post/" + post_id;
         });
     };
 
@@ -14,7 +14,7 @@ function initializeTooltips(is_webeditor, post_id, id, data_repo_github_root){
 
    if (raw_tooltip[0] !== null){
         raw_tooltip.click(function() {
-            document.location.href = "/raw?markdown=" + post_id;
+            document.location.href = "/post/" + post_id + "?render=raw";
         });
     };
 
@@ -22,7 +22,7 @@ function initializeTooltips(is_webeditor, post_id, id, data_repo_github_root){
 
     if (edit_tooltip[0] !== null){
         edit_tooltip.click(function(){
-          document.location.href =  "/posteditor?post_id=" + id;
+          document.location.href =  "/edit/" + id;
         });
     }
 

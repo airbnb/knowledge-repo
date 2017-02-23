@@ -14,7 +14,7 @@
     <a class="btn btn-primary" href="create/Rmd" role="button"> R-Markdown </a>
     <a class="btn btn-primary" href="create/md" role="button"> Markdown </a>
     {% if web_editor_enabled %}
-    <a class="btn btn-primary" href="posteditor" role="button"> Web Editor </a>
+    <a class="btn btn-primary" href="{{ url_for('editor.editor') }}" role="button"> Web Editor </a>
     {% endif %}
 </div>
 </center>

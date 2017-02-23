@@ -61,7 +61,7 @@
         <ul>
         {% for item in contents %}
           <li>
-            <a href="{{'/render?markdown=' + item.path|urlencode }}">
+            <a href="{{'/post/' + item.path|urlencode }}">
               {{ item.title|replace('_', ' ')|title }}
             </a>
           </li>

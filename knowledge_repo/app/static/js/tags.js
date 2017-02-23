@@ -96,7 +96,7 @@ function addTagSubscriptionListener(v) {
     }
     $.ajax({
       type: "POST",
-      url: url_request,
+      url: "/" + url_request,
       async: true,
       success: function() {
         // We want to toggle all the buttons for all the relevant tags

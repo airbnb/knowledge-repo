@@ -4,7 +4,7 @@ This file deals with all of the email functions.
 
 import logging
 
-from flask import render_template, current_app
+from flask import render_template, current_app, url_for
 from flask_mail import Message
 
 from ..app import db_session
@@ -21,8 +21,7 @@ def usernames_to_emails(usernames):
 
 
 def subscription_email_recipients(post, tag):
-    """Check who should recieve a subscription email about this post
-    """
+    """Check who should recieve a subscription email about this post"""
     db_session.expire_on_commit = False
 
     subscriptions = (db_session.query(Subscription)
@@ -52,8 +51,7 @@ def send_subscription_emails(post):
         with that tag was published to the repo
     """
     if 'mail' not in current_app.config:
-        logger.warning(
-            'Mail subsystem is not configured. Silently dropping email.')
+        logger.warning('Mail subsystem is not configured. Silently dropping email.')
         return
 
     # if this post is tagged as private - send no emails
@@ -61,6 +59,7 @@ def send_subscription_emails(post):
     for full_tag in post_full_tags:
         if full_tag in current_app.config.get("EXCLUDED_TAGS", []):
             return
+
     for tag in post.tags:
         send_subscription_email(post, tag)
 
@@ -120,32 +119,26 @@ def send_subscription_email(post, tag):
     current_app.config['mail'].send(msg)
 
 
-def send_comment_email(post_id, comment_text, commenter='Someone'):
+def send_comment_email(path, comment_text, commenter='Someone'):
     if 'mail' not in current_app.config:
-        logger.warning(
-            'Mail subsystem is not configured. Silently dropping email.')
+        logger.warning('Mail subsystem is not configured. Silently dropping email.')
         return
 
-    gitpost = (db_session.query(Post)
-               .filter(Post.id == post_id)
-               .first())
-    post_title = gitpost.title
-    authors = [author.username for author in gitpost.authors]
-    post_author_emails = usernames_to_emails(authors)
+    kp = current_repo.post(path)
+    headers = kp.headers
 
-    msg = Message("Someone commented on your post!", post_author_emails)
+    msg = Message("Someone commented on your post!", usernames_to_emails(headers['authors']))
     msg.body = render_template("email_templates/comment_email.txt",
                                commenter=commenter,
                                comment_text=comment_text,
-                               post_title=post_title,
-                               post_id=post_id)
+                               post_title=headers['title'],
+                               post_url=url_for('posts.render', path=path, _external=True))
     current_app.config['mail'].send(msg)
 
 
 def send_internal_error_email(subject_line, **kwargs):
     if 'mail' not in current_app.config:
-        logger.warning(
-            'Mail subsystem is not configured. Silently dropping email.')
+        logger.warning('Mail subsystem is not configured. Silently dropping email.')
         return
     recipients = usernames_to_emails(current_repo.config.editors)
     msg = Message(subject_line, recipients)
@@ -161,7 +154,7 @@ def send_reviewer_request_email(path, reviewer):
     subject = "Someone requested a web post review from you!"
     msg = Message(subject, [reviewer])
     msg.body = render_template("email_templates/reviewer_request_email.txt",
-                               path=path)
+                               post_url=url_for('editor.editor', path=path, _external=True))
     current_app.config['mail'].send(msg)
 
 
@@ -172,14 +165,11 @@ def send_review_email(path, comment_text, commenter='Someone'):
 
     kp = current_repo.post(path)
     headers = kp.headers
-    post_title = headers['title']
-    authors = headers['authors']
-    post_author_emails = usernames_to_emails(authors)
-    subject = "Someone reviewed your post!"
-    msg = Message(subject, post_author_emails)
+
+    msg = Message("Someone reviewed your post!", usernames_to_emails(headers['authors']))
     msg.body = render_template("email_templates/review_email.txt",
                                commenter=commenter,
                                comment_text=comment_text,
-                               post_title=post_title,
-                               path=path)
+                               post_title=headers['title'],
+                               post_url=url_for('editor.editor', path=path, _external=True))
     current_app.config['mail'].send(msg)

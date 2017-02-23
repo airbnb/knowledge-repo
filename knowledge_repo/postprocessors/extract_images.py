@@ -50,14 +50,18 @@ class ExtractImages(KnowledgePostProcessor):
     def find_images(cls, md):
         images = []
         images.extend(cls.collect_images_for_pattern(
-            md, '<img.*src=[\'"](.*?)[\'"].*>'))
-        images.extend(cls.collect_images_for_pattern(md, '\!\[.*\]\((.*)\)'))
+            md,
+            # Match all <img /> tags with attributes of form <name>(="<value>") with optional quotes (can be single or double)
+            # The src attribute is exected to always be surrounded by quotes.
+            r'<img\s+(?:\w+(?:=([\'\"])?(?(1)(?:(?!\1).)*?\1|[^>]*?))?\s+?)*src=([\'\"])(?P<src>(?:(?!\2).)*?)\2(?:\s+\w+(?:=([\'\"])?(?(1)(?:(?!\4).)*?\4|[^>]*?))?)*\s*\/?>'
+        ))
+        images.extend(cls.collect_images_for_pattern(md, r'\!\[.*\]\((?P<src>[^\)]*)\)'))
         return sorted(images, key=lambda x: x['offset'])
 
     @classmethod
     def collect_images_for_pattern(cls, md, pattern=None):
         p = re.compile(pattern)
-        return [{'offset': m.start(), 'tag': m.group(0), 'src': m.group(1)} for m in p.finditer(md)]
+        return [{'offset': m.start(), 'tag': m.group(0), 'src': m.group('src')} for m in p.finditer(md)]
 
     @classmethod
     def collect_images(cls, kp, images):

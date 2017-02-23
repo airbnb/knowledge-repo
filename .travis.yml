@@ -29,7 +29,7 @@ install:
 # cache: pip
 
 before_script:
-  - "pep8 --exclude knowledge_repo/app/migrations,build --ignore=E501 ."
+  - "pep8 --exclude knowledge_repo/app/migrations,build,deploy,kube --ignore=E501 ."
 script:
   - bash run_tests.sh
 

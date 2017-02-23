@@ -11,13 +11,43 @@
   {% endfor %}
 {% endmacro %}
 
+{% macro pagination(max_pages=10, extremes=True, autohide=True) %}
+  {% if feed_params %}
+    {% set start = feed_params['start'] | default(0) %}
+    {% set results = feed_params['results'] | default(10) %}
+    {% set page = 1 if (start == 0) else (start//results + 1) %}
+    {% set page_count = feed_params['page_count'] | default(1) %}
+
+    {% if autohide and page_count > 1 %}
+      {% set page_nums = pagination_pages(current_page=page, page_count=page_count, max_pages=max_pages, extremes=extremes) %}
+
+      <div class='pagination-bar' role="group">
+        <a href="{{ "#" if (page == 1) else modify_query(start=(page-2)*results) }}" class="pagination-stepper{% if page == 1 %} disabled{% endif %}"{% if page == 1 %} onclick="return false;"{% endif %}>
+          <i class="glyphicon glyphicon-chevron-left"></i>
+        </a>
+        <ul class="pagination">
+          {% for page_num in page_nums %}
+            {% if loop.index0 > 0 and page_num - page_nums[loop.index0 - 1] > 1 %}
+              <li class="disabled"><a>&middot;&middot;&middot;</a></li>
+            {% endif %}
+            <li {% if page == page_num %}class="active"{% endif %}><a href= "{{ modify_query(start=(page_num-1)*results) }}"> {{ page_num }} </a></li>
+          {% endfor %}
+        </ul>
+        <a href="{{ "#" if (page == page_count) else modify_query(start=page*results) }}" class="pagination-stepper{% if page == page_count %} disabled{% endif %}"{% if page == page_count %} onclick="return false;"{% endif %}>
+          <i class="glyphicon glyphicon-chevron-right"></i>
+        </a>
+      </div>
+
+    {% endif %}
+  {% endif %}
+
+{% endmacro %}
 
 {% block title %} Knowledge Repo {% endblock %}
 
 {% block content %}
 
   <div class="row">
-    <br>
     <div class="col-md-5">
       <div class="btn-group btn-group-justified index-view-btn-group" role="group">
         <a href="/feed" class="btn btn-default btn-card no-underline" role="button">
@@ -35,38 +65,11 @@
       </div>
     </div>
 
-  {% if request.endpoint != 'index.render_cluster' %}
-  <div class='col-md-3 col-md-offset-4'>
-    {% set start = feed_params['start'] | default(0) %}
-    {% set results = feed_params['results'] | default(10) %}
-    {% set page = 1 if (start == 0) else (start//results + 1) %}
-
-    <div class="btn-group btn-sm btn-group-justified pagination-group" role="group">
-      {% set href = "#" if (page == 1) else request.path %}
-        <a href="{{ href }}" data-page="{{ page }}"
-           class="btn btn-default {{ "disabled" if (page == 1)}} prev-btn">
-          <i class="glyphicon glyphicon-chevron-left"></i>
-        </a>
-
-      {% if page == 1 %}
-        {% set page_nums = [page, page + 1, page + 2] %}
-      {% else %}
-        {% set page_nums = [page - 1, page, page + 1] %}
-      {% endif %}
-      {% for page_num in page_nums %}
-        {% if page == page_num %}
-          <a href= "{{ request.path }}"  data-page="{{ page_num }}" class="btn btn-default page-btn active-page"> {{ page_num }} </a>
-        {% else %}
-          <a href = "{{ request.path }}"  data-page="{{ page_num }}" class="btn btn-default page-btn"> {{ page_num }} </a>
-        {% endif %}
-      {% endfor %}
-
-      <a href="{{ request.path }}" class="btn btn-default next-btn" data-page="{{ page }}">
-        <i class="glyphicon glyphicon-chevron-right"></i>
-      </a>
+    {% if request.endpoint != 'index.render_cluster' %}
+    <div class='pull-right'>
+      {{ pagination(max_pages=5, extremes=False) }}
     </div>
-  </div>
-  {% endif %}
+    {% endif %}
 
   </div>
 
@@ -74,62 +77,10 @@
     {% block inner_content %}
     {% endblock %}
   </div>
-{% endblock %}
 
-{% block scripts %}
-{{ super() }}
-<script type="text/javascript">
 
-    $( document ).ready(function() {
-      $.ajaxSetup({
-        cache: true
-      });
+{{ pagination(max_pages=10) }}
 
-      function getParameters() {
-        var queries = {};
-        $.each(document.location.search.substr(1).split('&'), function(c,q) {
-        if (q.length > 0) {
-          var i = q.split('=');
-          queries[i[0].toString()] = decodeURIComponent(
-            i[1].toString().replace(/\+/g, '%20')
-          );
-        }
-      });
-      return queries;
-    }
-
-    // format the page navigation buttons - prev, btn, and page numbers
-    parameters = getParameters();
-
-    // By default, show 10 results
-    if (!("results" in parameters)){
-      parameters["results"] = 10;
-    }
-
-    if ($(".prev-btn").data("page") != 1){
-      prev_parameters = $.extend(true, {}, parameters);
-      prev_parameters["start"] = (parseInt(prev_parameters["start"]) - 10).toString();
-      $(".prev-btn").href += "?" + $.param(prev_parameters);
-    }
-
-    $(".page-btn").each(function(){
-      page = $(this).data("page");
-      page_parameters = $.extend(true, {}, parameters);
-      page_parameters["start"] = ((page - 1) * parameters["results"]).toString();
-      $(this)[0].href += "?" + $.param(page_parameters);
-    })
-
-    next_parameters = $.extend(true, {}, parameters);
-    if ("start" in next_parameters){
-      next_parameters["start"] = (parseInt(next_parameters["start"]) + 10).toString();
-    } else {
-      next_parameters["start"] = next_parameters["results"];
-    }
-    if ($(".next-btn").length > 0) {
-      $(".next-btn")[0].href += "?" + $.param(next_parameters);
-    }
-  });
-</script>
 {% endblock %}
 
 

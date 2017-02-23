@@ -5,5 +5,5 @@ knowledge-repo/knowledge_repo/app/static/js/highlight.pack.js linguist-vendored
 knowledge-repo/knowledge_repo/app/static/js/select2.min.js linguist-vendored
 
 knowledge-repo/knowledge_repo/app/static/css/highlight/* linguist-vendored
-knowledge-repo/knowledge_repo/app/static/css/codehilite.css linguist-vendored
+knowledge-repo/knowledge_repo/app/static/css/codehilite-friendly.css linguist-vendored
 knowledge-repo/knowledge_repo/app/static/css/select2.min.css lingust-vendored

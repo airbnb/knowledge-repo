@@ -5,7 +5,7 @@ __all__ = ['__author__', '__author_email__', '__version__', '__git_uri__', '__de
 
 __author__ = "Nikki Ray (maintainer), Robert Chang, Dan Frank,  Chetan Sharma,  Matthew Wardrop"
 __author_email__ = "nikki.ray@airbnb.com, robert.chang@airbnb.com, dan.frank@airbnb.com, chetan.sharma@airbnb.com, matthew.wardrop@airbnb.com"
-__version__ = "0.7.4"
+__version__ = "0.7.5"
 try:
     with open(os.devnull, 'w') as devnull:
         __version__ += '_' + subprocess.check_output(['git', 'rev-parse', 'HEAD'], shell=False, stderr=devnull).decode('utf-8').replace('\n', '')
@@ -22,6 +22,7 @@ __dependencies__ = [
     'enum34',  # Python 3.4+ enum object used for Post status
     'pyyaml',  # Yaml parser and utilities
     'markdown',  # Markdown conversion utilities
+    'pygments',  # Code highlighting support in markdown
     'gitpython',  # Git abstraction
     'tabulate',  # Rendering information prettily in knowledge_repo script
 

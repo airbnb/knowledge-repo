@@ -2,64 +2,72 @@
 
 {% block title %} Knowledge {% endblock %}
 
+{% block style_links %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/codehilite-friendly.css')}}">
+{% endblock %}
+
 {% block content %}
 
     {{ super() }}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/codehilite.css') }}">
-    <div class='container'>
-      <div id="renderedMarkdown">
-          {{ html|safe }}
-      </div>
-    </div>
-
-    <hr/>
-    <div class="row">
-      <div class="col-md-12">
-        <h2> {{ comments | length }} Comments </h2>
-        </br>
-        <div>
-          <div class="row">
+    <div class='container-fluid'>
+        <div class="row">
             <div class="col-md-12">
-              <textarea class="form-control" type="text" id="comment-text" style="height:87px;" placeholder="Leave a comment..."></textarea>
+                <div id="renderedMarkdown">
+                    {{ html|safe }}
+                </div>
             </div>
-          </div>
         </div>
-        </br>
-        <div>
-          <button class="btn btn-primary" id="post_comment_btn">Post Comment</button>
-        </div>
-      </div>
     </div>
 
-    <br>
-
-    <div class="row">
-      <div class="col-md-12">
-        {% for item in comments %}
-          {% set messageId = item.id %}
-          <div class="panel">
-            <div class="panel-header panel-light">
+    <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <h2> {{ comments | length }} Comments </h2>
+            </br>
+            <div>
               <div class="row">
-                <div class="col-md-11">
-                  <div class="post_comment">
-                    Posted by <b>{{ item.author }}</b> on {{ item.created_at_fmt }}
-                  </div>
-                </div>
-                <div class="col-md-1">
-                  <p style="text-align:right">
-                    <i class="glyphicon glyphicon-remove-sign" id="delete_comment__{{ messageId }}"></i>
-                  </p>
+                <div class="col-md-12">
+                  <textarea class="form-control" type="text" id="comment-text" style="height:87px;" placeholder="Leave a comment..."></textarea>
                 </div>
               </div>
             </div>
-            <div class="panel-body panel-light">
-              <p> {{ item.text|safe }} </p>
+            </br>
+            <div>
+              <button class="btn btn-primary" id="post_comment_btn">Post Comment</button>
             </div>
           </div>
-      {% endfor %}
-      </div>
-      </br>
+        </div>
+
+        <br>
+
+        <div class="row">
+          <div class="col-md-12">
+            {% for item in comments %}
+              {% set messageId = item.id %}
+              <div class="panel">
+                <div class="panel-header panel-light">
+                  <div class="row">
+                    <div class="col-md-11">
+                      <div class="post_comment">
+                        Posted by <b>{{ item.author }}</b> on {{ item.created_at|format_date }}
+                      </div>
+                    </div>
+                    <div class="col-md-1">
+                      <p style="text-align:right">
+                        <i class="glyphicon glyphicon-remove-sign" id="delete_comment__{{ messageId }}"></i>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel-body panel-light">
+                  <p> {{ item.text|safe }} </p>
+                </div>
+              </div>
+          {% endfor %}
+          </div>
+          </br>
+        </div>
     </div>
   </div>
 {% endblock %}
@@ -97,7 +105,6 @@ $(document).on('ready', function(){
 
   // Initialize comments
   var post_path = '{{ post_path }}';
-  var post_id = '{{ post_id }}';
 
   $("#post_comment_btn").on('click', function(){
       comment_author = '{{ username }}';
@@ -136,9 +143,7 @@ $.each(all_headers, function(index, value){
 })
 
 //turn all the tags into links, similar to what's done on the feed page
-var markdown = $("#renderedMarkdown")[0]
-var metadata = markdown.getElementsByTagName("p")[0]
-var tags = metadata.getElementsByTagName("strong")[3]
+var tags = $("#renderedMarkdown .metadata .tags")[0]
 var tags_list = {{ tags_list|safe }}
 var subscriptions_list = {{ user_subscriptions | safe }}
 $.each(tags_list, function(i,tag){
@@ -176,7 +181,7 @@ $.each(tags_list, function(i,tag){
   if (i == 0){
     ahref.innerHTML = " "
     colon = document.createElement("text")
-    colon.innerHTML = ": "
+    colon.innerHTML = "<b>Tags</b>: "
     tags.appendChild(colon)
   }
   ahref.innerHTML = ahref.innerHTML + tag_name
@@ -189,7 +194,7 @@ $.each(tags_list, function(i,tag){
 })
 tags.nextSibling.remove()
 
-$(tags).after("<i class='glyphicon glyphicon-edit icon-gray' style='font-size:12pt; padding-left:4px' id='tooltip-edit_tags'></i>")
+tags.innerHTML += "<i class='glyphicon glyphicon-edit icon-gray' style='font-size:12pt; padding-left:4px' id='tooltip-edit_tags'></i>"
 
 $(".pop").popover({ trigger: "manual" , html: true, animation:false, delay: 100})
   .on("mouseenter", function () {
@@ -329,4 +334,3 @@ $('#tooltip-edit_tags').click(function(){
 
 </script>
 {% endblock %}
-

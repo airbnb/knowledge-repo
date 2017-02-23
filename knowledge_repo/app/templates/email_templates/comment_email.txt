@@ -2,7 +2,7 @@
 
 They said "{{ comment_text }}"
 
-Link to post: {{ request.base_url }}/render?markdown={{ post_id }}
+Link to post: {{ post_url }}
 
 Regards,
 

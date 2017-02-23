@@ -5,7 +5,7 @@
 {% block content %}
 
     <br>
-    <div class="container">
+    <div class="container-fluid">
       <div class="row">
         <div class="col-md-6">
           <div class="btn-group" role="group">
@@ -15,11 +15,16 @@
             <button type="button" class="btn btn-default btn-raw">
               View Raw Markdown
             </button>
+            {% if is_author and show_webeditor_button %}
+            <button type="button" class="btn btn-default btn-webeditor">
+              View post in webeditor
+            </button>
+            {% endif %}
           </div>
         </div>
         <div class="col-md-2">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 text-right">
           {% if page_views >= 0 %}
             <i class="glyphicon glyphicon-eye-open" id="pageview_stats" style='color: #9CA299'></i>
             <div id="pageview_stats" style="display: inline-block">
@@ -44,7 +49,6 @@
           {% endif %}
         </div>
       </div>
-      <div class="row row-space-4"></div>
       <div class="row col-md-12">
         {% if not webeditor_buttons and data_repo_git_root %}
           <a href='{{ data_repo_git_root}}/blob/master/{{post_path|urlencode}}'
@@ -65,7 +69,6 @@
         {% endif %}
       </div>
     </div>
-    <br>
 {% endblock %}
 
 {% block scripts %}
@@ -85,11 +88,15 @@ $("document").ready(function(){
   tooltipsJx.initializeTooltips(is_webeditor, post_id, id, data_repo_github_root);
 
   $(".btn-rendered").on("click", function(){
-    document.location.href = "/render?markdown=" + encodeURI(post_path);
+    document.location.href = "/post/" + encodeURI(post_path);
   })
 
   $(".btn-raw").on("click", function(){
-    document.location.href = "/raw?markdown=" + encodeURI(post_path);
+    document.location.href = "/post/" + encodeURI(post_path) + "?render=raw";
+  })
+
+  $(".btn-webeditor").on("click", function(){
+    document.location.href = "/edit/" + encodeURI(post_path);
   })
 });
 

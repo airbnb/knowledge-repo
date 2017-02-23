@@ -25,30 +25,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-blueprint = Blueprint('web_editor', __name__,
+blueprint = Blueprint('editor', __name__,
                       template_folder='../templates', static_folder='../static')
 
 # TODO: These functions have not been fully married to the KnowledgePost API
 # Currently, backended by Post objects but partially implemented on KnowledgePost API
 
 
-@blueprint.route('/ajax_tags_typeahead', methods=['GET'])
-def generate_tags_typeahead():
-    return json.dumps([t[0] for t in db_session.query(Tag.name).all()])
-
-
-@blueprint.route('/ajax_users_typeahead', methods=['GET'])
-def generate_users_typeahead():
-    return json.dumps([u[0] for u in db_session.query(User.username).all()])
-
-
-@blueprint.route('/ajax_paths_typeahead', methods=['GET'])
-def generate_projects_typeahead():
-    # return path stubs for all repositories
-    stubs = ['/'.join(p.split('/')[:-1]) for p in current_repo.dir()]
-    return json.dumps(list(set(stubs)))
-
-
+# TODO: Deprecate this route in favour of integrating editing links into primary index pages and user pages
 @blueprint.route('/webposts', methods=['GET'])
 @PageView.logged
 def gitless_drafts():
@@ -70,23 +54,33 @@ def gitless_drafts():
     return render_template("web_posts.html", posts=query.all())
 
 
-@blueprint.route('/posteditor', methods=['GET', 'POST'])
+@blueprint.route('/edit')
+@blueprint.route('/edit/<path:path>', methods=['GET', 'POST'])
 @PageView.logged
-def post_editor():
+def editor(path=None):
     """ Render the web post editor, either with the default values
         or if the post already exists, with what has been saved """
-    path = request.args.get('path', None)
+
+    prefixes = current_app.config.get('WEB_EDITOR_PREFIXES', None)
+
+    if prefixes is not None:
+        assert (
+            path is None or any(path.startswith(prefix) for prefix in prefixes)
+        ), "Editing of this post online is not permitted by server configuration."
+
     # set defaults
     data = {'title': None,
             'status': current_repo.PostStatus.DRAFT.value,
-            'markdown': None,
+            'markdown': request.args.get('markdown'),
             'thumbnail': '',
             'can_approve': 0,
             'username': g.user.username,
             'created_at': datetime.now(),
             'updated_at': datetime.now(),
             'authors': [g.user.username],
-            'comments': []}
+            'comments': [],
+            'tldr': request.args.get('tldr'),
+            }
 
     if path is not None and path in current_repo:
         kp = current_repo.post(path)
@@ -107,8 +101,8 @@ def post_editor():
     if g.user.username not in data['authors'] or g.user.username in current_repo.config.editors:
         data['can_approve'] = 1
 
-    data['created_at'] = data['created_at'].strftime('%Y-%m-%d')
-    data['updated_at'] = data['updated_at'].strftime('%Y-%m-%d')
+    data['created_at'] = data['created_at']
+    data['updated_at'] = data['updated_at']
     data['authors'] = json.dumps(data.get('authors'))
     data['tags'] = json.dumps(data.get('tags', []))
 
@@ -118,7 +112,7 @@ def post_editor():
                            **data)
 
 
-@blueprint.route('/save_post', methods=['GET', 'POST'])
+@blueprint.route('/ajax/editor/save', methods=['GET', 'POST'])
 @PageView.logged
 def save_post():
     """ Save the post """
@@ -139,8 +133,8 @@ def save_post():
     kp = None
     if path in current_repo:
         kp = current_repo.post(path)
-        if g.user.username not in kp.headers['authors']:
-            return json.dumps({'msg': ("Post with path {} already exists and you are not an author!",
+        if g.user.username not in kp.headers['authors'] and g.user.username not in current_repo.config.editors:
+            return json.dumps({'msg': ("Post with path {} already exists and you are not an author!"
                                        "\nPlease try a different path").format(path),
                                'success': False})
 
@@ -169,7 +163,7 @@ def save_post():
     return json.dumps({'path': path})
 
 
-@blueprint.route('/submit', methods=['GET', 'POST'])
+@blueprint.route('/ajax/editor/submit', methods=['GET', 'POST'])
 @PageView.logged
 def submit_for_review():
     """ Submit post and if there are reviewers assigned, email them"""
@@ -187,7 +181,7 @@ def submit_for_review():
     return 'OK'
 
 
-@blueprint.route('/publish_post', methods=['GET', 'POST'])
+@blueprint.route('/ajax/editor/publish', methods=['GET', 'POST'])
 @PageView.logged
 def publish_post():
     """ Publish the post by changing the status """
@@ -196,11 +190,11 @@ def publish_post():
         return json.dumps({'msg': "Unable to retrieve post with path = {}!".format(path), 'success': False})
     current_repo.publish(path)
 
-    update_index()
+    update_index(check_timeouts=False)
     return 'OK'
 
 
-@blueprint.route('/unpublish_post', methods=['GET', 'POST'])
+@blueprint.route('/ajax/editor/unpublish', methods=['GET', 'POST'])
 @PageView.logged
 def unpublish_post():
     """ Unpublish the post """
@@ -209,11 +203,11 @@ def unpublish_post():
         return json.dumps({'msg': "Unable to retrieve post with path = {}!".format(path), 'success': False})
     current_repo.unpublish(path)
 
-    update_index()
+    update_index(check_timeouts=False)
     return 'OK'
 
 
-@blueprint.route('/accept_post', methods=['POST'])
+@blueprint.route('/ajax/editor/accept', methods=['GET', 'POST'])
 @PageView.logged
 def accept():
     """ Accept the post """
@@ -225,7 +219,7 @@ def accept():
     return 'OK'
 
 
-@blueprint.route('/delete_post', methods=['GET'])
+@blueprint.route('/ajax/editor/delete', methods=['GET', 'POST'])
 @PageView.logged
 def delete_post():
     """ Delete a post """
@@ -237,38 +231,39 @@ def delete_post():
         return json.dumps({'msg': "You can only delete a post where you are an author!", 'success': False})
     current_repo.remove(path)
 
-    update_index()
+    update_index(check_timeouts=False)
     return 'OK'
 
 
-@blueprint.route('/review', methods=['POST'])
+@blueprint.route('/ajax/editor/review', methods=['POST', 'DELETE'])
 @PageView.logged
 def review_comment():
-    """ Saves a review and sends an email that the post has been reviewed to the author of the post """
-    path = request.args.get('path', None)
-    post_id = db_session.query(Post).filter(Post.path == path).first().id
+    """
+    Saves a review and sends an email that the post has been reviewed to the author of the post or deletes a submitted review
+    """
 
-    comment = Comment()
-    comment.text = request.get_json()['text']
-    comment.user_id = g.user.id
-    comment.post_id = post_id
-    comment.type = "review"
-    db_session.add(comment)
-    db_session.commit()
+    if request.method == 'POST':
+        path = request.args.get('path', None)
+        post_id = db_session.query(Post).filter(Post.path == path).first().id
 
-    send_review_email(path=path,
-                      commenter=g.user.username,
-                      comment_text=comment.text)
-
-
-@blueprint.route('/delete_review', methods=['GET', 'POST'])
-@PageView.logged
-def delete_review():
-    """ Delete a review """
-    comment = Comment.query.get(int(request.args.get('comment_id', '')))
-    if comment and g.user.id == comment.user_id:
-        db_session.delete(comment)
+        comment = Comment()
+        comment.text = request.get_json()['text']
+        comment.user_id = g.user.id
+        comment.post_id = post_id
+        comment.type = "review"
+        db_session.add(comment)
         db_session.commit()
+
+        send_review_email(path=path,
+                          commenter=g.user.username,
+                          comment_text=comment.text)
+
+    elif request.method == 'DELETE':
+        comment = Comment.query.get(int(request.args.get('comment_id', '')))
+        if comment and g.user.id == comment.user_id:
+            db_session.delete(comment)
+            db_session.commit()
+
     return 'OK'
 
 
