@@ -70,6 +70,63 @@
         </div>
     </div>
   </div>
+  
+ <style>
+.codehilite {
+  position: relative;
+}
+
+.showallopt {
+  background-color: #00a699;
+  color: #FFFFFF; 
+  width: 140px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  vertical-align: middle !important;
+  float: right;
+  font-family: sans-serif;
+  border-radius: 8px;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+}
+
+.codehilite pre {
+	word-wrap: break-word;
+	white-space: -moz-pre-wrap;
+	white-space: pre-wrap;
+	overflow-x: hidden !important;
+}
+
+.showallopt:hover {
+    background-color: #dfe4f2;
+    color: #00a699;
+	cursor: pointer;
+}
+
+.showopt {
+  background-color: #00a699;
+  color: #FFFFFF; 
+  width: 70px;
+  height: 20px;
+  text-align: center;
+  vertical-align: middle !important;
+  font-family: sans-serif;
+  border-radius: 8px;
+  position: absolute;
+  top: 8px;
+  right: 22px;
+  cursor: pointer;
+}
+
+.showopt:hover {
+    background-color: #dfe4f2;
+    color: #00a699;
+	cursor: pointer;
+}
+</style>
 {% endblock %}
 
 {% block scripts %}
@@ -127,6 +184,67 @@ $(document).on('ready', function(){
   });
   $(document.body).on('click',"button[id^=tag-subscription]",function () {
     tagsJx.addTagSubscriptionListener($(this)[0]);
+  });
+  
+  // Add code folding
+  $chunks = $('.codehilite');
+  $chunks.each(function () {		
+		var orig_height = $(this).get(0).scrollHeight;
+		if (orig_height > 400) {
+			$('pre', this).prepend("<div class=\"showopt\">Expand</div><br style=\"line-height:22px;\"/>");
+		} else {
+			$('pre', this).prepend("<div class=\"showopt\">Hide</div><br style=\"line-height:22px;\"/>");
+		}
+    });
+	
+  // function to toggle chunk visibility
+  $('.showopt').click(function() {
+    var label = $(this).html();
+    if (label.indexOf("Expand") >= 0) {
+      $(this).html(label.replace("Expand", "Hide"));
+	  var orig_height = $(this).parent().get(0).scrollHeight;
+	  var new_height = orig_height + 11;
+	  $(this).parent().css("overflow","auto");
+	  $(this).parent().animate({height: new_height+"px"}, 200);
+    } else {
+      $(this).html(label.replace("Hide", "Expand"));
+	  $(this).parent().css("overflow","hidden");
+	  $(this).parent().animate({height: "35px"}, 200);
+    }
+  });
+  
+  $maindiv = $('#renderedMarkdown');
+  $maindiv.prepend("<div class=\"showallopt\">Hide All Code</div>");
+
+  $('.showallopt').click(function() {
+    var label = $(this).html();
+    if (label.indexOf("Expand All Code") >= 0) {
+      $(this).html(label.replace("Expand All Code", "Hide All Code"));
+	  $(".showopt").each(function() {
+		  var label = $(this).html();
+		  $(this).html(label.replace("Expand", "Hide"));
+		  var orig_height = $(this).parent().get(0).scrollHeight;
+		  var new_height = orig_height + 11;
+		  $(this).parent().css("overflow","auto");
+		  $(this).parent().css("height",new_height+"px");
+	  });
+    } else {
+      $(this).html(label.replace("Hide All Code", "Expand All Code"));
+	  $(".showopt").each(function() {
+		  var label = $(this).html();
+		  $(this).parent().css("overflow","hidden");
+		  $(this).parent().css("height","35px");
+		  $(this).html(label.replace("Hide", "Expand"));
+	  });
+    }
+  });
+  
+  $chunks.each(function () {
+	var orig_height = $(this).get(0).scrollHeight;
+	if (orig_height > 400) {
+		$('pre', this).css("height","400px");
+		$('pre', this).css("overflow","scroll");
+	}
   });
 })
 
