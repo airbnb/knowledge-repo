@@ -142,7 +142,7 @@ def _render_preview(path, tmpl):
                            unique_views=0,
                            likes=1,
                            total_likes=0,
-                           tags_list=','.join(post.headers.get('tags', [])),
+                           tags_list=post.headers.get('tags', []),
                            user_subscriptions=[],
                            webeditor_buttons=False,
                            table_id=None)
