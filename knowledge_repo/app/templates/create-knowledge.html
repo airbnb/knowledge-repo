@@ -15,6 +15,7 @@
     <a class="btn btn-primary" href="create/md" role="button"> Markdown </a>
     {% if web_editor_enabled %}
     <a class="btn btn-primary" href="{{ url_for('editor.editor') }}" role="button"> Web Editor </a>
+    <a class="btn btn-primary" href="{{ url_for('editor.editor', proxy='true') }}" role="button"> Web Proxy </a>
     {% endif %}
 </div>
 </center>
