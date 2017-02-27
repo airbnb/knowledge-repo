@@ -271,7 +271,7 @@ if args.action in ['preview', 'runserver']:
                                   debug=args.debug,
                                   db_uri=args.dburi,
                                   config=args.config,
-                                  REPOSITORY_INDEXING_ENABLED=(args.action == 'runserver'))
+                                  INDEXING_ENABLED=(args.action == 'runserver'))
 
     if args.action == 'preview':
         kp_path = repo._kp_path(args.path)
@@ -312,4 +312,4 @@ elif args.action == 'db_migrate':
 
 elif args.action == 'reindex':
     app = repo.get_app(db_uri=args.dburi, debug=args.debug, config=args.config)
-    app.db_update_index(reindex=True)
+    app.db_update_index(check_timeouts=False, force=True, reindex=True)

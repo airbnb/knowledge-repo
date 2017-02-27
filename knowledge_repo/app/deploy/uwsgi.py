@@ -15,7 +15,7 @@ class uWSGIDeployer(KnowledgeDeployer):
     COMMAND = u"uwsgi --http {socket} --plugin python --wsgi-file {path} --callable app --master --processes {processes} --threads {threads} --uid --gid"
 
     def run(self):
-        if not self.app.supports_threads:
+        if not self.app.check_thread_support():
             raise RuntimeError("Database configuration is not suitable for deployment (not thread-safe).")
 
         tmp_dir = self.write_temp_files()

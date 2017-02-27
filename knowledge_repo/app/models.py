@@ -141,6 +141,7 @@ class ErrorLog(db.Model):
             try:
                 return function(*args, **kwargs)
             except Exception as e:
+                db_session.rollback()
                 db_session.add(ErrorLog.from_exception(e))
                 db_session.commit()
                 raise_with_traceback(e)
@@ -172,7 +173,7 @@ class PageView(db.Model):
             return getattr(self._route, attr)
 
         def __call__(self, *args, **kwargs):
-            if not current_app.config.get('REPOSITORY_INDEXING_ENABLED', True):
+            if not current_app.config.get('INDEXING_ENABLED', True):
                 return self._route(*args, **kwargs)
 
             log = PageView(

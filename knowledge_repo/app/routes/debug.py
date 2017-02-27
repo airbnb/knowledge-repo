@@ -62,7 +62,7 @@ def show_versions():
 @blueprint.route('/debug/force_reindex', methods=['GET'])
 def force_reindex():
     reindex = bool(request.args.get('reindex', ''))
-    current_app.db_update_index(reindex=reindex)
+    current_app.db_update_index(check_timeouts=False, force=True, reindex=reindex)
     return "Index Updated"
 
 

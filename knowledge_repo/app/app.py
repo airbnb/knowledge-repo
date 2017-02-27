@@ -1,9 +1,14 @@
 from __future__ import absolute_import
+
+import multiprocessing
+import time
+import atexit
 import os
 import imp
 import logging
 import traceback
 import math
+import multiprocessing
 import uuid
 
 from flask import Flask, current_app, render_template, g, request, flash, redirect, url_for
@@ -20,7 +25,7 @@ import knowledge_repo
 from . import roles, routes
 from .auth_provider import KnowledgeAuthProvider
 from .proxies import db_session, current_repo, current_user
-from .index import update_index, time_since_index, time_since_index_check, _update_index
+from .index import update_index, set_up_indexing_timers, time_since_index, time_since_index_check
 from .models import db as sqlalchemy_db, Post, User, Tag
 from .utils.auth import AnonymousKnowledgeUser, populate_identity_roles, prepare_user
 
@@ -35,6 +40,11 @@ class KnowledgeFlask(Flask):
         Flask.__init__(self, __name__,
                        template_folder='templates',
                        static_folder='static')
+
+        # Add unique identifier for this application isinstance
+        self.uuid = str(uuid.uuid4())
+        if 'KNOWLEDGE_REPO_MASTER_UUID' not in os.environ:
+            os.environ['KNOWLEDGE_REPO_MASTER_UUID'] = self.uuid
 
         # Preload default configuration
         self.config.from_object('knowledge_repo.app.config_defaults')
@@ -164,9 +174,8 @@ class KnowledgeFlask(Flask):
                 Tag(name=tag)
             db_session.commit()
 
-        @self.before_request
-        def update_index_if_required():
-            update_index()
+        # Set up indexing timers
+        set_up_indexing_timers(self)
 
         @self.before_request
         def open_repository_session():
@@ -284,22 +293,23 @@ class KnowledgeFlask(Flask):
         with self.app_context():
             command.revision(self._alembic_config, message=message, autogenerate=autogenerate)
 
-    def db_update_index(self, reindex=True):
+    def db_update_index(self, check_timeouts=True, force=False, reindex=False):
         with self.app_context():
-            _update_index(current_app, force=True, reindex=reindex)
+            update_index(check_timeouts=check_timeouts, force=force, reindex=reindex)
 
-    @property
-    def supports_threads(self):
+    def check_thread_support(self, check_index=True, check_repositories=True):
         # If index database is an sqlite database, it will lock on any write action, and so breaks on multiple threads
         # Repository uris will break as above (but less often since they are not often written too), but will also
         # end up being a separate repository per thread; breaking consistency of presented content.
 
-        index_db = self.config['SQLALCHEMY_DATABASE_URI']
-        if index_db.startswith('sqlite://') and ':memory:' not in index_db:
-            return False
-
-        for uri in self.repository.uris.values():
-            if uri.startswith('sqlite://') or ':memory:' in uri:
+        if check_index:
+            index_db = self.config['SQLALCHEMY_DATABASE_URI']
+            if index_db.startswith('sqlite://'):
                 return False
+
+        if check_repositories:
+            for uri in self.repository.uris.values():
+                if uri.startswith('sqlite://') or ':memory:' in uri:
+                    return False
 
         return True
