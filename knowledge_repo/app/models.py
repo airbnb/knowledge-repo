@@ -108,10 +108,46 @@ class Comment(db.Model):
     updated_at = db.Column(db.DateTime, default=func.now(), onupdate=func.now())
 
 
+class ErrorLog(db.Model):
+    __tablename__ = 'errorlog'
+
+    id = db.Column(db.Integer, primary_key=True)
+    function = db.Column(db.String(100))
+    location = db.Column(db.String(255))
+    message = db.Column(db.Text())
+    traceback = db.Column(db.Text())
+    version = db.Column(db.String(100), default=__version__)
+    created_at = db.Column(db.DateTime, default=func.now())
+
+    @classmethod
+    def from_exception(cls, e):
+        tb = sys.exc_info()[-1]
+        s = traceback.extract_tb(sys.exc_info()[-1])[-1]
+        filename = os.path.relpath(s.filename, os.path.join(os.path.dirname(__file__), '..'))
+        return ErrorLog(
+            function=s.name,
+            location='{}:{}'.format(filename, s.lineno),
+            message='{}: {}'.format(e.__class__.__name__, "; ".join(str(a) for a in e.args)),
+            traceback="\n".join(traceback.format_tb(tb))
+        )
+
+    @classmethod
+    def logged(cls, function):
+        def wrapped(*args, **kwargs):
+            try:
+                return function(*args, **kwargs)
+            except Exception as e:
+                db_session.add(ErrorLog.from_exception(e))
+                db_session.commit()
+                raise_with_traceback(e)
+        return wrapped
+
+
 class PageView(db.Model):
     __tablename__ = 'pageviews'
 
     id = db.Column(db.Integer, primary_key=True)
+    id_errorlog = db.Column(db.Integer)
     page = db.Column(db.String(512))
     endpoint = db.Column(db.String(255))
     user_id = db.Column(db.Integer)
@@ -120,8 +156,7 @@ class PageView(db.Model):
     object_action = db.Column(db.String(100))
     ip_address = db.Column(db.String(64))
     created_at = db.Column(db.DateTime, default=func.now())
-    error_message = db.Column(db.Text())
-    version = db.Column(db.String(100))
+    version = db.Column(db.String(100), default=__version__)
 
     class logged(object):
 
@@ -143,14 +178,18 @@ class PageView(db.Model):
                 ip_address=request.remote_addr,
                 version=__version__
             )
+            errorlog = None
             log.object_id, log.object_type, log.object_action, reextract_after_request = self.extract_objects(*args, **kwargs)
-            db_session.add(log)
+            db_session.add(log)  # Add log here to ensure pageviews are accurate
 
             try:
                 return self._route(*args, **kwargs)
             except Exception as e:
-                tb = traceback.extract_tb(sys.exc_info()[2])
-                log.error_message = type(e).__name__ + ': ' + str(e) + '\nTraceback (most recent call last):\n' + '\n'.join(traceback.format_list(tb[1:]))
+                db_session.rollback()  # Ensure no lingering database changes remain after crashed route
+                db_session.add(log)
+                errorlog = ErrorLog.from_exception(e)
+                db_session.add(errorlog)
+                db_session.commit()
                 raise_with_traceback(e)
             finally:
                 # Extract object id and type after response generated (if requested) to ensure
@@ -158,7 +197,8 @@ class PageView(db.Model):
                 if reextract_after_request:
                     log.object_id, log.object_type, log.object_action, _ = self.extract_objects(*args, **kwargs)
 
-                db_session.rollback()
+                if errorlog is not None:
+                    log.id_errorlog = errorlog.id
                 db_session.add(log)
                 db_session.commit()
 
