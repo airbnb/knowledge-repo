@@ -18,6 +18,17 @@ import tempfile
 
 import jinja2
 from tabulate import tabulate
+import pwd
+
+def get_login():
+    """
+    Try to retrieve the user login to in a
+    """
+    try:
+        user_login = os.getlogin()
+    except OSError:
+        user_login = pwd.getpwuid(os.geteuid()).pw_name
+    return user_login
 
 # Register handler for SIGTERM, so we can run cleanup code if we are terminated
 signal.signal(signal.SIGTERM, lambda signum, frame: sys.exit(0))
@@ -275,8 +286,8 @@ if args.action == 'create':
     
     # Replace the current timestamp
     with open(src) as f:
-        #result = jinja2.Template(f.read()).render(current_date='{:%Y-%m-%d}'.format(datetime.datetime.now()), author=os.getlogin())
-        result = jinja2.Template(f.read()).render(current_date='{:%Y-%m-%d}'.format(datetime.datetime.now()), author='krepo')
+        result = jinja2.Template(f.read()).render(current_date='{:%Y-%m-%d}'.format(datetime.datetime.now()), author=get_login())
+        #result = jinja2.Template(f.read()).render(current_date='{:%Y-%m-%d}'.format(datetime.datetime.now()), author='krepo')
         with open(args.filename, "w") as out:
             out.write(result)
 
