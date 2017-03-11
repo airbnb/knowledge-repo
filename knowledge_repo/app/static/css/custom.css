@@ -304,7 +304,7 @@ a.label:focus, a.label:hover {
   font-size: 18px;
 }
 
-#renderedMarkdown {
+.renderedMarkdown {
     border: 1px solid #bbb;
     padding: 1.5em;
     background: #fff;
@@ -314,33 +314,33 @@ a.label:focus, a.label:hover {
     position: relative;
 }
 
-#renderedMarkdown h1,
-#renderedMarkdown h2,
-#renderedMarkdown h3,
-#renderedMarkdown h4,
-#renderedMarkdown h5,
-#renderedMarkdown h6 {
+.renderedMarkdown h1,
+.renderedMarkdown h2,
+.renderedMarkdown h3,
+.renderedMarkdown h4,
+.renderedMarkdown h5,
+.renderedMarkdown h6 {
   margin-top: 1.5em;
   margin-bottom: 0.5em;
   font-weight: bold;
 }
 
-#renderedMarkdown h1:nth-of-type(1) {
+.renderedMarkdown h1:nth-of-type(1) {
   margin-top: 1em;
   text-align: center;
   display: block;
 }
 
-#renderedMarkdown h2 {
+.renderedMarkdown h2 {
     border-bottom: 1px solid #eee;
     padding-bottom: 0.3em;
 }
 
-#renderedMarkdown div.metadata {
+.renderedMarkdown div.metadata {
     margin-bottom: 1em;
 }
 
-#renderedMarkdown .authors {
+.renderedMarkdown .authors {
     margin: auto;
     display: block;
     width: 80%;
@@ -349,14 +349,14 @@ a.label:focus, a.label:hover {
     padding-bottom: 0.8em;
 }
 
-#renderedMarkdown .date_created {
+.renderedMarkdown .date_created {
     display: block;
     margin: auto;
     text-align: center;
     font-size: 1.2em;
 }
 
-#renderedMarkdown .date_updated {
+.renderedMarkdown .date_updated {
     display: block;
     margin: auto;
     text-align: center;
@@ -364,7 +364,7 @@ a.label:focus, a.label:hover {
     font-style: italic;
 }
 
-#renderedMarkdown .tldr {
+.renderedMarkdown .tldr {
     width: 80%;
     padding-top: 1em;
     margin: auto;
@@ -373,19 +373,19 @@ a.label:focus, a.label:hover {
     text-align: justify;
 }
 
-#renderedMarkdown .tags {
+.renderedMarkdown .tags {
     width: 80%;
     display: block;
     margin: auto;
 }
 
-#renderedMarkdown img {
+.renderedMarkdown img {
     display: block;
     margin: auto;
     max-width: 80%;
 }
 
-#renderedMarkdown table {
+.renderedMarkdown table {
   margin: 10px auto;
   display: block;
   overflow-x: auto;
@@ -393,29 +393,29 @@ a.label:focus, a.label:hover {
   border: transparent;
 }
 
-#renderedMarkdown table tr th {
+.renderedMarkdown table tr th {
     background: #d8d8d8;
 }
 
-#renderedMarkdown table tr:nth-child(2n) th {
+.renderedMarkdown table tr:nth-child(2n) th {
     background: #e8e8e8;
 }
 
-#renderedMarkdown table tr:nth-child(2n+1) td {
+.renderedMarkdown table tr:nth-child(2n+1) td {
     background: #f8f8f8;
 }
 
-#renderedMarkdown table th, #renderedMarkdown table td {
+.renderedMarkdown table th, .renderedMarkdown table td {
   border: 1px solid grey;
   padding: 0.5em;
 }
 
-#renderedMarkdown .codehilite {
+.renderedMarkdown .codehilite {
   margin-top: 25px;
   margin-bottom: 25px;
 }
 
-#renderedMarkdown ul > li > p {
+.renderedMarkdown ul > li > p {
   margin-left: 0;
 }
 
@@ -662,4 +662,3 @@ border-color: #11b6aa;
   box-shadow: none;
   -webkit-box-shadow: none;
 }
-

@@ -13,7 +13,7 @@
     <div class='container-fluid'>
         <div class="row">
             <div class="col-md-12">
-                <div id="renderedMarkdown">
+                <div class="renderedMarkdown">
                     {{ html|safe }}
                 </div>
             </div>
@@ -70,7 +70,7 @@
         </div>
     </div>
   </div>
-  
+
  <style>
 .codehilite {
   position: relative;
@@ -78,7 +78,7 @@
 
 .showallopt {
   background-color: #00a699;
-  color: #FFFFFF; 
+  color: #FFFFFF;
   width: 140px;
   height: 20px;
   line-height: 20px;
@@ -108,7 +108,7 @@
 
 .showopt {
   background-color: #00a699;
-  color: #FFFFFF; 
+  color: #FFFFFF;
   width: 70px;
   height: 20px;
   text-align: center;
@@ -185,10 +185,10 @@ $(document).on('ready', function(){
   $(document.body).on('click',"button[id^=tag-subscription]",function () {
     tagsJx.addTagSubscriptionListener($(this)[0]);
   });
-  
+
   // Add code folding
   $chunks = $('.codehilite');
-  $chunks.each(function () {		
+  $chunks.each(function () {
 		var orig_height = $(this).get(0).scrollHeight;
 		if (orig_height > 400) {
 			$('pre', this).prepend("<div class=\"showopt\">Expand</div><br style=\"line-height:22px;\"/>");
@@ -196,7 +196,7 @@ $(document).on('ready', function(){
 			$('pre', this).prepend("<div class=\"showopt\">Hide</div><br style=\"line-height:22px;\"/>");
 		}
     });
-	
+
   // function to toggle chunk visibility
   $('.showopt').click(function() {
     var label = $(this).html();
@@ -212,7 +212,7 @@ $(document).on('ready', function(){
 	  $(this).parent().animate({height: "35px"}, 200);
     }
   });
-  
+
   $maindiv = $('#renderedMarkdown');
   $maindiv.prepend("<div class=\"showallopt\">Hide All Code</div>");
 
@@ -238,7 +238,7 @@ $(document).on('ready', function(){
 	  });
     }
   });
-  
+
   $chunks.each(function () {
 	var orig_height = $(this).get(0).scrollHeight;
 	if (orig_height > 400) {
