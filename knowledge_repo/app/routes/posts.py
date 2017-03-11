@@ -55,13 +55,9 @@ def render(path):
         # It's possible that someone gets a direct link to a post that has an excluded tag
         return render_template("error.html")
 
-    if post.private:
-        groups = post.groups
-        users = set()
-        for group in groups:
-            user_ids = [user.id for user in group.users]
-            users.update(user_ids)
-        if user_id not in users and username not in current_repo.config.editors:
+    if post.private and not (username in post.authors or username in current_repo.config.editors):
+        allowed_users = set(user.id for group in post.groups for user in group.users)
+        if user_id not in allowed_users:
             return render_template("permission_ask.html", authors=post.authors_string)
 
     html = render_post(post)
