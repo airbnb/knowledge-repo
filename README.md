@@ -16,7 +16,7 @@ Check out this [Medium Post](https://medium.com/airbnb-engineering/scaling-knowl
 
 ## Quickstart
 
-For details, see [Getting Started](#getting-started) below.
+*For details, see [Getting Started](#getting-started) below.*
 
 1\. Install the Knowledge Repo Toolset, which will allow you to create a Knowledge Repo.
 ```
