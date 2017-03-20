@@ -16,7 +16,7 @@ Check out this [Medium Post](https://medium.com/airbnb-engineering/scaling-knowl
 
 ## Quickstart
 
-For details, see [below](#installation).
+For details, see [Getting Started](#getting-started) below.
 
 1\. Install the Knowledge Repo Toolset, which will allow you to create a Knowledge Repo.
 ```
@@ -99,7 +99,7 @@ tldr: This is short description of the content and findings of the post.
 ---
 ```
 
-*See a full description of headers [further below](https://github.com/airbnb/knowledge-repo#post-headers)*
+*See a full description of headers [further below](#post-headers).*
 
 Users add these notebooks/files to the knowledge repository through the `knowledge_repo` tool, as described below; which allows them to be rendered and curated in the knowledge repository's web app.
 
