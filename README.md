@@ -78,7 +78,7 @@ Here's a running list of known issues we are working on:
 
 Knowledge posts are a general markdown format that is automatically generated from the following common formats:
 
- - Jupyter/Ipython notebooks
+ - Jupyter/iPython notebooks
  - Rmd notebooks
  - Markdown files
 
