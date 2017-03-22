@@ -111,6 +111,12 @@ def render(path):
     return rendered
 
 
+@blueprint.route('/post/preview/<path:path>', methods=['GET'])
+@PageView.logged
+def render_preview(path):
+    return _render_preview(path, 'markdown-rendered.html')
+
+
 def _render_preview(path, tmpl):
     post = None
     mode = request.args.get('render', 'html')
