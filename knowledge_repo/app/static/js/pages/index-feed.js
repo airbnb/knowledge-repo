@@ -5,7 +5,13 @@
     }
 
     function posts_open(event) {
-        window.location = $(this).data('url');
+        var is_mac = navigator.platform.indexOf('Mac') != -1;
+        if (is_mac && event.metaKey || !is_mac && event.ctrlKey) {
+            window.open($(this).data('url'), '_blank');
+        } else {
+            window.location = $(this).data('url');
+        }
+
     }
 
     function posts_expand_tldr(event) {
