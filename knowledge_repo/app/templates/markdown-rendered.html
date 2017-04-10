@@ -261,7 +261,7 @@ $.each(all_headers, function(index, value){
 })
 
 //turn all the tags into links, similar to what's done on the feed page
-var tags = $("#renderedMarkdown .metadata .tags")[0]
+var tags = $(".renderedMarkdown .metadata .tags")[0]
 var tags_list = {{ tags_list|safe }}
 var subscriptions_list = {{ user_subscriptions | safe }}
 $.each(tags_list, function(i,tag){
