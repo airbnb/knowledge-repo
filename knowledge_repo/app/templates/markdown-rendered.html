@@ -70,63 +70,6 @@
         </div>
     </div>
   </div>
-
- <style>
-.codehilite {
-  position: relative;
-}
-
-.showallopt {
-  background-color: #00a699;
-  color: #FFFFFF;
-  width: 140px;
-  height: 20px;
-  line-height: 20px;
-  text-align: center;
-  vertical-align: middle !important;
-  float: right;
-  font-family: sans-serif;
-  border-radius: 8px;
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  cursor: pointer;
-}
-
-.codehilite pre {
-	word-wrap: break-word;
-	white-space: -moz-pre-wrap;
-	white-space: pre-wrap;
-	overflow-x: hidden !important;
-}
-
-.showallopt:hover {
-    background-color: #dfe4f2;
-    color: #00a699;
-	cursor: pointer;
-}
-
-.showopt {
-  background-color: #00a699;
-  color: #FFFFFF;
-  width: 70px;
-  height: 20px;
-  text-align: center;
-  vertical-align: middle !important;
-  font-family: sans-serif;
-  border-radius: 8px;
-  position: absolute;
-  top: 8px;
-  right: 22px;
-  cursor: pointer;
-}
-
-.showopt:hover {
-    background-color: #dfe4f2;
-    color: #00a699;
-	cursor: pointer;
-}
-</style>
 {% endblock %}
 
 {% block scripts %}
@@ -190,51 +133,52 @@ $(document).on('ready', function(){
   $chunks = $('.codehilite');
   $chunks.each(function () {
 		var orig_height = $(this).get(0).scrollHeight;
-		if (orig_height > 400) {
-			$('pre', this).prepend("<div class=\"showopt\">Expand</div><br style=\"line-height:22px;\"/>");
-		} else {
-			$('pre', this).prepend("<div class=\"showopt\">Hide</div><br style=\"line-height:22px;\"/>");
+    if (orig_height > 400) {
+			$('pre', this).prepend("<div class=\"codetoggle\">Expand</div>");
+		}
+    else {
+			$('pre', this).prepend("<div class=\"codetoggle\">Collapse</div>");
 		}
     });
 
   // function to toggle chunk visibility
-  $('.showopt').click(function() {
+  $('.codetoggle').click(function() {
     var label = $(this).html();
     if (label.indexOf("Expand") >= 0) {
-      $(this).html(label.replace("Expand", "Hide"));
+      $(this).html(label.replace("Expand", "Collapse"));
 	  var orig_height = $(this).parent().get(0).scrollHeight;
 	  var new_height = orig_height + 11;
 	  $(this).parent().css("overflow","auto");
 	  $(this).parent().animate({height: new_height+"px"}, 200);
     } else {
-      $(this).html(label.replace("Hide", "Expand"));
+      $(this).html(label.replace("Collapse", "Expand"));
 	  $(this).parent().css("overflow","hidden");
 	  $(this).parent().animate({height: "35px"}, 200);
     }
   });
 
-  $maindiv = $('#renderedMarkdown');
-  $maindiv.prepend("<div class=\"showallopt\">Hide All Code</div>");
+  $maindiv = $('.renderedMarkdown');
+  $maindiv.prepend("<div class=\"codetoggleall\">Collapse All Code</div>");
 
-  $('.showallopt').click(function() {
+  $('.codetoggleall').click(function() {
     var label = $(this).html();
     if (label.indexOf("Expand All Code") >= 0) {
-      $(this).html(label.replace("Expand All Code", "Hide All Code"));
-	  $(".showopt").each(function() {
+      $(this).html(label.replace("Expand All Code", "Collapse All Code"));
+	  $(".codetoggle").each(function() {
 		  var label = $(this).html();
-		  $(this).html(label.replace("Expand", "Hide"));
+		  $(this).html(label.replace("Expand", "Collapse"));
 		  var orig_height = $(this).parent().get(0).scrollHeight;
 		  var new_height = orig_height + 11;
 		  $(this).parent().css("overflow","auto");
 		  $(this).parent().css("height",new_height+"px");
 	  });
     } else {
-      $(this).html(label.replace("Hide All Code", "Expand All Code"));
-	  $(".showopt").each(function() {
+      $(this).html(label.replace("Collapse All Code", "Expand All Code"));
+	  $(".codetoggle").each(function() {
 		  var label = $(this).html();
 		  $(this).parent().css("overflow","hidden");
 		  $(this).parent().css("height","35px");
-		  $(this).html(label.replace("Hide", "Expand"));
+		  $(this).html(label.replace("Collapse", "Expand"));
 	  });
     }
   });
@@ -261,7 +205,7 @@ $.each(all_headers, function(index, value){
 })
 
 //turn all the tags into links, similar to what's done on the feed page
-var tags = $("#renderedMarkdown .metadata .tags")[0]
+var tags = $(".renderedMarkdown .metadata .tags")[0]
 var tags_list = {{ tags_list|safe }}
 var subscriptions_list = {{ user_subscriptions | safe }}
 $.each(tags_list, function(i,tag){
