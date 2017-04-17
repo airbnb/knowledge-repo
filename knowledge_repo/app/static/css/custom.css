@@ -415,6 +415,67 @@ a.label:focus, a.label:hover {
   margin-bottom: 25px;
 }
 
+.renderedMarkdown .code-output {
+  background: #eee;
+  padding: 15px;
+  border-radius: 4px;
+  overflow: auto;
+}
+
+.renderedMarkdown .codehilite + .code-output  {
+  margin-top: -29px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+.renderedMarkdown .pre {
+  white-space: pre;
+}
+
+.codehilite {
+  position: relative;
+}
+
+.codehilite pre {
+	word-wrap: break-word;
+	white-space: -moz-pre-wrap;
+	white-space: pre-wrap;
+	overflow-x: hidden !important;
+}
+
+.codetoggle, .codetoggleall {
+  background-color: #ccc;
+  color: #FFFFFF;
+  width: 6em;
+  padding: 3px;
+  text-align: center;
+  font-family: sans-serif;
+  border-top-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.codetoggleall {
+  width: 140px;
+  border-top-right-radius: 0px;
+}
+
+.codetoggle:hover, .codetoggleall:hover {
+  background-color: #00a699;
+  color: #fff;
+	cursor: pointer;
+  opacity: 1;
+  transition: background-color 0.2s;
+}
+
+.codetoggle:active, .codetoggleall:active {
+  background: #edd114;
+}
+
 .renderedMarkdown ul > li > p {
   margin-left: 0;
 }

@@ -13,7 +13,7 @@ rm -f .coverage &> /dev/null
 set -e
 
 # Run pep8 tests
-pep8 --exclude knowledge_repo/app/migrations,tests/test_repo,build,deploy,kube --ignore=E501 .
+pep8 --exclude knowledge_repo/app/migrations,tests/test_repo,build,deploy,kube,docs --ignore=E501 .
 
 # Create fake repository and add some sample posts.
 # We use a fake repository here to speed things up, and to avoid using git in test environments
@@ -40,6 +40,12 @@ popd &> /dev/null
 `dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add `dirname $0`/knowledge_repo/templates/knowledge_template.ipynb -p projects/test/ipynb_test -m "Test commit" --branch master
 `dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add `dirname $0`/knowledge_repo/templates/knowledge_template.Rmd -p projects/test/Rmd_test -m "Test commit" --branch master
 `dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add `dirname $0`/knowledge_repo/templates/knowledge_template.md -p projects/test/md_test -m "Test commit" --branch master
+
+for post in $(ls `dirname $0`/tests/test_posts); do
+    if [[ "${post}" == *.ipynb ]]; then
+        `dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add `dirname $0`/tests/test_posts/${post} -p projects/${post} -m "Test commit" --branch master;
+    fi;
+done
 
 echo
 echo "Running regression test suite"
