@@ -122,11 +122,11 @@ class ErrorLog(db.Model):
     @classmethod
     def from_exception(cls, e):
         tb = sys.exc_info()[-1]
-        s = traceback.extract_tb(sys.exc_info()[-1])[-1]
-        filename = os.path.relpath(s.filename, os.path.join(os.path.dirname(__file__), '..'))
+        filename, linenumber, function, code = traceback.extract_tb(sys.exc_info()[-1])[-1]
+        filename = os.path.relpath(filename, os.path.join(os.path.dirname(__file__), '..'))
         return ErrorLog(
-            function=s.name,
-            location='{}:{}'.format(filename, s.lineno),
+            function=function,
+            location='{}:{}'.format(filename, linenumber),
             message='{}: {}'.format(e.__class__.__name__, "; ".join(str(a) for a in e.args)),
             traceback="\n".join(traceback.format_tb(tb))
         )

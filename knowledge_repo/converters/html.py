@@ -2,7 +2,10 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 import markdown
 from markdown import Extension
+from markdown.blockprocessors import BlockProcessor
 from markdown.preprocessors import Preprocessor
+from markdown.util import AtomicString
+import markdown.extensions.codehilite
 import re
 import base64
 import mimetypes
@@ -19,7 +22,7 @@ MARKDOWN_EXTENSTIONS = ['markdown.extensions.extra',
                         'markdown.extensions.tables',
                         'markdown.extensions.smart_strong',
                         'markdown.extensions.admonition',
-                        'markdown.extensions.codehilite',
+                        markdown.extensions.codehilite.CodeHiliteExtension(guess_lang=False),
                         'markdown.extensions.headerid',
                         'markdown.extensions.meta',
                         'markdown.extensions.sane_lists',
@@ -27,7 +30,57 @@ MARKDOWN_EXTENSTIONS = ['markdown.extensions.extra',
                         'markdown.extensions.toc(baselevel=1)',
                         'markdown.extensions.wikilinks',
                         'knowledge_repo.converters.html:KnowledgeMetaExtension',
-                        'knowledge_repo.converters.html:MathJaxExtension']
+                        'knowledge_repo.converters.html:MathJaxExtension',
+                        'knowledge_repo.converters.html:IndentsAsCellOutput']
+
+
+class IndentsAsCellOutputProcessor(BlockProcessor):
+    """ Process code blocks. """
+
+    def test(self, parent, block):
+        return block.startswith(' ' * self.tab_length)
+
+    def run(self, parent, blocks):
+        sibling = self.lastChild(parent)
+        block = blocks.pop(0)
+
+        block, theRest = self.detab(block)
+        block = block.rstrip()
+
+        block_is_html = False
+        if "<div " in block or "</" in block or "<span " in block:
+            block_is_html = True
+
+        if (sibling is not None and sibling.tag == "div"):
+            # The previous block was a code block. As blank lines do not start
+            # new code blocks, append this block to the previous, adding back
+            # linebreaks removed from the split into a list.
+
+            block_is_html = block_is_html and not isinstance(sibling.text, AtomicString)
+
+            block = '\n'.join([sibling.text, block])
+            output = sibling
+        else:
+            # This is a new codeblock. Create the elements and insert text.
+            output = markdown.util.etree.SubElement(parent, 'div', {'class': 'code-output'})
+
+        # If not HTML, add the `pre` class so that we know to render output as raw text
+        if not block_is_html and 'pre' not in output.get('class', 'code-output'):
+            output.set('class', ' '.join([output.get('class', ''), 'pre']))
+
+        output.text = "{}\n".format(block) if block_is_html else AtomicString("{}\n".format(block))
+
+        if theRest:
+            # This block contained unindented line(s) after the first indented
+            # line. Insert these lines as the first block of the master blocks
+            # list for future processing.
+            blocks.insert(0, theRest)
+
+
+class IndentsAsCellOutput(Extension):
+
+    def extendMarkdown(self, md, md_globals):
+        md.parser.blockprocessors['code'] = IndentsAsCellOutputProcessor(md.parser)
 
 
 class KnowledgeMetaPreprocessor(Preprocessor):
