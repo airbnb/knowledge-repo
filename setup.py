@@ -79,5 +79,10 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],
-    cmdclass={'install_scripts': install_scripts_windows_wrapper}
+    cmdclass={'install_scripts': install_scripts_windows_wrapper},
+    entry_points={
+        'nbconvert.exporters': [
+            'knowledge_post = knowledge_repo.converters.pkp:NBConvertExporter',
+        ],
+    }
 )
