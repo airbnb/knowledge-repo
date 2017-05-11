@@ -3,6 +3,7 @@
 {% block title %} Knowledge {% endblock %}
 
 {% block style_links %}
+{{ super() }}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/codehilite-friendly.css')}}">
 {% endblock %}
 
@@ -133,25 +134,20 @@ $(document).on('ready', function(){
   $chunks = $('.codehilite');
   $chunks.each(function () {
 		var orig_height = $(this).get(0).scrollHeight;
-    if (orig_height > 400) {
-			$('pre', this).prepend("<div class=\"codetoggle\">Expand</div>");
-		}
-    else {
-			$('pre', this).prepend("<div class=\"codetoggle\">Collapse</div>");
-		}
+		$('pre', this).prepend("<div class=\"codetoggle\">↕</div>");
     });
 
   // function to toggle chunk visibility
   $('.codetoggle').click(function() {
     var label = $(this).html();
-    if (label.indexOf("Expand") >= 0) {
-      $(this).html(label.replace("Expand", "Collapse"));
+    if ($(this).data("expansion_status") == "expanded") {
+      $(this).data("expansion_status", "collapsed");
 	  var orig_height = $(this).parent().get(0).scrollHeight;
 	  var new_height = orig_height + 11;
 	  $(this).parent().css("overflow","auto");
 	  $(this).parent().animate({height: new_height+"px"}, 200);
     } else {
-      $(this).html(label.replace("Collapse", "Expand"));
+      $(this).data("expansion_status", "expanded");
 	  $(this).parent().css("overflow","hidden");
 	  $(this).parent().animate({height: "35px"}, 200);
     }
@@ -181,14 +177,6 @@ $(document).on('ready', function(){
 		  $(this).html(label.replace("Collapse", "Expand"));
 	  });
     }
-  });
-
-  $chunks.each(function () {
-	var orig_height = $(this).get(0).scrollHeight;
-	if (orig_height > 400) {
-		$('pre', this).css("height","400px");
-		$('pre', this).css("overflow","scroll");
-	}
   });
 })
 
