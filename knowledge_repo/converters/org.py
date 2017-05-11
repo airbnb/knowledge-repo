@@ -54,8 +54,6 @@ class OrgConverter(KnowledgePostConverter):
         self.from_lines(lines, **opts)
 
     def from_lines(self, lines, **opts):
-        #TODO: Image support
-
         # These dict will let use the correct function for each line
         line_converters = {
             "src": self.convert_code,
@@ -130,6 +128,13 @@ class OrgConverter(KnowledgePostConverter):
             link, desc = match.groups()
             new_hlink = "[{}]({})".format(desc, link)
             new_line = new_line.replace("[[{}][{}]]".format(link, desc), new_hlink)
+
+        # Images (Org: [[path/to/img]]
+        reg = re.compile("\[\[([^\[\]]+)\]\]")
+        img_find = re.finditer(reg, new_line)
+        for match in img_find:
+            img_path = match.group(1)
+            new_line = "![]({})".format(img_path)
 
         return new_line.strip()
 
