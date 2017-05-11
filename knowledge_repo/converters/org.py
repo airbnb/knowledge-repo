@@ -2,6 +2,22 @@ import re
 
 from ..converter import KnowledgePostConverter
 
+
+def dict_to_yaml(x):
+    yaml = ''
+    for key, value in x.items():
+        if type(value) == list:
+            lines = "{key}:\n".format(key=key)
+            for v in value:
+                lines += "- {v}\n".format(v=v)
+        else:
+            lines = "{key}: {value}\n".format(key=key, value=value)
+
+        yaml += lines
+
+    return yaml
+
+
 class OrgConverter(KnowledgePostConverter):
     '''
     Use this as a template for new KnowledgePostConverters.
@@ -22,15 +38,15 @@ class OrgConverter(KnowledgePostConverter):
             "type": "string",
             "converts_to": "created_at"
         },
-        "date_updated": {
+        "kr_updated_at": {
             "type": "string",
             "converts_to": "updated_at"
         },
-        "tldr": {
+        "kr_tldr": {
             "type": "string",
             "converts_to": "tldr"
         },
-        "post_tags": {
+        "kr_tags": {
             "type": "list",
             "converts_to": "tags"
         }
@@ -62,7 +78,7 @@ class OrgConverter(KnowledgePostConverter):
         }
 
         new_lines = []
-        metadata = []
+        metadata = dict()
         in_chunk = False
         line_type = "text"
         for line in lines:
@@ -88,7 +104,7 @@ class OrgConverter(KnowledgePostConverter):
                 new_line = line_converters[line_type](line)
 
             if new_meta is not None:
-                metadata.extend(new_meta)
+                metadata.update(new_meta)
 
             if new_line is not None:
                 new_lines.append(new_line)
@@ -96,8 +112,7 @@ class OrgConverter(KnowledgePostConverter):
         return self.write_kp(new_lines, metadata)
 
     def convert_text(self, line):
-        #TODO: inline source
-        #TODO: strikethrough
+
 
         new_line = line
 
@@ -107,36 +122,46 @@ class OrgConverter(KnowledgePostConverter):
             n_asts = len(header_match.group(1))
             new_line = re.sub("^(\*+)", "#"*n_asts, new_line)
 
-        # Bold (Org: *bold*)
-        reg = re.compile(r"[^\w]\*([^\*]+)\*[^\w]", re.U)
-        bold_find = re.finditer(reg, new_line)
-        for match in bold_find:
-            bolded = match.group(1)
-            new_line = new_line.replace("*{}*".format(bolded), "**{}**".format(bolded))
+        # Find and replace
+        replacer_regex = [
+            #TODO: inline source
+            #TODO: strikethrough
+            # Bold (*bold*)
+            {
+                "regex": re.compile(r"\B\*(?P<bolded>[^\*]+)\*\B", re.U),
+                "replace_fmt": "**{bolded}**"
+            },
+            # Italics (/italics/)
+            {
+                "regex": re.compile(r"\B/(?P<italicized>[^/]+)/\B", re.U),
+                "replace_fmt": "_{italicized}_"
+            },
+            # Hyperlinks ([[link][desc]])
+            {
+                "regex": re.compile("\[\[(?P<link>[^\[\]]+)\]\[(?P<desc>[^\[\]]+)\]\]"),
+                "replace_fmt": "[{desc}]({link})"
+            },
+            # Images ([[imgpath]])
+            {
+                "regex": re.compile("\[\[(?P<imgpath>[^\[\]]+)\]\]"),
+                "replace_fmt": "![]({imgpath})"
+            }
+        ]
 
-        # Italics (Org: /italic/)
-        reg = re.compile("[^\w/]/([^/]+)/[^\w/]", re.U)
-        italics_find = re.finditer(reg, new_line)
-        for match in italics_find:
-            italicized = match.group(1)
-            new_line = new_line.replace("/{}/".format(italicized), "_{}_".format(italicized))
-
-        # Hyperlinks (Org: [[link][desc]])
-        reg = re.compile("\[\[([^\[\]]+)\]\[([^\[\]]+)\]\]")
-        hlink_find = re.finditer(reg, new_line)
-        for match in hlink_find:
-            link, desc = match.groups()
-            new_hlink = "[{}]({})".format(desc, link)
-            new_line = new_line.replace("[[{}][{}]]".format(link, desc), new_hlink)
-
-        # Images (Org: [[path/to/img]]
-        reg = re.compile("\[\[([^\[\]]+)\]\]")
-        img_find = re.finditer(reg, new_line)
-        for match in img_find:
-            img_path = match.group(1)
-            new_line = "![]({})".format(img_path)
+        for args in replacer_regex:
+            new_line = self.find_and_replace(new_line, **args)
 
         return new_line.strip()
+
+    def find_and_replace(self, string, regex, replace_fmt):
+        new_string = string
+        for match in re.finditer(regex, string):
+            groups = match.groupdict()
+            found = string[match.start():match.end()]
+
+            new_string = new_string.replace(found, replace_fmt.format(**groups))
+
+        return new_string
 
     def extract_meta(self, line):
         meta = None
@@ -146,18 +171,14 @@ class OrgConverter(KnowledgePostConverter):
                 field_type = self.metadata_fields[field]["type"]
                 field_name = self.metadata_fields[field]["converts_to"]
 
-                # Add a single line to metadata YAML
-                if field_type == "string":
-                    value = line.split(":")[1].strip()
-                    meta = ["{}: {}".format(field_name, value)]
-                # Add multiple lines to metadata YAML
-                elif field_type == "list":
-                    values = line.split(":")[1].strip().split(",")
-                    meta = ["{}:".format(field_name)]
-                    for value in values:
-                        meta.append("- {}".format(value))
+                if field_type == "list":
+                    value = line.split(":")[1].split(",")
+                else:
+                    value = line.split(":")[1]
 
+                meta = { field_name: value }
                 break
+
         return meta
 
     def convert_code(self, line):
@@ -184,7 +205,8 @@ class OrgConverter(KnowledgePostConverter):
 
     def write_kp(self, new_lines, metadata):
         # Metadata header
-        metadata_str = "---\n{}\n---".format("\n".join(metadata))
+        print metadata
+        metadata_str = "---\n{}\n---".format(dict_to_yaml(metadata))
 
         body = metadata_str + "\n".join(new_lines)
 
