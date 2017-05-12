@@ -6,6 +6,17 @@ from .._version import __optional_dependencies__
 TEMPLATE = '''
 {%- extends 'markdown.tpl' -%}
 
+{%- block data_javascript scoped %}
+{% set div_id = uuid4() %}
+<div id="{{ div_id }}"></div>
+<div class="output_subarea output_javascript {{ extra_class }}">
+<script type="text/javascript">
+var element = $('#{{ div_id }}');
+{{ output.data['application/javascript'] }}
+</script>
+</div>
+{%- endblock -%}
+
 {%- block input -%}
 {%- if cell['metadata'].get('slideshow',{}).get('slide_type','') == 'skip' -%}
 {%- else %}
@@ -46,6 +57,9 @@ class IpynbFormat(KnowledgePostConverter):
         c = Config()
         # c.ExtractOutputPreprocessor.extract_output_types = set()
         c.ExtractOutputPreprocessor.output_filename_template = 'images/{unique_key}_{cell_index}_{index}{extension}'
+        c.NbConvertBase.display_data_priority = ['application/javascript', 'text/html', 'text/markdown',
+                                                 'image/svg+xml', 'text/latex', 'image/png', 'image/jpeg',
+                                                 'text/plain']
 
         nb = nbformat.read(filename, as_version=4)
 
