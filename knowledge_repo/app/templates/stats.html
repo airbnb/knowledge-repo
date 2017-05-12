@@ -22,6 +22,10 @@
       <div class="panel-header">Pageviews per Day</div>
       <div id="pageviews_daily"></div>
     </div>
+    <div class="panel">
+      <div class="panel-header">Number of posts per author</div>
+      <div id="posts_per_author"></div>
+    </div>
   </br>
 
 
@@ -105,6 +109,22 @@ function drawChart() {
                     colors: ['#007a87'],
                     height: height,
                     hAxis: hAxisOpts});
+
+  // Number of posts per author
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Author');
+  data.addColumn('number', 'Number of posts');
+  data.addRows([
+          {%- for k, v in post_per_author_count.items() %}
+          ["{{ k }}", {{ v }} ],
+          {%- endfor %}
+  ]);
+  data.sort(0);
+  var chart = new google.visualization.BarChart(document.getElementById('posts_per_author'));
+  chart.draw(data, {hAxis: {baseline: 0, gridlines: {count: -1}},
+                    colors: ['#007a87'],
+                    height: height,
+                    });
 
 }
 
