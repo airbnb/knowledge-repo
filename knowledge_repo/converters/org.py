@@ -20,7 +20,24 @@ def dict_to_yaml(x):
 
 class OrgConverter(KnowledgePostConverter):
     '''
-    Use this as a template for new KnowledgePostConverters.
+    Converts .org documents to the markdown syntax needed for a knowledge repo.
+
+    Uses the .org metadata standard syntax to populate the metadata YAML required by the knowledge repo.
+    (e.g. #+TITLE: the title becomes - title: the title)
+
+    Metadata field equivalency:
+    TITLE: title
+    AUTHOR: authors
+    DATE: created_at
+    KR_UPDATED_AT: updated_at
+    KR_TLDR: tldr
+    KR_TAGS: tags
+
+    Note that in orgmode, the convention for designating many authors is to separate them using commas like so:
+    #+AUTHOR: author 1, author 2
+    This convention was kept for every list element, so that
+    #+KR_TAGS: tag1, tag2
+    is the correct way to assign many tags to a post/document
     '''
     _registry_keys = ["org"]
 
@@ -112,7 +129,9 @@ class OrgConverter(KnowledgePostConverter):
         return self.write_kp(new_lines, metadata)
 
     def convert_text(self, line):
-
+        '''
+        Translates a single line of 'regular' text from orgmode syntax to markdown syntax
+        '''
 
         new_line = line
 
@@ -154,6 +173,14 @@ class OrgConverter(KnowledgePostConverter):
         return new_line.strip()
 
     def find_and_replace(self, string, regex, replace_fmt):
+        '''
+        Finds every match of a regular expression with named groups and replaces it according to a specified
+        format (format must also have names)
+
+        :param string: original string
+        :param regex: regex to find and replace
+        :param replace_fmt: replace format, must have names
+        '''
         new_string = string
         for match in re.finditer(regex, string):
             groups = match.groupdict()
@@ -182,6 +209,9 @@ class OrgConverter(KnowledgePostConverter):
         return meta
 
     def convert_code(self, line):
+        '''
+        Translates a single line of a code block in orgmode syntax to markdown syntax.
+        '''
         if "#+begin_src" in line.lower():
             new_line = "```"
 
@@ -198,14 +228,16 @@ class OrgConverter(KnowledgePostConverter):
         return new_line.strip()
 
     def convert_example(self, line):
+        '''
+        Translates a single line of an 'example' block in orgmode syntax to markdown syntax
+        '''
         if "#+begin_example" in line.lower() or "#+end_example" in line.lower():
             return None
 
         return "    " + line.strip()
 
     def write_kp(self, new_lines, metadata):
-        # Metadata header
-        print metadata
+       # Metadata header
         metadata_str = "---\n{}\n---".format(dict_to_yaml(metadata))
 
         body = metadata_str + "\n".join(new_lines)
