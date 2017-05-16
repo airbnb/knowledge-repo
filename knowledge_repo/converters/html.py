@@ -34,6 +34,28 @@ MARKDOWN_EXTENSTIONS = ['markdown.extensions.extra',
                         'knowledge_repo.converters.html:IndentsAsCellOutput']
 
 
+class IndentsAsCellOutputPreprocessor(Preprocessor):
+    """
+    Ensure all indented blocks are followed by a blank line to allow html
+    preprocessors to extract html elements (like scripts) properly.
+    """
+
+    def run(self, lines):
+        in_block = False
+        block_startable = True
+        for i, line in enumerate(lines):
+            if not line.startswith(' ' * self.markdown.tab_length):
+                if in_block:
+                    if line != "":
+                        lines.insert(i, "")
+                    in_block = False
+                else:
+                    block_startable = True if line == "" else False
+            elif block_startable and not in_block:
+                in_block = True
+        return lines
+
+
 class IndentsAsCellOutputProcessor(BlockProcessor):
     """ Process code blocks. """
 
@@ -80,6 +102,7 @@ class IndentsAsCellOutputProcessor(BlockProcessor):
 class IndentsAsCellOutput(Extension):
 
     def extendMarkdown(self, md, md_globals):
+        md.preprocessors.add("code_isolation", IndentsAsCellOutputPreprocessor(md), "<html_block")
         md.parser.blockprocessors['code'] = IndentsAsCellOutputProcessor(md.parser)
 
 

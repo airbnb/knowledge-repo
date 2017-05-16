@@ -2,6 +2,11 @@
 
 {% block title %} Knowledge {% endblock %}
 
+{% block style_links %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/markdown-base.css')}}">
+{% endblock %}
+
 {% block content %}
 
     <br>
