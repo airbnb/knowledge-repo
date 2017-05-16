@@ -139,12 +139,12 @@ class OrgConverter(KnowledgePostConverter):
         header_match = re.match("^(\*+)", new_line)
         if header_match:
             n_asts = len(header_match.group(1))
-            new_line = re.sub("^(\*+)", "#"*n_asts, new_line)
+            new_line = re.sub("^(\*+)", "#" * n_asts, new_line)
 
         # Find and replace
         replacer_regex = [
-            #TODO: inline source
-            #TODO: strikethrough
+            # TODO: inline source
+            # TODO: strikethrough
             # Bold (*bold*)
             {
                 "regex": re.compile(r"\B\*(?P<bolded>[^\*]+)\*\B", re.U),
@@ -203,7 +203,7 @@ class OrgConverter(KnowledgePostConverter):
                 else:
                     value = line.split(":")[1]
 
-                meta = { field_name: value }
+                meta = {field_name: value}
                 break
 
         return meta
@@ -237,7 +237,7 @@ class OrgConverter(KnowledgePostConverter):
         return "    " + line.strip()
 
     def write_kp(self, new_lines, metadata):
-       # Metadata header
+        # Metadata header
         metadata_str = "---\n{}\n---".format(dict_to_yaml(metadata))
 
         body = metadata_str + "\n".join(new_lines)
