@@ -109,7 +109,8 @@ class OrgConverter(KnowledgePostConverter):
         line_converters = {
             "src": self.convert_code,
             "text": self.convert_text,
-            "example": self.convert_example
+            "example": self.convert_example,
+            "results": self.convert_example
         }
 
         new_lines = []
@@ -129,6 +130,12 @@ class OrgConverter(KnowledgePostConverter):
                 in_chunk = True
                 line_type = re.search("#\+begin_(\w+)", clean_line).group(1)
             elif clean_line.strip().startswith("#+end_"):
+                in_chunk = False
+            # Special case for chunk start and end for results block
+            elif clean_line.startswith("#+results"):
+                in_chunk = True
+                line_type = "results"
+            elif line_type == "results" and not clean_line.startswith(":"):
                 in_chunk = False
             elif clean_line.startswith("#+") or clean_line.startswith("# -*-"):
                 line_type = "meta"
@@ -162,8 +169,6 @@ class OrgConverter(KnowledgePostConverter):
 
         # Find and replace
         replacer_regex = [
-            # TODO: inline source
-            # TODO: strikethrough
             # Bold (*bold*)
             {
                 "regex": re.compile(r"\B\*(?P<bolded>[^\*]+)\*\B", re.U),
@@ -183,6 +188,16 @@ class OrgConverter(KnowledgePostConverter):
             {
                 "regex": re.compile("\[\[(?P<imgpath>[^\[\]]+)\]\]"),
                 "replace_fmt": "![]({imgpath})"
+            },
+            # Code/verbatim (~verbatim~  or =verbatim=)
+            {
+                "regex": re.compile(r"\B[~=](?P<verbatim>[^~=]+)[~=]\B", re.U),
+                "replace_fmt": "`{verbatim}`"
+            },
+            # Strikethrough (+strikethrough+)
+            {
+                "regex": re.compile(r"\B\+(?P<strikethrough>[^\+]+)\+\B", re.U),
+                "replace_fmt": "~~{strikethrough}~~"
             }
         ]
 
@@ -273,10 +288,16 @@ class OrgConverter(KnowledgePostConverter):
         '''
         Translates a single line of an 'example' block in orgmode syntax to markdown syntax
         '''
-        if "#+begin_example" in line.lower() or "#+end_example" in line.lower():
+        if "#+begin_example" in line.lower() or "#+end_example" in line.lower() or "#+results" in line.lower():
             return None
 
         return "    " + line.strip()
+
+    def convert_result(self, line):
+        if "#+results" in line.lower():
+            return None
+
+        return "    " + re.sub("^:", "", line.strip())
 
     def write_kp(self, new_lines, metadata):
         # Metadata header
