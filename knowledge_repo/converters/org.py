@@ -25,13 +25,17 @@ class OrgConverter(KnowledgePostConverter):
     Uses the .org metadata standard syntax to populate the metadata YAML required by the knowledge repo.
     (e.g. #+TITLE: the title becomes - title: the title)
 
-    Metadata field equivalency:
+    Metadata required fields equivalency:
     TITLE: title
     AUTHOR: authors
     DATE: created_at
-    KR_UPDATED_AT: updated_at
-    KR_TLDR: tldr
-    KR_TAGS: tags
+    DESCRIPTION: tldr
+    KEYWORDS: tags
+
+    For optional fields, the syntax is as follows
+    #+KNOWLEDGE_REPO: :updated_at <date> :thumbnail <number>
+
+    The names are the same as the YAML header
 
     Note that in orgmode, the convention for designating many authors is to separate them using commas like so:
     #+AUTHOR: author 1, author 2
@@ -41,8 +45,8 @@ class OrgConverter(KnowledgePostConverter):
     '''
     _registry_keys = ["org"]
 
-    # This dict will help in converting org metadata (#+TITLE: {}) to yaml metadata (title: {})
-    metadata_fields = {
+    # This dicts will help in converting org metadata (#+TITLE: {}) to yaml metadata (title: {})
+    metadata_required_fields = {
         "title": {
             "type": "string",
             "converts_to": "title"
@@ -55,17 +59,31 @@ class OrgConverter(KnowledgePostConverter):
             "type": "string",
             "converts_to": "created_at"
         },
-        "kr_updated_at": {
-            "type": "string",
-            "converts_to": "updated_at"
-        },
-        "kr_tldr": {
+        "description": {
             "type": "string",
             "converts_to": "tldr"
         },
-        "kr_tags": {
+        "keywords": {
             "type": "list",
             "converts_to": "tags"
+        }
+    }
+
+    metadata_optional_fields = {
+        "updated_at": {
+            "type": "string"
+        },
+        "path": {
+            "type": "string"
+        },
+        "thumbnail": {
+            "type": "string"
+        },
+        "private": {
+            "type": "string"
+        },
+        "allowed_groups": {
+            "type": "list"
         }
     }
 
@@ -106,12 +124,13 @@ class OrgConverter(KnowledgePostConverter):
                 line_type = "text"
 
             # Is this the beggining or end of a chunk?
-            if line.lower().strip().startswith("#+begin_"):
+            clean_line = line.lower().strip()
+            if clean_line.startswith("#+begin_"):
                 in_chunk = True
-                line_type = re.search("#\+begin_(\w+)", line.lower()).group(1)
-            elif line.lower().strip().startswith("#+end_"):
+                line_type = re.search("#\+begin_(\w+)", clean_line).group(1)
+            elif clean_line.strip().startswith("#+end_"):
                 in_chunk = False
-            elif line.strip().startswith("#+") or line.strip().startswith("# -*-"):
+            elif clean_line.startswith("#+") or clean_line.startswith("# -*-"):
                 line_type = "meta"
 
             # Meta (org settings) never add a line to markdown
@@ -191,18 +210,41 @@ class OrgConverter(KnowledgePostConverter):
         return new_string
 
     def extract_meta(self, line):
-        meta = None
         line = line.strip()
-        for field in self.metadata_fields:
-            if line.lower().startswith("#+{}:".format(field)):
-                field_type = self.metadata_fields[field]["type"]
-                field_name = self.metadata_fields[field]["converts_to"]
+        if line.startswith("#+KNOWLEDGE_REPO"):
+            return self.extract_optional_meta(line)
+        else:
+            return self.extract_required_meta(line)
 
+    def extract_optional_meta(self, line):
+        meta = dict()
+        line = line.replace("#+KNOWLEDGE_REPO:", "").strip()
+
+        prop_definitions = line.split(":")
+        if len(prop_definitions) > 1:  # Else line is empty
+            for prop_def in prop_definitions[1:]:
+                prop_def_list = prop_def.strip().split()
+                field = prop_def_list[0].strip()
+                if self.metadata_optional_fields[field]["type"] == "list":
+                    value = prop_def_list[1:]
+                else:
+                    value = prop_def_list[1].strip()
+
+                meta.update({field: value})
+
+        return meta
+
+    def extract_required_meta(self, line):
+        meta = dict()
+
+        for field in self.metadata_required_fields:
+            if line.lower().startswith("#+{}:".format(field)):
+                field_type = self.metadata_required_fields[field]["type"]
+                field_name = self.metadata_required_fields[field]["converts_to"]
                 if field_type == "list":
                     value = line.split(":")[1].split(",")
                 else:
                     value = line.split(":")[1]
-
                 meta = {field_name: value}
                 break
 
