@@ -1,0 +1,28 @@
+#+TITLE: This is an orgmode document
+#+AUTHOR: arinarmo
+#+DATE: 2017-05-19
+#+DESCRIPTION: The TL;DR goes here
+#+KEYWORDS: test, knowledge
+#+KNOWLEDGE_REPO: :updated_at 2017-05-17
+
+* Header 1
+You can *bold* and /italicize/ stuff, you can also _underscore_ and +strikethrough+.
+** SubHeader 1
+   You can also run some code with babel!
+#+BEGIN_SRC python :results output
+x = 3
+y = 5
+print("Time for a sum!")
+print(x + y)
+#+END_SRC
+
+#+RESULTS:
+: Time for a sum!
+: 8
+   
+You can also quote "code" (verbatim) like so: ~x + y~ 
+** SubHeader 2
+   + Lists 
+   + Work
+   + Fine
+

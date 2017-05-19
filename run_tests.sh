@@ -42,7 +42,7 @@ popd &> /dev/null
 `dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add `dirname $0`/knowledge_repo/templates/knowledge_template.md -p projects/test/md_test -m "Test commit" --branch master
 
 for post in $(ls `dirname $0`/tests/test_posts); do
-    if [[ "${post}" == *.ipynb ]]; then
+    if [[ "${post}" == *.ipynb ]] || [[ "${post}" == *.org ]] ; then
         `dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add `dirname $0`/tests/test_posts/${post} -p projects/${post} -m "Test commit" --branch master;
     fi;
 done
