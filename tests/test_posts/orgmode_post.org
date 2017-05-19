@@ -6,7 +6,7 @@
 #+KNOWLEDGE_REPO: :updated_at 2017-05-17
 
 * Header 1
-You can *bold* and /italicize/ stuff, you can also _underscore_ and +strikethrough+.
+You can *bold* and /italicize/ stuff, you can also _underscore_ (No underscore in markdown though :( ) and +strikethrough+.
 ** SubHeader 1
    You can also run some code with babel!
 #+BEGIN_SRC python :session :results output :exports both
@@ -48,3 +48,5 @@ You can also quote "code" (verbatim) like so: ~x + y~
    + Work
    + Fine
 
+Images work too!
+[[https://random.dog/8617-11546-19302.jpg]]
