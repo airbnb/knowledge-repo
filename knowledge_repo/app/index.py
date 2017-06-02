@@ -129,7 +129,7 @@ def _update_index(app, force=False, reindex=False):
         kp = kr_dir.pop(post.path)
 
         # Update metadata of post if required
-        if reindex or (kp.revision > post.revision or not post.is_published or kp.uuid != post.uuid):
+        if reindex or (kp.revision > post.revision or not post.is_published or post.status != kp.status or kp.uuid != post.uuid):
             if kp.is_valid():
                 logger.info('Recording update to post at: {}'.format(kp.path))
                 post.update_metadata_from_kp(kp)
