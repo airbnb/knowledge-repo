@@ -1,7 +1,12 @@
+sudo: required
+
 language: python
 python:
   - "2.7"
   - "3.4"
+
+services:
+  - docker
 
 before_install:
   # build docker image - this image contains none of the testing dependencies so is releasable if the tests pass
