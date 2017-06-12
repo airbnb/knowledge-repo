@@ -1,0 +1,10 @@
+version: '2'
+services:
+  web:
+    build:
+      context: .
+      args:
+        TRAVIS_PYTHON_VERSION: "${TRAVIS_PYTHON_VERSION}"
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
