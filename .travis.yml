@@ -37,8 +37,8 @@ script:
 
 after_success:
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - docker tag knowledgerepo_web ${DOCKER_REPO}-python{$TRAVIS_PYTHON_VERSION}:${TRAVIS_BRANCH}
-  - docker push ${DOCKER_REPO}-python{$TRAVIS_PYTHON_VERSION}:${TRAVIS_BRANCH}
+  - docker tag knowledgerepo_web ${DOCKER_REPO}-python${TRAVIS_PYTHON_VERSION}:${TRAVIS_BRANCH}
+  - docker push ${DOCKER_REPO}-python${TRAVIS_PYTHON_VERSION}:${TRAVIS_BRANCH}
 
 # Deploy to pypi automatically from tagged releases on the stable branch
 deploy:
