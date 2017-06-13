@@ -40,8 +40,8 @@ after_success:
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   # omit docker image tags for successful builds on the master branch, pushing to :latest instead
   - if [ "$TRAVIS_BRANCH" == "master" ];
-    then export DOCKER_REPO_FULLNAME=${DOCKER_REPO}_python${TRAVIS_PYTHON_VERSION};
-    else export DOCKER_REPO_FULLNAME=${DOCKER_REPO}_python${TRAVIS_PYTHON_VERSION}:${TRAVIS_BRANCH};
+    then export DOCKER_REPO_FULLNAME=${DOCKER_REPO}-python${TRAVIS_PYTHON_VERSION};
+    else export DOCKER_REPO_FULLNAME=${DOCKER_REPO}-python${TRAVIS_PYTHON_VERSION}:${TRAVIS_BRANCH};
     fi
   - docker tag knowledgerepo_web $DOCKER_REPO_FULLNAME
   - docker push $DOCKER_REPO_FULLNAME
