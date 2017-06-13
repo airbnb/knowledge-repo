@@ -2,6 +2,7 @@
 FROM ubuntu:14.04
 
 ARG TRAVIS_PYTHON_VERSION
+ARG PORT
 
 # Install required Ubuntu packages
 RUN apt-get update
@@ -31,11 +32,25 @@ RUN conda install -c r r-knitr
 # Set the application directory
 WORKDIR /app
 
+# Install python dependencies - do this before adding rest of code to allow docker to cache this step
+ADD ./requirements.txt /app/requirements.txt
+RUN pip install -r requirements.txt
+
 # Copy our code from the current folder to /app inside the container
 ADD . /app
 
-# Install python dependencies
-RUN pip install -r requirements.txt
+# Run project installation scripts
+RUN python setup.py develop
 
 # Ready dependencies to use IpynbFormat instances
 RUN pip install --ignore-installed --upgrade nbformat nbconvert[execute] traitlets
+
+# Set up to use a new empty repo until configured otherwise
+RUN ./scripts/knowledge_repo --repo ./default_repo init
+ENV KNOWLEDGE_REPO=./default_repo
+
+EXPOSE ${PORT}
+ENV PORT=${PORT}
+
+# Deploy via gunicorn as standard startup command
+CMD ["bash", "-c", "./scripts/knowledge_repo deploy --port ${PORT}"]

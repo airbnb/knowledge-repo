@@ -5,6 +5,14 @@ services:
       context: .
       args:
         TRAVIS_PYTHON_VERSION: "${TRAVIS_PYTHON_VERSION}"
+        PORT: "${PORT}"
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "${PORT}:${PORT}"
+  sut:
+    build:
+      context: .
+      dockerfile: Dockerfile.systest
+    tty: true
+    links:
+      - web

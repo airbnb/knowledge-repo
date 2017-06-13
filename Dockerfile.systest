@@ -1,0 +1,12 @@
+
+# this Dockerfile builds a container from which system tests can be run
+
+FROM ubuntu:14.04
+
+RUN apt-get update && apt-get install -yq curl && apt-get clean
+
+WORKDIR /app
+
+ADD ./system_tests/run_tests.sh /app/run_tests.sh
+
+CMD ["bash"]
