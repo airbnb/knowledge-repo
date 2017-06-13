@@ -12,28 +12,30 @@ before_install:
   # build docker image - this image contains none of the testing dependencies so is releasable if the tests pass
   - docker-compose build
 install:
-  # create a new container for testing with bash running in the background
-  - docker run -d -t --name knowledgerepo_test knowledgerepo_web bash
+  # create web app and system-under-test containers
+  - docker-compose up -d
   # install python testing dependencies
-  - docker exec knowledgerepo_test pip install autopep8 pep8 nose coverage bs4
+  - docker exec knowledgerepo_web_1 pip install autopep8 pep8 nose coverage bs4
 
 # Cache isn't working yet because problems with expiration header. Disable for now because it's breaking builds.
 # cache: pip
 
 before_script:
   # make sure test .py files are nonexecutable so nose will find them
-  - docker exec knowledgerepo_test bash -c 'chmod a-x /app/tests/*.py'
-  - "docker exec knowledgerepo_test pep8 --exclude knowledge_repo/app/migrations,build,deploy,kube --ignore=E501 ."
+  - docker exec knowledgerepo_web_1 bash -c 'chmod a-x /app/tests/*.py'
+  - "docker exec knowledgerepo_web_1 pep8 --exclude knowledge_repo/app/migrations,build,deploy,kube --ignore=E501 ."
 script:
-  # run testing suite on the test container
-  - docker exec knowledgerepo_test bash run_tests.sh
-  # kill and remove the test container
-  - docker kill knowledgerepo_test
-  - docker rm knowledgerepo_test
+  # run unit tests
+  - docker exec knowledgerepo_web_1 bash run_tests.sh
+  # run system tests
+  - docker exec knowledgerepo_sut_1 bash run_tests.sh
+  # kill and remove the containers
+  - docker-compose down
 
 after_success:
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - docker push ${DOCKER_REPO}:${TRAVIS_BRANCH}
+  - docker tag knowledgerepo_web ${DOCKER_REPO}-python{$TRAVIS_PYTHON_VERSION}:${TRAVIS_BRANCH}
+  - docker push ${DOCKER_REPO}-python{$TRAVIS_PYTHON_VERSION}:${TRAVIS_BRANCH}
 
 # Deploy to pypi automatically from tagged releases on the stable branch
 deploy:
