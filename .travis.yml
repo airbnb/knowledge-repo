@@ -8,6 +8,9 @@ python:
 services:
   - docker
 
+env:
+  - PORT=80
+
 before_install:
   # build docker image - this image contains none of the testing dependencies so is releasable if the tests pass
   - docker-compose build
