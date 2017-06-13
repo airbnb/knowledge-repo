@@ -44,5 +44,5 @@ deploy:
   on:
     tags: true
     distributions: sdist bdist_wheel
-    repo: airbnb/knowledge-repo
+    repo: $PYPI_REPO
     condition: $TRAVIS_PYTHON_VERSION = "3.4"
