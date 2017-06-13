@@ -31,6 +31,10 @@ script:
   - docker kill knowledgerepo_test
   - docker rm knowledgerepo_test
 
+after_success:
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - docker push ${DOCKER_REPO}:${TRAVIS_BRANCH}
+
 # Deploy to pypi automatically from tagged releases on the stable branch
 deploy:
   provider: pypi
