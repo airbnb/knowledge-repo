@@ -1,4 +1,4 @@
-from ..authenticator import KnowledgePostConverter
+from ..authenticator import KnowledgeRepositoryAuthenticator
 from flask.ext.login import LoginManager, UserMixin
 
 class BitbucketAuthenticator(KnowledgeRepositoryAuthenticator):
