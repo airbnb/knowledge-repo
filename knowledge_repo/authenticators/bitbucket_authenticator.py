@@ -1,32 +1,10 @@
-from ..authenticator import KnowledgeRepositoryAuthenticator
-from flask.ext.login import LoginManager, UserMixin
+from .bitbucket_authenticator import OAuthAuthenticator
+from ..app.models import User
+from flask_login import LoginManager
 
-class BitbucketAuthenticator(KnowledgeRepositoryAuthenticator):
+
+class BitbucketAuthenticator(OAuthAuthenticator):
     _registry_keys = ['bitbucket']
 
-    def load_user(token):
-        raise NotImplementedError
-
-
-class BitbucketUser(UserMixin):
-
-    def __init__(self, token):
-        raise NotImplementedError
-
-    def __repr__(self):
-        raise NotImplementedError
-
-    @property
-    def is_active(self):
-        raise NotImplementedError
-
-    @property
-    def is_authenticated(self):
-        raise NotImplementedError
-
-    @property
-    def is_anonymous(self):
-        raise NotImplementedError
-
-    def get_id(self):
+    def login(self):
         raise NotImplementedError

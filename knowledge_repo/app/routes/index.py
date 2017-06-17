@@ -49,6 +49,16 @@ def render_index():
     return redirect('/feed')
 
 
+@blueprint.route('/login')
+@PageView.logged
+def login():
+    try:
+        authenticator = current_app.authenticator
+    except AttributeError:
+        raise RuntimeError("No authenticator has been set")
+    return authenticator.login()
+
+
 @blueprint.route('/favorites')
 @PageView.logged
 def render_favorites():

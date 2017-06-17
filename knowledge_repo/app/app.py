@@ -8,6 +8,7 @@ import math
 from flask import Flask, current_app, render_template, g, request
 from flask_mail import Mail
 from flask_migrate import Migrate
+from flask_login import LoginManager
 from alembic import command
 from alembic.migration import MigrationContext
 from datetime import datetime
@@ -36,6 +37,12 @@ class KnowledgeFlask(Flask):
                 config = imp.load_source('knowledge_server_config', os.path.abspath(config))
             self.config.from_object(config)
         self.config.update(kwargs)
+
+        self.login_manager = LoginManager(self)
+
+        @self.login_manager.user_loader
+        def load_user(id):
+            return User.query.get(int(id))
 
         if hasattr(config, 'prepare_repo'):
             repo = config.prepare_repo(repo)
@@ -218,6 +225,14 @@ class KnowledgeFlask(Flask):
     @repository.setter
     def repository(self, repo):
         self._repository = repo
+
+    @property
+    def authenticator(self):
+        return getattr(self, '_authenticator')
+
+    @authenticator.setter
+    def authenticator(self, authenticator):
+        self._authenticator = authenticator
 
     @property
     def db(self):
