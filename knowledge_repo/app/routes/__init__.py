@@ -1,6 +1,7 @@
 from . import health
 from . import comment
 from . import index
+from . import auth
 from . import posts
 from . import stats
 from . import tags

@@ -91,6 +91,7 @@ class KnowledgeFlask(Flask):
         self.register_blueprint(routes.posts.blueprint)
         self.register_blueprint(routes.health.blueprint)
         self.register_blueprint(routes.index.blueprint)
+        self.register_blueprint(routes.auth.blueprint)
         self.register_blueprint(routes.tags.blueprint)
         self.register_blueprint(routes.vote.blueprint)
         self.register_blueprint(routes.comment.blueprint)

@@ -1,5 +1,6 @@
 import unittest
 import uuid
+import os
 from nose.tools import *
 from knowledge_repo import KnowledgeRepository
 from flask import current_app, request, redirect, session
@@ -14,6 +15,8 @@ class FlaskLoginUserTest(unittest.TestCase):
     """Test that basic flask-login user model works."""
 
     def setUp(self):
+        # allow oauth over http for testing
+        os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
         self.repo = KnowledgeRepository.for_uri('tests/test_repo', auto_create=True)
         self.repo_app = self.repo.get_app(config='tests/config_server.py')
         # set a random secret_key for test purposes
@@ -80,9 +83,10 @@ class FlaskLoginUserTest(unittest.TestCase):
         with self.repo_app.app_context():
             self.repo_app.authenticator = NoCheckAuthenticator()
         rv = self.app.get('/login', headers=self.headers)
+        print(rv.status)
         print(rv.headers)
         assert (rv.status == "302 FOUND")
-        assert_true("/tests/login_required_route" in rv.headers['Location'])
+        assert ("/tests/login_required_route" in rv.headers['Location'])
 
         rv = self.app.get('/tests/login_required_route', headers=self.headers)
         assert (rv.status == "204 NO CONTENT")
@@ -94,8 +98,8 @@ class FlaskLoginUserTest(unittest.TestCase):
         with self.repo_app.app_context():
             self.repo_app.config['OAUTH_CREDENTIALS'] = {
                 'foo': {
-                    'id': 'fooid12345',
-                    'secret': 'foosecret12345'
+                    'consumer_key': 'fooid12345',
+                    'consumer_secret': 'foosecret12345'
                 }
             }
             self.repo_app.config['OAUTH_SERVICES'] = {
@@ -110,7 +114,8 @@ class FlaskLoginUserTest(unittest.TestCase):
             self.repo_app.authenticator = OAuthAuthenticator('foo')
 
         rv = self.app.get('/login', headers=self.headers)
-        assert_true(False)
+        assert (rv.status == "302 FOUND")
+        assert ("http://localhost/tests/oauth/authorize" in rv.headers['Location'])
 
 if __name__ == '__main__':
     unittest.main()
