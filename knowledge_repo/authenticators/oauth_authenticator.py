@@ -1,51 +1,35 @@
 from ..authenticator import KnowledgeRepositoryAuthenticator
 from ..app.models import User
-from flask import current_app, url_for, request
+# import uuid
+from flask import current_app, url_for, request, redirect, session
 from flask_login import LoginManager, current_user
-from flask_oauthlib.client import OAuth
+from flask_dance.consumer import OAuth2ConsumerBlueprint
+import sys
 
 
 class OAuthAuthenticator(KnowledgeRepositoryAuthenticator):
-    _registry_keys = ['oauth']
-    providers = None
+    _registry_keys = None
 
-    def __init__(self, provider_name):
-        oauth = OAuth()
-        self.provider_name = provider_name
-        self.oauth_credentials = current_app.config['OAUTH_CREDENTIALS'][provider_name]
-        self.oauth_service_config = current_app.config['OAUTH_SERVICES'][provider_name]
-        self.oauth_remote_app = oauth.remote_app(provider_name,
-                                                 **self.oauth_credentials,
-                                                 **self.oauth_service_config)
+    def __init__(self, provider_name, oauth_credentials, oauth_service_config):
+        self._blueprint = OAuth2ConsumerBlueprint(provider_name, 'app',
+                                                 **oauth_credentials,
+                                                 **oauth_service_config)
 
-    def authorize(self):
-        pass
-
-    def callback(self):
-        pass
-
-    def get_callback_url(self):
-        return url_for('oauth_callback', provider=self.provider_name, _external=True)
-
-    @classmethod
-    def get_provider(self, provider_name):
-        if self.providers is None:
-            self.providers = {}
-            for provider_class in self.__subclasses__():
-                provider = provider_class()
-                self.providers[provider.provider_name] = provider
-        return self.providers[provider_name]
+    @property
+    def blueprint(self):
+        return self._blueprint
 
     def login(self):
         if not current_user.is_anonymous:
-            return redirect(url_for('index'))
-        return self.oauth_remote_app.authorize(
-            callback=url_for('auth.oauth_authorized', next=request.args.get('next') or request.referrer or None))
+            return redirect(url_for('index.render_index'))
+        # session['random_key_' + str(uuid.uuid4())] = 'random_value_' + str(uuid.uuid4())
+        # print(session, file=sys.stderr)
+        return redirect(url_for("bitbucket.login"))
 
-    def oauth_callback(provider):
-        if not current_user.is_anonymous():
-            return redirect(url_for('index'))
-        next_url = request.args.get('next') or url_for('index')
+    def oauth_callback(self):
+        if not current_user.is_anonymous:
+            return redirect(url_for('/'))
+        next_url = request.args.get('next') or url_for('index.render_index')
         resp = self.oauth_remote_app.authorized_response()
         if resp is None:
             flash(u'You denied the request to sign in.')
@@ -58,4 +42,4 @@ class OAuthAuthenticator(KnowledgeRepositoryAuthenticator):
             resp['oauth_token_secret']
         )
 
-        return redirect(next_url)
+        return (resp['oauth_token'], 200)

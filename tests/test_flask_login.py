@@ -7,8 +7,7 @@ from flask import current_app, request, redirect, session
 from flask_login import login_required, login_user, current_user
 from knowledge_repo.app.proxies import login_manager, db_session
 from knowledge_repo.app.models import User
-from knowledge_repo.authenticators.oauth_authenticator import OAuthAuthenticator
-from knowledge_repo.authenticators.nocheck_authenticator import NoCheckAuthenticator
+from knowledge_repo.authenticator import KnowledgeRepositoryAuthenticator
 
 
 class FlaskLoginUserTest(unittest.TestCase):
@@ -81,7 +80,7 @@ class FlaskLoginUserTest(unittest.TestCase):
         assert_true("/login" in rv.headers['Location'])
 
         with self.repo_app.app_context():
-            self.repo_app.authenticator = NoCheckAuthenticator()
+            self.repo_app.authenticator = KnowledgeRepositoryAuthenticator.by_name('nocheck')()
         rv = self.app.get('/login', headers=self.headers)
         print(rv.status)
         print(rv.headers)
@@ -111,11 +110,18 @@ class FlaskLoginUserTest(unittest.TestCase):
                     'authorize_url': 'http://localhost/tests/oauth/authorize'
                 }
             }
-            self.repo_app.authenticator = OAuthAuthenticator('foo')
+            self.repo_app.authenticator = KnowledgeRepositoryAuthenticator.by_name('oauth')('foo')
 
         rv = self.app.get('/login', headers=self.headers)
         assert (rv.status == "302 FOUND")
         assert ("http://localhost/tests/oauth/authorize" in rv.headers['Location'])
+
+    @raises(ValueError)
+    def test_unknown_named_authenticator(self):
+        """
+        Test that instantiating a nonexistent named authenticator raises a ValueError
+        """
+        fooAuthenticator = KnowledgeRepositoryAuthenticator.by_name('foo')()
 
 if __name__ == '__main__':
     unittest.main()

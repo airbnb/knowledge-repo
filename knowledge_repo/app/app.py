@@ -18,6 +18,7 @@ import knowledge_repo
 from .proxies import db_session, current_repo
 from .index import update_index, time_since_index, time_since_index_check, _update_index
 from .models import db as sqlalchemy_db, Post, User, Tag
+from ..authenticator import KnowledgeRepositoryAuthenticator
 from . import routes
 
 logging.basicConfig(level=logging.INFO)
@@ -81,9 +82,13 @@ class KnowledgeFlask(Flask):
         # Set config defaults if not included
         # WEB_EDITOR_PREFIXES: Prefixes of repositories that can be edited via the web editor UI
         # Defaults to no prefixes allowed. If None, all prefixes editable via the UI.
-        server_config_defaults = {'SERVER_NAME': 'localhost',
-                                  'plugins': [],
-                                  'WEB_EDITOR_PREFIXES': []}
+        server_config_defaults = {
+            'SERVER_NAME': 'localhost',
+            'SECRET_KEY': 'unsecure_key_please_replace_me',
+            'plugins': [],
+            'WEB_EDITOR_PREFIXES': []
+            }
+            
         for k, v in server_config_defaults.items():
             self.config[k] = self.config.get(k, v)
 
@@ -98,6 +103,10 @@ class KnowledgeFlask(Flask):
         self.register_blueprint(routes.stats.blueprint)
         self.register_blueprint(routes.editor.blueprint)
         self.register_blueprint(routes.groups.blueprint)
+
+        # Set up authenticator
+        self.authenticator = KnowledgeRepositoryAuthenticator.by_name(self.config.get('USER_AUTHENTICATOR', 'nocheck'))(config=self.config)
+        self.register_blueprint(self.authenticator.blueprint, url_prefix="/login")
 
         if self.config['DEBUG']:
             self.register_blueprint(routes.debug.blueprint)

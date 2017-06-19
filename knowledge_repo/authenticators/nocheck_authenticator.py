@@ -5,7 +5,7 @@ from flask_login import LoginManager, login_user
 
 
 class NoCheckAuthenticator(KnowledgeRepositoryAuthenticator):
-    _registry_keys = None
+    _registry_keys = ['nocheck']
 
     def login(self):
         username = request.headers.get(current_app.config.get(

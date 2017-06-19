@@ -18,6 +18,11 @@ def login():
         raise RuntimeError("No authenticator has been set")
     return authenticator.login()
 
+
 @blueprint.route("/oauth/authorized")
 def oauth_authorized():
-    return ('', 204)
+    try:
+        authenticator = current_app.authenticator
+    except AttributeError:
+        raise RuntimeError("No authenticator has been set")
+    return authenticator.oauth_callback()

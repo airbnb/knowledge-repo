@@ -11,6 +11,7 @@
   entrypoints==0.2.3
   enum34==1.1.6
   Flask==0.12.2
+  Flask-Login==0.4.0
   Flask-Mail==0.9.1
   Flask-Migrate==2.0.4
   Flask-Script==2.0.5
