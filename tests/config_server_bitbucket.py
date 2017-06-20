@@ -97,4 +97,11 @@ WEB_EDITOR_PREFIXES = None
 # in the app. This can be useful for security purposes
 EXCLUDED_TAGS = ['private']
 
-USER_AUTHENTICATOR = 'nocheck'
+USER_AUTHENTICATOR = 'bitbucket'
+
+OAUTH_CREDENTIALS = {
+    'bitbucket': {
+        'client_id': 'UqSQNA6dYaZ82THNWt',
+        'client_secret': 'Bey9qhtdHLfnsUjP93uzMSjesN75npBf'
+    }
+}

@@ -248,6 +248,9 @@ class User(UserMixin, db.Model):
     _posts_assoc = db.relationship("PostAuthorAssoc")
     posts = association_proxy('_posts_assoc', 'post')  # This property should not directly modified
 
+    def get_id(self):
+        return self.username
+
     @property
     def format_name(self):
         username_to_name = current_repo.config.username_to_name

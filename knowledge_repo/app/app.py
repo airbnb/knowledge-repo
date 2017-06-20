@@ -5,7 +5,7 @@ import logging
 import traceback
 import math
 
-from flask import Flask, current_app, render_template, g, request
+from flask import Flask, current_app, render_template, g, request, session, redirect, url_for
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -42,8 +42,15 @@ class KnowledgeFlask(Flask):
         self.login_manager = LoginManager(self)
 
         @self.login_manager.user_loader
-        def load_user(id):
-            return User.query.get(int(id))
+        def load_user(username):
+            user = User(username=username)
+            if user.id is None:
+                db_session.commit()
+            return user
+
+        @self.login_manager.unauthorized_handler
+        def unauthorized_handler_callback():
+            return redirect(url_for('auth.before_login', next=request.url))
 
         if hasattr(config, 'prepare_repo'):
             repo = config.prepare_repo(repo)
@@ -87,7 +94,7 @@ class KnowledgeFlask(Flask):
             'SECRET_KEY': 'unsecure_key_please_replace_me',
             'plugins': [],
             'WEB_EDITOR_PREFIXES': []
-            }
+        }
 
         for k, v in server_config_defaults.items():
             self.config[k] = self.config.get(k, v)
@@ -104,8 +111,7 @@ class KnowledgeFlask(Flask):
         self.register_blueprint(routes.groups.blueprint)
 
         # Set up authenticator
-        self.authenticator = KnowledgeRepositoryAuthenticator.from_config(self.config)
-        self.register_blueprint(self.authenticator.blueprint, url_prefix="/auth")
+        self.authenticator = KnowledgeRepositoryAuthenticator.from_app(self)
 
         if self.config['DEBUG']:
             self.register_blueprint(routes.debug.blueprint)

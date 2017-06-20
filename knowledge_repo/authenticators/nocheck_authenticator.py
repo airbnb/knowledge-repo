@@ -7,5 +7,5 @@ from flask_login import LoginManager, login_user
 class NoCheckAuthenticator(KnowledgeRepositoryAuthenticator):
     _registry_keys = ['nocheck']
 
-    def __init__(self, config):
-        super().__init__(config)
+    def __init__(self, app):
+        super().__init__(app)
