@@ -107,4 +107,4 @@ ENV/
 # Mac OS X filesystem artifacts
 .DS_Store
 
-server_config.py
+current_server_config.py

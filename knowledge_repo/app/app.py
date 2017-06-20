@@ -88,7 +88,7 @@ class KnowledgeFlask(Flask):
             'plugins': [],
             'WEB_EDITOR_PREFIXES': []
             }
-            
+
         for k, v in server_config_defaults.items():
             self.config[k] = self.config.get(k, v)
 
@@ -96,7 +96,6 @@ class KnowledgeFlask(Flask):
         self.register_blueprint(routes.posts.blueprint)
         self.register_blueprint(routes.health.blueprint)
         self.register_blueprint(routes.index.blueprint)
-        self.register_blueprint(routes.auth.blueprint)
         self.register_blueprint(routes.tags.blueprint)
         self.register_blueprint(routes.vote.blueprint)
         self.register_blueprint(routes.comment.blueprint)
@@ -105,8 +104,8 @@ class KnowledgeFlask(Flask):
         self.register_blueprint(routes.groups.blueprint)
 
         # Set up authenticator
-        self.authenticator = KnowledgeRepositoryAuthenticator.by_name(self.config.get('USER_AUTHENTICATOR', 'nocheck'))(config=self.config)
-        self.register_blueprint(self.authenticator.blueprint, url_prefix="/login")
+        self.authenticator = KnowledgeRepositoryAuthenticator.from_config(self.config)
+        self.register_blueprint(self.authenticator.blueprint, url_prefix="/auth")
 
         if self.config['DEBUG']:
             self.register_blueprint(routes.debug.blueprint)
