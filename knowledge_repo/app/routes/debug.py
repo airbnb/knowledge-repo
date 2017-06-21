@@ -63,3 +63,8 @@ def force_reindex():
     reindex = bool(request.args.get('reindex', ''))
     current_app.db_update_index(reindex=reindex)
     return "Index Updated"
+
+
+@blueprint.route('/debug/repo_info', methods=['GET'])
+def repo_info():
+    return "path: " + str(current_repo.path) + "<br>" + "git_has_remote: " + str(current_repo.git_has_remote) + "<br>" + "git_remote: " + str(current_repo.git_remote.url) + "<br>"

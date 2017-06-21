@@ -4,7 +4,12 @@ from .utils.registry import SubclassRegisteringABCMeta
 # from .app.models import User
 from future.utils import with_metaclass
 from flask import request, redirect, current_app, session, Blueprint, url_for, session
-from flask_login import login_user
+from flask_login import login_user, logout_user, login_required
+
+
+def login_exempt(f):
+    f.login_exempt = True
+    return f
 
 
 class KnowledgeRepositoryAuthenticator(with_metaclass(SubclassRegisteringABCMeta, object)):
@@ -14,10 +19,27 @@ class KnowledgeRepositoryAuthenticator(with_metaclass(SubclassRegisteringABCMeta
         self.app = app
         self.blueprint.add_url_rule('/', view_func=self.before_login)
         self.blueprint.add_url_rule('/after_authorized', view_func=self.after_authorized)
+        self.blueprint.add_url_rule('/logout', view_func=self.logout)
+        self.blueprint.add_url_rule('/denied', view_func=self.denied)
         self.app.register_blueprint(self.blueprint, url_prefix="/auth")
 
-    def login(self):
-        raise NotImplementedError
+        # a dummy callable to execute the login_required logic
+        login_required_dummy_view = login_required(lambda: None)
+
+        # require login by default
+        @app.before_request
+        def default_login_required():
+            # exclude 404 errors and static routes
+            # uses split to handle blueprint static routes as well
+            if not request.endpoint or request.endpoint.rsplit('.', 1)[-1] == 'static':
+                return
+
+            view = app.view_functions[request.endpoint]
+
+            if getattr(view, 'login_exempt', False) or request.endpoint in ['auth.before_login', 'auth.login', 'auth.authorized', 'auth.after_authorized', 'auth.denied']:
+                return
+
+            return login_required_dummy_view()
 
     @classmethod
     def from_app(cls, app):
@@ -39,16 +61,25 @@ class KnowledgeRepositoryAuthenticator(with_metaclass(SubclassRegisteringABCMeta
             self._blueprint = Blueprint('auth', __name__)
         return self._blueprint
 
+    @login_exempt
     def before_login(self):
         auth_username_request_header = self.app.config.get('AUTH_USERNAME_REQUEST_HEADER', 'username_header')
         username = request.headers.get(auth_username_request_header)
         if username:
             user = self.app.login_manager.user_callback(username)
             login_user(user)
-        return redirect(url_for('auth.after_authorized', next=request.args.get('next')))
+        return redirect(url_for('.after_authorized', next=request.args.get('next')))
 
+    @login_exempt
     def after_authorized(self):
         if 'next' in request.args:
             return redirect(request.args.get('next'))
         else:
             return redirect(url_for('index.render_index'))
+
+    def logout(self):
+        logout_user()
+        return redirect(url_for('index.render_index'))
+
+    def denied(self):
+        return "Access Denied"

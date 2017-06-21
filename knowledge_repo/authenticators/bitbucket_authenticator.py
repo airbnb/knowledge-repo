@@ -38,10 +38,20 @@ class BitbucketAuthenticator(KnowledgeRepositoryAuthenticator):
         bitbucket = self.blueprint.session
         if not bitbucket.authorized:
             return redirect(url_for("auth.before_login"))
+
+        # if repository has a Bitbucket remote, check that we can access it or deny access
+        if self.app.repository.git_has_remote:
+            git_remote_url_parts = self.app.repository.git_remote.url.split(':')
+            if git_remote_url_parts[0] == "git@bitbucket.org":
+                resp = bitbucket.get("repositories/" + git_remote_url_parts[1].split('.')[0])
+                if resp.status_code != 200:
+                    return redirect(url_for("auth.denied"))
+
+        # log the user in
         resp = bitbucket.get("user/emails")
         resp_email = resp.json()["values"][0]
         if resp_email["is_primary"] and resp_email["is_confirmed"] and resp_email["type"] == "email":
-            pass
-            # login_user(User(username=resp_email["email"]))
-        print(resp_email["email"], file=sys.stderr)
+            user = self.app.login_manager.user_callback(resp_email["email"])
+            login_user(user)
+
         return redirect(url_for('index.render_index'))

@@ -16,7 +16,7 @@ class FlaskLoginUserTest(unittest.TestCase):
         # allow oauth over http for testing
         os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
         self.repo = KnowledgeRepository.for_uri('tests/test_repo', auto_create=True)
-        self.app = self.repo.get_app(config='tests/config_server.py')
+        self.app = self.repo.get_app(config='tests/config_server_nocheck.py')
         self.client = self.app.test_client()
 
         with self.app.app_context():
@@ -59,7 +59,7 @@ class FlaskLoginUserTest(unittest.TestCase):
         rv = self.client.get('/tests/login_required_route', headers=self.headers)
         assert (rv.status == "204 NO CONTENT")
 
-    def test_nocheck_redirect(self):
+    def test_nocheck_login(self):
         """
         Test that the nocheck authenticator automatically logs in the user and redirects to the originally requested URI
         """
@@ -79,6 +79,26 @@ class FlaskLoginUserTest(unittest.TestCase):
 
             rv = self.client.get('/tests/login_required_route', headers=self.headers)
             assert (rv.status == "204 NO CONTENT")
+
+    def test_nocheck_logout(self):
+        """
+        Test that the nocheck authenticator logs out an authenticated user when requested
+        """
+        with self.app.app_context():
+            rv = self.client.get(url_for('auth.before_login'), headers=self.headers)
+            assert (rv.status == "302 FOUND")
+
+            rv = self.client.get(rv.headers['Location'], headers=self.headers)
+            assert (rv.status == "302 FOUND")
+
+            rv = self.client.get('/tests/login_required_route', headers=self.headers)
+            assert (rv.status == "204 NO CONTENT")
+
+            rv = self.client.get(url_for('auth.logout'), headers=self.headers)
+            assert (rv.status == "302 FOUND")
+
+            rv = self.client.get('/tests/login_required_route', headers=self.headers)
+            assert (rv.status == "302 FOUND")
 
     @raises(ValueError)
     def test_unknown_named_authenticator(self):
