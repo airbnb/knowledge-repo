@@ -109,3 +109,4 @@ ENV/
 
 current_server_config.py
 knowledge.db
+/tests/test_repo
