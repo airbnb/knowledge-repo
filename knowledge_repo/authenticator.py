@@ -1,4 +1,5 @@
 import sys
+import re
 from builtins import object
 from .utils.registry import SubclassRegisteringABCMeta
 # from .app.models import User
@@ -6,7 +7,7 @@ from future.utils import with_metaclass
 from flask import request, redirect, current_app, session, Blueprint, url_for, session
 from flask_login import login_user, logout_user, login_required
 
-
+# decorator for views that do not require login
 def login_exempt(f):
     f.login_exempt = True
     return f
@@ -36,7 +37,9 @@ class KnowledgeRepositoryAuthenticator(with_metaclass(SubclassRegisteringABCMeta
 
             view = app.view_functions[request.endpoint]
 
-            if getattr(view, 'login_exempt', False) or request.endpoint in ['auth.before_login', 'auth.login', 'auth.authorized', 'auth.after_authorized', 'auth.denied']:
+            # bypass auth for any views set to login_exempt
+            # bypass auth for this module (otherwise redirect loops will happen)
+            if getattr(view, 'login_exempt', False) or re.search('^auth\.', request.endpoint):
                 return
 
             return login_required_dummy_view()

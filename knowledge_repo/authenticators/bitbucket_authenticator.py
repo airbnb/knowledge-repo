@@ -29,6 +29,11 @@ class BitbucketAuthenticator(KnowledgeRepositoryAuthenticator):
                                                   **oauth_credentials,
                                                   **oauth_service_config)
 
+        @self._blueprint.route('/gitwebhook', methods=['GET'])
+        def gitwebhook():
+            app.repository.update()
+            return ("OK", 200)
+
         super().__init__(app)
 
     def before_login(self):
