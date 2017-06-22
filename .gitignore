@@ -108,3 +108,4 @@ ENV/
 .DS_Store
 
 current_server_config.py
+knowledge.db
