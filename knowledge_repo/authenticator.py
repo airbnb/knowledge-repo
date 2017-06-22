@@ -7,6 +7,7 @@ from future.utils import with_metaclass
 from flask import request, redirect, current_app, session, Blueprint, url_for, session
 from flask_login import login_user, logout_user, login_required
 
+
 # decorator for views that do not require login
 def login_exempt(f):
     f.login_exempt = True
