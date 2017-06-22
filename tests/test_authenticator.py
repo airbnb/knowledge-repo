@@ -39,26 +39,6 @@ class FlaskLoginUserTest(unittest.TestCase):
         rv = self.client.get('/tests/login_required_route', headers=self.headers)
         assert (rv.status == "302 FOUND")
 
-    def test_simple_login(self):
-        """
-        Test a simple endpoint that automatically logs in the user
-        """
-        with self.app.app_context():
-            @self.app.route("/tests/simple_login")
-            def simple_login():
-                assert_false(current_user.is_authenticated)
-                username = request.headers.get(current_app.config.get(
-                    'AUTH_USERNAME_REQUEST_HEADER'))
-                login_user(User(username=username))
-                assert_true(current_user.is_authenticated)
-                return ('', 204)
-
-        rv = self.client.get('/tests/simple_login', headers=self.headers)
-        assert (rv.status == "204 NO CONTENT")
-
-        rv = self.client.get('/tests/login_required_route', headers=self.headers)
-        assert (rv.status == "204 NO CONTENT")
-
     def test_nocheck_login(self):
         """
         Test that the nocheck authenticator automatically logs in the user and redirects to the originally requested URI
