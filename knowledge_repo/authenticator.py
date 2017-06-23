@@ -65,16 +65,15 @@ class KnowledgeRepositoryAuthenticator(with_metaclass(SubclassRegisteringABCMeta
             self._blueprint = Blueprint('auth', __name__)
         return self._blueprint
 
-    @login_exempt
     def before_login(self):
         auth_username_request_header = self.app.config.get('AUTH_USERNAME_REQUEST_HEADER', 'username_header')
-        username = request.headers.get(auth_username_request_header)
+        # log in in anonymous mode by default
+        username = request.headers.get(auth_username_request_header) or 'knowledge_user'
         if username:
             user = self.app.login_manager.user_callback(username)
             login_user(user)
         return redirect(url_for('.after_authorized', next=request.args.get('next')))
 
-    @login_exempt
     def after_authorized(self):
         if 'next' in request.args:
             return redirect(request.args.get('next'))
