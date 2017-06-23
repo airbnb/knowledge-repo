@@ -12,6 +12,8 @@ services:
   sut:
     build:
       context: .
+      args:
+        PORT: "${PORT}"
       dockerfile: Dockerfile.systest
     tty: true
     links:
