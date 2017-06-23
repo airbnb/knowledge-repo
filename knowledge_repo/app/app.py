@@ -39,11 +39,11 @@ class KnowledgeFlask(Flask):
             self.config.from_object(config)
         self.config.update(kwargs)
 
-        if 'SECRET_KEY' not in self.config:
+        if self.config['SECRET_KEY'] is None:
             # load SECRET_KEY from environment if not set in config
             if 'SECRET_KEY' not in os.environ:
                 # fall back to random SECRET_KEY if none is set in environment
-                os.environ['SECRET_KEY'] = os.urandom(24).encode('hex')
+                os.environ['SECRET_KEY'] = str(os.urandom(24))
             self.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 
         self.login_manager = LoginManager(self)
