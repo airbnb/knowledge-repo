@@ -39,6 +39,13 @@ class KnowledgeFlask(Flask):
             self.config.from_object(config)
         self.config.update(kwargs)
 
+        if 'SECRET_KEY' not in self.config:
+            # load SECRET_KEY from environment if not set in config
+            if 'SECRET_KEY' not in os.environ:
+                # fall back to random SECRET_KEY if none is set in environment
+                os.environ['SECRET_KEY'] = os.urandom(24).encode('hex')
+            self.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+
         self.login_manager = LoginManager(self)
 
         @self.login_manager.user_loader
@@ -91,7 +98,6 @@ class KnowledgeFlask(Flask):
         # Defaults to no prefixes allowed. If None, all prefixes editable via the UI.
         server_config_defaults = {
             'SERVER_NAME': 'localhost',
-            'SECRET_KEY': 'unsecure_key_please_replace_me',
             'plugins': [],
             'WEB_EDITOR_PREFIXES': []
         }
