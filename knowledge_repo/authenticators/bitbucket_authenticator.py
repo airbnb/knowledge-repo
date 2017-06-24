@@ -1,5 +1,5 @@
 from ..authenticator import KnowledgeRepositoryAuthenticator
-from flask import redirect, url_for, session
+from flask import redirect, url_for, session, current_app
 from flask_login import LoginManager
 from flask_dance.consumer import OAuth2ConsumerBlueprint
 from flask_login import login_user
@@ -25,7 +25,6 @@ class BitbucketAuthenticator(KnowledgeRepositoryAuthenticator):
         self._blueprint = OAuth2ConsumerBlueprint('auth', __name__,
                                                   login_url='/login',
                                                   authorized_url='/authorized',
-                                                  redirect_to='auth.after_authorized',
                                                   **oauth_credentials,
                                                   **oauth_service_config)
 
@@ -37,7 +36,9 @@ class BitbucketAuthenticator(KnowledgeRepositoryAuthenticator):
         super().__init__(app)
 
     def before_login(self):
-        return redirect(url_for('auth.login'))
+        url_scheme = current_app.config['PREFERRED_URL_SCHEME'] or 'http'
+        redirect_url = url_for('auth.after_authorized', _external=True, _scheme=url_scheme)
+        return redirect(url_for('auth.login', next=redirect_url))
 
     def after_authorized(self):
         bitbucket = self.blueprint.session

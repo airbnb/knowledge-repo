@@ -41,7 +41,7 @@ class FlaskLoginUserTest(unittest.TestCase):
 
             rv = self.client.get(url_for('auth.before_login'), headers=self.headers)
             assert (rv.status == "302 FOUND")
-            assert (rv.headers['Location'] == url_for('auth.login'))
+            assert (url_for('auth.login') in rv.headers['Location'])
 
             rv = self.client.get(url_for('auth.login'), headers=self.headers)
             assert (rv.status == "302 FOUND")
