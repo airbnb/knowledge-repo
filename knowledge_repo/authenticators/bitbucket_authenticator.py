@@ -6,6 +6,7 @@ import flask
 
 original_url_for = flask.url_for
 
+
 def monkey_patch_url_for(endpoint, **values):
     if flask.current_app.config['OAUTH_FORCE_HTTPS'] and '_external' in values:
         if values['_external']:

@@ -13,7 +13,7 @@ rm -f .coverage &> /dev/null
 set -e
 
 # Run pep8 tests
-pep8 --exclude knowledge_repo/app/migrations,tests/test_repo,build,deploy,kube,docs --ignore=E501 .
+pep8 --exclude knowledge_repo/app/migrations,tests/test_repo,build,deploy,kube,docs --ignore=E501,E402 .
 
 # Create fake repository and add some sample posts.
 # We use a fake repository here to speed things up, and to avoid using git in test environments

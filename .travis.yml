@@ -26,7 +26,7 @@ install:
 before_script:
   # make sure test .py files are nonexecutable so nose will find them
   - docker exec knowledgerepo_web_1 bash -c 'chmod a-x /app/tests/*.py'
-  - "docker exec knowledgerepo_web_1 pep8 --exclude knowledge_repo/app/migrations,build,deploy,kube --ignore=E501 ."
+  - "docker exec knowledgerepo_web_1 pep8 --exclude knowledge_repo/app/migrations,build,deploy,kube --ignore=E501,E402 ."
 script:
   # run unit tests
   - docker exec knowledgerepo_web_1 bash run_tests.sh
