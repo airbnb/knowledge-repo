@@ -140,6 +140,13 @@ class KnowledgeFlask(Flask):
             return response
 
         @self.context_processor
+        def login_information():
+            return {
+                'username': g.user.username,
+                'name': g.user.format_name
+            }
+
+        @self.context_processor
         def webediting_enabled():
             # TODO: Link this more to KnowledgeRepository capability and
             # configuration rather than a specific name.

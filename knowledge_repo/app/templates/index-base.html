@@ -20,7 +20,6 @@
 
     {% if autohide and page_count > 1 %}
       {% set page_nums = pagination_pages(current_page=page, page_count=page_count, max_pages=max_pages, extremes=extremes) %}
-
       <div class='pagination-bar' role="group">
         <a href="{{ "#" if (page == 1) else modify_query(start=(page-2)*results) }}" class="pagination-stepper{% if page == 1 %} disabled{% endif %}"{% if page == 1 %} onclick="return false;"{% endif %}>
           <i class="glyphicon glyphicon-chevron-left"></i>
@@ -40,13 +39,10 @@
 
     {% endif %}
   {% endif %}
-
 {% endmacro %}
 
-{% block title %} Knowledge Repo {% endblock %}
-
 {% block content %}
-
+  <!-- Index rendering mode switch -->
   <div class="row">
     <div class="col-md-5">
       <div class="btn-group btn-group-justified index-view-btn-group" role="group">
@@ -65,22 +61,24 @@
       </div>
     </div>
 
+    {# Show pagination at top unless showing clusters. #}
     {% if request.endpoint != 'index.render_cluster' %}
-    <div class='pull-right'>
+    <div class='pull-right visible-md-block visible-lg-block'>
       {{ pagination(max_pages=5, extremes=False) }}
     </div>
     {% endif %}
 
   </div>
 
+  <!-- Container for index items -->
   <div class="col-12">
     {% block inner_content %}
     {% endblock %}
   </div>
 
-
-{{ pagination(max_pages=10) }}
+  {# Show pagination at bottom of page unless showing clusters. #}
+  {% if request.endpoint != 'index.render_cluster' %}
+  {{ pagination(max_pages=10) }}
+  {% endif %}
 
 {% endblock %}
-
-

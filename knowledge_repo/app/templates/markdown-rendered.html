@@ -11,14 +11,32 @@
 
     {{ super() }}
 
-    <div class='container-fluid'>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="renderedMarkdown">
-                    {{ html|safe }}
-                </div>
-            </div>
-        </div>
+    <div class="renderedMarkdown">
+        <span class='stats' style='position: absolute; right: 0px; padding: 5px; color: #aaa; top: 0px;'>
+            {% if page_views >= 0 %}
+              <i class="glyphicon glyphicon-eye-open" id="pageview_stats" style='color: #9CA299'></i>
+              <div id="pageview_stats" style="display: inline-block">
+                Viewed {{ page_views }} times by {{ unique_views }} different users
+              </div>
+            {% endif %}
+            {% if likes %}
+              <i class="glyphicon glyphicon-heart glyphicon-clickable pop" style="font-size:16pt; vertical-align: top;" id="tooltip-unlike" data-placement="bottom"
+               data-trigger="#tooltip-like"
+               data-container="body"
+               data-toggle="popover"
+               data-content='<div>Unlike This Post</div>'></i>
+            {% else %}
+              <i class="glyphicon glyphicon-heart-empty glyphicon-clickable pop" style="font-size:16pt; vertical-align: top;" id="tooltip-like" data-placement="bottom"
+               data-trigger="#tooltip-like"
+               data-container="body"
+               data-toggle="popover"
+               data-content='<div>Like This Post</div>'></i>
+            {% endif %}
+            {% if total_likes %}
+            + {{ total_likes }}
+            {% endif %}
+        </span>
+        {{ html|safe }}
     </div>
 
     <div class="container-fluid">
@@ -70,7 +88,6 @@
           </br>
         </div>
     </div>
-  </div>
 {% endblock %}
 
 {% block scripts %}
@@ -100,6 +117,13 @@
 $(document).on('ready', function(){
   // Make the Rendered Markdown Button active
   $(".btn-rendered").addClass("btn-active");
+  $(".tab-rendered").addClass('active');
+
+  // Activate scrollspy for dynamic highlighting the table of contents
+  $('body').scrollspy({ target: '.toc', offset: 71 })
+
+  // Wrap all tables in a div to allow for centering with overscroll
+  $('.renderedMarkdown table').wrap("<div class='table-wrapper'></div>")
 
   // Initialize headers
   helpersJx.linkifyHeaders();

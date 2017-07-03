@@ -1,6 +1,7 @@
 import sys
 
 import markdown
+import pygments
 from flask import url_for
 from knowledge_repo.post import KnowledgePost
 
@@ -67,6 +68,12 @@ def render_post_raw(post):
     else:
         raw_post = post.text.encode('ascii', 'ignore')
 
+    raw_post = pygments.highlight(
+        code=raw_post,
+        lexer=pygments.lexers.get_lexer_by_name('md'),
+        formatter=pygments.formatters.get_formatter_by_name('html')
+    )
+
     # NOTE: `str.encode()` returns a `bytes` object in Python 3
     if sys.version_info.major >= 3:
         return raw_post.decode('ascii', 'ignore')
@@ -77,15 +84,21 @@ def render_post(post):
     """
     Renders the markdown as html
     """
+    from knowledge_repo.converters.html import HTMLConverter
+
     def intra_knowledge_urlmapper(name, url):
         if name == 'a' and url.startswith('knowledge:'):
             return url_for('posts.render', path=url.split('knowledge:')[1]).replace('%2F', '/')  # Temporary fix before url revamp
         return None
 
-    html = render_post_header(post) + (post if isinstance(post, KnowledgePost) else post.kp).to_string('html',
-                                                                                                       skip_headers=True,
-                                                                                                       urlmappers=[intra_knowledge_urlmapper])
-    return html
+    md, html = HTMLConverter(post if isinstance(post, KnowledgePost) else post.kp)._render_markdown(skip_headers=True, urlmappers=[intra_knowledge_urlmapper])
+
+    html = render_post_header(post) + html
+
+    return {
+        "html": html,
+        "toc": md.toc
+    }
 
 
 def render_comment(comment):

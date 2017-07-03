@@ -7,7 +7,7 @@ from ..converter import KnowledgePostConverter
 
 
 class IpynbFormat(KnowledgePostConverter):
-    _registry_keys = ['kp']
+    _registry_keys = ['kp', 'zip']
 
     def to_file(self, filename):
         zf = zipfile.ZipFile(filename, 'w')
