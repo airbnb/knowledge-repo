@@ -106,6 +106,7 @@ def send_subscription_email(post, tag):
 
     for user in recipient_users:
         # mark email as sent just before you send the email
+        print(subject, post_text)
         email_sent = Email(user_id=user.id,
                            trigger_id=tag.id,
                            trigger_type='subscription',

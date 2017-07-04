@@ -18,8 +18,10 @@ blueprint = Blueprint('posts', __name__,
 @blueprint.route('/post/<path:path>', methods=['GET'])
 @PageView.logged
 def render(path):
-    """ Render the knowledge post with all the related formatting """
-    
+    """
+    Render the knowledge post with all the related formatting.
+    """
+
     mode = request.args.get('render', 'html')
     username, user_id = g.user.username, g.user.id
 
@@ -60,7 +62,7 @@ def render(path):
         if user_id not in allowed_users:
             return render_template("permission_ask.html", authors=post.authors_string)
 
-    rendered = render_post(post)
+    rendered = render_post(post, with_toc=True)
     raw_post = render_post_raw(post) if mode == 'raw' else None
 
     comments = post.comments
@@ -139,7 +141,7 @@ def _render_preview(path, tmpl):
     if not post:
         raise Exception("unable to find post at {}".format(path))
 
-    rendered = render_post(post)
+    rendered = render_post(post, with_toc=True)
     raw_post = render_post_raw(post) if (mode == 'raw') else None
 
     return render_template(tmpl,
@@ -175,6 +177,7 @@ def render_legacy():
 def about():
     """Renders about page. This is the html version of REAMDE.md"""
     return render_template("about.html")
+
 
 @blueprint.route('/ajax/post/download', methods=['GET'])
 @PageView.logged

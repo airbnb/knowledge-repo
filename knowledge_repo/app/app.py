@@ -141,10 +141,13 @@ class KnowledgeFlask(Flask):
 
         @self.context_processor
         def login_information():
-            return {
-                'username': g.user.username,
-                'name': g.user.format_name
-            }
+            if hasattr(g, 'user'):
+                return {
+                    'username': g.user.username,
+                    'name': g.user.format_name
+                }
+            else:
+                return {}
 
         @self.context_processor
         def webediting_enabled():

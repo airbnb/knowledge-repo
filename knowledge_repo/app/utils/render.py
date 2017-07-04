@@ -80,7 +80,7 @@ def render_post_raw(post):
     return raw_post
 
 
-def render_post(post):
+def render_post(post, with_toc=False):
     """
     Renders the markdown as html
     """
@@ -95,10 +95,12 @@ def render_post(post):
 
     html = render_post_header(post) + html
 
-    return {
-        "html": html,
-        "toc": md.toc
-    }
+    if with_toc:
+        return {
+            "html": html,
+            "toc": md.toc
+        }
+    return html
 
 
 def render_comment(comment):

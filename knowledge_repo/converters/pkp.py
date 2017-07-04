@@ -37,8 +37,6 @@ class IpynbFormat(KnowledgePostConverter):
 
         zf.close()
 
-     #   raise RuntimeError("Portable Knowledge Post is invalid!")
-
 
 class NBConvertExporter(Exporter):
 
