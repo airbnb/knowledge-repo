@@ -233,7 +233,7 @@ if args.action == 'create':
     if os.path.exists(args.filename):
         raise ValueError("File already exists at '{}'. Please choose a different filename and try again.".format(args.filename))
     shutil.copy(src, args.filename)
-    print("Created a {format} knowledge post template at {filename}.".format(format=args.format, filename=args.filename))
+    print("Created a {format} knowledge post template at '{filename}'.".format(format=args.format, filename=args.filename))
     sys.exit(0)
 
 # # Check which branches have local work
