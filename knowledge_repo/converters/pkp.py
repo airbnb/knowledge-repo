@@ -1,8 +1,6 @@
 import zipfile
 import io
 
-from nbconvert.exporters.exporter import Exporter
-
 from ..converter import KnowledgePostConverter
 
 
@@ -36,30 +34,3 @@ class IpynbFormat(KnowledgePostConverter):
                 self.kp._write_ref(ref, f.read())
 
         zf.close()
-
-
-class NBConvertExporter(Exporter):
-
-    def from_notebook_node(self, nb, resources=None, **kw):
-        """
-        Convert a notebook from a notebook node instance.
-        Parameters
-        ----------
-        nb : :class:`~nbformat.NotebookNode`
-          Notebook node (dict-like with attr-access)
-        resources : dict
-          Additional resources that can be accessed read/write by
-          preprocessors and filters.
-        `**kw`
-          Ignored
-        """
-        nb_copy = copy.deepcopy(nb)
-        resources = self._init_resources(resources)
-
-        if 'language' in nb['metadata']:
-            resources['language'] = nb['metadata']['language'].lower()
-
-        # Preprocess
-        nb_copy, resources = self._preprocess(nb_copy, resources)
-
-        return nb_copy, resources
