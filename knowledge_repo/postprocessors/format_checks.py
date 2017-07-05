@@ -1,22 +1,24 @@
 import datetime
+
+import six
 from past.builtins import basestring
 
 from ..postprocessor import KnowledgePostProcessor
 
 REQUIRED_FIELD_TYPES = {
-    'title': str,
+    'title': six.string_types,
     'authors': list,
     'created_at': datetime.datetime,
-    'tldr': basestring,
+    'tldr': six.string_types,
     'tags': list
 }
 
 OPTIONAL_FIELD_TYPES = {
-    'path': str,
+    'path': six.string_types,
     'updated_at': datetime.datetime,
     'private': bool,   # If true, this post starts out private
     'allowed_groups': list,
-    'thumbnail': (int, str)
+    'thumbnail': (int, ) + six.string_types
 }
 
 

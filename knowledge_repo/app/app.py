@@ -46,7 +46,7 @@ class KnowledgeFlask(Flask):
 
         # Configure database
         db_uri = db_uri or self.config.get('SQLALCHEMY_DATABASE_URI') or 'sqlite:///:memory:'
-        logger.debug("Using database: {}".format(db_uri))
+        logger.debug(u"Using database: {}".format(db_uri))
         self.config['SQLALCHEMY_DATABASE_URI'] = db_uri
         self.config['SQLALCHEMY_ECHO'] = repo.config.debug
         self.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -173,7 +173,7 @@ class KnowledgeFlask(Flask):
             for key, value in new_values.items():
                 args[key] = value
 
-            return '{}?{}'.format(request.path, url_encode(args))
+            return u'{}?{}'.format(request.path, url_encode(args))
 
         @self.template_global()
         def pagination_pages(current_page, page_count, max_pages=5, extremes=True):

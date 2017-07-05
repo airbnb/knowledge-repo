@@ -29,7 +29,7 @@ class SubstitutionMapper(object):
             else:
                 output.append(replacement)
         output.append(text[last_offset:])
-        return ''.join(output)
+        return u''.join(output)
 
     def find_matches(self, text, reverse=False):
         matches = []

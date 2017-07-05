@@ -1,5 +1,6 @@
 import logging
 import os
+from builtins import str
 from flask import request, url_for, redirect, render_template, current_app, Blueprint, g, Response
 
 from ..proxies import db_session, current_repo
@@ -51,7 +52,7 @@ def render(path):
                               .filter(Post.path == knowledge_aliases[path])
                               .first())
     if not post:
-        raise Exception("unable to find post at {}".format(path))
+        raise Exception(u"unable to find post at {}".format(path))
 
     if post.contains_excluded_tag:
         # It's possible that someone gets a direct link to a post that has an excluded tag
@@ -139,7 +140,7 @@ def _render_preview(path, tmpl):
             post = current_repo.post(knowledge_aliases[path])
 
     if not post:
-        raise Exception("unable to find post at {}".format(path))
+        raise Exception(u"unable to find post at {}".format(path))
 
     rendered = render_post(post, with_toc=True)
     raw_post = render_post_raw(post) if (mode == 'raw') else None
@@ -152,7 +153,7 @@ def _render_preview(path, tmpl):
                            raw_post=raw_post,
                            comments=[],
                            username=None,
-                           post_author=', '.join(post.headers['authors']),
+                           post_author=u', '.join(post.headers['authors']),
                            title=post.headers['title'],
                            page_views=0,
                            unique_views=0,
@@ -194,13 +195,13 @@ def download():
         return Response(
             post.to_string(format=resource_type),
             mimetype="application/zip",
-            headers={"Content-disposition": "attachment; filename={}".format(filename)})
+            headers={u"Content-disposition": "attachment; filename={}".format(filename)})
     elif resource_type == 'source':
         path = request.args.get('path', None)
         assert path is not None, "Source path not provided."
         return Response(
             post.read_src(path),
             mimetype="application/octet-stream",
-            headers={"Content-disposition": "attachment; filename={}".format(os.path.basename(path))})
+            headers={u"Content-disposition": "attachment; filename={}".format(os.path.basename(path))})
     else:
-        raise RuntimeError("Invalid resource_type: {}".format(resource_type))
+        raise RuntimeError(u"Invalid resource_type: {}".format(resource_type))

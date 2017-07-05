@@ -45,6 +45,12 @@ for post in $(ls `dirname $0`/tests/test_posts); do
     if [[ "${post}" == *.ipynb ]]; then
         `dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add `dirname $0`/tests/test_posts/${post} -p projects/${post} -m "Test commit" --branch master;
     fi;
+    if [[ "${post}" == *.Rmd ]]; then
+        `dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add `dirname $0`/tests/test_posts/${post} -p projects/${post} -m "Test commit" --branch master;
+    fi;
+    if [[ "${post}" == *.md ]]; then
+        `dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add `dirname $0`/tests/test_posts/${post} -p projects/${post} -m "Test commit" --branch master;
+    fi;
 done
 
 echo

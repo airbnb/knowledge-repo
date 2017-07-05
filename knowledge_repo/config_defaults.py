@@ -42,7 +42,7 @@ def username_to_name(username):
 
 # Function to convert a username to a person's email
 def username_to_email(username):
-    return '{}@example.com'.format(username)
+    return u'{}@example.com'.format(username)
 
 
 # Function to generate the web uri for a knowledge post at

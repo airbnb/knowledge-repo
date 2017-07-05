@@ -203,7 +203,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
                 break
         if not ref.endswith('.kp'):
             return None
-        return '/'.join(refs[:i + 1])
+        return u'/'.join(refs[:i + 1])
 
     def git_local_posts(self, branches=None, as_dict=False):
         if branches is None:

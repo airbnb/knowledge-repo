@@ -42,11 +42,11 @@ class KnowledgeRepositoryConfig(dict):
                     self.__update_from_file(value)
                 else:
                     logger.warning(
-                        "Configuration file {} does not exist.".format(value))
+                        u"Configuration file {} does not exist.".format(value))
             elif isinstance(value, type(None)):
                 pass
             else:
-                raise ValueError("Cannot interpret {}".format(value))
+                raise ValueError(u"Cannot interpret {}".format(value))
         dict.update(self, kwargs)
 
     def update_defaults(self, *values, **kwargs):
@@ -59,11 +59,11 @@ class KnowledgeRepositoryConfig(dict):
                 if os.path.exists(value):
                     self.__defaults_from_file(value)
                 else:
-                    logger.warning("Configuration file {} does not exist.".format(value))
+                    logger.warning(u"Configuration file {} does not exist.".format(value))
             elif isinstance(value, type(None)):
                 pass
             else:
-                raise ValueError("Cannot interpret {}".format(value))
+                raise ValueError(u"Cannot interpret {}".format(value))
         self.DEFAULT_CONFIGURATION.update(kwargs)
 
     def __defaults_from_file(self, filename):
@@ -79,7 +79,7 @@ class KnowledgeRepositoryConfig(dict):
         self.__set_from_module(self, module)
 
     def __set_from_file(self, d, filename, force=False):
-        config = imp.load_source('knowledge_repo.config_{}'.format(str(time.time()).replace('.', '')), filename)
+        config = imp.load_source(u'knowledge_repo.config_{}'.format(str(time.time()).replace('.', '')), filename)
         self.__set_from_module(d, config, force)
 
     def __set_from_module(self, d, module, force=False):
