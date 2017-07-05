@@ -36,14 +36,6 @@ color: #fff;
     color: #fff;
     border: none;
     transition: background 0.2s;
-    /*border-radius: 5px;
-    box-shadow: none;
-    border: none;
-    padding: 20px;
-    padding-top: 22px;
-    margin: 0px;
-    display: block;
-    border-bottom: 3px solid transparent;*/
 }
 #navbar .navbar-form .input-group #searchbar:focus {
     background: #aaa;

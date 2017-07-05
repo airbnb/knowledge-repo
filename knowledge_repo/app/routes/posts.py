@@ -184,11 +184,8 @@ def about():
 def download():
     "Downloads resources associated with a post."
 
-    path = request.args.get('post')
-    post = current_repo.post(path)
-
+    post = current_repo.post(request.args.get('post'))  # Note: `post` is expected to be a post path
     resource_type = request.args.get('type', 'source')
-    post = current_repo.post(path)
 
     if resource_type in ('kp', 'zip'):
         filename = os.path.basename(post.path)

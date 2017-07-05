@@ -157,31 +157,6 @@
     background: rgba(66, 165, 245, 0.2);
 }
 
-/*.renderedMarkdown table {
-  margin: 10px auto;
-  display: block;
-  overflow-x: auto;
-  border-spacing: 10px;
-  border: transparent;
-}
-
-.renderedMarkdown table tr th {
-    background: #d8d8d8;
-}
-
-.renderedMarkdown table tr:nth-child(2n) th {
-    background: #e8e8e8;
-}
-
-.renderedMarkdown table tr:nth-child(2n+1) td {
-    background: #f8f8f8;
-}
-
-.renderedMarkdown table th, .renderedMarkdown table td {
-  border: 1px solid grey;
-  padding: 0.5em;
-}*/
-
 .renderedMarkdown .codehilite {
   margin-top: 25px;
   margin-bottom: 25px;

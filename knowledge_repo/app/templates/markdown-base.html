@@ -30,6 +30,11 @@
 <a href='{{url_for('posts.download')}}?type=source&post={{post_path|urlencode}}&path={{file|urlencode}}' class="btn btn-primary btn-download">{{ file }}</a>
 {% endfor %}
 {% endif %}
+
+{% if is_author and is_private %}
+<span class='section'>Post Permissions</span>
+<a href='post_groups?post_id={{post_id}}'>Add permissions for users</a>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -42,28 +47,21 @@
                 {% if is_author and show_webeditor_button %}
                 <li role="presentation"><a href="/edit/{{post_path}}">Edit</a></li>
                 {% endif %}
+                {% if not webeditor_buttons and data_repo_git_root %}
+                  <a href='{{ data_repo_git_root}}/blob/master/{{post_path|urlencode}}'
+                     target="_blank"
+                     style='padding-right:10px;'>
+                    View on Github
+                    <i class='glyphicon glyphicon-new-window'></i>
+                  </a>
+                  <a href='{{ data_repo_git_root}}/edit/master/{{post_path|urlencode}}' target="_blank">
+                    Edit on Github
+                    <i class='glyphicon glyphicon-new-window'></i>
+                  </a>
+                {% endif %}
             </ul>
         </div>
       </div>
-      <!-- <div class="row col-md-12">
-        {% if not webeditor_buttons and data_repo_git_root %}
-          <a href='{{ data_repo_git_root}}/blob/master/{{post_path|urlencode}}'
-             target="_blank"
-             style='padding-right:10px;'>
-            View on Github
-            <i class='glyphicon glyphicon-new-window'></i>
-          </a>
-          <a href='{{ data_repo_git_root}}/edit/master/{{post_path|urlencode}}' target="_blank">
-            Edit on Github
-            <i class='glyphicon glyphicon-new-window'></i>
-          </a>
-        {% endif %}
-        {% if is_author and is_private %}
-        <a href='post_groups?post_id={{post_id}}'>
-          Add permissions for users
-        </a>
-        {% endif %}
-      </div> -->
     </div>
 {% endblock %}
 
