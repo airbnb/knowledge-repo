@@ -30,5 +30,5 @@ def get_keywords(post):
     tldr = post.tldr.split(" ")
     tags = [tag.name for tag in post.tags]
     full_search_text = author + title + tldr + tags
-    keywords = ' '.join([word for word in full_search_text if word not in ENGLISH_STOPWORDS])
+    keywords = u' '.join([word for word in full_search_text if word not in ENGLISH_STOPWORDS])
     return keywords

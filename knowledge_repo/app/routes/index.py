@@ -9,6 +9,7 @@ This includes:
 import os
 import posixpath
 import json
+from builtins import str
 from flask import request, render_template, redirect, Blueprint, current_app, make_response
 from sqlalchemy import case, desc
 
@@ -39,7 +40,7 @@ def site_map():
         # url = url_for(rule.endpoint, **(rule.defaults or {}))
         links.append((str(rule), rule.endpoint))
     # links is now a list of url, endpoint tuples
-    return '<br />'.join(str(link) for link in links)
+    return u'<br />'.join(str(link) for link in links)
 
 
 @blueprint.route('/')
@@ -169,7 +170,7 @@ def render_cluster():
         tuples = [(k, v) for (k, v) in folder_to_posts.items()]
 
     else:
-        raise ValueError("Group by `{}` not understood.".format(group_by))
+        raise ValueError(u"Group by `{}` not understood.".format(group_by))
 
     if sort_by == 'alpha':
         grouped_data = sorted(tuples, key=lambda x: x[0])
@@ -247,5 +248,5 @@ def generate_users_typeahead():
 @blueprint.route('/ajax_paths_typeahead', methods=['GET'])
 def generate_projects_typeahead():
     # return path stubs for all repositories
-    stubs = ['/'.join(p.split('/')[:-1]) for p in current_repo.dir()]
+    stubs = [u'/'.join(p.split('/')[:-1]) for p in current_repo.dir()]
     return json.dumps(list(set(stubs)))

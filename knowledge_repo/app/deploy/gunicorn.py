@@ -22,7 +22,7 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
 
     def load_config(self):
         options = {
-            'bind': '{}:{}'.format(self.host, self.port),
+            'bind': u'{}:{}'.format(self.host, self.port),
             'workers': self.workers,
             'timeout': self.timeout
         }

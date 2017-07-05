@@ -45,8 +45,8 @@ def render_post_header(post):
     """
 
     def get_authors(usernames, authors):
-        authors = ["<a href='{}'>{}</a>".format(url_for('index.render_feed', authors=username), author) for username, author in zip(usernames, authors)]
-        return ' and '.join(', '.join(authors).rsplit(', ', 1))
+        authors = [u"<a href='{}'>{}</a>".format(url_for('index.render_feed', authors=username), author) for username, author in zip(usernames, authors)]
+        return u' and '.join(u', '.join(authors).rsplit(', ', 1))
 
     if isinstance(post, KnowledgePost):
         return header_template.format(title=post.headers['title'],

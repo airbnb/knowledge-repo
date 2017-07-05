@@ -126,7 +126,7 @@ def save_post():
 
     if prefixes is not None:
         if not any([path.startswith(prefix) for prefix in prefixes]):
-            return json.dumps({'msg': ("Your post path must begin with one of {}").format(prefixes),
+            return json.dumps({'msg': (u"Your post path must begin with one of {}").format(prefixes),
                                'success': False})
 
     # TODO better handling of overwriting
@@ -134,7 +134,7 @@ def save_post():
     if path in current_repo:
         kp = current_repo.post(path)
         if g.user.username not in kp.headers['authors'] and g.user.username not in current_repo.config.editors:
-            return json.dumps({'msg': ("Post with path {} already exists and you are not an author!"
+            return json.dumps({'msg': (u"Post with path {} already exists and you are not an author!"
                                        "\nPlease try a different path").format(path),
                                'success': False})
 
@@ -187,7 +187,7 @@ def publish_post():
     """ Publish the post by changing the status """
     path = request.args.get('path', None)
     if path not in current_repo:
-        return json.dumps({'msg': "Unable to retrieve post with path = {}!".format(path), 'success': False})
+        return json.dumps({'msg': u"Unable to retrieve post with path = {}!".format(path), 'success': False})
     current_repo.publish(path)
 
     update_index(check_timeouts=False)
@@ -200,7 +200,7 @@ def unpublish_post():
     """ Unpublish the post """
     path = request.args.get('path', None)
     if path not in current_repo:
-        return json.dumps({'msg': "Unable to retrieve post with path = {}!".format(path), 'success': False})
+        return json.dumps({'msg': u"Unable to retrieve post with path = {}!".format(path), 'success': False})
     current_repo.unpublish(path)
 
     update_index(check_timeouts=False)
@@ -213,7 +213,7 @@ def accept():
     """ Accept the post """
     path = request.args.get('path', None)
     if path not in current_repo:
-        return json.dumps({'msg': "Unable to retrieve post with path = {}!".format(path), 'success': False})
+        return json.dumps({'msg': u"Unable to retrieve post with path = {}!".format(path), 'success': False})
     current_repo.accept(path)
     update_index()
     return 'OK'
@@ -225,7 +225,7 @@ def delete_post():
     """ Delete a post """
     path = request.args.get('path', None)
     if path not in current_repo:
-        return json.dumps({'msg': "Unable to retrieve post with path = {}!".format(path), 'success': False})
+        return json.dumps({'msg': u"Unable to retrieve post with path = {}!".format(path), 'success': False})
     kp = current_repo.post(path)
     if g.user.username not in kp.headers['authors']:
         return json.dumps({'msg': "You can only delete a post where you are an author!", 'success': False})
@@ -290,7 +290,7 @@ def file_upload():
                     send_from_directory(dst_folder, filename)
                     uploadedFiles += [url_for("static", filename=os.path.join(upload_folder, filename))]
                 except Exception as e:
-                    error_msg = "ERROR during image upload: {}".format(str(e))
+                    error_msg = u"ERROR during image upload: {}".format(str(e))
                     logger.error(error_msg)
                     return json.dumps({'error_msg': error_msg, 'success': False})
 
@@ -302,11 +302,11 @@ def file_upload():
                     num_pages = src_pdf.getNumPages()
                     for page_num in range(num_pages):
                         page_png = pdf_page_to_png(src_pdf, page_num)
-                        page_name = "{filename}_{page_num}.jpg".format(**locals())
+                        page_name = u"{filename}_{page_num}.jpg".format(**locals())
                         page_png.save(filename=os.path.join(dst_folder, page_name))
                         uploadedFiles += [url_for("static", filename=os.path.join(upload_folder, page_name))]
                 except Exception as e:
-                    error_msg = "ERROR during pdf upload: {}".format(str(e))
+                    error_msg = u"ERROR during pdf upload: {}".format(str(e))
                     logger.error(error_msg)
                     return json.dumps({'error_msg': error_msg, 'success': False})
 

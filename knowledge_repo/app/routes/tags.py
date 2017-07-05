@@ -15,6 +15,7 @@ from flask import current_app, request, render_template, Blueprint, g
 from sqlalchemy import and_
 import logging
 import math
+from builtins import str
 
 from ..app import db_session
 from ..models import PageView, Post, assoc_post_tag, Subscription, Tag
