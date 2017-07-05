@@ -156,9 +156,10 @@ class HTMLConverter(KnowledgePostConverter):
     def init(self):
         self.kp_images = self.kp.read_images()
 
-    def to_string(self, skip_headers=False, images_base64_encode=True, urlmappers=[]):
+    def _render_markdown(self, skip_headers=False, images_base64_encode=True, urlmappers=[]):
         """
-        Renders the markdown as html
+        Returns the `Markdown` instance as well as the rendered html output
+        as a tuple: (`Markdown`, str).
         """
         # Copy urlmappers locally so we can modify it without affecting global
         # state
@@ -174,9 +175,18 @@ class HTMLConverter(KnowledgePostConverter):
         if not skip_headers:
             html += self.render_headers()
 
-        html += markdown.Markdown(extensions=MARKDOWN_EXTENSTIONS).convert(self.kp.read())
+        md = markdown.Markdown(extensions=MARKDOWN_EXTENSTIONS)
+        html += md.convert(self.kp.read())
 
-        return self.apply_url_remapping(html, urlmappers)
+        html = self.apply_url_remapping(html, urlmappers)
+
+        return md, html
+
+    def to_string(self, skip_headers=False, images_base64_encode=True, urlmappers=[]):
+        """
+        Renders the markdown as html
+        """
+        return self._render_markdown[1]
 
     def apply_url_remapping(self, html, urlmappers):
         patterns = {

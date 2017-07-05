@@ -1,5 +1,6 @@
 import logging
-from flask import request, url_for, redirect, render_template, current_app, Blueprint, g
+import os
+from flask import request, url_for, redirect, render_template, current_app, Blueprint, g, Response
 
 from ..proxies import db_session, current_repo
 from ..models import User, Post, PageView
@@ -17,10 +18,11 @@ blueprint = Blueprint('posts', __name__,
 @blueprint.route('/post/<path:path>', methods=['GET'])
 @PageView.logged
 def render(path):
-    """ Render the knowledge post with all the related formatting """
+    """
+    Render the knowledge post with all the related formatting.
+    """
 
     mode = request.args.get('render', 'html')
-
     username, user_id = g.user.username, g.user.id
 
     tmpl = 'markdown-rendered.html'
@@ -60,7 +62,7 @@ def render(path):
         if user_id not in allowed_users:
             return render_template("permission_ask.html", authors=post.authors_string)
 
-    html = render_post(post)
+    rendered = render_post(post, with_toc=True)
     raw_post = render_post_raw(post) if mode == 'raw' else None
 
     comments = post.comments
@@ -84,7 +86,8 @@ def render(path):
         is_webpost = any(prefix for prefix in web_editor_prefixes if path.startswith(prefix))
 
     rendered = render_template(tmpl,
-                               html=html,
+                               html=rendered['html'],
+                               toc=rendered['toc'],
                                post_id=post.id,
                                post_path=path,
                                raw_post=raw_post,
@@ -103,8 +106,18 @@ def render(path):
                                web_uri=post.kp.web_uri,
                                table_id=None,
                                is_private=(post.private == 1),
-                               is_author=is_author)
+                               is_author=is_author,
+                               downloads=list(post.kp._dir('orig_src/')))
     return rendered
+
+
+@render.object_extractor
+def render(path):
+    return {
+        'id': Post.query.filter(Post.path == path).first().id,
+        'type': 'post',
+        'action': 'view'
+    }
 
 
 @blueprint.route('/post/preview/<path:path>', methods=['GET'])
@@ -128,11 +141,12 @@ def _render_preview(path, tmpl):
     if not post:
         raise Exception("unable to find post at {}".format(path))
 
-    html = render_post(post)
+    rendered = render_post(post, with_toc=True)
     raw_post = render_post_raw(post) if (mode == 'raw') else None
 
     return render_template(tmpl,
-                           html=html,
+                           html=rendered['html'],
+                           toc=rendered['toc'],
                            post_id=None,
                            post_path=path,
                            raw_post=raw_post,
@@ -150,15 +164,6 @@ def _render_preview(path, tmpl):
                            table_id=None)
 
 
-@render.object_extractor
-def render(path):
-    return {
-        'id': Post.query.filter(Post.path == path).first().id,
-        'type': 'post',
-        'action': 'view'
-    }
-
-
 # DEPRECATED: Legacy route for the /render endpoint to allow old bookmarks to function
 @blueprint.route('/render', methods=['GET'])
 @PageView.logged
@@ -172,3 +177,30 @@ def render_legacy():
 def about():
     """Renders about page. This is the html version of REAMDE.md"""
     return render_template("about.html")
+
+
+@blueprint.route('/ajax/post/download', methods=['GET'])
+@PageView.logged
+def download():
+    "Downloads resources associated with a post."
+
+    post = current_repo.post(request.args.get('post'))  # Note: `post` is expected to be a post path
+    resource_type = request.args.get('type', 'source')
+
+    if resource_type in ('kp', 'zip'):
+        filename = os.path.basename(post.path)
+        if resource_type == 'zip':
+            filename = filename[:-3] + '.zip'
+        return Response(
+            post.to_string(format=resource_type),
+            mimetype="application/zip",
+            headers={"Content-disposition": "attachment; filename={}".format(filename)})
+    elif resource_type == 'source':
+        path = request.args.get('path', None)
+        assert path is not None, "Source path not provided."
+        return Response(
+            post.read_src(path),
+            mimetype="application/octet-stream",
+            headers={"Content-disposition": "attachment; filename={}".format(os.path.basename(path))})
+    else:
+        raise RuntimeError("Invalid resource_type: {}".format(resource_type))

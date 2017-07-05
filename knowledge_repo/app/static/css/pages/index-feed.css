@@ -119,3 +119,32 @@
   margin-left: 1em;
   color: #aaa;
 }
+
+@media (max-width: 650px) {
+    .feed-post {
+        flex-direction: column;
+        border-radius: 0px;
+        margin-left: -25px;
+        margin-right: -25px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .feed-post .feed-thumbnail {
+        align-self: center;
+        margin-bottom: 1em;
+        width: 150px;
+        height: 150px;
+    }
+
+    .feed-post .feed-thumbnail img {
+        align-self: center;
+        margin-bottom: 1em;
+        max-width: 125px;
+        max-height: 125px;
+    }
+
+    .feed-post .feed-metadata {
+        margin-left: 0px;
+    }
+}

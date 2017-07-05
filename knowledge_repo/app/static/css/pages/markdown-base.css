@@ -1,13 +1,22 @@
 .renderedMarkdown {
-    border: 1px solid #bbb;
+    border: 1px solid #aaa;
     border-radius: 3px;
     padding: 1.5em;
     background: #fff;
     color: #484848;
-    margin-top: 2em;
     margin-bottom: 2em;
     position: relative;
     box-shadow: 0px 2px 3px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 992px) {
+    .renderedMarkdown {
+        border-radius: 0px;
+        border-left: none;
+        border-right: none;
+        margin-left: -25px;
+        margin-right: -25px;
+    }
 }
 
 .renderedMarkdown h1,
@@ -81,29 +90,71 @@
     max-width: 80%;
 }
 
+.renderedMarkdown .table-wrapper {
+    overflow-x: auto;
+    display: block;
+}
+
 .renderedMarkdown table {
-  margin: 10px auto;
-  display: block;
-  overflow-x: auto;
-  border-spacing: 10px;
-  border: transparent;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    border-collapse: collapse;
+    border-spacing: 0;
+    color: #000;
+    table-layout: fixed;
+    border: 1px solid #aaa;
+    padding: 2px;
+    border-collapse: separate;
 }
-
-.renderedMarkdown table tr th {
-    background: #d8d8d8;
+.renderedMarkdown thead th {
+    border-left: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
 }
-
-.renderedMarkdown table tr:nth-child(2n) th {
-    background: #e8e8e8;
+.renderedMarkdown thead th:first-child {
+    border-left: none;
 }
-
-.renderedMarkdown table tr:nth-child(2n+1) td {
-    background: #f8f8f8;
+.renderedMarkdown thead > tr:last-child > th {
+    border-bottom: 1px solid #aaa;
+    vertical-align: bottom;
 }
-
-.renderedMarkdown table th, .renderedMarkdown table td {
-  border: 1px solid grey;
-  padding: 0.5em;
+.renderedMarkdown tr, th, td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 0.5em 0.5em;
+    line-height: normal;
+    white-space: normal;
+    max-width: none;
+    border: none;
+}
+.renderedMarkdown th {
+    font-weight: bold;
+    text-align: right;
+}
+.renderedMarkdown thead th {
+    text-align: center;
+}
+.renderedMarkdown tr th {
+    background: rgba(255,255,255,0.5);
+}
+.renderedMarkdown tr > td:first-child:empty {
+    background: #fff;
+}
+.renderedMarkdown tr > td:first-child:empty + th {
+    border-left: 1px solid #aaa;
+}
+.renderedMarkdown tr > th + td {
+    border-left: 1px solid #aaa;
+}
+.renderedMarkdown tr > td + th {
+    border-left: 1px solid #000;
+}
+.renderedMarkdown tbody tr:nth-child(odd) {
+    background: #f5f5f5;
+}
+.renderedMarkdown tbody tr:hover {
+    background: rgba(66, 165, 245, 0.2);
 }
 
 .renderedMarkdown .codehilite {
@@ -150,6 +201,9 @@
 .codetoggleall {
   width: 140px;
   border-top-right-radius: 0px;
+  border-radius: 3px;
+  top: -35px;
+  z-index: 3;
 }
 
 .codetoggle:hover, .codetoggleall:hover {
@@ -162,6 +216,12 @@
 
 .codetoggle:active, .codetoggleall:active {
   background: #edd114;
+}
+
+@media (max-width: 992px) {
+    .codetoggle, .codetoggleall {
+        display:none;
+    }
 }
 
 .renderedMarkdown ul > li > p {
@@ -199,4 +259,38 @@
 
 .renderedMarkdown .codehilite:hover .codetoggle {
     opacity: 1;
+}
+
+.side-panel .btn-download {
+    background: #ccc;
+    color: #fff;
+    border: none;
+    transition: background-color 0.3s;
+    margin: 5px;
+    overflow: hidden;
+}
+
+.side-panel .btn-download:hover {
+    background: #00a699;
+    color: #fff;
+    opacity: 1;
+    transition: background-color 0.2s;
+}
+
+.side-panel .toc ul.nav {
+    list-style-type: decimal;
+}
+
+.side-panel .toc ul.nav > li {
+    display: list-item;
+    margin-left: 1.5em;
+    font-weight: normal;
+}
+
+.side-panel .toc ul.nav > li > a {
+    padding: 3px;
+}
+
+.side-panel .toc ul.nav > li.active {
+    font-weight: bold;
 }
