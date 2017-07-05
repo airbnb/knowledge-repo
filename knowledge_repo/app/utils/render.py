@@ -98,7 +98,7 @@ def render_post(post, with_toc=False):
     if with_toc:
         return {
             "html": html,
-            "toc": md.toc
+            "toc": md.toc if md is not None else None
         }
     return html
 
