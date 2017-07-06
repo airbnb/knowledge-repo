@@ -6,6 +6,7 @@ ARG PORT
 # Install required Ubuntu packages
 RUN apt-get update
 RUN apt-get install -y wget
+RUN apt-get install -y bzip2
 RUN apt-get install -y git
 
 # Download appropriate version of Miniconda
