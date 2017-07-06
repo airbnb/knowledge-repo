@@ -1,5 +1,4 @@
-# Using officially supported Ubuntu version for Travis CI
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 
 ARG TRAVIS_PYTHON_VERSION
 ARG PORT
