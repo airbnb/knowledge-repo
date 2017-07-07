@@ -186,7 +186,11 @@ class HTMLConverter(KnowledgePostConverter):
         """
         Renders the markdown as html
         """
-        return self._render_markdown[1]
+        return self._render_markdown(
+            skip_headers=skip_headers,
+            images_base64_encode=images_base64_encode,
+            urlmappers=urlmappers
+        )[1]
 
     def apply_url_remapping(self, html, urlmappers):
         patterns = {
