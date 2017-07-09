@@ -4,6 +4,7 @@ import traceback
 from builtins import str
 from future.utils import raise_with_traceback
 from flask import current_app, request, g
+from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 import functools
 from collections import defaultdict
@@ -16,7 +17,7 @@ import six
 
 from knowledge_repo._version import __version__
 from knowledge_repo.repository import KnowledgeRepository
-from .proxies import current_repo, db_session
+from .proxies import current_user, current_repo, db_session
 from .utils.models import unique_constructor
 from .utils.search import get_keywords
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -176,7 +177,7 @@ class PageView(db.Model):
             log = PageView(
                 page=request.full_path,
                 endpoint=request.endpoint,
-                user_id=g.user.id,
+                user_id=current_user.id,
                 ip_address=request.remote_addr,
                 version=__version__
             )
@@ -234,26 +235,55 @@ class Vote(db.Model):
 
 
 @unique_constructor(
-    lambda username: username,
-    lambda query, username: query.filter(User.username == username)
+    lambda identifier: identifier,
+    lambda query, identifier: query.filter(User.identifier == identifier)
 )
-class User(db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(500))
     created_at = db.Column(db.DateTime, default=func.now())
+
+    identifier = db.Column(db.String(1000))  # Typically expected to be an email
+
+    name = db.Column(db.String(500))  # Name as determined by auth method
+    preferred_name = db.Column(db.String(500))  # Name as determined by user preferences
+    photo_uri = db.Column(db.Text())  # Either external url or data uri
+    banned = db.Column(db.Boolean, default=False)
+
+    last_login_at = db.Column(db.DateTime)
+    former_login_at = db.Column(db.DateTime)
 
     _posts_assoc = db.relationship("PostAuthorAssoc")
     posts = association_proxy('_posts_assoc', 'post')  # This property should not directly modified
 
+    # Method overrides for the UserMixin class for flask_login
     @property
-    def format_name(self):
-        username_to_name = current_repo.config.username_to_name
-        return username_to_name(self.username)
+    def is_active(self):
+        return not self.banned
 
     @property
-    def get_subscriptions(self):
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.identifier
+
+    can_logout = True
+
+    # Other useful methods
+    @property
+    def format_name(self):
+        return self.preferred_name or self.name or self.identifier
+        # username_to_name = current_repo.config.username_to_name
+        # return username_to_name(self.username)
+
+    @property
+    def subscriptions(self):  # TODO: make attribute style naming
         """Get the subscriptions associated with a user.
 
         Return an array of strings of tag_names
@@ -275,7 +305,7 @@ class User(db.Model):
         return out_subscriptions
 
     @property
-    def get_liked_posts(self):
+    def liked_posts(self):
         """
         :return: Posts that a user has liked
         :rtype: list
@@ -369,7 +399,7 @@ class Post(db.Model):
         for author in authors:
             if not isinstance(author, User):
                 author = author.strip()
-                author = User(username=author)
+                author = User(identifier=author)
             user_objs.append(author)
 
         self._authors = user_objs

@@ -9,7 +9,7 @@ from sqlalchemy import or_
 from werkzeug import secure_filename
 
 from knowledge_repo.post import KnowledgePost
-from ..proxies import db_session, current_repo
+from ..proxies import db_session, current_repo, current_user
 from ..models import Post, PostAuthorAssoc, Tag, Comment, User, PageView
 from ..utils.emails import send_review_email, send_reviewer_request_email
 from ..utils.image import pdf_page_to_png, is_pdf, is_allowed_image_format
@@ -47,9 +47,9 @@ def gitless_drafts():
     if prefixes is not None:
         query = query.filter(or_(*[Post.path.like(p + '%') for p in prefixes]))
 
-    if g.user.username not in current_repo.config.editors:
+    if current_user.identifier not in current_repo.config.editors:
         query = (query.outerjoin(PostAuthorAssoc, PostAuthorAssoc.post_id == Post.id)
-                      .filter(PostAuthorAssoc.user_id == g.user.id))
+                      .filter(PostAuthorAssoc.user_id == current_user.id))
 
     return render_template("web_posts.html", posts=query.all())
 
@@ -74,10 +74,10 @@ def editor(path=None):
             'markdown': request.args.get('markdown'),
             'thumbnail': '',
             'can_approve': 0,
-            'username': g.user.username,
+            'username': current_user.identifier,
             'created_at': datetime.now(),
             'updated_at': datetime.now(),
-            'authors': [g.user.username],
+            'authors': [current_user.identifier],
             'comments': [],
             'tldr': request.args.get('tldr'),
             }
@@ -98,7 +98,7 @@ def editor(path=None):
                                           .filter(Comment.type == "review")
                                           .all())
 
-    if g.user.username not in data['authors'] or g.user.username in current_repo.config.editors:
+    if current_user.identifier not in data['authors'] or current_user.identifier in current_repo.config.editors:
         data['can_approve'] = 1
 
     data['created_at'] = data['created_at']
@@ -133,7 +133,7 @@ def save_post():
     kp = None
     if path in current_repo:
         kp = current_repo.post(path)
-        if g.user.username not in kp.headers['authors'] and g.user.username not in current_repo.config.editors:
+        if current_user.identifier not in kp.headers['authors'] and current_user.identifier not in current_repo.config.editors:
             return json.dumps({'msg': (u"Post with path {} already exists and you are not an author!"
                                        "\nPlease try a different path").format(path),
                                'success': False})
@@ -227,7 +227,7 @@ def delete_post():
     if path not in current_repo:
         return json.dumps({'msg': u"Unable to retrieve post with path = {}!".format(path), 'success': False})
     kp = current_repo.post(path)
-    if g.user.username not in kp.headers['authors']:
+    if current_user.identifier not in kp.headers['authors']:
         return json.dumps({'msg': "You can only delete a post where you are an author!", 'success': False})
     current_repo.remove(path)
 
@@ -248,19 +248,19 @@ def review_comment():
 
         comment = Comment()
         comment.text = request.get_json()['text']
-        comment.user_id = g.user.id
+        comment.user_id = current_user.id
         comment.post_id = post_id
         comment.type = "review"
         db_session.add(comment)
         db_session.commit()
 
         send_review_email(path=path,
-                          commenter=g.user.username,
+                          commenter=current_user.identifier,
                           comment_text=comment.text)
 
     elif request.method == 'DELETE':
         comment = Comment.query.get(int(request.args.get('comment_id', '')))
-        if comment and g.user.id == comment.user_id:
+        if comment and current_user.id == comment.user_id:
             db_session.delete(comment)
             db_session.commit()
 

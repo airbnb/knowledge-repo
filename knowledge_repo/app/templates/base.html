@@ -41,6 +41,7 @@
 
   <body>
 
+    {% block navbar %}
     <!-- Top-level navbar -->
     <nav class="navbar navbar-fixed-top navbar-inverse">
       <div class="container">
@@ -80,13 +81,18 @@
           <!-- Drop down menu to surface less used links on large screens -->
           <ul class="nav navbar-nav navbar-right visible-sm-block visible-md-block visible-lg-block">
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true"><span class="caret"></span></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true" style='padding: 5px;'><img style='width: 40px; height: 40px; border-radius:20px; margin-left: 5px; margin-right: 5px; border: 1px solid #000; background-color: #eee;' src="{% if current_user.is_anonymous %}{{url_for('static', filename='images/profile_photo_logged_out.png')}}{%else%}{{ current_user.photo_uri or url_for('static', filename='images/profile_photo_default.png') }}{%endif%}" /><span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li class="dropdown-header">Logged in as <em>{{name}}</em></li>
-                <li><a href="/feed?authors={{username}}">My Posts</a></li>
+                {% if current_user.is_authenticated %}
+                <li class="dropdown-header">Logged in as <em>{{ current_user.format_name }}</em></li>
+                <li><a href="/feed?authors={{ current_user.identifier }}">My Posts</a></li>
                 <li><a href="/favorites">My Favorites</a></li>
+                {% if current_user.can_logout %}<li><a href="{{ url_for('auth.logout') }}">Sign out</a></li>{%endif%}
                 <li role="separator" class="divider"></li>
                 <li class="dropdown-header">Site Features</li>
+                {% else %}
+                <li><a href="{{ url_for('auth.login') }}">Sign in</a></li>
+                {% endif %}
                 <li><a href="/stats">Stats</a></li>
                 <li><a href="/about">About</a></li>
               </ul>
@@ -95,10 +101,12 @@
 
           <!-- Expose the same links as above in the collapsed navbar header -->
           <ul class="nav navbar-nav navbar-right visible-xs-block">
+            {% if current_user.is_authenticated %}
             <li class="dropdown-header">Logged in as <em>{{name}}</em></li>
             <li><a href="/feed?authors={{username}}">My Posts</a></li>
             <li><a href="/favorites">My Favorites</a></li><li role="separator" class="divider"></li>
             <li class="dropdown-header">Site Features</li>
+            {% endif %}
             <li><a id="stats_tab" href="/stats">Stats</a></li>
             <li><a id="help_tab" href="/about">About</a></li>
           </ul>
@@ -106,6 +114,7 @@
         </div>
       </div>
     </nav>
+    {% endblock %}
 
     <!-- Main content place holder, with a sidebar on both the left and right,
          which collapse to form a single column on smaller screens. -->

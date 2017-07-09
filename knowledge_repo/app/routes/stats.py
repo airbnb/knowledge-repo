@@ -4,7 +4,7 @@ import collections
 from flask import Blueprint, request, render_template
 from sqlalchemy import func
 
-from ..app import db_session
+from ..proxies import db_session
 from ..models import PageView, Post
 from ..utils.requests import from_request_get_feed_params
 from ..utils.posts import get_posts

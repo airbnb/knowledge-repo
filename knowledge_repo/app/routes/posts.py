@@ -3,7 +3,7 @@ import os
 from builtins import str
 from flask import request, url_for, redirect, render_template, current_app, Blueprint, g, Response
 
-from ..proxies import db_session, current_repo
+from ..proxies import db_session, current_repo, current_user
 from ..models import User, Post, PageView
 from ..utils.render import render_post, render_comment, render_post_raw
 
@@ -24,7 +24,7 @@ def render(path):
     """
 
     mode = request.args.get('render', 'html')
-    username, user_id = g.user.username, g.user.id
+    username, user_id = current_user.identifier, current_user.id
 
     tmpl = 'markdown-rendered.html'
     if mode == 'raw':
@@ -68,16 +68,16 @@ def render(path):
 
     comments = post.comments
     for comment in comments:
-        comment.author = db_session.query(User).filter(User.id == comment.user_id).first().username
+        comment.author = db_session.query(User).filter(User.id == comment.user_id).first().identifier
         if mode != 'raw':
             comment.text = render_comment(comment)
 
-    user_obj = (db_session.query(User)
-                          .filter(User.id == user_id)
-                          .first())
+    user_obj = current_user #(db_session.query(User)
+                         # .filter(User.id == user_id)
+                         # .first())
 
     tags_list = [str(t.name) for t in post.tags]
-    user_subscriptions = [str(s) for s in user_obj.get_subscriptions]
+    user_subscriptions = [str(s) for s in user_obj.subscriptions]
 
     is_author = user_id in [author.id for author in post.authors]
 

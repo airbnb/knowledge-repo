@@ -9,7 +9,7 @@ from builtins import str
 from flask import current_app
 from sqlalchemy import func, distinct, or_
 
-from ..app import db_session
+from ..proxies import db_session
 from ..models import (Comment, PageView, Post,
                       Tag, Vote, User)
 
@@ -53,7 +53,7 @@ def get_posts(feed_params):
     author_names = feed_params['authors']
     if author_names:
         author_names = [author_name.strip() for author_name in author_names.split(",")]
-        query = query.filter(Post.authors.any(User.username.in_(author_names)))
+        query = query.filter(Post.authors.any(User.identifier.in_(author_names)))
 
     # sort - TODO clean up
     sort_by = feed_params['sort_by']

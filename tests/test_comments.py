@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from knowledge_repo import KnowledgeRepository
 from knowledge_repo.app.models import Comment, Post, User
 
-from knowledge_repo.app.app import db_session
+from knowledge_repo.app.proxies import db_session
 
 
 class CommentTest(unittest.TestCase):

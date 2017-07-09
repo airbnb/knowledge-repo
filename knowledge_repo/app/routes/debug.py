@@ -5,7 +5,8 @@ import logging
 import tabulate
 import knowledge_repo
 
-from flask import request, current_app, Blueprint
+from flask import request, current_app, Blueprint, url_for, Response
+
 from ..proxies import current_repo
 from ..index import get_indexed_revisions, is_indexing
 
@@ -63,3 +64,25 @@ def force_reindex():
     reindex = bool(request.args.get('reindex', ''))
     current_app.db_update_index(reindex=reindex)
     return "Index Updated"
+
+
+@blueprint.route('/debug/views')
+def show_views():
+    import urllib
+    output = []
+    for rule in current_app.url_map.iter_rules():
+        options = {}
+        for arg in rule.arguments:
+            options[arg] = "[{0}]".format(arg)
+
+        methods = ','.join(rule.methods)
+        url = url_for(rule.endpoint, **options)
+        line = urllib.unquote("{:50s} {:20s} {}".format(rule.endpoint, methods, url))
+        output.append(line)
+
+    return "<br />".join(sorted(output))
+
+
+@blueprint.route('/debug/headers')
+def show_headers():
+    return Response(str(request.headers).encode(), mimetype='text/plain')

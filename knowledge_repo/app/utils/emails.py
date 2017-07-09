@@ -7,7 +7,7 @@ import logging
 from flask import render_template, current_app, url_for
 from flask_mail import Message
 
-from ..app import db_session
+from ..proxies import db_session
 from ..proxies import current_repo
 from ..models import Email, Subscription, User, Post
 from ..utils.render import render_post

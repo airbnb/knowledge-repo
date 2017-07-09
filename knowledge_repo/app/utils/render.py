@@ -56,7 +56,7 @@ def render_post_header(post):
                                       tldr=render_post_tldr(post))
     else:
         return header_template.format(title=post.title,
-                                      authors=get_authors([author.username for author in post.authors], [author.format_name for author in post.authors]),
+                                      authors=get_authors([author.identifier for author in post.authors], [author.format_name for author in post.authors]),
                                       date_created=post.created_at.strftime("%B %d, %Y"),
                                       date_updated=post.updated_at.strftime("%B %d, %Y"),
                                       tldr=render_post_tldr(post))

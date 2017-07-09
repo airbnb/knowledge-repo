@@ -8,8 +8,9 @@ import logging
 from flask import request, Blueprint, g
 from sqlalchemy import and_
 
-from ..app import db_session
+from ..proxies import db_session
 from ..models import Post, Vote, PageView
+from ..proxies import current_user
 
 
 blueprint = Blueprint(
@@ -25,10 +26,10 @@ def like_post():
         if post_id < 0:
             return "No Post Found to like!"
         vote = (db_session.query(Vote)
-                .filter(and_(Vote.object_id == post_id, Vote.user_id == g.user.id))
+                .filter(and_(Vote.object_id == post_id, Vote.user_id == current_user.id))
                 .first())
         if not vote:
-            vote = Vote(user_id=g.user.id, object_id=post_id)
+            vote = Vote(user_id=current_user.id, object_id=post_id)
             db_session.add(vote)
             db_session.commit()
     except:
@@ -45,7 +46,7 @@ def unlike_post():
         if post_id < 0:
             return "No Post Found to Unlike!"
         votes = (db_session.query(Vote)
-                 .filter(and_(Vote.object_id == post_id, Vote.user_id == g.user.id))
+                 .filter(and_(Vote.object_id == post_id, Vote.user_id == current_user.id))
                  .all())
         if votes:
             for vote in votes:

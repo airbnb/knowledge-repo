@@ -17,8 +17,9 @@ import logging
 import math
 from builtins import str
 
-from ..app import db_session
+from ..proxies import db_session
 from ..models import PageView, Post, assoc_post_tag, Subscription, Tag
+from ..proxies import current_user
 from ..utils.requests import from_request_get_feed_params
 from ..utils.emails import send_subscription_email
 
@@ -239,13 +240,13 @@ def toggle_tag_subscription():
         if tag_obj:
             subscription = db_session.query(Subscription).filter(
                 and_(Subscription.object_type == 'tag',
-                     Subscription.user_id == g.user.id,
+                     Subscription.user_id == current_user.id,
                      Subscription.object_id == tag_obj.id)).first()
         if subscription and subscribe_action == 'unsubscribe':
             db_session.delete(subscription)
         elif not subscription and subscribe_action == 'subscribe':
             # otherwise, create new subscription
-            subscription = Subscription(user_id=g.user.id, object_type='tag',
+            subscription = Subscription(user_id=current_user.id, object_type='tag',
                                         object_id=tag_obj.id)
             db_session.add(subscription)
         else:
@@ -263,7 +264,7 @@ def toggle_tag_subscription():
     tag_obj = Tag(name=request.args.get('tag_name', ''))
     subscription = db_session.query(Subscription).filter(
         and_(Subscription.object_type == 'tag',
-             Subscription.user_id == g.user.id,
+             Subscription.user_id == current_user.id,
              Subscription.object_id == tag_obj.id)
     ).first()
     return {

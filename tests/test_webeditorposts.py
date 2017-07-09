@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import datetime
 
 from knowledge_repo import KnowledgeRepository, KnowledgePost
-from knowledge_repo.app.app import db_session
+from knowledge_repo.app.proxies import db_session
 from knowledge_repo.app.models import User, Post, Tag
 
 

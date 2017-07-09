@@ -4,7 +4,7 @@ from sqlalchemy import and_
 
 from knowledge_repo import KnowledgeRepository
 from knowledge_repo.app.models import User, Vote, Post
-from knowledge_repo.app.app import db_session
+from knowledge_repo.app.proxies import db_session
 
 
 class FavoriteTest(unittest.TestCase):

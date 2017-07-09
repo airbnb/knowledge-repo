@@ -11,6 +11,7 @@ import posixpath
 import json
 from builtins import str
 from flask import request, render_template, redirect, Blueprint, current_app, make_response
+from flask_login import login_required
 from sqlalchemy import case, desc
 
 from ..proxies import db_session, current_repo
@@ -60,7 +61,7 @@ def render_favorites():
     user = (db_session.query(User)
             .filter(User.id == user_id)
             .first())
-    posts = user.get_liked_posts
+    posts = user.liked_posts
 
     post_stats = {post.path: {'all_views': post.view_count,
                               'distinct_views': post.view_user_count,
@@ -71,12 +72,12 @@ def render_favorites():
                            feed_params=feed_params,
                            posts=posts,
                            post_stats=post_stats,
-                           top_header='Favorites',
-                           contribs=current_app.config['plugins'])
+                           top_header='Favorites')
 
 
 @blueprint.route('/feed')
 @PageView.logged
+@login_required
 def render_feed():
     """ Renders the index-feed view """
     feed_params = from_request_get_feed_params(request)
@@ -88,8 +89,7 @@ def render_feed():
                            feed_params=feed_params,
                            posts=posts,
                            post_stats=post_stats,
-                           top_header='Knowledge Feed',
-                           contribs=current_app.config['plugins'])
+                           top_header='Knowledge Feed')
 
 
 @blueprint.route('/table')
@@ -103,8 +103,7 @@ def render_table():
                            posts=posts,
                            post_stats=post_stats,
                            top_header="Knowledge Table",
-                           feed_params=feed_params,
-                           contribs=current_app.config['plugins'])
+                           feed_params=feed_params)
 
 
 @blueprint.route('/cluster')
@@ -183,8 +182,7 @@ def render_cluster():
                            filters=filters,
                            sort_by=sort_by,
                            group_by=group_by,
-                           tag=request_tag,
-                           contribs=current_app.config['plugins'])
+                           tag=request_tag)
 
 
 @blueprint.route('/create')
@@ -241,7 +239,7 @@ def generate_tags_typeahead():
 @blueprint.route('/ajax/index/typeahead_users')
 @blueprint.route('/ajax_users_typeahead', methods=['GET'])
 def generate_users_typeahead():
-    return json.dumps([u[0] for u in db_session.query(User.username).all()])
+    return json.dumps([u[0] for u in db_session.query(User.identifier).all()])
 
 
 @blueprint.route('/ajax/index/typeahead_paths')
