@@ -53,6 +53,24 @@ knowledge_repo --repo ./example_repo preview project/example_rmd
 knowledge_repo --repo ./example_repo preview project/example_ipynb
 ```
 
+### Docker images
+
+Docker images of the latest build are available at Docker Hub and can be downloaded as follows:
+
+Python 2.7:
+```
+docker pull airbnb/knowledge-repo-python2.7
+docker run -d -p 80:80 airbnb/knowledge-repo-python2.7
+```
+
+Python 3.4:
+```
+docker pull airbnb/knowledge-repo-python3.4
+docker run -d -p 80:80 airbnb/knowledge-repo-python3.4
+```
+
+A Dockerfile has been provided if you wish to build a Docker image yourself.
+
 ### Feedback for Beta
 
 The Knowledge Repo is currently in a public beta, and we are rolling it out to more people to get feedback. In particular, we'd love to hear about the following:
@@ -176,7 +194,7 @@ See the file itself for more detail.
 
 #### Knowledge Web Application Configuration
 
-Specify a configuration file when running the web application by adding the flag `--config path/to/config_file.py`. An example configuration file is provided [here](https://github.com/airbnb/knowledge-repo/blob/master/resources/server_config.py). 
+Specify a configuration file when running the web application by adding the flag `--config path/to/config_file.py`. An example configuration file is provided [here](https://github.com/airbnb/knowledge-repo/blob/master/resources/server_config.py).
 
 This configuration file lets you specify details specific to the web server. For instance, one can specify the database connection string or the request header that contains usernames. See the file itself for more detail.
 

@@ -78,12 +78,12 @@ the growing library of work.
 
 ```python
     import numpy as np
-    
+
     x = np.linspace(0, 3*np.pi, 500)
     plot_data = dict()
     plot_data["x"] = x
     plot_data["y"] = np.sin(x**2)
-    
+
     from ggplot import *
     ggplot(aes(x='date', y='beef'), data=meat) + \
             geom_point(color='lightblue') + \
@@ -131,6 +131,3 @@ one person, and whether someone else's work can be linked.
 
 Put all the stuff here that is not necessary for supporting the points above.
 Good place for documentation without distraction.
-
-
-    

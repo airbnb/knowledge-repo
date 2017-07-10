@@ -106,3 +106,7 @@ ENV/
 
 # Mac OS X filesystem artifacts
 .DS_Store
+
+current_server_config.py
+knowledge.db
+/tests/test_repo

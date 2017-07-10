@@ -5,6 +5,7 @@ from builtins import str
 from future.utils import raise_with_traceback
 from flask import current_app, request, g
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 import functools
 from collections import defaultdict
 import datetime
@@ -237,7 +238,7 @@ class Vote(db.Model):
     lambda username: username,
     lambda query, username: query.filter(User.username == username)
 )
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -246,6 +247,9 @@ class User(db.Model):
 
     _posts_assoc = db.relationship("PostAuthorAssoc")
     posts = association_proxy('_posts_assoc', 'post')  # This property should not directly modified
+
+    def get_id(self):
+        return self.username
 
     @property
     def format_name(self):

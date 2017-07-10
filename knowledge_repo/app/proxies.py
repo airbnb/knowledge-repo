@@ -3,3 +3,4 @@ from werkzeug.local import LocalProxy
 
 db_session = LocalProxy(lambda: current_app.db.session)
 current_repo = LocalProxy(lambda: current_app.repository)
+login_manager = LocalProxy(lambda: current_app.login_manager)

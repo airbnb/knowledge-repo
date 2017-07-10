@@ -1,0 +1,25 @@
+
+# this Dockerfile builds a container from which system tests can be run
+
+FROM ubuntu:16.04
+
+# Set the locale
+RUN apt-get update
+RUN apt-get install -y locales
+RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+    locale-gen
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+
+ARG PORT
+
+RUN apt-get update && apt-get install -yq curl && apt-get clean
+
+WORKDIR /app
+
+ADD ./system_tests/run_tests.sh /app/run_tests.sh
+
+ENV PORT=${PORT}
+
+CMD ["bash"]

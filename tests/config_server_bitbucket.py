@@ -6,10 +6,6 @@ import posixpath
 SERVER_NAME = 'localhost'
 SECRET_KEY = 'notrandomsecretkeytestonly'
 
-# Disable Flask-Login for non auth-related unit tests
-
-LOGIN_DISABLED = True
-
 # ---------------------------------------------------
 # Database configuration
 # ---------------------------------------------------
@@ -100,3 +96,12 @@ WEB_EDITOR_PREFIXES = None
 # Posts with certain tags can be excluded from showing up
 # in the app. This can be useful for security purposes
 EXCLUDED_TAGS = ['private']
+
+USER_AUTHENTICATOR = 'bitbucket'
+
+OAUTH_CREDENTIALS = {
+    'bitbucket': {
+        'client_id': 'UqSQNA6dYaZ82THNWt',
+        'client_secret': 'Bey9qhtdHLfnsUjP93uzMSjesN75npBf'
+    }
+}

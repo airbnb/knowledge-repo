@@ -1,0 +1,20 @@
+version: '2'
+services:
+  web:
+    build:
+      context: .
+      args:
+        TRAVIS_PYTHON_VERSION: "${TRAVIS_PYTHON_VERSION}"
+        PORT: "${PORT}"
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT}:${PORT}"
+  sut:
+    build:
+      context: .
+      args:
+        PORT: "${PORT}"
+      dockerfile: Dockerfile.systest
+    tty: true
+    links:
+      - web

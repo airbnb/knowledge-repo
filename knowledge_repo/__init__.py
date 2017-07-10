@@ -8,6 +8,7 @@ from .post import KnowledgePost  # nopep8
 from . import converters  # nopep8
 from . import postprocessors  # nopep8
 from . import repositories  # nopep8
+from . import authenticators  # nopep8
 
 import logging  # nopep8
 logging.basicConfig(level=logging.INFO)

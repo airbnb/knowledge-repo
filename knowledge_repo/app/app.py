@@ -5,9 +5,10 @@ import logging
 import traceback
 import math
 
-from flask import Flask, current_app, render_template, g, request
+from flask import Flask, current_app, render_template, g, request, session, redirect, url_for
 from flask_mail import Mail
 from flask_migrate import Migrate
+from flask_login import LoginManager
 from alembic import command
 from alembic.migration import MigrationContext
 from datetime import datetime
@@ -17,6 +18,7 @@ import knowledge_repo
 from .proxies import db_session, current_repo
 from .index import update_index, time_since_index, time_since_index_check, _update_index
 from .models import db as sqlalchemy_db, Post, User, Tag
+from ..authenticator import KnowledgeRepositoryAuthenticator
 from . import routes
 
 logging.basicConfig(level=logging.INFO)
@@ -36,6 +38,26 @@ class KnowledgeFlask(Flask):
                 config = imp.load_source('knowledge_server_config', os.path.abspath(config))
             self.config.from_object(config)
         self.config.update(kwargs)
+
+        if self.config['SECRET_KEY'] is None:
+            # load SECRET_KEY from environment if not set in config
+            if 'SECRET_KEY' not in os.environ:
+                # fall back to random SECRET_KEY if none is set in environment
+                os.environ['SECRET_KEY'] = str(os.urandom(24))
+            self.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+
+        self.login_manager = LoginManager(self)
+
+        @self.login_manager.user_loader
+        def load_user(username):
+            user = User(username=username)
+            if user.id is None:
+                db_session.commit()
+            return user
+
+        @self.login_manager.unauthorized_handler
+        def unauthorized_handler_callback():
+            return redirect(url_for('auth.before_login', next=request.url))
 
         if hasattr(config, 'prepare_repo'):
             repo = config.prepare_repo(repo)
@@ -74,9 +96,12 @@ class KnowledgeFlask(Flask):
         # Set config defaults if not included
         # WEB_EDITOR_PREFIXES: Prefixes of repositories that can be edited via the web editor UI
         # Defaults to no prefixes allowed. If None, all prefixes editable via the UI.
-        server_config_defaults = {'SERVER_NAME': 'localhost',
-                                  'plugins': [],
-                                  'WEB_EDITOR_PREFIXES': []}
+        server_config_defaults = {
+            'SERVER_NAME': 'localhost',
+            'plugins': [],
+            'WEB_EDITOR_PREFIXES': []
+        }
+
         for k, v in server_config_defaults.items():
             self.config[k] = self.config.get(k, v)
 
@@ -90,6 +115,9 @@ class KnowledgeFlask(Flask):
         self.register_blueprint(routes.stats.blueprint)
         self.register_blueprint(routes.editor.blueprint)
         self.register_blueprint(routes.groups.blueprint)
+
+        # Set up authenticator
+        self.authenticator = KnowledgeRepositoryAuthenticator.from_app(self)
 
         if self.config['DEBUG']:
             self.register_blueprint(routes.debug.blueprint)
@@ -218,6 +246,14 @@ class KnowledgeFlask(Flask):
     @repository.setter
     def repository(self, repo):
         self._repository = repo
+
+    @property
+    def authenticator(self):
+        return getattr(self, '_authenticator')
+
+    @authenticator.setter
+    def authenticator(self, authenticator):
+        self._authenticator = authenticator
 
     @property
     def db(self):
