@@ -82,7 +82,8 @@ class OAuth2Provider(KnowledgeAuthProvider):
              user_info_endpoint=None,
              client_id=None,
              client_secret=None,
-             user_info_mapping=None):
+             user_info_mapping=None,
+             validate=None):
 
         (self.base_url,
          self.authorization_url,
@@ -92,18 +93,24 @@ class OAuth2Provider(KnowledgeAuthProvider):
          self.user_info_endpoint,
          self.client_id,
          self.client_secret,
-         self.user_info_mapping) = _resolve_oauth_config(self.name,
-                                                         locals(),
-                                                         self.app.config,
-                                                         'base_url',
-                                                         'authorization_url',
-                                                         'token_url',
-                                                         'auto_refresh_url',
-                                                         'scopes',
-                                                         'user_info_endpoint',
-                                                         'client_id',
-                                                         'client_secret',
-                                                         'user_info_mapping')
+         self.user_info_mapping,
+         validate) = _resolve_oauth_config(
+            self.name,
+            locals(),
+            self.app.config,
+            'base_url',
+            'authorization_url',
+            'token_url',
+            'auto_refresh_url',
+            'scopes',
+            'user_info_endpoint',
+            'client_id',
+            'client_secret',
+            'user_info_mapping',
+            'validate'
+        )
+        if validate is not None:
+            self.validate = validate
 
         redirect_url = self.app.config['SERVER_NAME'] or 'localhost:7000'
         if self.app.config['APPLICATION_ROOT']:
