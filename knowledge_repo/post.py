@@ -229,7 +229,7 @@ class KnowledgePost(object):
         return ['images/{}'.format(image_name) for image_name in self._dir(parent='images')]
 
     def read_image(self, name):
-        return self._read_ref('image/' + name)
+        return self._read_ref('images/' + name)
 
     def read_images(self):
         image_data = {}
