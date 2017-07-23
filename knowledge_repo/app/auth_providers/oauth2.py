@@ -72,7 +72,7 @@ def _resolve_oauth_config(name, local_namespace, config, *variables):
 
 
 class OAuth2Provider(KnowledgeAuthProvider):
-    _registry_keys = ['github', 'google']
+    _registry_keys = list(PRESETS.keys())
 
     def init(self,
              authorization_url=None,

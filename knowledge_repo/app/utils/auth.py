@@ -1,5 +1,4 @@
-from future.moves.urllib.parse import urlparse, urlencode
-from urlparse import urlparse, urljoin
+from future.moves.urllib.parse import urlparse, urlencode, urljoin
 
 from flask import request, url_for
 from flask_login import AnonymousUserMixin

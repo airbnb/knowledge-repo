@@ -8,6 +8,7 @@ This includes:
 import logging
 from flask import request, Blueprint, g
 
+from .. import permissions
 from ..proxies import db_session
 from ..models import Comment, Post, PageView
 from ..utils.emails import send_comment_email
@@ -21,6 +22,7 @@ blueprint = Blueprint('comments', __name__,
 
 @blueprint.route('/comment', methods=['POST'])
 @PageView.logged
+@permissions.post_comment.require()
 def post_comment():
     """ Post a comment underneath a post """
 
@@ -64,6 +66,7 @@ def post_comment():
 
 @blueprint.route('/delete_comment')
 @PageView.logged
+@permissions.post_comment.require()
 def delete_comment():
     """ Delete a comment """
     try:

@@ -88,7 +88,7 @@ class FavoriteTest(unittest.TestCase):
                 'div', {'class': 'row row-space-4 panel feed-post'})
 
             user = (db_session.query(User)
-                    .filter(User.username == self.knowledge_username)
+                    .filter(User.identifier == self.knowledge_username)
                     .first())
             votes = (db_session.query(Vote)
                      .filter(Vote.user_id == user.id)

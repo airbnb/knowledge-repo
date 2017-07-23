@@ -6,19 +6,20 @@ import traceback
 import math
 import uuid
 
-from flask import Flask, current_app, render_template, g, request
+from flask import Flask, current_app, render_template, g, request, flash, redirect, url_for
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
+from flask_principal import Principal, identity_loaded, RoleNeed, UserNeed, AnonymousIdentity, PermissionDenied
 from alembic import command
 from alembic.migration import MigrationContext
 from datetime import datetime
 from werkzeug import url_encode
 
 import knowledge_repo
-from . import routes
+from . import roles, routes
 from .auth_provider import KnowledgeAuthProvider
-from .proxies import db_session, current_repo
+from .proxies import db_session, current_repo, current_user
 from .index import update_index, time_since_index, time_since_index_check, _update_index
 from .models import db as sqlalchemy_db, Post, User, Tag
 from .utils.auth import AnonymousKnowledgeUser
@@ -101,6 +102,52 @@ class KnowledgeFlask(Flask):
                     if user.id is None:
                         db_session.commit()
                     return user
+
+        # Intialise access policies
+        principals = Principal(self)
+
+        # Add AnonymousIdentity fallback so that on_identity_loaded is called for
+        # anonymous users too.
+        principals.identity_loaders.append(lambda: AnonymousIdentity())
+
+        # Synchronise user permissions with data model
+        @identity_loaded.connect_via(self)
+        def on_identity_loaded(sender, identity):
+
+            # Set the identity user object
+            identity.user = current_user
+
+            identity.provides.add(roles.admin)
+
+            # Check if user is anonymous (identifier = None) and add appropriate roles
+            if isinstance(identity, AnonymousIdentity):
+                if self.config['POLICY_ANONYMOUS_VIEW_INDEX']:
+                    identity.provides.add(roles.index_view)
+                if self.config['POLICY_ANONYMOUS_VIEW_POST']:
+                    identity.provides.add(roles.post_view)
+                if self.config['POLICY_ANONYMOUS_VIEW_STATS']:
+                    identity.provides.add(roles.stats_view)
+                return
+
+            # Add permissions appropriate for the logged in user
+            identity.provides.add(UserNeed(current_user.identifier))
+            identity.provides.add(roles.index_view)
+            identity.provides.add(roles.post_comment)
+            identity.provides.add(roles.post_view)
+            identity.provides.add(roles.post_download)
+            identity.provides.add(roles.post_edit)
+            identity.provides.add(roles.stats_view)
+
+            # # Assuming the User model has a list of roles, update the
+            # # identity with the roles that the user provides
+            # if hasattr(current_user, 'roles'):
+            #     for role in current_user.roles:
+            #         identity.provides.add(RoleNeed(role.name))
+
+        @self.errorhandler(PermissionDenied)
+        def handle_insufficient_permissions(error):
+            flash("You have insufficient permissions to access this resource.")
+            return render_template('base.html')
 
         # Add mail object if configuration is supplied
         if self.config.get('MAIL_SERVER'):

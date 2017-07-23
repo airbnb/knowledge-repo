@@ -106,7 +106,7 @@ class WebEditorPostTest(unittest.TestCase):
 
             # TODO this now is populated by a "select"
             # author = soup.findAll("input", {"id": "post_author"})[0]
-            # assert author['value'] == post.authors[0].username
+            # assert author['value'] == post.authors[0].identifier
 
             # feed_image = soup.findAll("input", {"id": "post_image_feed"})[0]
             # TODO(nikki_ray): For some reason the feed_image isn't being parsed

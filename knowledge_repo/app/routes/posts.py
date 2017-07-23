@@ -3,6 +3,7 @@ import os
 from builtins import str
 from flask import request, url_for, redirect, render_template, current_app, Blueprint, g, Response
 
+from .. import permissions
 from ..proxies import db_session, current_repo, current_user
 from ..models import User, Post, PageView
 from ..utils.render import render_post, render_comment, render_post_raw
@@ -18,6 +19,7 @@ blueprint = Blueprint('posts', __name__,
 
 @blueprint.route('/post/<path:path>', methods=['GET'])
 @PageView.logged
+@permissions.post_view.require()
 def render(path):
     """
     Render the knowledge post with all the related formatting.
@@ -72,9 +74,7 @@ def render(path):
         if mode != 'raw':
             comment.text = render_comment(comment)
 
-    user_obj = current_user #(db_session.query(User)
-                         # .filter(User.id == user_id)
-                         # .first())
+    user_obj = current_user
 
     tags_list = [str(t.name) for t in post.tags]
     user_subscriptions = [str(s) for s in user_obj.subscriptions]
@@ -108,7 +108,7 @@ def render(path):
                                table_id=None,
                                is_private=(post.private == 1),
                                is_author=is_author,
-                               downloads=list(post.kp._dir('orig_src/')))
+                               downloads=list(post.kp._dir('orig_src/')) if permissions.post_download.can() else None)
     return rendered
 
 
@@ -123,6 +123,7 @@ def render(path):
 
 @blueprint.route('/post/preview/<path:path>', methods=['GET'])
 @PageView.logged
+@permissions.post_view.require()
 def render_preview(path):
     return _render_preview(path, 'markdown-rendered.html')
 
@@ -168,6 +169,7 @@ def _render_preview(path, tmpl):
 # DEPRECATED: Legacy route for the /render endpoint to allow old bookmarks to function
 @blueprint.route('/render', methods=['GET'])
 @PageView.logged
+@permissions.post_view.require()
 def render_legacy():
     path = request.args.get('markdown', '')
     return redirect(url_for('.render', path=path), code=302)
@@ -182,6 +184,7 @@ def about():
 
 @blueprint.route('/ajax/post/download', methods=['GET'])
 @PageView.logged
+@permissions.post_download.require()
 def download():
     "Downloads resources associated with a post."
 

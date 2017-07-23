@@ -14,6 +14,7 @@ from flask import request, render_template, redirect, Blueprint, current_app, ma
 from flask_login import login_required
 from sqlalchemy import case, desc
 
+from .. import permissions
 from ..proxies import db_session, current_repo
 from ..utils.posts import get_posts
 from ..models import Post, Tag, User, PageView
@@ -52,6 +53,7 @@ def render_index():
 
 @blueprint.route('/favorites')
 @PageView.logged
+@login_required
 def render_favorites():
     """ Renders the index-feed view for posts that are liked """
 
@@ -77,7 +79,7 @@ def render_favorites():
 
 @blueprint.route('/feed')
 @PageView.logged
-@login_required
+@permissions.index_view.require()
 def render_feed():
     """ Renders the index-feed view """
     feed_params = from_request_get_feed_params(request)
@@ -94,6 +96,7 @@ def render_feed():
 
 @blueprint.route('/table')
 @PageView.logged
+@permissions.index_view.require()
 def render_table():
     """Renders the index-table view"""
     feed_params = from_request_get_feed_params(request)
@@ -108,6 +111,7 @@ def render_table():
 
 @blueprint.route('/cluster')
 @PageView.logged
+@permissions.index_view.require()
 def render_cluster():
     """ Render the cluster view """
     # we don't use the from_request_get_feed_params because some of the
@@ -188,6 +192,7 @@ def render_cluster():
 @blueprint.route('/create')
 @blueprint.route('/create/<knowledge_format>')
 @PageView.logged
+@permissions.post_view.require()
 def create(knowledge_format=None):
     """ Renders the create knowledge view """
     if knowledge_format is None:
@@ -204,6 +209,9 @@ def create(knowledge_format=None):
 
 @blueprint.route('/ajax/index/typeahead', methods=['GET', 'POST'])
 def ajax_post_typeahead():
+    if not permissions.index_view.can():
+        return '[]'
+
     # this a string of the search term
     search_terms = request.args.get('search', '')
     search_terms = search_terms.split(" ")
@@ -233,18 +241,24 @@ def ajax_post_typeahead():
 @blueprint.route('/ajax/index/typeahead_tags')
 @blueprint.route('/ajax_tags_typeahead', methods=['GET'])
 def generate_tags_typeahead():
+    if not permissions.index_view.can():
+        return '[]'
     return json.dumps([t[0] for t in db_session.query(Tag.name).all()])
 
 
 @blueprint.route('/ajax/index/typeahead_users')
 @blueprint.route('/ajax_users_typeahead', methods=['GET'])
 def generate_users_typeahead():
+    if not permissions.index_view.can():
+        return '[]'
     return json.dumps([u[0] for u in db_session.query(User.identifier).all()])
 
 
 @blueprint.route('/ajax/index/typeahead_paths')
 @blueprint.route('/ajax_paths_typeahead', methods=['GET'])
 def generate_projects_typeahead():
+    if not permissions.index_view.can():
+        return '[]'
     # return path stubs for all repositories
     stubs = [u'/'.join(p.split('/')[:-1]) for p in current_repo.dir()]
     return json.dumps(list(set(stubs)))

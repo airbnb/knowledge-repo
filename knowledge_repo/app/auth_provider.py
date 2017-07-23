@@ -7,6 +7,7 @@ from builtins import object
 from future.utils import with_metaclass
 from flask import request, redirect, current_app, session, Blueprint, url_for, session
 from flask_login import login_user, logout_user, login_required
+from flask_principal import identity_changed, Identity
 
 from .models import User
 from .proxies import db_session
@@ -18,10 +19,12 @@ class KnowledgeAuthProvider(with_metaclass(SubclassRegisteringABCMeta, object)):
 
     @classmethod
     def register_auth_provider_blueprints(cls, app, prefix='/auth/login'):
+        app.auth_providers = []
         for provider in app.config.get('AUTH_PROVIDERS', ['debug', 'oauth']):
             if not isinstance(provider, KnowledgeAuthProvider):
                 provider = cls._get_subclass_for(provider.lower())(name=provider, app=app)
             app.register_blueprint(provider.blueprint, url_prefix='/'.join((prefix, provider.name)))
+            app.auth_providers.append(provider)
 
     def __init__(self, name, app=None, **kwargs):
         self.name = name
@@ -38,6 +41,14 @@ class KnowledgeAuthProvider(with_metaclass(SubclassRegisteringABCMeta, object)):
         blueprint.add_url_rule('/authorize', view_func=self.authorize, methods=['GET', 'POST'])
         return blueprint
 
+    @property
+    def link_text(self):
+        return "Sign in using {}".format(self.name.capitalize())
+
+    @property
+    def icon_uri(self):
+        return url_for('static', filename='images/auth/{}.png'.format(self.name))
+
     def authorize(self):
         user = self.get_user()
         if user is None:
@@ -53,6 +64,10 @@ class KnowledgeAuthProvider(with_metaclass(SubclassRegisteringABCMeta, object)):
         db_session.add(user)
         db_session.commit()
         login_user(user)
+
+        # Notify flask principal that the identity has changed
+        identity_changed.send(current_app._get_current_object(),
+                              identity=Identity(user.id))
 
     @abstractmethod
     def prompt(self):

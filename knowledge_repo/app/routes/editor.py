@@ -9,6 +9,7 @@ from sqlalchemy import or_
 from werkzeug import secure_filename
 
 from knowledge_repo.post import KnowledgePost
+from .. import permissions
 from ..proxies import db_session, current_repo, current_user
 from ..models import Post, PostAuthorAssoc, Tag, Comment, User, PageView
 from ..utils.emails import send_review_email, send_reviewer_request_email
@@ -35,6 +36,7 @@ blueprint = Blueprint('editor', __name__,
 # TODO: Deprecate this route in favour of integrating editing links into primary index pages and user pages
 @blueprint.route('/webposts', methods=['GET'])
 @PageView.logged
+@permissions.post_edit.require()
 def gitless_drafts():
     """ Render the gitless posts that a user has created in table form
         Editors can see all the posts created via Gitless_Editing
@@ -57,6 +59,7 @@ def gitless_drafts():
 @blueprint.route('/edit')
 @blueprint.route('/edit/<path:path>', methods=['GET', 'POST'])
 @PageView.logged
+@permissions.post_edit.require()
 def editor(path=None):
     """ Render the web post editor, either with the default values
         or if the post already exists, with what has been saved """
@@ -114,6 +117,7 @@ def editor(path=None):
 
 @blueprint.route('/ajax/editor/save', methods=['GET', 'POST'])
 @PageView.logged
+@permissions.post_edit.require()
 def save_post():
     """ Save the post """
 
@@ -165,6 +169,7 @@ def save_post():
 
 @blueprint.route('/ajax/editor/submit', methods=['GET', 'POST'])
 @PageView.logged
+@permissions.post_edit.require()
 def submit_for_review():
     """ Submit post and if there are reviewers assigned, email them"""
     path = request.args.get('path', None)
@@ -183,6 +188,7 @@ def submit_for_review():
 
 @blueprint.route('/ajax/editor/publish', methods=['GET', 'POST'])
 @PageView.logged
+@permissions.post_edit.require()
 def publish_post():
     """ Publish the post by changing the status """
     path = request.args.get('path', None)
@@ -196,6 +202,7 @@ def publish_post():
 
 @blueprint.route('/ajax/editor/unpublish', methods=['GET', 'POST'])
 @PageView.logged
+@permissions.post_edit.require()
 def unpublish_post():
     """ Unpublish the post """
     path = request.args.get('path', None)
@@ -209,6 +216,7 @@ def unpublish_post():
 
 @blueprint.route('/ajax/editor/accept', methods=['GET', 'POST'])
 @PageView.logged
+@permissions.post_edit.require()
 def accept():
     """ Accept the post """
     path = request.args.get('path', None)
@@ -221,6 +229,7 @@ def accept():
 
 @blueprint.route('/ajax/editor/delete', methods=['GET', 'POST'])
 @PageView.logged
+@permissions.post_edit.require()
 def delete_post():
     """ Delete a post """
     path = request.args.get('path', None)
@@ -237,6 +246,7 @@ def delete_post():
 
 @blueprint.route('/ajax/editor/review', methods=['POST', 'DELETE'])
 @PageView.logged
+@permissions.post_edit.require()
 def review_comment():
     """
     Saves a review and sends an email that the post has been reviewed to the author of the post or deletes a submitted review
@@ -270,6 +280,7 @@ def review_comment():
 # DEPRECATED
 @blueprint.route('/file_upload', methods=['POST', 'GET'])
 @PageView.logged
+@permissions.post_edit.require()
 def file_upload():
     """ Uploads images dropped on the web editor's markdown box to static/images
         and notifies editors by email

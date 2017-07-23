@@ -28,7 +28,7 @@ DEBUG = False
 # Database configuration
 # ---------------------------------------------------
 SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
-SQLALCHEMY_ECHO = DEBUG
+SQLALCHEMY_ECHO = False
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # Should the database tables be automatically created
@@ -42,6 +42,7 @@ DB_AUTO_CREATE = True
 # performed using `knowledge_repo --repo <> db_upgrade ...`.
 DB_AUTO_UPGRADE = False
 
+
 # ---------------------------------------------------
 # Authentication configuration
 # ---------------------------------------------------
@@ -49,8 +50,8 @@ DB_AUTO_UPGRADE = False
 # in a variety of different ways. You can create your own subclass of
 # `KnowledgeAuthProvider` and add either the instance or identifier
 # used for that class below.
-# By default, the knowledge repo offers: ['debug', 'local', 'bitbucket', 'github', 'google']
-AUTH_PROVIDERS = []
+# By default, the knowledge repo offers: ['debug', 'bitbucket', 'github', 'google']
+AUTH_PROVIDERS = ['debug', 'github', 'bitbucket', 'google']
 
 # If you are going to use a OAuth provider, you will need to specify client ids
 # and private tokens. This can be done by instantiating instances of
@@ -68,6 +69,22 @@ AUTH_PROVIDERS = []
 # the authentication flow will fall back to use any of the providers
 # specified above.
 AUTH_USER_IDENTIFIER_REQUEST_HEADER = None
+
+
+# ---------------------------------------------------
+# Policy configuration
+# ---------------------------------------------------
+# This section configures various policy related to access control.
+
+# Should anonymous users be able to view the post indices
+POLICY_ANONYMOUS_VIEW_INDEX = True
+
+# Should anonymous users be able to view the content of posts
+POLICY_ANONYMOUS_VIEW_POST = True
+
+# Should anonymous users be able to view overall statistics
+POLICY_ANONYMOUS_VIEW_STATS = True
+
 
 # ---------------------------------------------------
 # Repository configuration
@@ -108,6 +125,7 @@ def prepare_repo(repo):
 # MAIL_MAX_EMAILS = None  # default = None
 # MAIL_SUPPRESS_SEND = False  # default = app.testing
 # MAIL_ASCII_ATTACHMENTS = False  # default = False
+
 
 # --------------------------------------------------
 # Web Editor Configuration

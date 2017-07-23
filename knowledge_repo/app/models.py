@@ -244,15 +244,19 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=func.now())
 
-    identifier = db.Column(db.String(1000))  # Typically expected to be an email
+    identifier = db.Column(db.String(500))  # Unique identifier across all login methods
+
+    username = db.Column(db.String(500))  # Username used to log in (may differ from identifier)
+    password = db.Column(db.String(500))  # Password for local logins
 
     name = db.Column(db.String(500))  # Name as determined by auth method
     preferred_name = db.Column(db.String(500))  # Name as determined by user preferences
-    photo_uri = db.Column(db.Text())  # Either external url or data uri
+
+    email = db.Column(db.String(500))  # Email address
+    avatar_uri = db.Column(db.Text())  # Either external url or data uri
     banned = db.Column(db.Boolean, default=False)
 
-    last_login_at = db.Column(db.DateTime)
-    former_login_at = db.Column(db.DateTime)
+    last_login_at = db.Column(db.DateTime)  # Date of last login
 
     _posts_assoc = db.relationship("PostAuthorAssoc")
     posts = association_proxy('_posts_assoc', 'post')  # This property should not directly modified

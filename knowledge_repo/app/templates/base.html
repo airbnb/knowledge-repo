@@ -33,6 +33,9 @@
     <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='modules/select2/css/select2.min.css') }}">
     <link href='https://fonts.googleapis.com/css?family=Lato:400,900|Playfair+Display|Source+Serif+Pro:400,700' rel='stylesheet' type='text/css'>
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}"> {% block style_links %}{% endblock %}
+
+    {% block extra_headers %}
+    {% endblock %}
     <style>
       {% block style %}
       {% endblock %}
@@ -40,7 +43,6 @@
   </head>
 
   <body>
-
     {% block navbar %}
     <!-- Top-level navbar -->
     <nav class="navbar navbar-fixed-top navbar-inverse">
@@ -81,7 +83,10 @@
           <!-- Drop down menu to surface less used links on large screens -->
           <ul class="nav navbar-nav navbar-right visible-sm-block visible-md-block visible-lg-block">
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true" style='padding: 5px;'><img style='width: 40px; height: 40px; border-radius:20px; margin-left: 5px; margin-right: 5px; border: 1px solid #000; background-color: #eee;' src="{% if current_user.is_anonymous %}{{url_for('static', filename='images/profile_photo_logged_out.png')}}{%else%}{{ current_user.photo_uri or url_for('static', filename='images/profile_photo_default.png') }}{%endif%}" /><span class="caret"></span></a>
+              <a href="#" class="avatar-dropdown dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true" style='padding: 5px;'>
+                  <img class="avatar" src="{% if current_user.is_anonymous %}{{url_for('static', filename='images/profile_photo_logged_out.png')}}{%else%}{{ current_user.avatar_uri or url_for('static', filename='images/profile_photo_default.png') }}{%endif%}" />
+                  <span class="caret"></span>
+              </a>
               <ul class="dropdown-menu">
                 {% if current_user.is_authenticated %}
                 <li class="dropdown-header">Logged in as <em>{{ current_user.format_name }}</em></li>
@@ -128,6 +133,15 @@
         </div>
         <!-- Main content placeholder -->
         <div class='col-lg-8' id='panel-main'>
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <ul class=flashes>
+                {% for message in messages %}
+                  <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+              {% endif %}
+            {% endwith %}
           {% block content %} {% endblock %}
         </div>
         <!-- Right sidebar -->

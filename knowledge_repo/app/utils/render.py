@@ -74,9 +74,6 @@ def render_post_raw(post):
         formatter=pygments.formatters.get_formatter_by_name('html')
     )
 
-    # NOTE: `str.encode()` returns a `bytes` object in Python 3
-    if sys.version_info.major >= 3:
-        return raw_post.decode('ascii', 'ignore')
     return raw_post
 
 

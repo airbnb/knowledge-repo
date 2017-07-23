@@ -6,6 +6,7 @@ This includes:
 """
 import logging
 from flask import request, Blueprint, g
+from flask_login import login_required
 from sqlalchemy import and_
 
 from ..proxies import db_session
@@ -19,6 +20,7 @@ blueprint = Blueprint(
 
 @blueprint.route('/like')
 @PageView.logged
+@login_required
 def like_post():
     """ Like a post """
     try:
@@ -39,6 +41,7 @@ def like_post():
 
 @blueprint.route('/unlike')
 @PageView.logged
+@login_required
 def unlike_post():
     """ Un-like a post """
     try:
