@@ -21,7 +21,7 @@ class PDFConverter(KnowledgePostConverter):
         raise NotImplementedError
 
     def to_file(self, filename, **opts):
-        with open(filename, 'w') as f:
+        with open(filename, 'wb') as f:
             f.write(self.to_string())
 
     def to_string(self, **opts):
