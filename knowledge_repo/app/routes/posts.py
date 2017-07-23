@@ -70,7 +70,11 @@ def render(path):
 
     comments = post.comments
     for comment in comments:
-        comment.author = db_session.query(User).filter(User.id == comment.user_id).first().identifier
+        author = db_session.query(User).filter(User.id == comment.user_id).first()
+        if author is not None:
+            comment.author = author.identifier
+        else:
+            comment.author = 'Anonymous'
         if mode != 'raw':
             comment.text = render_comment(comment)
 

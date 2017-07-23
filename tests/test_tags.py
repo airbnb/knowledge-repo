@@ -17,37 +17,37 @@ class TagsTest(unittest.TestCase):
         self.app = self.repo.get_app(config='tests/config_server.py')
         self.client = self.app.test_client()
 
-        # we'll create a tag for the purpose of tag testing
-        test_run = datetime.datetime.now().strftime('%Y-%m-%d')
-
+        self.knowledge_username = 'tag_test_user'
         with self.app.app_context():
+            user = User(identifier=self.knowledge_username)
+            if user.id is None:
+                db_session.commit()
+            self.user_id = user.id
+
+            # we'll create a tag for the purpose of tag testing
+            test_run = datetime.datetime.now().strftime('%Y-%m-%d')
             tag = Tag(name='test/tag_' + test_run)
             db_session.commit()
             TagsTest.tag_id = tag.id
             TagsTest.tag_name = tag.name
-
-            # the default user is "knowledge_default"
-            user = (db_session.query(User)
-                    .filter(User.username == 'knowledge_default')
-                    .first())
-
-            TagsTest.user_id = user.id
+            TagsTest.user_id = self.user_id
 
             # We need an example post as well to test some of the
             # add/delete/rename functionality
             example_post = (db_session.query(Post).first())
             TagsTest.post_path = example_post.path
 
+        self.headers = {self.app.config['AUTH_USER_IDENTIFIER_REQUEST_HEADER']: self.knowledge_username}
+
     def test01_test_subscribe_to_tag(self):
         """Test the subscription feature."""
-        headers = {"X-InternalAuth-Username": "knowledge_default"}
 
         route_name = '/toggle_tag_subscription'
         tag_name = 'tag_name=' + TagsTest.tag_name
         action = 'subscribe_action=subscribe'
         full_url = '{route_name}?{tag_name}&{action}'.format(**locals())
         # check that status == 200 & the tag has been subscribed too
-        rv = self.client.post(full_url, headers=headers)
+        rv = self.client.post(full_url, headers=self.headers)
         assert (rv.status == "200 OK")
 
         with self.app.app_context():
@@ -59,8 +59,6 @@ class TagsTest(unittest.TestCase):
 
     def test02_test_unsubscribe_to_tag(self):
         """Test the unsubscribe feature."""
-        headers = {"X-InternalAuth-Username": "knowledge_default"}
-
         route_name = '/toggle_tag_subscription'
 
         with self.app.app_context():
@@ -72,7 +70,7 @@ class TagsTest(unittest.TestCase):
                 **locals())
 
             # check that status == 200 & the tag has been subscribed too
-            rv = self.client.post(full_url, headers=headers)
+            rv = self.client.post(full_url, headers=self.headers)
             assert (rv.status == "200 OK")
 
             subscription = (db_session.query(Subscription)
@@ -103,7 +101,8 @@ class TagsTest(unittest.TestCase):
             rv = self.client.post('/tag_list?post_id=' + TagsTest.post_path,
                                   data=json.dumps(data),
                                   content_type='application/json',
-                                  method='POST')
+                                  method='POST',
+                                  headers=self.headers)
 
             assert rv.status == "200 OK"
 
@@ -137,7 +136,8 @@ class TagsTest(unittest.TestCase):
 
             rv = self.client.post('/rename_tag',
                                   data=json.dumps(data),
-                                  content_type='application/json')
+                                  content_type='application/json',
+                                  headers=self.headers)
 
             assert(rv.status == "200 OK")
 
@@ -173,7 +173,7 @@ class TagsTest(unittest.TestCase):
                          .all())
             post_ids = [x[0] for x in post_tags]
             delete_tag_url = '/delete_tag_post?tag_id={tag_id}'.format(**locals())
-            rv = self.client.get(delete_tag_url)
+            rv = self.client.get(delete_tag_url, headers=self.headers)
 
             assert rv.status == "200 OK"
 

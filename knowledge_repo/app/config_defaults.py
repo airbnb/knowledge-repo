@@ -71,6 +71,13 @@ AUTH_PROVIDERS = ['debug', 'github', 'bitbucket', 'google']
 AUTH_USER_IDENTIFIER_REQUEST_HEADER = None
 
 
+# If the identifier used above needs some transformation to match the canonical
+# identifier format used in this repository, you can specify a mapping using
+# the below config option.
+def AUTH_USER_IDENTIFIER_REQUEST_HEADER_MAPPING(identifier):
+    return identifier
+
+
 # ---------------------------------------------------
 # Policy configuration
 # ---------------------------------------------------

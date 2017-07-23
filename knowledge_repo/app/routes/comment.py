@@ -9,7 +9,7 @@ import logging
 from flask import request, Blueprint, g
 
 from .. import permissions
-from ..proxies import db_session
+from ..proxies import db_session, current_user
 from ..models import Comment, Post, PageView
 from ..utils.emails import send_comment_email
 

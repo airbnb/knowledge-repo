@@ -82,7 +82,7 @@ def send_subscription_email(post, tag):
     if not recipient_users:
         return
 
-    recipients_bcc = [usernames_to_emails([user.username])[0] for user in recipient_users]
+    recipients_bcc = [usernames_to_emails([user.identifier])[0] for user in recipient_users]
 
     if not recipients_bcc:
         return

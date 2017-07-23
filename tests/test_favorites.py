@@ -16,8 +16,7 @@ class FavoriteTest(unittest.TestCase):
         self.headers = {}
 
         self.knowledge_username = 'favorite_test_user'
-        username_request_header = self.repo_app.config.get(
-            "AUTH_USERNAME_REQUEST_HEADER")
+        username_request_header = self.repo_app.config.get("AUTH_USER_IDENTIFIER_REQUEST_HEADER")
         self.headers = {
             username_request_header: self.knowledge_username
         }
