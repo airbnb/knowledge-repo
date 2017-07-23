@@ -254,7 +254,7 @@ class User(db.Model, UserMixin):
 
     email = db.Column(db.String(500))  # Email address
     avatar_uri = db.Column(db.Text())  # Either external url or data uri
-    banned = db.Column(db.Boolean, default=False)
+    active = db.Column(db.Boolean, default=True)
 
     last_login_at = db.Column(db.DateTime)  # Date of last login
 
@@ -264,7 +264,7 @@ class User(db.Model, UserMixin):
     # Method overrides for the UserMixin class for flask_login
     @property
     def is_active(self):
-        return not self.banned
+        return self.active
 
     @property
     def is_authenticated(self):
