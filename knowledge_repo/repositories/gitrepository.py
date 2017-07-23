@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class GitKnowledgeRepository(KnowledgeRepository):
-    _registry_keys = ['', 'git']
+    _registry_keys = ['git']
 
     @classmethod
     def create(cls, uri, embed_tooling=False):

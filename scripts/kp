@@ -1,0 +1,109 @@
+#!/usr/bin/env python
+from __future__ import print_function
+from __future__ import unicode_literals
+
+import argparse
+import os
+import socket
+import sys
+import threading
+import webbrowser
+
+# If this script is being run out of a checked out repository, we need to make sure
+# the appropriate knowledge_repo is being used. To do this, we add the parent directory
+# of the folder containing this script if it contains a python package named "knowledge_repo".
+script_dir = os.path.dirname(__file__)
+if os.path.exists(os.path.join(os.path.dirname(script_dir), 'knowledge_repo', '__init__.py')):
+    sys.path.insert(0, os.path.join(script_dir, '..'))
+import knowledge_repo  # nopep8
+from knowledge_repo import KnowledgePost
+
+# Build argparser
+
+parser = argparse.ArgumentParser(add_help=False, description='Script to simplify interactions with knowledge posts.')
+parser.add_argument('--version', dest='version', action='store_true', help='Show version and exit.')
+parser.add_argument('-h', '--help', action='store_true', help='Show help and exit.')
+
+args, remaining_args = parser.parse_known_args()
+
+if args.version:
+    print('{}'.format(knowledge_repo.__version__))
+    sys.exit(0)
+
+parser.add_argument('post_path', nargs='?', help='The location of a knowledge_post')
+
+
+# ---------------------------------------------------------------------------------------
+# Everything below this line pertains to actual actions to be performed on the repository
+# By now, we are guaranteed to be the script that is to perform actions on the repository,
+# so we have freedom to change and/or add options at whim, without affecting
+# interoperability.
+
+# Add the action parsers
+subparsers = parser.add_subparsers(help='actions')
+
+# Add parser to import files into a knowledge post
+from_ = subparsers.add_parser('from', help='Initialise a new git knowledge repository.')
+from_.set_defaults(action='from')
+from_.add_argument('source', help='Name of source file.')
+from_.add_argument('--format', help='Use specific format rather than default.')
+from_.add_argument('--src', nargs='+', help='Specify additional source files to add to <knowledge_post>/orig_src.')
+
+# Add parser to export files from a knowledge post
+to = subparsers.add_parser('to', help='Initialise a new git knowledge repository.')
+to.set_defaults(action='to')
+to.add_argument('target', help='Name of source file.')
+to.add_argument('--format', help='Use specific format rather than default.')
+# TODO: Add options for conversion
+
+preview = subparsers.add_parser('preview', help='Run the knowledge repo app, and preview the specified post. It is assumed it is available on the currently checked out branch.')
+preview.set_defaults(action='preview')
+
+args = parser.parse_args()
+
+print(args)
+
+if args.help:
+    parser.print_help()
+    sys.exit(0)
+
+if args.action == 'from':
+    kp = KnowledgePost.from_file(args.source, format=args.format, src_paths=args.src)
+    kp.to_file(args.post_path, format='kp')
+    sys.exit(0)
+
+if args.action == 'to':
+    kp = KnowledgePost.from_file(args.post_path, format='kp')
+    kp.to_file(args.target, format=args.format)
+    sys.exit(0)
+
+if args.action == 'preview':
+    from knowledge_repo.app.deploy import KnowledgeDeployer, get_app_builder
+
+    def get_available_port():
+        s = socket.socket()
+        s.bind(("", 0))
+        free_port = s.getsockname()[1]
+        s.close()
+        return free_port
+    port = get_available_port()
+
+    post_path = os.path.abspath(args.post_path)
+    repo_dir = os.path.dirname(post_path)
+    post_path = os.path.basename(post_path)
+
+    app_builder = get_app_builder(repo_dir,
+                                  debug=False,
+                                  db_uri='sqlite:///:memory:',
+                                  config=None,
+                                  REPOSITORY_INDEXING_ENABLED=False)
+
+    url = 'http://127.0.0.1:{}/post/{}'.format(port, post_path)
+    threading.Timer(1.25, lambda: webbrowser.open(url)).start()
+
+    KnowledgeDeployer.using('flask')(
+        app_builder,
+        host='0.0.0.0',
+        port=port
+    ).run()
+    sys.exit(0)
