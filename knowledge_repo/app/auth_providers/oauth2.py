@@ -3,8 +3,6 @@ from flask import request, render_template, flash, redirect, url_for
 from flask_login import login_user
 from six.moves.urllib.parse import urljoin
 
-from requests_oauthlib import OAuth2Session
-
 from ..models import User
 from ..proxies import db_session
 from ..utils.auth import is_safe_url
@@ -116,6 +114,8 @@ class OAuth2Provider(KnowledgeAuthProvider):
         if self.app.config['APPLICATION_ROOT']:
             redirect_url = '/'.join((redirect_url, self.app.config['APPLICATION_ROOT']))
 
+        # Import OAuth deps here so we do not have a hard dependency on them
+        from requests_oauthlib import OAuth2Session
         self.oauth_client = OAuth2Session(
             client_id=self.client_id,
             scope=self.scopes,

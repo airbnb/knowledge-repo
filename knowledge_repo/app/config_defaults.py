@@ -51,7 +51,7 @@ DB_AUTO_UPGRADE = False
 # `KnowledgeAuthProvider` and add either the instance or identifier
 # used for that class below.
 # By default, the knowledge repo offers: ['debug', 'bitbucket', 'github', 'google']
-AUTH_PROVIDERS = ['debug', 'github', 'bitbucket', 'google']
+AUTH_PROVIDERS = []
 
 # If you are going to use a OAuth provider, you will need to specify client ids
 # and private tokens. This can be done by instantiating instances of
