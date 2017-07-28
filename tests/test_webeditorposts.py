@@ -58,8 +58,6 @@ class WebEditorPostTest(unittest.TestCase):
 
             assert rv.status == '200 OK'
 
-            print(rv.data)
-
             data = rv.data.decode('utf-8')
             soup = BeautifulSoup(data, 'html.parser')
 

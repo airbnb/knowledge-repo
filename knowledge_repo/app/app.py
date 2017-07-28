@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 class KnowledgeFlask(Flask):
 
-    def __init__(self, repo=None, db_uri=None, debug=None, config=None, **kwargs):
+    def __init__(self, repo, db_uri=None, debug=None, config=None, **kwargs):
         Flask.__init__(self, __name__,
                        template_folder='templates',
                        static_folder='static')

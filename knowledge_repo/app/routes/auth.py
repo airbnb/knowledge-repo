@@ -23,26 +23,6 @@ def login():
         providers=[{'name': provider.name, 'icon_uri': provider.icon_uri, 'link_text': provider.link_text} for provider in providers]
     )
 
-# @blueprint.route('/auth/login/<provider>', methods=['GET', 'POST'])
-# def provider_login(provider):
-#     # Here we use a class of some kind to represent and validate our
-#     # client-side form data. For example, WTForms is a library that will
-#     # handle this for us, and we use a custom LoginForm to validate.
-#     if request.method == 'POST':
-#         user = request.form['username']
-#         login_user(User(identifier=user))
-#
-#         flash('Logged in successfully.')
-#
-#         next = request.args.get('next')
-#         # is_safe_url should check if the url is safe for redirects.
-#         # See http://flask.pocoo.org/snippets/62/ for an example.
-#         if not is_safe_url(next):
-#             return flask.abort(400)
-#
-#         return redirect(next or url_for('index.render_feed'))
-#     return render_template('login.html')
-
 
 @blueprint.route("/auth/logout")
 @login_required

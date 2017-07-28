@@ -283,8 +283,6 @@ class User(db.Model, UserMixin):
     @property
     def format_name(self):
         return self.preferred_name or self.name or self.identifier
-        # username_to_name = current_repo.config.username_to_name
-        # return username_to_name(self.username)
 
     @property
     def subscriptions(self):  # TODO: make attribute style naming

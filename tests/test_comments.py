@@ -52,8 +52,6 @@ class CommentTest(unittest.TestCase):
 
             assert rv.status == '200 OK'
 
-            print(rv.data)
-
             assert post.status == self.repo.PostStatus.PUBLISHED
 
             # check that new comment exists in db
