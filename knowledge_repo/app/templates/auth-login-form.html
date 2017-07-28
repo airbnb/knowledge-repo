@@ -1,0 +1,39 @@
+{% extends "auth-switcher.html" %}
+
+{% block content %}
+
+<style>
+.login-form {
+    display: block;
+    list-style-type: none;
+    margin: 10px;
+    padding: 1em;
+    background: #fff;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+.login-form > input {
+    display: block;
+    width: 100%;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    padding: 1em;
+    margin-bottom: 10px;
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;         /* Opera/IE 8+ */
+}
+.login-form > input[type=submit] {
+    margin-bottom: 0px;
+}
+</style>
+
+<form name='login' action='authorize' method='POST' class='login-form'>
+<input type='text' placeholder="Username" name='username' />
+{% if not skip_password %}
+<input type='password' placeholder="Password" name='password' />
+{% endif %}
+<input type='submit' value='Sign in'/>
+</form>
+{% endblock %}

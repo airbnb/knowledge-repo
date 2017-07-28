@@ -29,14 +29,16 @@ class EmailTest(unittest.TestCase):
                    'created_at': datetime.date.today(),
                    'updated_at': datetime.date.today()}
         kp.write(md='Test Text', headers=headers)
-        self.repo.add(kp, message='test commit message')
 
         # manual re-index
         with self.app.app_context():
+            self.repo.add(kp, message='test commit message')
+
             post = Post()
             db_session.add(post)
             post.update_metadata_from_kp(kp)
             db_session.commit()
+
             self.post_id = post.id
 
     def test01_review_email(self):
@@ -105,7 +107,7 @@ class EmailTest(unittest.TestCase):
             db_session.expire_on_commit = False
             post = db_session.query(Post).get(self.post_id)
 
-            user = User(username=self.knowledge_username)
+            user = User(identifier=self.knowledge_username)
             if user.id is None:
                 db_session.commit()
             user_id = user.id

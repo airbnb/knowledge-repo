@@ -7,7 +7,7 @@ import logging
 from flask import render_template, current_app, url_for
 from flask_mail import Message
 
-from ..app import db_session
+from ..proxies import db_session
 from ..proxies import current_repo
 from ..models import Email, Subscription, User, Post
 from ..utils.render import render_post
@@ -82,7 +82,7 @@ def send_subscription_email(post, tag):
     if not recipient_users:
         return
 
-    recipients_bcc = [usernames_to_emails([user.username])[0] for user in recipient_users]
+    recipients_bcc = [usernames_to_emails([user.identifier])[0] for user in recipient_users]
 
     if not recipients_bcc:
         return
