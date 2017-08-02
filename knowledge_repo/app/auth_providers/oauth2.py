@@ -108,7 +108,7 @@ class OAuth2Provider(KnowledgeAuthProvider):
             'validate'
         )
         if validate is not None:
-            self.validate = lamda x: validate(self, x)
+            self.validate = lambda x: validate(self, x)
 
         redirect_url = self.app.config['SERVER_NAME'] or 'localhost:7000'
         if self.app.config['APPLICATION_ROOT']:
