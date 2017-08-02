@@ -20,7 +20,7 @@ PRESETS = {
         'user_info_endpoint': 'user',
         'user_info_mapping': {
             'identifier': 'username',
-            'name': 'name',
+            'name': 'display_name',
             'photo_uri': ['links', 'avatar']
         }
     },
@@ -108,7 +108,7 @@ class OAuth2Provider(KnowledgeAuthProvider):
             'validate'
         )
         if validate is not None:
-            self.validate = validate
+            self.validate = lamda x: validate(self, x)
 
         redirect_url = self.app.config['SERVER_NAME'] or 'localhost:7000'
         if self.app.config['APPLICATION_ROOT']:
@@ -146,7 +146,7 @@ class OAuth2Provider(KnowledgeAuthProvider):
                     key = key[0]
                 else:
                     return extract_from_dict(d[key[0]], key[1:])
-            elif isinstance(key, str):
+            if isinstance(key, str):
                 return d[key]
             raise RuntimeError("Invalid key type: {}.".format(key))
 
