@@ -21,7 +21,7 @@ PRESETS = {
         'user_info_mapping': {
             'identifier': 'username',
             'name': 'display_name',
-            'photo_uri': ['links', 'avatar']
+            'photo_uri': ['links', 'avatar', 'href']
         }
     },
     'github': {
