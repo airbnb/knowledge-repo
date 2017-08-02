@@ -2,7 +2,7 @@ import unittest
 from bs4 import BeautifulSoup
 
 from knowledge_repo import KnowledgeRepository
-from knowledge_repo.app.app import db_session
+from knowledge_repo.app.proxies import db_session
 from knowledge_repo.app.models import PageView, Comment, Vote
 from sqlalchemy import func
 

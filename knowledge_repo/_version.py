@@ -28,6 +28,8 @@ __dependencies__ = [
 
     # Flask App Dependencies
     'flask',  # Main flask framework
+    'flask_login',  # User management framework
+    'flask_principal',  # Permissions management framework
     'flask_mail',  # Mail client and utilities
     'Flask-Migrate',  # Database migration utilities
     'sqlalchemy',  # Database abstractions
@@ -49,6 +51,11 @@ __optional_dependencies__ = {
     'pdf': [
         'PyPDF2',  # image for parsing PDFs to images
         'wand',  # imagemagick integration for image uploading
+    ],
+
+    # Optional OAuth library for external authentication support
+    'oauth': [
+        'requests_oauthlib'
     ],
 
     # Testing dependencies

@@ -1,0 +1,50 @@
+.navbar .navbar-brand {
+    display: block;
+    float: none;
+    height:inherit;
+    text-align: center;
+}
+
+.navbar .navbar-brand img {
+    height:3em;
+    margin: auto;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+ul.auth-providers {
+    display: block;
+    list-style-type: none;
+    margin: 10px;
+    padding: 5px;
+    background: #fff;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+}
+ul.auth-providers > li > a {
+    padding: 1em;
+    display: block;
+    border-radius: 2px;
+    transition: background 0.3s;
+    color: #000;
+    text-decoration: none;
+}
+ul.auth-providers > li > a:hover {
+    padding: 1em;
+    display: block;
+    background: #d2f1ee;
+    transition: background 0.2s;
+    opacity: 1;
+}
+ul.auth-providers > li > a > img {
+    height: 3em;
+    width: 3em;
+    margin: 5px;
+    margin-right: 1.5em;
+}
+
+span.auth-message {
+    display: block;
+    font-size: 2em;
+    text-align: center;
+}

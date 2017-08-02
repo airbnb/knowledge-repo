@@ -95,6 +95,21 @@ color: #fff;
     opacity: 1;
 }
 
+#navbar .avatar-dropdown {
+    padding-left: 5px;
+    margin-left: 5px;
+}
+
+#navbar .avatar-dropdown img.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius:20px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border: 1px solid #000;
+    background-color: #eee;
+}
+
 .spinner {
     position: fixed;
     top: 50%;

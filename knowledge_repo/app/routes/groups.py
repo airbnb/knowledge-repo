@@ -61,10 +61,10 @@ def add_users_to_group():
     for user in users:
         username = user.strip()
         user_obj = (db_session.query(User)
-                              .filter(User.username == username)
+                              .filter(User.identifier == username)
                               .first())
         if not user_obj:
-            user_obj = User(username=username)
+            user_obj = User(identifier=username)
             db_session.add(user_obj)
         user_objs.append(user_obj)
 

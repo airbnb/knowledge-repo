@@ -54,6 +54,12 @@ for post in $(ls `dirname $0`/tests/test_posts); do
 done
 
 echo
+echo "Synchronising database index"
+echo "-----------------------------"
+echo
+`dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" reindex --config `dirname $0`/tests/config_server.py
+
+echo
 echo "Running regression test suite"
 echo "-----------------------------"
 echo
