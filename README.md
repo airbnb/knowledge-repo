@@ -176,7 +176,7 @@ See the file itself for more detail.
 
 #### Knowledge Web Application Configuration
 
-Specify a configuration file when running the web application by adding the flag `--config path/to/config_file.py`. An example configuration file is provided [here](https://github.com/airbnb/knowledge-repo/blob/master/resources/server_config.py). 
+Specify a configuration file when running the web application by adding the flag `--config path/to/config_file.py`. An example configuration file is provided [here](https://github.com/airbnb/knowledge-repo/blob/master/resources/server_config.py).
 
 This configuration file lets you specify details specific to the web server. For instance, one can specify the database connection string or the request header that contains usernames. See the file itself for more detail.
 
@@ -390,6 +390,6 @@ A knowledge post is a directory, with the following structure:
 	<knowledge_post>
 		- knowledge.md
 		+ images/* [Optional]
-		+ orig_src/* [Optional; stores the original converted file]
+		+ src/* [Optional; stores the original source files]
 
-Images are automatically extracted from the local paths on your computer, and placed into images. `orig_src` contains the file(s) from which the knowledge post was converted from.
+Images are automatically extracted from the local paths on your computer, and placed into images. `src` contains the file(s) from which the knowledge post was converted from.
