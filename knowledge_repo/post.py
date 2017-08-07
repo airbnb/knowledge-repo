@@ -1,6 +1,4 @@
 from __future__ import absolute_import
-from builtins import next
-from builtins import object
 import os
 import posixpath
 import re
@@ -11,6 +9,9 @@ import yaml
 import mimetypes
 import base64
 import uuid
+
+import six
+from builtins import next, object
 
 from .utils.encoding import encode, decode
 
@@ -283,6 +284,8 @@ class KnowledgePost(object):
         for key, value in headers.copy().items():
             if isinstance(value, datetime.date):
                 headers[key] = datetime.datetime.combine(value, datetime.time(0))
+            if key == 'tags' and isinstance(value, list):
+                headers[key] = [str(v) if six.PY3 else unicode(v) for v in value]
         return headers
 
     @headers.setter
