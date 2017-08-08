@@ -1,4 +1,5 @@
 import os
+import posixpath
 import re
 import logging
 
@@ -104,7 +105,7 @@ class ExtractImages(KnowledgePostProcessor):
             return
         with open(path, 'rb') as f:
             kp.write_image(os.path.basename(path), f.read())
-        return os.path.join('images', os.path.basename(path))
+        return posixpath.join('images', os.path.basename(path))
 
     @classmethod
     def replace_image_locations(cls, md, offset, match, old_path, new_path):
