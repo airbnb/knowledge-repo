@@ -234,6 +234,7 @@ class HTMLConverter(KnowledgePostConverter):
 
     def base64_encode_image_mapper(self, tag, url):
         if tag == 'img':
+            url = url.replace('\\', '/')
             if url in self.kp_images:
                 image_data = base64.b64encode(self.kp_images[url])
                 image_mimetype = mimetypes.guess_type(url)[0]
