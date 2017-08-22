@@ -144,7 +144,7 @@ class ReferenceCache(object):
 class KnowledgePost(object):
     '''
     A "Knowledge Post" is a (virtual) folder in which there is a 'knowledge.md' file,
-    and potentially an 'images' and/or 'orig_src' folder. It is "virtual" in the sense
+    and potentially an 'images' and/or 'src' folder. It is "virtual" in the sense
     that `KnowledgePost` objects store everything in memory, and use `KnowledgeRepository`
     object instances to interface with "physical" realisations of them. For example,
     in a GitKnowledgeRepository, the physical realisation is an actual folder; whereas
@@ -238,8 +238,21 @@ class KnowledgePost(object):
             image_data[image_path] = self._read_ref(image_path)
         return image_data
 
+    @property
+    def src_paths(self):
+        srcs = ['src/{}'.format(src_name) for src_name in self._dir(parent='src')]
+        legacy_srcs = ['orig_src/{}'.format(src_name) for src_name in self._dir(parent='orig_src')]  # TODO: deprecate
+        return srcs + legacy_srcs
+
     def read_src(self, ref):
-        return self._read_ref('orig_src/' + ref)
+        # Read src reference, first attempting to read from `src`, then from
+        # the legacy `orig_src`, path.
+        try:
+            return self._read_ref('src/' + ref)
+        except Exception as e:
+            if self._has_ref('orig_src/' + ref):
+                return self._read_ref('orig_src/' + ref)
+            raise e
 
     def write(self, md, headers=None, images={}):
         md = md.strip()
@@ -262,7 +275,7 @@ class KnowledgePost(object):
             self.write_image(name, data)
 
     def write_src(self, name, data):
-        self._write_ref('orig_src/' + name, encode(data))
+        self._write_ref('src/' + name, encode(data))
 
     def add_srcfile(self, filename, name=None):
         if not name:

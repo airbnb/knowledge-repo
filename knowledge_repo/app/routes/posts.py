@@ -112,7 +112,7 @@ def render(path):
                                table_id=None,
                                is_private=(post.private == 1),
                                is_author=is_author,
-                               downloads=list(post.kp._dir('orig_src/')) if permissions.post_download.can() else None)
+                               downloads=post.kp.src_paths if permissions.post_download.can() else None)
     return rendered
 
 
@@ -206,8 +206,9 @@ def download():
     elif resource_type == 'source':
         path = request.args.get('path', None)
         assert path is not None, "Source path not provided."
+        assert path in post.src_paths, "Provided reference is not a valid source path."
         return Response(
-            post.read_src(path),
+            post.read_ref(path),
             mimetype="application/octet-stream",
             headers={u"Content-disposition": "attachment; filename={}".format(os.path.basename(path))})
     else:

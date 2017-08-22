@@ -115,7 +115,7 @@ Here is a full list of headers used in the YAML section of knowledge posts:
 
 ### Handling Images
 
-The knowledge repo's default behavior is to add the markdown's contents as is to your knowledge post git repository. If you do not have git LFS set up, it may be in your interest to have these images hosted on some type of cloud storage, so that pulling the repo locally isn't cumbersome. 
+The knowledge repo's default behavior is to add the markdown's contents as is to your knowledge post git repository. If you do not have git LFS set up, it may be in your interest to have these images hosted on some type of cloud storage, so that pulling the repo locally isn't cumbersome.
 
 Configuring the knowledge repository to strip out images and upload them to some cloud service looks like defining a KnowledgePostProcessor in the .knowledge_repo_config.py on the master branch of the repository; and then referencing it in the postprocessors configuration key. An example KnowledgePostProcessor that uploads images to S3 is provided in resources/extract_images_to_s3.py. Getting it working in your set up may require some tweaking, which we are happy to help with. Once configured, the postprocessor's registry key can be added to the knowledge post git repository's .knowledge_repo_config postprocessor list.
 
@@ -207,5 +207,4 @@ A knowledge post is a virtual directory, with the following structure:
 	<knowledge_post>
 		- knowledge.md
 		+ images/* [Optional]
-		+ orig_src/* [Optional; stores the original converted file]
-
+		+ src/* [Optional; stores the original source files]
