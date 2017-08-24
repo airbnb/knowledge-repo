@@ -1,5 +1,9 @@
 import os
-import posixpath
+import shutil
+try:
+    from urllib.parse import urljoin
+except ImportError:  # Python 2
+    from urlparse import urljoin
 import random
 import string
 import logging
@@ -28,7 +32,7 @@ class ExtractImagesToLocalServer(ExtractImages):
 
         try:
             # Get image type
-            img_ext = posixpath.splitext(img_path)[1]
+            img_ext = os.path.splitext(img_path)[1]
 
             # Make random filename for image
             random_string = ''.join(
@@ -42,21 +46,22 @@ class ExtractImagesToLocalServer(ExtractImages):
             # See if a static file directory exists, if not, let's create
             if not os.path.exists(LOCAL_HTTP_SERVER_DIRECTORY):
                 os.makedirs(LOCAL_HTTP_SERVER_DIRECTORY)
+
             # Copy images to local http server directory
-            cmd = "cp {} {}/{}".format(
-                tmp_path, LOCAL_HTTP_SERVER_DIRECTORY, fname_img)
-            logger.info("Copying image {} to {}/{}".format(
-                tmp_path, LOCAL_HTTP_SERVER_DIRECTORY, fname_img))
-            retval = os.system(cmd)
-            if retval != 0:
-                raise Exception('Problem copying images')
+            new_path = os.path.join(LOCAL_HTTP_SERVER_DIRECTORY, fname_img)
+            logger.info("Copying image {} to {}".format(tmp_path, new_path))
+            try:
+                shutil.copyfile(tmp_path, new_path)
+            except Exception as e:
+                raise Exception('Problem copying image: {}'.format(e))
+
         finally:
             # Clean up temporary file
             if is_ref:
                 os.remove(tmp_path)
 
         # return uploaded path of file
-        return posixpath.join(LOCAL_HTTP_SERVER_ROOT, fname_img)
+        return urljoin(LOCAL_HTTP_SERVER_ROOT, fname_img)
 
     @classmethod
     def skip_image(cls, kp, image):
