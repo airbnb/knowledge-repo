@@ -22,13 +22,16 @@ class GitKnowledgeRepository(KnowledgeRepository):
     _registry_keys = ['', 'git']
 
     @classmethod
-    def create(cls, uri, embed_tooling=False):
+    def create(cls, uri, embed_tooling=False, no_prompt=False):
         path = uri.replace('git://', '')
         if os.path.exists(path):
-            response = input('Repository already exists. Do you want to convert it to a knowledge data repository? Note that this will override any existing `README.md` and `.knowledge_repo_config.py` files, and replace any submodule at `.resources`. (y/n) ')
-            if response is not 'y':
-                logger.warning('Not updating existing repository. Aborting!')
-                return
+            if no_prompt is True:
+                logger.warning('Overriding existing repository!')
+            else:
+                response = input('Repository already exists. Do you want to convert it to a knowledge data repository? Note that this will override any existing `README.md` and `.knowledge_repo_config.py` files, and replace any submodule at `.resources`. (y/n) ')
+                if response is not 'y':
+                    logger.warning('Not updating existing repository. Aborting!')
+                    return
         repo = git.Repo.init(path, mkdir=True)
         sm = None
         if embed_tooling is True or isinstance(embed_tooling, dict):

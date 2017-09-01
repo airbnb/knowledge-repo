@@ -120,6 +120,7 @@ subparsers = parser.add_subparsers(help='sub-commands')
 
 init = subparsers.add_parser('init', help='Initialise a new git knowledge repository.')
 init.set_defaults(action='init')
+init.add_argument('--no-prompt', action='store_true', help='Create a repository, overriding current repo if one already exists.')
 init.add_argument('--tooling-embed', action='store_true', help='Embed a reference version knowledge_repo tooling in the repository.')
 init.add_argument('--tooling-repo', help='The repository to use (if not the default).')
 init.add_argument('--tooling-branch', help='The branch to use when embedding the tools as a submodule (default is "master").')
@@ -218,7 +219,7 @@ if args.action == 'init':
             embed_tooling['branch'] = args.tooling_branch
     else:
         embed_tooling = False
-    kr = knowledge_repo.KnowledgeRepository.create_for_uri(args.repo, embed_tooling=embed_tooling)
+    kr = knowledge_repo.KnowledgeRepository.create_for_uri(args.repo, embed_tooling=embed_tooling, no_prompt=args.no_prompt)
     if kr is not None:
         print("Knowledge repository created for uri `{}`.".format(kr.uri))
     sys.exit(0)
