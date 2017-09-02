@@ -5,13 +5,13 @@ import textwrap
 from abc import abstractmethod
 from future.utils import with_metaclass
 
-from knowledge_repo import KnowledgeRepository
+import knowledge_repo
 from knowledge_repo.utils.registry import SubclassRegisteringABCMeta
 
 
 def get_app_builder(uris, debug, db_uri, config, **kwargs):
     def get_app():
-        return KnowledgeRepository.for_uri(uris).get_app(db_uri=db_uri, debug=debug, config=config, **kwargs)
+        return knowledge_repo.KnowledgeRepository.for_uri(uris).get_app(db_uri=db_uri, debug=debug, config=config, **kwargs)
     return get_app
 
 
