@@ -1,3 +1,4 @@
+import datetime
 # ---------------------------------------------------
 # Host configuration
 # ---------------------------------------------------
@@ -77,6 +78,28 @@ AUTH_USER_IDENTIFIER_REQUEST_HEADER = None
 def AUTH_USER_IDENTIFIER_REQUEST_HEADER_MAPPING(identifier):
     return identifier
 
+
+# If the server desires to modify the attributes of the `User` object associated with
+# users logged in via any of the above authentication providers, it can do so via
+# this configuration key. This function will be run once at user login (if using
+# an `AuthenticationProvider`, and then at most once during any caching lifetime
+# period (as specified below). Note that attributes collected via
+# `AuthenticationProvider`s will not be updated after initial login (user must
+# relogin in order to reset those attributes).
+def AUTH_USER_ATTRIBUTE_SETTER(user):
+    return user
+
+
+# The time to wait before re-checking user attributes with the above function
+# for users logged in via request headers.
+AUTH_USER_ATTRIBUTE_CACHE_LIFETIME = 24 * 60 * 60  # 1 day
+
+# Once a user is logged in via an authentication provider, they will remain
+# logged in via the use of cookies. By default, this cookie will last one year.
+# This is managed by `flask_login`, but is copied here for convenience.
+# For other options regarding sessions, please refer to:
+# https://flask-login.readthedocs.io/en/latest/#cookie-settings
+REMEMBER_COOKIE_DURATION = datetime.timedelta(days=365)
 
 # ---------------------------------------------------
 # Policy configuration

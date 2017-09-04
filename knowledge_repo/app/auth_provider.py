@@ -5,11 +5,10 @@ from builtins import object
 
 from future.utils import with_metaclass
 from flask import request, redirect, current_app, session, Blueprint, url_for, session
-from flask_login import login_user, logout_user, login_required
-from flask_principal import identity_changed, Identity
 
 from .models import User
 from .proxies import db_session
+from .utils.auth import prepare_user
 from ..utils.registry import SubclassRegisteringABCMeta
 
 
@@ -60,8 +59,7 @@ class KnowledgeAuthProvider(with_metaclass(SubclassRegisteringABCMeta, object)):
         return True
 
     def _perform_login(self, user):
-        db_session.add(user)
-        db_session.commit()
+        user = prepare_user(user)
         login_user(user)
 
         # Notify flask principal that the identity has changed
