@@ -22,7 +22,7 @@ from .auth_provider import KnowledgeAuthProvider
 from .proxies import db_session, current_repo, current_user
 from .index import update_index, time_since_index, time_since_index_check, _update_index
 from .models import db as sqlalchemy_db, Post, User, Tag
-from .utils.auth import AnonymousKnowledgeUser, populate_identity_roles
+from .utils.auth import AnonymousKnowledgeUser, populate_identity_roles, prepare_user
 
 
 logging.basicConfig(level=logging.INFO)
@@ -101,8 +101,7 @@ class KnowledgeFlask(Flask):
                         identifier = current_app.config['AUTH_USER_IDENTIFIER_REQUEST_HEADER_MAPPING'](identifier)
                     user = User(identifier=identifier)
                     user.can_logout = False
-                    if user.id is None:
-                        db_session.commit()
+                    user = prepare_user(user, session_start=False)
                     return user
 
         # Intialise access policies
