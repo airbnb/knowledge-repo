@@ -233,7 +233,7 @@ The `-p` flag specifies the location of the post in the knowledge data repositor
 The `-p` flag does not need to be specified if `path` is included in the header of the knowledge post.
 
 #### Updating knowledge
-To update an existing knowledge post, pass the `--update` flag to the `add` command. This will allow the add operation to override exiting knowledge posts.
+To update an existing knowledge post, pass the `--update` flag to the `add` command. This will allow the add operation to override existing knowledge posts.
 ```
 knowledge_repo --repo <repo_path> add --update <file with format {ipynb, Rmd, md}> <location in knowledge repo>
 ```
