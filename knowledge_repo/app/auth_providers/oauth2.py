@@ -1,12 +1,7 @@
 import json
-from flask import request, render_template, flash, redirect, url_for
-from flask_login import login_user
+from flask import request, redirect
 from six.moves.urllib.parse import urljoin
-
 from ..models import User
-from ..proxies import db_session
-from ..utils.auth import is_safe_url
-
 from ..auth_provider import KnowledgeAuthProvider
 
 
@@ -21,7 +16,7 @@ PRESETS = {
         'user_info_mapping': {
             'identifier': 'username',
             'name': 'display_name',
-            'photo_uri': ['links', 'avatar', 'href']
+            'avatar_uri': ['links', 'avatar', 'href']
         }
     },
     'github': {
@@ -32,9 +27,9 @@ PRESETS = {
         'scopes': None,
         'user_info_endpoint': 'user',
         'user_info_mapping': {
-            'identifier': 'email',
+            'identifier': ['email', 'login'],
             'name': 'name',
-            'photo_uri': 'avatar_url'
+            'avatar_uri': 'avatar_url'
         }
     },
     'google': {
@@ -50,7 +45,7 @@ PRESETS = {
         'user_info_mapping': {
             'identifier': 'email',
             'name': 'name',
-            'photo_uri': 'picture'
+            'avatar_uri': 'picture'
         }
     }
 }
@@ -116,6 +111,8 @@ class OAuth2Provider(KnowledgeAuthProvider):
 
         # Import OAuth deps here so we do not have a hard dependency on them
         from requests_oauthlib import OAuth2Session
+        if self.client_id is None or self.client_secret is None:
+            raise ValueError('You must configure a client id and client secret in order to use oauth')
         self.oauth_client = OAuth2Session(
             client_id=self.client_id,
             scope=self.scopes,
@@ -130,12 +127,8 @@ class OAuth2Provider(KnowledgeAuthProvider):
         return urljoin(self.base_url, endpoint)
 
     def get_user(self):
-        code = request.args.get('code')
-        state = request.args.get('state')
-
-        self.oauth_client.state = state
-        self.oauth_client.fetch_token(self.token_url, client_secret=self.client_secret, code=code)
-
+        self.oauth_client.state = request.args.get('state')
+        self.oauth_client.fetch_token(self.token_url, client_secret=self.client_secret, code=request.args.get('code'))
         return self.extract_user_from_api()
 
     def extract_user_from_api(self):
@@ -152,14 +145,16 @@ class OAuth2Provider(KnowledgeAuthProvider):
 
         response = self.oauth_client.get(self.get_endpoint_url(self.user_info_endpoint))
         try:
-            r = json.loads(response.content)
-
-            user = User(identifier=extract_from_dict(r, self.user_info_mapping['identifier']))
+            response_dict = json.loads(response.content)
+            identifier = extract_from_dict(response_dict, self.user_info_mapping['identifier'])
+            if identifier is None:
+                raise ValueError("identifier '{}' not found in authentication response".format(self.user_info_mapping['identifier']))
+            user = User(identifier=identifier)
             if 'name' in self.user_info_mapping:
-                user.name = extract_from_dict(r, self.user_info_mapping['name'])
-            if 'photo_uri' in self.user_info_mapping:
-                user.photo_uri = extract_from_dict(r, self.user_info_mapping['photo_uri'])
-        except:
+                user.name = extract_from_dict(response_dict, self.user_info_mapping['name'])
+            if 'avatar_uri' in self.user_info_mapping:
+                user.avatar_uri = extract_from_dict(response_dict, self.user_info_mapping['avatar_uri'])
+        except Exception:
             raise RuntimeError("Failure to extract user information from:\n\n {}".format(response.content))
 
         return user
