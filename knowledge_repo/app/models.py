@@ -1,19 +1,16 @@
 import os
 import sys
+import datetime
+import logging
 import traceback
 from builtins import str
 from future.utils import raise_with_traceback
-from flask import current_app, request, g
+from flask import current_app, request
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
-import functools
 from collections import defaultdict
-import datetime
 
-from werkzeug.local import LocalProxy
 from sqlalchemy import func, distinct, and_, select, UniqueConstraint
-import logging
-import six
 
 from knowledge_repo._version import __version__
 from knowledge_repo.repository import KnowledgeRepository
@@ -27,7 +24,6 @@ from sqlalchemy.ext.associationproxy import association_proxy
 logger = logging.getLogger(__name__)
 
 db = SQLAlchemy()
-db_session = LocalProxy(lambda: current_app.db.session)
 
 
 class IndexMetadata(db.Model):

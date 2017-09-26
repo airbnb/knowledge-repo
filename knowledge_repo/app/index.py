@@ -1,19 +1,14 @@
 from __future__ import absolute_import
 
-import atexit
 import logging
-import datetime
 import multiprocessing
 import os
-import threading
 import time
 from builtins import str
-from flask import has_app_context
 
 from .proxies import db_session, current_repo, current_app
 from .models import ErrorLog, Post, IndexMetadata
 from .utils.emails import send_subscription_emails
-from .utils.search import get_keywords
 from .utils.time import time_since
 
 logging.basicConfig(level=logging.INFO)

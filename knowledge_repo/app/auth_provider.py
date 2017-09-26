@@ -1,13 +1,11 @@
-import sys
-import re
 from abc import abstractmethod
 from builtins import object
 
+from flask_principal import identity_changed, Identity
+from flask_login import login_user
 from future.utils import with_metaclass
-from flask import request, redirect, current_app, session, Blueprint, url_for, session
+from flask import redirect, current_app, Blueprint, url_for
 
-from .models import User
-from .proxies import db_session
 from .utils.auth import prepare_user
 from ..utils.registry import SubclassRegisteringABCMeta
 
