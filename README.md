@@ -280,7 +280,7 @@ Here is a full list of headers used in the YAML section of knowledge posts:
 |authors        |required |User entity that wrote the post in organization specified format                   |authors: <br> - kanye_west<br> - beyonce_knowles                                          |
 |tags           |required |Topics, projects, or any other uniting principle across posts                      |tags: <br> - hiphop<br> - yeezy                                                           |
 |created_at     |required |Date when post was written                                                         |created_at: 2016-04-03                                                                    |
-|updated_at     |optional |Date when post was last updated                                                    |created_at: 2016-10-10                                                                    |
+|updated_at     |optional |Date when post was last updated                                                    |updated_at: 2016-10-10                                                                    |
 |tldr           |required |Summary of post takeaways that will be visible in /feed                            |tldr: I'ma let you finish, but Beyonce had one of the best videos of all time!            |
 |path           |optional |Instead of specifying post path in the CLI, specify with this post header          |path: projects/path/to/post/on/repo                                                       |
 |thumbnail      |optional |Specify which image is shown in /feed                                              |thumbnail: 3 OR thumbnail: http://cdn.pcwallart.com/images/giraffe-tongue-wallpaper-1.jpg |
