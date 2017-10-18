@@ -18,7 +18,7 @@ class RmdConverter(KnowledgePostConverter):
             tmp_fd, tmp_path = tempfile.mkstemp()
             os.close(tmp_fd)
 
-            runcmd = """R --vanilla --slave -e "library(knitr); setwd('{0}'); \
+            runcmd = """R --no-save --no-restore --slave -e "library(knitr); setwd('{0}'); \
                         x = knit('{1}', '{2}', quiet=T)" """.format(os.path.abspath(os.path.dirname(filename)),
                                                                     os.path.abspath(filename),
                                                                     tmp_path)
