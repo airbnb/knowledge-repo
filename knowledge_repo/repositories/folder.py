@@ -24,8 +24,15 @@ class FolderKnowledgeRepository(KnowledgeRepository):
     _registry_keys = ['']
 
     @classmethod
-    def create(cls, uri):
-        raise NotImplementedError("Folder does not exist. Not attempting to create it.")
+    def create(cls, uri, embed_tooling=False):
+        path = os.path.abspath(uri)
+        if not os.path.exists(path):
+            raise Exception("Folder does not exist. Not attempting to create it.")
+        shutil.copy(os.path.join(os.path.dirname(__file__), '../config_defaults.py'),
+                    os.path.join(path, '.knowledge_repo_config.py'))
+        shutil.copy(os.path.join(os.path.dirname(__file__), '../templates', 'repo_data_readme.md'),
+                    os.path.join(path, 'README.md'))
+        return FolderKnowledgeRepository(path)
 
     def init(self, config='.knowledge_repo_config.py', auto_create=False):
         self.auto_create = auto_create
@@ -83,10 +90,10 @@ class FolderKnowledgeRepository(KnowledgeRepository):
             yield post
 
     # ------------- Post submission / addition user flow ----------------------
-    def _add_prepare(self, kp, path, update=False):
+    def _add_prepare(self, kp, path, update=False, **kwargs):
         pass
 
-    def _add_cleanup(self, kp, path, update=False):
+    def _add_cleanup(self, kp, path, update=False, **kwargs):
         pass
 
     def _submit(self, path=None, branch=None, force=False):
@@ -138,17 +145,17 @@ class FolderKnowledgeRepository(KnowledgeRepository):
 
     def _kp_write_ref(self, path, reference, data, uuid=None, revision=None):
         path = os.path.join(self.path, path)
-        if os.path.isdir(path):
+        if os.path.isfile(path):
+            kp = KnowledgePost.from_file(path, format='kp')
+            kp._write_ref(reference, data)
+            kp.to_file(path, format='kp')
+        else:
             ref_path = os.path.join(path, reference)
             ref_dir = os.path.dirname(ref_path)
             if not os.path.exists(ref_dir):
                 os.makedirs(ref_dir)
             with open(ref_path, 'wb') as f:
                 return f.write(data)
-        else:
-            kp = KnowledgePost.from_file(path, format='kp')
-            kp._write_ref(reference, data)
-            kp.to_file(path, format='kp')
 
     def _kp_dir(self, path, parent=None, revision=None):  # TODO: Account for revision
         path = os.path.join(self.path, path)
