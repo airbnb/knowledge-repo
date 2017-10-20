@@ -38,6 +38,12 @@ for ipynb
 ```
 knowledge_repo --repo ./example_repo create ipynb example_post.ipynb
 ```
+
+using a custom template
+```
+knowledge_repo --repo ./example_repo create --template path/to/template.Rmd Rmd example_post.Rmd
+```
+
 4\. Edit the notebook file `example_post.ipynb` or `example_post.Rmd` as you normally would.
 
 
@@ -210,6 +216,12 @@ If the knowledge data repository is created at `knowledge_data_repo`, running
 knowledge_repo --repo knowledge_data_repo create md ~/Documents/my_first_knowledge_post.md
 ```
 will create a file, `~/Documents/my_first_knowledge_post.md`, the contents of which will be the boilerplate template of the knowledge post.
+
+You can also specify the location of a custom knowledge post template with the optional `--template` argument:
+
+```
+knowledge_repo --repo <repo_path> create --template path/to/template{.ipynb, .Rmd, .md} {ipynb, Rmd, md} filename
+```
 
 The help menu for this command (and all following commands) can be reached by adding the `-h` flag, `knowledge_repo --repo <repo_path> create -h`.
 
