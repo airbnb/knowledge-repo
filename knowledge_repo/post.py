@@ -338,7 +338,7 @@ class KnowledgePost(object):
             return False
         try:
             FormatChecks.process(self)
-        except:
+        except AssertionError:
             return False
         return True
 
