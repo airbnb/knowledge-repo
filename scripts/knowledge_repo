@@ -220,7 +220,8 @@ if args.action == 'init':
             embed_tooling['branch'] = args.tooling_branch
     else:
         embed_tooling = False
-    kr = knowledge_repo.KnowledgeRepository.create_for_uri(args.repo, embed_tooling=embed_tooling, no_prompt=args.no_prompt)
+    kr = knowledge_repo.KnowledgeRepository.create_for_uri(
+        args.repo, embed_tooling=embed_tooling, no_prompt=args.no_prompt, no_config=args.no_config)
     if kr is not None:
         print("Knowledge repository created for uri `{}`.".format(kr.uri))
     sys.exit(0)
