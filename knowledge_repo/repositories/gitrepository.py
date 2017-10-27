@@ -22,7 +22,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
     _registry_keys = ['', 'git']
 
     @classmethod
-    def create(cls, uri, embed_tooling=False, no_prompt=False):
+    def create(cls, uri, embed_tooling=False, no_prompt=False, no_config=False):
         path = uri.replace('git://', '')
         if os.path.exists(path):
             if no_prompt is True:
@@ -52,8 +52,9 @@ class GitKnowledgeRepository(KnowledgeRepository):
             except ValueError:  # Repository has no active refs
                 pass
             sm = repo.create_submodule(name='embedded_knowledge_repo', path='.resources', url=tooling_repo, branch=tooling_branch)
-        shutil.copy(os.path.join(os.path.dirname(__file__), '../config_defaults.py'),
-                    os.path.join(path, '.knowledge_repo_config.py'))
+        if no_config is False:
+            shutil.copy(os.path.join(os.path.dirname(__file__), '../config_defaults.py'),
+                        os.path.join(path, '.knowledge_repo_config.py'))
         shutil.copy(os.path.join(os.path.dirname(__file__), '../templates', 'repo_data_readme.md'),
                     os.path.join(path, 'README.md'))
         repo.index.add(['.knowledge_repo_config.py', 'README.md'])
