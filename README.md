@@ -4,7 +4,7 @@
 [![PyPI version](https://badge.fury.io/py/knowledge-repo.svg)](https://badge.fury.io/py/knowledge-repo)
 [![Python](https://img.shields.io/pypi/pyversions/knowledge-repo.svg?maxAge=2592000)](https://pypi.python.org/pypi/knowledge-repo)
 
-The Knowledge Repository project is focused on facilitating the sharing of knowledge between data scientists and other technical roles using data formats and tools that make sense in these professions. It provides various data stores (and utilities to manage them) for "knowledge posts", with a particular focus on notebooks (R Markdown and Jupyter / iPython Notebook) to better promote reproducible research.
+The Knowledge Repository project is focused on facilitating the sharing of knowledge between data scientists and other technical roles using data formats and tools that make sense in these professions. It provides various data stores (and utilities to manage them) for "knowledge posts", with a particular focus on notebooks (R Markdown and Jupyter / IPython Notebook) to better promote reproducible research.
 
 Check out this [Medium Post](https://medium.com/airbnb-engineering/scaling-knowledge-at-airbnb-875d73eff091) for the inspiration for the project.
 
@@ -21,7 +21,7 @@ Check out this [Medium Post](https://medium.com/airbnb-engineering/scaling-knowl
 pip install  --upgrade knowledge-repo
 ```
 
-To install dependencies for iPython notebook, PDF uploading, and local development, use `pip install --upgrade knowledge-repo[all]`
+To install dependencies for IPython notebook, PDF uploading, and local development, use `pip install --upgrade knowledge-repo[all]`
 
 2\. Initialize a knowledge repository - your posts will get added here
 ```
@@ -82,7 +82,7 @@ Here's a running list of known issues we are working on:
 
 Knowledge posts are a general markdown format that is automatically generated from the following common formats:
 
- - Jupyter/Ipython notebooks
+ - Jupyter/IPython notebooks
  - Rmd notebooks
  - Markdown files
 
@@ -190,7 +190,7 @@ This configuration file lets you specify details specific to the web server. For
 
 ### TLDR Guide For Contributing
 
-If you have already set up your system as described below, here is a snapshot of the commands you need to run to upload your knowledge post stored in ~/Documents/my_post.Rmd. For Jupyter / iPython Notebooks, the commands are the same, replacing all instances of `Rmd` with `ipynb`. It assumes you have configured the KNOWLEDGE_REPO environment variable to point to your local copy of the knowledge repository. The code is written for producing and contributing an ipynb file to make the examples clear, R Markdown files are run by using `Rmd` in place of `ipynb` in each command.
+If you have already set up your system as described below, here is a snapshot of the commands you need to run to upload your knowledge post stored in ~/Documents/my_post.Rmd. For Jupyter / IPython Notebooks, the commands are the same, replacing all instances of `Rmd` with `ipynb`. It assumes you have configured the KNOWLEDGE_REPO environment variable to point to your local copy of the knowledge repository. The code is written for producing and contributing an ipynb file to make the examples clear, R Markdown files are run by using `Rmd` in place of `ipynb` in each command.
 
 1. `knowledge_repo create Rmd ~/Documents/my_post.Rmd`, which creates a template with required yaml headers. Templates can also be downloaded by clicking "Write a Post!" the web application. *Make sure your post has these headers with correct values for your post*
 2. Do your work in the generated my_post.Rmd file. *Make sure the post runs through from start to finish before attempting to add to the Knowledge Repo!*
