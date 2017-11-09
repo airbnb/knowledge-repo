@@ -202,9 +202,7 @@ class HTMLConverter(KnowledgePostConverter):
             for urlmapper in urlmappers:
                 new_url = urlmapper(name, match.group('url'))
                 if new_url is not None:
-                    break
-            if new_url is not None:
-                return re.sub('(src|href)=[\'"](?:.*?)[\'"]', '\\1="{}"'.format(new_url), match.group(0))
+                    return match.group(0).replace(match.group('url'), new_url)
             return None
 
         return SubstitutionMapper(patterns=patterns, mappers=[urlmapper_proxy]).apply(html)
