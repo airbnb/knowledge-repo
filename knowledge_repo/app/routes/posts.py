@@ -40,7 +40,7 @@ def render(path):
         # html = create_presentation_text(presentation_post)
         tmpl = "markdown-presentation.html"
 
-    if not current_app.config.get('REPOSITORY_INDEXING_ENABLED', True):
+    if not current_app.config.get('INDEXING_ENABLED', True):
         return _render_preview(path=path, tmpl=tmpl)
 
     post = (db_session.query(Post)

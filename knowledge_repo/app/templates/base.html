@@ -84,7 +84,7 @@
           <ul class="nav navbar-nav navbar-right visible-sm-block visible-md-block visible-lg-block">
             <li class="dropdown">
               <a href="#" class="avatar-dropdown dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true" style='padding: 5px;'>
-                  <img class="avatar" src="{% if current_user.is_anonymous %}{{url_for('static', filename='images/profile_photo_logged_out.png')}}{%else%}{{ current_user.avatar_uri or url_for('static', filename='images/profile_photo_default.png') }}{%endif%}" />
+                  <img class="avatar" src="{% if current_user.is_anonymous %}{{ url_for('static', filename='images/profile_photo_logged_out.png') }}{%else%}{{ current_user.avatar_uri or url_for('static', filename='images/profile_photo_default.png') }}{%endif%}" />
                   <span class="caret"></span>
               </a>
               <ul class="dropdown-menu">
@@ -92,7 +92,9 @@
                 <li class="dropdown-header">Logged in as <em>{{ current_user.format_name }}</em></li>
                 <li><a href="/feed?authors={{ current_user.identifier }}">My Posts</a></li>
                 <li><a href="/favorites">My Favorites</a></li>
-                {% if current_user.can_logout %}<li><a href="{{ url_for('auth.logout') }}">Sign out</a></li>{%endif%}
+                {% if current_user.can_logout %}
+                <li><a href="{{ url_for('auth.logout') }}">Sign out</a></li>
+                {% endif %}
                 <li role="separator" class="divider"></li>
                 <li class="dropdown-header">Site Features</li>
                 {% else %}

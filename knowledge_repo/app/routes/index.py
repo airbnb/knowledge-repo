@@ -223,6 +223,7 @@ def ajax_post_typeahead():
     match_score = sum(case_statements).label("match_score")
 
     posts = (db_session.query(Post, match_score)
+                       .filter(Post.status == current_repo.PostStatus.PUBLISHED.value)
                        .order_by(desc(match_score))
                        .limit(5)
                        .all())

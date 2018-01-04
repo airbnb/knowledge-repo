@@ -5,6 +5,7 @@ Organizations
 ----------
  - [Airbnb](https://github.com/airbnb)
  - [Postmates](https://github.com/postmates)
+ - [Recursion Pharmaceuticals](http://recursionpharma.com)
 
 Projects
 ----------
