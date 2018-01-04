@@ -23,13 +23,21 @@ Knowledge Repo Login
 {% endblock %}
 
 {% block content %}
+{% if providers %}
 <span class='auth-message'>
-    The content you are attempting to access requires that you are logged in.
-    Please sign in using one of the following login methods to continue.
+  The content you are attempting to access requires that you are logged in.
+  Please sign in using one of the following login methods to continue.
 </span>
 <ul class='auth-providers'>
 {% for provider in providers %}
     <li><a href='login/{{ provider['name'] }}?next={{request.args.next}}'><img src='{{ provider['icon_uri'] }}' />{{ provider['link_text'] }}</a></li>
 {% endfor %}
 </ul>
+{% else %}
+<span class='auth-message'>
+  The content you are attempting to access requires that you are logged in.
+  <br><br>
+  Unfortunately, there are no authentication mechanisms configured. Please contact your system administrator to enable authentication.
+</span>
+{% endif %}
 {% endblock %}

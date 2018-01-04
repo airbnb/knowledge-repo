@@ -1,19 +1,16 @@
 import os
 import sys
+import datetime
+import logging
 import traceback
 from builtins import str
 from future.utils import raise_with_traceback
-from flask import current_app, request, g
+from flask import current_app, request
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
-import functools
 from collections import defaultdict
-import datetime
 
-from werkzeug.local import LocalProxy
 from sqlalchemy import func, distinct, and_, select, UniqueConstraint
-import logging
-import six
 
 from knowledge_repo._version import __version__
 from knowledge_repo.repository import KnowledgeRepository
@@ -27,7 +24,6 @@ from sqlalchemy.ext.associationproxy import association_proxy
 logger = logging.getLogger(__name__)
 
 db = SQLAlchemy()
-db_session = LocalProxy(lambda: current_app.db.session)
 
 
 class IndexMetadata(db.Model):
@@ -54,8 +50,9 @@ class IndexMetadata(db.Model):
         m = db_session.query(IndexMetadata).filter(IndexMetadata.type == type).filter(IndexMetadata.name == name).first()
         if m is not None:
             m.value = value
+            m.updated_at = datetime.datetime.utcnow()
         else:
-            m = IndexMetadata(type=type, name=name, value=value)
+            m = IndexMetadata(type=type, name=name, value=value, updated_at=datetime.datetime.utcnow())
             db_session.add(m)
 
     @classmethod
@@ -140,6 +137,7 @@ class ErrorLog(db.Model):
             try:
                 return function(*args, **kwargs)
             except Exception as e:
+                db_session.rollback()
                 db_session.add(ErrorLog.from_exception(e))
                 db_session.commit()
                 raise_with_traceback(e)
@@ -171,7 +169,7 @@ class PageView(db.Model):
             return getattr(self._route, attr)
 
         def __call__(self, *args, **kwargs):
-            if not current_app.config.get('REPOSITORY_INDEXING_ENABLED', True):
+            if not current_app.config.get('INDEXING_ENABLED', True):
                 return self._route(*args, **kwargs)
 
             log = PageView(

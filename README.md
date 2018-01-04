@@ -4,7 +4,7 @@
 [![PyPI version](https://badge.fury.io/py/knowledge-repo.svg)](https://badge.fury.io/py/knowledge-repo)
 [![Python](https://img.shields.io/pypi/pyversions/knowledge-repo.svg?maxAge=2592000)](https://pypi.python.org/pypi/knowledge-repo)
 
-The Knowledge Repository project is focused on facilitating the sharing of knowledge between data scientists and other technical roles using data formats and tools that make sense in these professions. It provides various data stores (and utilities to manage them) for "knowledge posts", with a particular focus on notebooks (R Markdown and Jupyter / iPython Notebook) to better promote reproducible research.
+The Knowledge Repository project is focused on facilitating the sharing of knowledge between data scientists and other technical roles using data formats and tools that make sense in these professions. It provides various data stores (and utilities to manage them) for "knowledge posts", with a particular focus on notebooks (R Markdown and Jupyter / IPython Notebook) to better promote reproducible research.
 
 Check out this [Medium Post](https://medium.com/airbnb-engineering/scaling-knowledge-at-airbnb-875d73eff091) for the inspiration for the project.
 
@@ -21,7 +21,7 @@ Check out this [Medium Post](https://medium.com/airbnb-engineering/scaling-knowl
 pip install  --upgrade knowledge-repo
 ```
 
-To install dependencies for iPython notebook, PDF uploading, and local development, use `pip install --upgrade knowledge-repo[all]`
+To install dependencies for IPython notebook, PDF uploading, and local development, use `pip install --upgrade knowledge-repo[all]`
 
 2\. Initialize a knowledge repository - your posts will get added here
 ```
@@ -38,6 +38,12 @@ for ipynb
 ```
 knowledge_repo --repo ./example_repo create ipynb example_post.ipynb
 ```
+
+using a custom template
+```
+knowledge_repo --repo ./example_repo create --template path/to/template.Rmd Rmd example_post.Rmd
+```
+
 4\. Edit the notebook file `example_post.ipynb` or `example_post.Rmd` as you normally would.
 
 
@@ -76,7 +82,7 @@ Here's a running list of known issues we are working on:
 
 Knowledge posts are a general markdown format that is automatically generated from the following common formats:
 
- - Jupyter/Ipython notebooks
+ - Jupyter/IPython notebooks
  - Rmd notebooks
  - Markdown files
 
@@ -184,7 +190,7 @@ This configuration file lets you specify details specific to the web server. For
 
 ### TLDR Guide For Contributing
 
-If you have already set up your system as described below, here is a snapshot of the commands you need to run to upload your knowledge post stored in ~/Documents/my_post.Rmd. For Jupyter / iPython Notebooks, the commands are the same, replacing all instances of `Rmd` with `ipynb`. It assumes you have configured the KNOWLEDGE_REPO environment variable to point to your local copy of the knowledge repository. The code is written for producing and contributing an ipynb file to make the examples clear, R Markdown files are run by using `Rmd` in place of `ipynb` in each command.
+If you have already set up your system as described below, here is a snapshot of the commands you need to run to upload your knowledge post stored in ~/Documents/my_post.Rmd. For Jupyter / IPython Notebooks, the commands are the same, replacing all instances of `Rmd` with `ipynb`. It assumes you have configured the KNOWLEDGE_REPO environment variable to point to your local copy of the knowledge repository. The code is written for producing and contributing an ipynb file to make the examples clear, R Markdown files are run by using `Rmd` in place of `ipynb` in each command.
 
 1. `knowledge_repo create Rmd ~/Documents/my_post.Rmd`, which creates a template with required yaml headers. Templates can also be downloaded by clicking "Write a Post!" the web application. *Make sure your post has these headers with correct values for your post*
 2. Do your work in the generated my_post.Rmd file. *Make sure the post runs through from start to finish before attempting to add to the Knowledge Repo!*
@@ -211,6 +217,12 @@ knowledge_repo --repo knowledge_data_repo create md ~/Documents/my_first_knowled
 ```
 will create a file, `~/Documents/my_first_knowledge_post.md`, the contents of which will be the boilerplate template of the knowledge post.
 
+You can also specify the location of a custom knowledge post template with the optional `--template` argument:
+
+```
+knowledge_repo --repo <repo_path> create --template path/to/template{.ipynb, .Rmd, .md} {ipynb, Rmd, md} filename
+```
+
 The help menu for this command (and all following commands) can be reached by adding the `-h` flag, `knowledge_repo --repo <repo_path> create -h`.
 
 Alternatively, by going to the `/create` route in the webapp, you can click the button for whichever template you would like to have,
@@ -233,7 +245,7 @@ The `-p` flag specifies the location of the post in the knowledge data repositor
 The `-p` flag does not need to be specified if `path` is included in the header of the knowledge post.
 
 #### Updating knowledge
-To update an existing knowledge post, pass the `--update` flag to the `add` command. This will allow the add operation to override exiting knowledge posts.
+To update an existing knowledge post, pass the `--update` flag to the `add` command. This will allow the add operation to override existing knowledge posts.
 ```
 knowledge_repo --repo <repo_path> add --update <file with format {ipynb, Rmd, md}> <location in knowledge repo>
 ```
@@ -280,7 +292,7 @@ Here is a full list of headers used in the YAML section of knowledge posts:
 |authors        |required |User entity that wrote the post in organization specified format                   |authors: <br> - kanye_west<br> - beyonce_knowles                                          |
 |tags           |required |Topics, projects, or any other uniting principle across posts                      |tags: <br> - hiphop<br> - yeezy                                                           |
 |created_at     |required |Date when post was written                                                         |created_at: 2016-04-03                                                                    |
-|updated_at     |optional |Date when post was last updated                                                    |created_at: 2016-10-10                                                                    |
+|updated_at     |optional |Date when post was last updated                                                    |updated_at: 2016-10-10                                                                    |
 |tldr           |required |Summary of post takeaways that will be visible in /feed                            |tldr: I'ma let you finish, but Beyonce had one of the best videos of all time!            |
 |path           |optional |Instead of specifying post path in the CLI, specify with this post header          |path: projects/path/to/post/on/repo                                                       |
 |thumbnail      |optional |Specify which image is shown in /feed                                              |thumbnail: 3 OR thumbnail: http://cdn.pcwallart.com/images/giraffe-tongue-wallpaper-1.jpg |

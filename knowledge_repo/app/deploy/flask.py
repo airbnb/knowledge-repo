@@ -11,6 +11,6 @@ class FlaskDeployer(KnowledgeDeployer):
             debug=app.config['DEBUG'],
             host=self.host,
             port=self.port,
-            threaded=app.supports_threads,
+            threaded=app.check_thread_support(),
             **kwargs
         )
