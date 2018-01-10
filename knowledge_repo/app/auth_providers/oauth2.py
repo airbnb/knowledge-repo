@@ -6,6 +6,7 @@ from ..auth_provider import KnowledgeAuthProvider
 
 
 PRESETS = {
+    'oauth2': {},  # allows generic OAuth2 to be configured in server_config.py
     'bitbucket': {
         'base_url': 'https://api.bitbucket.org/2.0/',
         'authorization_url': 'https://bitbucket.org/site/oauth2/authorize',
