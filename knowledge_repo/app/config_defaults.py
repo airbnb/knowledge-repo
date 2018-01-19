@@ -51,7 +51,8 @@ DB_AUTO_UPGRADE = False
 # in a variety of different ways. You can create your own subclass of
 # `KnowledgeAuthProvider` and add either the instance or identifier
 # used for that class below.
-# By default, the knowledge repo offers: ['debug', 'bitbucket', 'github', 'google']
+# By default, the knowledge repo offers:
+# ['debug', 'oauth2', 'bitbucket', 'github', 'google']
 AUTH_PROVIDERS = []
 
 # If you are going to use a OAuth provider, you will need to specify client ids
@@ -59,7 +60,76 @@ AUTH_PROVIDERS = []
 # `OAuth2Provider` and adding them to the above list, or by specifying OAuth
 # connection properties as demonstrated below for the GitHub authenticator.
 # OAUTH_GITHUB_CLIENT_ID = '<client id>'
-# OAUTH_GITHUB_CLIENT_SECRET = '<client_secret>'
+# OAUTH_GITHUB_CLIENT_SECRET = '<client id>'
+
+# To configure a generic OAuth provider that is not one of the presets
+# provided, you may use the provider 'oauth2' which creates an empty,
+# unconfigured OAuth2Provider. You must then override its configuration.
+# For example, for a self-managed Gitlab CE instance at gitlab.example.com:
+
+# OAUTH_OAUTH2_BASE_URL = 'https://gitlab.example.com/api/v4/'
+# OAUTH_OAUTH2_AUTHORIZATION_URL = 'https://gitlab.example.com/oauth/authorize'
+# OAUTH_OAUTH2_TOKEN_URL = 'https://gitlab.example.com/oauth/token'
+# OAUTH_OAUTH2_AUTO_REFRESH_URL = 'https://gitlab.example.com/oauth/token'
+# OAUTH_OAUTH2_SCOPES = 'api'
+# OAUTH_OAUTH2_USER_INFO_ENDPOINT = 'user'
+# OAUTH_OAUTH2_USER_INFO_MAPPING = {
+#     'identifier': 'username',
+#     'name': 'name',
+#     'avatar_uri': 'avatar_url'
+# }
+# OAUTH_OAUTH2_VERIFY_HTTPS = '/path/to/certs/my.ca-bundle'
+# OAUTH_OAUTH2_CLIENT_ID = '<client id>'
+# OAUTH_OAUTH2_CLIENT_SECRET = '<client secret>'
+
+# The configuration OAUTH_<name>_VERIFY_HTTPS is what is passed to the
+# 'verify' parameter in the Requests module, and can be used to disable
+# HTTPS verification (not recommended) or provide a custom CA bundle. See:
+# http://docs.python-requests.org/en/master/user/advanced/#ssl-cert-verification
+
+# You may also override the .validate() method of a KnowledgeAuthProvider
+# to perform an additional validation step before authenticating a user.
+# The following example checks whether a user has access to the git remote
+# of the local Knowledge Repository:
+
+# def OAUTH_OAUTH2_VALIDATE(provider, user):
+#
+#     if provider.app.repository.git_has_remote:
+#
+#         url_parts = (
+#             provider.app.repository.git_remote.url.split(':')
+#             )
+#
+#         url_subparts = url_parts[1].split('/')
+#
+#         if url_parts[0] == "git@gitlab.example.com":
+#             git_project = (
+#                 url_subparts[0] + "%2F" + url_subparts[1].split('.')[0])
+#         elif (
+#             url_parts[0] == "https"
+#             and url_subparts[2] == "gitlab.example.com"
+#         ):
+#             git_project = (
+#                 url_subparts[3] + "%2F" + url_subparts[4].split('.')[0])
+#         else:
+#             provider.app.logger.warning(
+#                 "User validation failed: unexpected git remote url ["
+#                 + provider.app.repository.git_remote.url + "]")
+#             return False
+#
+#         user_validate_url = provider.base_url + "projects/" + git_project
+#
+#         resp = provider.oauth_client.get(
+#             user_validate_url,
+#             verify=OAUTH_OAUTH2_VERIFY_HTTPS)
+#
+#         if resp.status_code == 200:
+#             return True
+#         else:
+#             provider.app.logger.warning(
+#                 "User validation failed: validation URL ["
+#                 + user_validate_url + "] returned HTTP status ["
+#                 + str(resp.status_code) + "]")
 
 # You can also forgo a fully-fledged sign in process for users
 # by hosting the knowledge repository behind a proxy server that
