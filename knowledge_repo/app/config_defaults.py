@@ -60,7 +60,7 @@ AUTH_PROVIDERS = []
 # `OAuth2Provider` and adding them to the above list, or by specifying OAuth
 # connection properties as demonstrated below for the GitHub authenticator.
 # OAUTH_GITHUB_CLIENT_ID = '<client id>'
-# OAUTH_GITHUB_CLIENT_SECRET = '<client id>'
+# OAUTH_GITHUB_CLIENT_SECRET = '<client secret>'
 
 # To configure a generic OAuth provider that is not one of the presets
 # provided, you may use the provider 'oauth2' which creates an empty,
@@ -78,11 +78,11 @@ AUTH_PROVIDERS = []
 #     'name': 'name',
 #     'avatar_uri': 'avatar_url'
 # }
-# OAUTH_OAUTH2_VERIFY_HTTPS = '/path/to/certs/my.ca-bundle'
+# OAUTH_OAUTH2_VERIFY_SSL_CERTS = '/path/to/certs/my.ca-bundle'
 # OAUTH_OAUTH2_CLIENT_ID = '<client id>'
 # OAUTH_OAUTH2_CLIENT_SECRET = '<client secret>'
 
-# The configuration OAUTH_<name>_VERIFY_HTTPS is what is passed to the
+# The configuration OAUTH_<name>_VERIFY_SSL_CERTS is what is passed to the
 # 'verify' parameter in the Requests module, and can be used to disable
 # HTTPS verification (not recommended) or provide a custom CA bundle. See:
 # http://docs.python-requests.org/en/master/user/advanced/#ssl-cert-verification

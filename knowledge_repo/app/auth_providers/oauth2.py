@@ -77,7 +77,7 @@ class OAuth2Provider(KnowledgeAuthProvider):
              client_id=None,
              client_secret=None,
              user_info_mapping=None,
-             verify_https=None,
+             verify_ssl_certs=None,
              validate=None):
 
         (self.base_url,
@@ -89,7 +89,7 @@ class OAuth2Provider(KnowledgeAuthProvider):
          self.client_id,
          self.client_secret,
          self.user_info_mapping,
-         self.verify_https,
+         self.verify_ssl_certs,
          validate) = _resolve_oauth_config(
             self.name,
             locals(),
@@ -103,14 +103,14 @@ class OAuth2Provider(KnowledgeAuthProvider):
             'client_id',
             'client_secret',
             'user_info_mapping',
-            'verify_https',
+            'verify_ssl_certs',
             'validate'
         )
         if validate is not None:
             self.validate = lambda x: validate(self, x)
 
-        if self.verify_https is None:
-            self.verify_https = True
+        if self.verify_ssl_certs is None:
+            self.verify_ssl_certs = True
 
         redirect_url = self.app.config['SERVER_NAME'] or 'localhost:7000'
         if self.app.config['APPLICATION_ROOT']:
@@ -139,7 +139,7 @@ class OAuth2Provider(KnowledgeAuthProvider):
             self.token_url,
             client_secret=self.client_secret,
             code=request.args.get('code'),
-            verify=self.verify_https)
+            verify=self.verify_ssl_certs)
         return self.extract_user_from_api()
 
     def extract_user_from_api(self):
@@ -154,7 +154,7 @@ class OAuth2Provider(KnowledgeAuthProvider):
                 return d[key]
             raise RuntimeError("Invalid key type: {}.".format(key))
 
-        response = self.oauth_client.get(self.get_endpoint_url(self.user_info_endpoint), verify=self.verify_https)
+        response = self.oauth_client.get(self.get_endpoint_url(self.user_info_endpoint), verify=self.verify_ssl_certs)
         try:
             response_dict = json.loads(response.content)
             identifier = extract_from_dict(response_dict, self.user_info_mapping['identifier'])
