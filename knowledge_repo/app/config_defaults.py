@@ -185,6 +185,9 @@ POLICY_ANONYMOUS_VIEW_POST = True
 # Should anonymous users be able to view overall statistics
 POLICY_ANONYMOUS_VIEW_STATS = True
 
+# Should anonymous users be able to download posts (or their source)
+POLICY_ANONYMOUS_DOWNLOADS = False
+
 
 # ---------------------------------------------------
 # Repository configuration

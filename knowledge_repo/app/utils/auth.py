@@ -62,14 +62,16 @@ def populate_identity_roles(identity, user=None):
             identity.provides.add(roles.post_view)
         if current_app.config['POLICY_ANONYMOUS_VIEW_STATS']:
             identity.provides.add(roles.stats_view)
+        if current_app.config['POLICY_ANONYMOUS_DOWNLOADS']:
+            identity.provides.add(roles.post_download)
 
     else:
         identity.provides.add(UserNeed(user.identifier))
         identity.provides.add(roles.index_view)
-        identity.provides.add(roles.post_comment)
         identity.provides.add(roles.post_view)
-        identity.provides.add(roles.post_download)
         identity.provides.add(roles.post_edit)
+        identity.provides.add(roles.post_comment)
+        identity.provides.add(roles.post_download)
         identity.provides.add(roles.stats_view)
 
         # TODO: Populate group permissions, and port existing group admin
