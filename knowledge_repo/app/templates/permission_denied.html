@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}
+Knowledge Repo 403
+{% endblock %}
+
+{% block content %}
+<div class="col-12">
+  <div class="panel">
+    <center>
+        <div class="panel-header">
+          Error!
+        </div>
+    </center>
+
+    <center>
+        <div class="panel-body">
+          <div class="row row-space-2"></div>
+          <h3> You don't have permission to view this page! </h3>
+          {% if current_user.is_authenticated %}
+          <text> If you think you should have access to this page, please contact a site admin. </text>
+          {% else %}
+          <text> <a href="{{ url_for('auth.login') }}">Click here</a> to sign in, and then try accessing this page again. </text>
+          {% endif %}
+        </div>
+    </center>
+  </div>
+</div>
+{% endblock %}

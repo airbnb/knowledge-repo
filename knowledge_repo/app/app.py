@@ -132,8 +132,7 @@ class KnowledgeFlask(Flask):
 
         @self.errorhandler(PermissionDenied)
         def handle_insufficient_permissions(error):
-            flash("You have insufficient permissions to access this resource.")
-            return render_template('base.html'), 403
+            return render_template('permission_denied.html'), 403
 
         # Add mail object if configuration is supplied
         if self.config.get('MAIL_SERVER'):
