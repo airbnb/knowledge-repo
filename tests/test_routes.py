@@ -41,5 +41,6 @@ class RouteTest(unittest.TestCase):
         rv = self.app.get('/stats')
         assert rv.status == '200 OK'
 
+
 if __name__ == '__main__':
     unittest.main()

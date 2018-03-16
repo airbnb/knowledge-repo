@@ -383,6 +383,7 @@ class KnowledgePost(object):
     def to_string(self, format, **opts):
         return KnowledgePostConverter.for_format(self, format).to_string(**opts)
 
+
 from .converter import KnowledgePostConverter  # noqa
 from .postprocessors.format_checks import FormatChecks  # noqa
 from .postprocessors.extract_images import ExtractImages  # noqa

@@ -135,5 +135,6 @@ class FeedTest(unittest.TestCase):
         all_posts = soup.findAll('div', {'class': 'row feed-post'})
         assert len(all_posts) == 3, "Expected 3 posts, found {}".format(len(all_posts))
 
+
 if __name__ == '__main__':
     unittest.main()

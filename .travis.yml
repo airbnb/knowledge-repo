@@ -22,14 +22,14 @@ before_install:
   - conda install -c r r
   - conda install -c r r-knitr
 install:
-  - pip install autopep8 pep8
+  - pip install pycodestyle
   - pip install .[all]
 
 # Cache isn't working yet because problems with expiration header. Disable for now because it's breaking builds.
 # cache: pip
 
 before_script:
-  - "pep8 --exclude knowledge_repo/app/migrations,build,deploy,kube --ignore=E501 ."
+  - "pycodestyle knowledge_repo scripts tests setup.py --exclude knowledge_repo/app/migrations,tests/test_repo --ignore=E501,E722"
 script:
   - bash run_tests.sh
 

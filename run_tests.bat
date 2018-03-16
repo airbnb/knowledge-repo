@@ -11,7 +11,7 @@ if exist ".coverage" (
 )
 
 REM Run pep8 tests
-%PYTHON%\\python.exe -m pep8 --exclude knowledge_repo/app/migrations,tests/test_repo,build,deploy,kube --ignore=E501 .
+%PYTHON%\\python.exe -m pycodestyle knowledge_repo scripts tests setup.py --exclude knowledge_repo/app/migrations,tests/test_repo --ignore=E501,E722
 
 REM Create fake repository and add some sample posts.
 REM We use a fake repository here to speed things up, and to avoid using git in test environments

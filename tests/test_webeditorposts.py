@@ -248,5 +248,6 @@ class WebEditorPostTest(unittest.TestCase):
         """Remove the user we created."""
         pass
 
+
 if __name__ == '__main__':
     unittest.main()

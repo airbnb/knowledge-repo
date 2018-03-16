@@ -12,5 +12,6 @@ from .uwsgi import uWSGIDeployer
 try:
     from .gunicorn import GunicornDeployer
 except:
-    logging.warn("Gunicorn deployer is not available. It only works on POSIX platforms (e.g. Linux, Mac OS X, etc). "
-                  "If you are using a POSIX platform, please ensure that `gunicorn` is installed.")
+    logging.warn("Gunicorn deployer is not available. It only works on POSIX "
+                 "platforms (e.g. Linux, Mac OS X, etc. If you are using a "
+                 "POSIX platform, please ensure that `gunicorn` is installed.")

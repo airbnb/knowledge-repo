@@ -60,6 +60,7 @@ __optional_dependencies__ = {
 
     # Testing dependencies
     'dev': [
+        'pycodestyle',  # PEP8 conformance
         'nose',  # Testing framework
         'beautifulsoup4',  # HTML/XML parser
         'coverage'  # Documentation coverage tester
