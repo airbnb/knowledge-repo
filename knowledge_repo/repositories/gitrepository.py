@@ -22,13 +22,16 @@ class GitKnowledgeRepository(KnowledgeRepository):
     _registry_keys = ['', 'git']
 
     @classmethod
-    def create(cls, uri, embed_tooling=False):
+    def create(cls, uri, embed_tooling=False, no_prompt=False, no_config=False):
         path = uri.replace('git://', '')
         if os.path.exists(path):
-            response = input('Repository already exists. Do you want to convert it to a knowledge data repository? Note that this will override any existing `README.md` and `.knowledge_repo_config.py` files, and replace any submodule at `.resources`. (y/n) ')
-            if response is not 'y':
-                logger.warning('Not updating existing repository. Aborting!')
-                return
+            if no_prompt is True:
+                logger.warning('Overriding existing repository!')
+            else:
+                response = input('Repository already exists. Do you want to convert it to a knowledge data repository? Note that this will override any existing `README.md` and `.knowledge_repo_config.py` files, and replace any submodule at `.resources`. (y/n) ')
+                if response is not 'y':
+                    logger.warning('Not updating existing repository. Aborting!')
+                    return
         repo = git.Repo.init(path, mkdir=True)
         sm = None
         if embed_tooling is True or isinstance(embed_tooling, dict):
@@ -49,8 +52,9 @@ class GitKnowledgeRepository(KnowledgeRepository):
             except ValueError:  # Repository has no active refs
                 pass
             sm = repo.create_submodule(name='embedded_knowledge_repo', path='.resources', url=tooling_repo, branch=tooling_branch)
-        shutil.copy(os.path.join(os.path.dirname(__file__), '../config_defaults.py'),
-                    os.path.join(path, '.knowledge_repo_config.py'))
+        if no_config is False:
+            shutil.copy(os.path.join(os.path.dirname(__file__), '../config_defaults.py'),
+                        os.path.join(path, '.knowledge_repo_config.py'))
         shutil.copy(os.path.join(os.path.dirname(__file__), '../templates', 'repo_data_readme.md'),
                     os.path.join(path, 'README.md'))
         repo.index.add(['.knowledge_repo_config.py', 'README.md'])
