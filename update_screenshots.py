@@ -17,4 +17,4 @@ def take_screenshots():
 
 threading.Timer(1.25, lambda: take_screenshots()).start()
 
-knowledge_repo.KnowledgeRepository.for_uri('../tests/test_repo').get_app().run(port=7000)
+knowledge_repo.KnowledgeRepository.for_uri('tests/test_repo').get_app().run(port=7000)
