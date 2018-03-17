@@ -1,4 +1,4 @@
-# The Knowledge Repository
+# Knowledge Repo
 
 [![PyPI](https://img.shields.io/pypi/status/knowledge-repo.svg)]()
 [![license](https://img.shields.io/github/license/airbnb/knowledge-repo.svg)]()
@@ -7,7 +7,7 @@
 [![Build Status](https://travis-ci.org/airbnb/knowledge-repo.svg?branch=master)](https://travis-ci.org/airbnb/knowledge-repo)
 [![Windows Build Status](https://ci.appveyor.com/api/projects/status/t88a27n099oqnbsw/branch/master?svg=true&pendingText=Windows%20build%20pending...&passingText=Windows%20build%20passing&failingText=Windows%20build%20failing)](https://ci.appveyor.com/project/matthewwardrop/knowledge-repo)
 
-The Knowledge Repository project is focused on facilitating the sharing of
+The Knowledge Repo project is focused on facilitating the sharing of
 knowledge between data scientists and other technical roles using data formats
 and tools that make sense in these professions. It provides various data stores
 (and utilities to manage them) for "knowledge posts", with a particular focus on
