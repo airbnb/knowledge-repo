@@ -1,0 +1,17 @@
+future
+enum34
+pyyaml
+markdown
+pygments
+gitpython
+tabulate
+flask
+flask_login
+flask_principal
+flask_mail
+Flask-Migrate
+sqlalchemy
+jinja2>=2.7
+werkzeug
+gunicorn
+inflection
