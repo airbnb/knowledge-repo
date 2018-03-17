@@ -7,7 +7,12 @@
 [![Build Status](https://travis-ci.org/airbnb/knowledge-repo.svg?branch=master)](https://travis-ci.org/airbnb/knowledge-repo)
 [![Windows Build Status](https://ci.appveyor.com/api/projects/status/t88a27n099oqnbsw/branch/master?svg=true&pendingText=Windows%20build%20pending...&passingText=Windows%20build%20passing&failingText=Windows%20build%20failing)](https://ci.appveyor.com/project/matthewwardrop/knowledge-repo)
 
-The Knowledge Repo is a convenient set of tools and a web application to create and disseminate a curated collection of knowledge posts, which are usually created from technical formats such as Jupyter and RMarkdown notebooks.
+The Knowledge Repository project is focused on facilitating the sharing of
+knowledge between data scientists and other technical roles using data formats
+and tools that make sense in these professions. It provides various data stores
+(and utilities to manage them) for "knowledge posts", with a particular focus on
+notebooks (R Markdown and Jupyter / IPython Notebook) to better promote
+reproducible research.
 
 For more information about the motivation and inspiration behind this project, we encourage you to read our [Medium Post](https://medium.com/airbnb-engineering/scaling-knowledge-at-airbnb-875d73eff091).
 
@@ -17,6 +22,6 @@ For more information about the motivation and inspiration behind this project, w
 
 ## Screenshots
 
-![](https://cloud.githubusercontent.com/assets/20175104/18972198/116861be-864d-11e6-9850-5a6cdad7ce54.png)
+![Main Feed](https://user-images.githubusercontent.com/124910/37555895-d6ad133a-2a42-11e8-9bb5-1b7ee8d60ef9.png)
 
-![](https://cloud.githubusercontent.com/assets/20175104/18972218/264f4c00-864d-11e6-8153-3e9833563784.png)
+![Example Post](https://user-images.githubusercontent.com/124910/37555894-d662eb5c-2a42-11e8-9547-78bef7835521.png)
