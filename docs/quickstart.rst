@@ -104,4 +104,4 @@ one way. For more workflows, refer to: :doc:`workflows/writing`.
 
   .. code-block:: shell
 
-    $ knowledge_repo --repo <path/uri_of_repo> preview <post_path_in_repository>
+    $ knowledge_repo --repo <path/uri_of_repo> submit <post_path_in_repository>
