@@ -1,5 +1,7 @@
 # Configuration for this knowledge data repository.
 
+import re
+
 
 # A function called to see whether a specified path is permitted in the repository
 # Only enforced when creating/modifying posts. It should return the path as a standard
@@ -7,7 +9,18 @@
 # It should raise an exception if the provided path is is not permitted in the knowledge
 # repository.
 def path_parse(repo, path):
-    return path
+    for pattern in repo.config.path_patterns:
+        if re.match(pattern, path):
+            return path
+    raise ValueError(
+        "Provided path '{path}' does not match any of the following patterns:\n" +
+        '\n'.join("'{}': {}".format(pattern, desc) for pattern, desc in repo.config.path_patterns.items())
+    )
+
+
+path_patterns = {
+    '.*': "Any path is valid."
+}
 
 
 # A dictionary of aliases which point to knowledge posts. This allows you to alias posts
@@ -32,17 +45,33 @@ editors = []
 # such that it is. Should raise an exception if that is not possible, and otherwise
 # return the parsed username.
 def username_parse(repo, username):
+    if not re.match(repo.config.username_pattern, username):
+        raise ValueError(
+            "Username '{}' does not follow the required pattern: '{}'"
+            .format(repo.config.username_pattern)
+        )
     return username
+
+
+username_pattern = '.*'
 
 
 # Function to convert a username to a person's proper name
 def username_to_name(repo, username):
-    return username
+    m = re.match(repo.config.username_to_name_pattern[0], username)
+    return repo.config.username_to_name_pattern[1].format(**m.groupdict())
+
+
+username_to_name_pattern = ('(?P<username>.*)', '{username}')
 
 
 # Function to convert a username to a person's email
 def username_to_email(repo, username):
-    return u'{}@example.com'.format(username)
+    m = re.match(repo.config.username_to_email_pattern[0], username)
+    return repo.config.username_to_email_pattern[1].format(**m.groupdict())
+
+
+username_to_email_pattern = ('(?P<username>.*)', '{username}@example.com')
 
 
 # Function to generate the web uri for a knowledge post at
@@ -50,7 +79,14 @@ def username_to_email(repo, username):
 # the entire repository. Return `None` if a web uri does
 # not exist.
 def web_uri(repo, path=None):
+    if repo.config.web_uri_base:
+        if path:
+            return '/'.join([repo.config.web_uri_base, 'post', path])
+        return repo.config.web_uri_base
     return None
+
+
+web_uri_base = None
 
 
 # WARNING: ADVANCED!
