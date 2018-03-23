@@ -6,7 +6,7 @@
 # unix path (virtual folders separated by '/' and the final node should end in '.kp').
 # It should raise an exception if the provided path is is not permitted in the knowledge
 # repository.
-def path_parse(path):
+def path_parse(repo, path):
     return path
 
 
@@ -31,17 +31,17 @@ editors = []
 # Function to check whether provided username is a valid username, and if not, mutate it
 # such that it is. Should raise an exception if that is not possible, and otherwise
 # return the parsed username.
-def username_parse(username):
+def username_parse(repo, username):
     return username
 
 
 # Function to convert a username to a person's proper name
-def username_to_name(username):
+def username_to_name(repo, username):
     return username
 
 
 # Function to convert a username to a person's email
-def username_to_email(username):
+def username_to_email(repo, username):
     return u'{}@example.com'.format(username)
 
 
@@ -49,7 +49,7 @@ def username_to_email(username):
 # path `path`. If `None`, should return the web uri for
 # the entire repository. Return `None` if a web uri does
 # not exist.
-def web_uri(path=None):
+def web_uri(repo, path=None):
     return None
 
 
@@ -58,5 +58,5 @@ def web_uri(path=None):
 # This is useful if you need to add a route for your local deployment, or other
 # equally invasive action. Not recommended unless you know exactly what you are doing.
 # It must return a KnowledgeFlask app instance.
-def prepare_app(app):
+def prepare_app(repo, app):
     return app

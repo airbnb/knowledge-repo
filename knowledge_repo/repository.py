@@ -70,7 +70,7 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
 
     def __init__(self, uri, debug=False, **kwargs):
         self.uri = uri
-        self.config = KnowledgeRepositoryConfig()
+        self.config = KnowledgeRepositoryConfig(self)
         self.config.debug = debug
         self.config.update_defaults(config_defaults)
         self.init(**kwargs)

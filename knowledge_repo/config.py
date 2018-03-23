@@ -1,23 +1,28 @@
+import functools
 import imp
-import types
 import logging
 import os
 import time
+import types
 
 logger = logging.getLogger(__name__)
 
 
 class KnowledgeRepositoryConfig(dict):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, repo, *args, **kwargs):
+        self._repo = repo
         super(KnowledgeRepositoryConfig, self).__init__(*args, **kwargs)
         self.DEFAULT_CONFIGURATION = {}
 
     def __getitem__(self, key):
         try:
-            return super(KnowledgeRepositoryConfig, self).__getitem__(key)
-        except:
-            return self.DEFAULT_CONFIGURATION[key]
+            value = super(KnowledgeRepositoryConfig, self).__getitem__(key)
+        except KeyError:
+            value = self.DEFAULT_CONFIGURATION[key]
+        if isinstance(value, types.FunctionType):
+            value = functools.partial(value, self._repo)
+        return value
 
     def __getattr__(self, attr):
         return self[attr]
@@ -31,9 +36,9 @@ class KnowledgeRepositoryConfig(dict):
     def update(self, *values, **kwargs):
         for value in values:
             if isinstance(value, dict):
-                if 'DEFAULT_CONFIGURATION' in value:
-                    value = value.copy()
-                    value.pop('DEFAULT_CONFIGURATION')
+                value = value.copy()
+                value.pop('DEFAULT_CONFIGURATION', None)
+                value.pop('_repo', None)
                 dict.update(self, value)
             elif isinstance(value, types.ModuleType):
                 self.__update_from_module(value)
