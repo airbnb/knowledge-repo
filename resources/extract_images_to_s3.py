@@ -19,8 +19,7 @@ class ExtractImagesToS3(ExtractImages):
     '''
     _registry_keys = ['extract_images_to_s3']
 
-    @classmethod
-    def copy_image(cls, kp, img_path, is_ref=False, repo_name='knowledge'):
+    def copy_image(self, kp, img_path, is_ref=False, repo_name='knowledge'):
         # Copy image data to new file
         if is_ref:
             _, tmp_path = tempfile.mkstemp()
@@ -58,14 +57,12 @@ class ExtractImagesToS3(ExtractImages):
         # return uploaded path of file
         return posixpath.join(HTTP_IMAGE_ROOT, repo_name, fname_img)
 
-    @classmethod
-    def skip_image(cls, kp, image):
+    def skip_image(self, kp, image):
         import re
         if re.match('http[s]?://', image['src']):
             return True
         return False
 
-    @classmethod
-    def cleanup(cls, kp):
+    def cleanup(self, kp):
         if kp._has_ref('images'):
             kp._drop_ref('images')

@@ -25,8 +25,7 @@ OPTIONAL_FIELD_TYPES = {
 class FormatChecks(KnowledgePostProcessor):
     _registry_keys = ['format_checks']
 
-    @classmethod
-    def process(cls, kp):
+    def process(self, kp):
         headers = kp.headers
         for field, typ in REQUIRED_FIELD_TYPES.items():
             assert field in headers, "Required field `{}` missing from headers.".format(
