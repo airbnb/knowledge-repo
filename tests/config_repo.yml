@@ -1,0 +1,18 @@
+# Configuration for this knowledge data repository.
+
+path_patterns:
+  '.*': 'All paths are supported.'
+
+aliases: {}
+
+postprocessors: []
+
+editors: []
+
+username_pattern: '.*'
+
+username_to_name_pattern: ['(?P<username>.*)', '{username}']
+
+username_to_email_pattern: ['(?P<username>.*)', '{username}@example.com']
+
+web_uri_base: 'http://localhost:7000'

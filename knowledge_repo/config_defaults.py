@@ -1,4 +1,4 @@
-# Configuration for this knowledge data repository.
+# Default configuration for knowledge repositories
 
 import re
 
@@ -7,8 +7,11 @@ import re
 # Only enforced when creating/modifying posts. It should return the path as a standard
 # unix path (virtual folders separated by '/' and the final node should end in '.kp').
 # It should raise an exception if the provided path is is not permitted in the knowledge
-# repository.
+# repository. A default implementation is provided using `path_patterns`, which
+# can be provided more readily in a YAML configuration file.
 def path_parse(repo, path):
+    if not path.endswith('.kp'):
+        path += '.kp'
     for pattern in repo.config.path_patterns:
         if re.match(pattern, path):
             return path
@@ -18,6 +21,8 @@ def path_parse(repo, path):
     )
 
 
+# The accepted path patterns should be provided as a dictionary mapping regex
+# patterns to descriptions of that pattern.
 path_patterns = {
     '.*': "Any path is valid."
 }
@@ -33,8 +38,9 @@ aliases = {}
 
 # Postprocessors to apply when importing KnowledgePost objects into the repository.
 # Note that KnowledgePost objects by default run 'extract_images' and 'format_checks'.
-# Order is important.
-postprocessors = []
+# Order is important. Should be a list of tuples, of form:
+# ('name of postprocessor', {'init_kwarg': 'value'})
+postprocessors = {}
 
 
 # Usernames of users to keep informed of changes to the knowledge data repo
@@ -43,7 +49,9 @@ editors = []
 
 # Function to check whether provided username is a valid username, and if not, mutate it
 # such that it is. Should raise an exception if that is not possible, and otherwise
-# return the parsed username.
+# return the parsed username. A default implementation is provided using
+# `username_pattern`, which can be provided more readily in a YAML configuration
+# file.
 def username_parse(repo, username):
     if not re.match(repo.config.username_pattern, username):
         raise ValueError(
@@ -53,31 +61,41 @@ def username_parse(repo, username):
     return username
 
 
+# A regex pattern to which valid usernames must adhere
 username_pattern = '.*'
 
 
-# Function to convert a username to a person's proper name
+# Function to convert a username to a person's proper name.  A default
+# implementation is provided using `username_to_name_pattern`, which can be
+# provided more readily in a YAML configuration file.
 def username_to_name(repo, username):
     m = re.match(repo.config.username_to_name_pattern[0], username)
     return repo.config.username_to_name_pattern[1].format(**m.groupdict())
 
 
+# A tuple/list of strings, the first being a regex with named groups, and the
+# second being a format string with the group names available.
 username_to_name_pattern = ('(?P<username>.*)', '{username}')
 
 
-# Function to convert a username to a person's email
+# Function to convert a username to a person's email. A default implementation
+# is provided using `username_to_email_pattern`, which can be provided more
+# readily in a YAML configuration file.
 def username_to_email(repo, username):
     m = re.match(repo.config.username_to_email_pattern[0], username)
     return repo.config.username_to_email_pattern[1].format(**m.groupdict())
 
 
+# A tuple/list of strings, the first being a regex with named groups, and the
+# second being a format string with the group names available.
 username_to_email_pattern = ('(?P<username>.*)', '{username}@example.com')
 
 
-# Function to generate the web uri for a knowledge post at
-# path `path`. If `None`, should return the web uri for
-# the entire repository. Return `None` if a web uri does
-# not exist.
+# Function to generate the web uri for a knowledge post at path `path`. If
+# `None`, should return the web uri for the entire repository. Return `None` if
+# a web uri does not exist. A default implementation is provided using
+# `web_uri_base`, which can be provided more readily in a YAML configuration
+# file.
 def web_uri(repo, path=None):
     if repo.config.web_uri_base:
         if path:
@@ -86,6 +104,7 @@ def web_uri(repo, path=None):
     return None
 
 
+# The base url of the server hosting this repository.
 web_uri_base = None
 
 

@@ -84,8 +84,13 @@ class KnowledgeRepositoryConfig(dict):
         self.__set_from_module(self, module)
 
     def __set_from_file(self, d, filename, force=False):
-        config = imp.load_source(u'knowledge_repo.config_{}'.format(str(time.time()).replace('.', '')), filename)
-        self.__set_from_module(d, config, force)
+        if filename.endswith('.py'):
+            config = imp.load_source(u'knowledge_repo.config_{}'.format(str(time.time()).replace('.', '')), filename)
+            self.__set_from_module(d, config, force)
+        elif filename.endswith('.yml'):
+            with open(filename) as f:
+                config = yaml.load(f)
+            self.update(config)
 
     def __set_from_module(self, d, module, force=False):
         for key in dir(module):
