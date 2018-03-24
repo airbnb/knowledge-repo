@@ -19,21 +19,19 @@ REM Once we ship a public version, this should be changed to use the actual init
 SET test_repo_path=tests\test_repo
 
 REM Creating a test repository in %test_repo_path%...
-REM Remove the repository if it
+REM Remove the repository if it already exists
 IF EXIST "%test_repo_path%" (
   RMDIR /Q /S %test_repo_path%
 )
 
-# `dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" init # TODO: USE THIS AGAIN
-MKDIR %test_repo_path%
+%PYTHON%\\python.exe scripts/knowledge_repo --repo="${test_repo_path}" init
 COPY tests\config_repo.yml %test_repo_path%\.knowledge_repo_config.yml
 
 PUSHD %test_repo_path%
-  git init
   git config user.email "knowledge_developer@example.com"
   git config user.name "Knowledge Developer"
   git add .knowledge_repo_config.yml
-  git commit -m "Initial commit."
+  git commit -m "Update repository config."
 POPD
 
 # Add some knowledge_posts

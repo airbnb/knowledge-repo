@@ -108,6 +108,19 @@ def web_uri(repo, path=None):
 web_uri_base = None
 
 
+# If administrators of this knowledge repository want to suggest a specific
+# knowledge_repo version requirement when interacting with the repository using
+# the `knowledge_repo` script, they may do so here. Users can always work around
+# this restriction by using the `--dev` flag to the `knowledge_repo` script. If
+# the value supplied is a string starting with '!', it is taken to refer to a
+# git tag or commit hash on the upstream Knowledge Repo repository, and the
+# `knowledge_repo` script will clone the required  Knowledge Repo version and
+# chain commands to it. Otherwise, it is interpreted as a pip-like version
+# description (e.g. '==x.y.z', '>0.1.2<=0.8.0', etc), and the currently running
+# version of the `knowledge_repo` library is checked at runtime.
+required_tooling_version = None
+
+
 # WARNING: ADVANCED!
 # Function that is called on a Flask web app instance before it is launched
 # This is useful if you need to add a route for your local deployment, or other
