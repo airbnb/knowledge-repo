@@ -70,7 +70,7 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
 
     def __init__(self, uri, debug=False, **kwargs):
         self.uri = uri
-        self.config = KnowledgeRepositoryConfig()
+        self.config = KnowledgeRepositoryConfig(self)
         self.config.debug = debug
         self.config.update_defaults(config_defaults)
         self.init(**kwargs)
@@ -254,8 +254,8 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         if new_authors != authors or kp.headers['updated_at'] < current_datetime:
             kp.update_headers(authors=new_authors, updated_at=current_datetime)
 
-        for postprocessor in self.config.postprocessors:
-            KnowledgePostProcessor._get_subclass_for(postprocessor).process(kp)
+        for postprocessor, kwargs in self.config.postprocessors:
+            KnowledgePostProcessor._get_subclass_for(postprocessor)(**kwargs).process(kp)
 
         cleanup_kwargs = self._add_prepare(kp, path, update, **kwargs)
 

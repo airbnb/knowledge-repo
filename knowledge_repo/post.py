@@ -337,7 +337,7 @@ class KnowledgePost(object):
         if not self._has_ref('knowledge.md'):
             return False
         try:
-            FormatChecks.process(self)
+            FormatChecks().process(self)
         except:
             return False
         return True

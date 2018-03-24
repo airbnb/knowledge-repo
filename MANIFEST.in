@@ -1,3 +1,4 @@
+include knowledge_repo/config_defaults.yml
 recursive-include knowledge_repo/templates *
 recursive-include knowledge_repo/app/templates *
 recursive-include knowledge_repo/app/static *

@@ -5,9 +5,11 @@ import os
 import shutil
 import logging
 import re
-import git
 import socket
 from io import open
+
+import git
+import yaml
 
 from knowledge_repo._version import __git_uri__
 from ..repository import KnowledgeRepository
@@ -49,26 +51,30 @@ class GitKnowledgeRepository(KnowledgeRepository):
             except ValueError:  # Repository has no active refs
                 pass
             sm = repo.create_submodule(name='embedded_knowledge_repo', path='.resources', url=tooling_repo, branch=tooling_branch)
-        shutil.copy(os.path.join(os.path.dirname(__file__), '../config_defaults.py'),
-                    os.path.join(path, '.knowledge_repo_config.py'))
+        shutil.copy(os.path.join(os.path.dirname(__file__), '../config_defaults.yml'),
+                    os.path.join(path, '.knowledge_repo_config.yml'))
         shutil.copy(os.path.join(os.path.dirname(__file__), '../templates', 'repo_data_readme.md'),
                     os.path.join(path, 'README.md'))
-        repo.index.add(['.knowledge_repo_config.py', 'README.md'])
+        repo.index.add(['.knowledge_repo_config.yml', 'README.md'])
         repo.index.commit("Initial creation of knowledge data repository structure.")
         if sm is not None:
             repo.submodule('embedded_knowledge_repo').update()
         return GitKnowledgeRepository(path)
 
-    def init(self, config='git:////.knowledge_repo_config.py', auto_create=False):
+    def init(self, config='git:///.knowledge_repo_config.yml', auto_create=False):
         self.config.update_defaults(published_branch='master')
         self.config.update_defaults(remote_name='origin')
         self.auto_create = auto_create
         self.path = self.uri.replace('git://', '')
 
-        if config.startswith('git:////'):
-            self.config.update(get_module_for_source(self.git_read(config.replace('git:////', '')), 'git_config'))
+        if config.startswith('git:///'):
+            assert config.endswith('.yml'), "In-repository configuration must be a YAML file."
+            try:
+                self.config.update(yaml.load(self.git_read(config.replace('git:///', ''))))
+            except KeyError:
+                logger.warning("Repository missing configuration file: {}".format(config))
         else:
-            self.config.update(os.path.join(self.path, config))
+            self.config.update(config)
 
     @property
     def path(self):

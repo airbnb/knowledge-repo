@@ -26,13 +26,13 @@ IF EXIST "%test_repo_path%" (
 
 # `dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" init # TODO: USE THIS AGAIN
 MKDIR %test_repo_path%
-COPY tests\config_repo.py %test_repo_path%\.knowledge_repo_config.py
+COPY tests\config_repo.yml %test_repo_path%\.knowledge_repo_config.yml
 
 PUSHD %test_repo_path%
   git init
   git config user.email "knowledge_developer@example.com"
   git config user.name "Knowledge Developer"
-  git add .knowledge_repo_config.py
+  git add .knowledge_repo_config.yml
   git commit -m "Initial commit."
 POPD
 

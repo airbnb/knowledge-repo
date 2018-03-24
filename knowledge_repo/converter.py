@@ -25,7 +25,7 @@ class KnowledgePostConverter(with_metaclass(SubclassRegisteringABCMeta, object))
         self.kp = kp
         self.format = format
         if postprocessors is None:
-            postprocessors = ['extract_images', 'format_checks']
+            postprocessors = [('extract_images', {}), ('format_checks', {})]
         self.postprocessors = postprocessors
         self.init(**kwargs)
 
@@ -49,8 +49,8 @@ class KnowledgePostConverter(with_metaclass(SubclassRegisteringABCMeta, object))
 
             if postprocessors is None:
                 postprocessors = []
-            for postprocessor in postprocessors:
-                KnowledgePostProcessor._get_subclass_for(postprocessor).process(kp)
+            for postprocessor, kwargs in postprocessors:
+                KnowledgePostProcessor._get_subclass_for(postprocessor)(**kwargs).process(kp)
 
             return kp
         return wrapped
