@@ -21,20 +21,12 @@ this stage, two backends have been fully implemented:
 - `DbKnowledgeRepository`: A repository backed by a database backend (most
 databases supported by SQLAlchemy can be used).
 
-All backends also allow configuration using a Python configuration file
-at '/.knowledge_repo_config' within the repository. A template for creating this
-file is available `here <repo_config_>`__, if one does not already exist or
+All backends also allow configuration using a YAML configuration file at
+'/.knowledge_repo_config.yml' within the repository. A template for creating
+this file is available `here <repo_config_>`__, if one does not already exist or
 the repository configuration has grown out of sync with upstream changes.
 
-.. _`repo_config`: https://github.com/airbnb/knowledge-repo/blob/master/knowledge_repo/config_defaults.py
-
-.. warning::
-
-  The `.knowledge_repo_config` file is executed at runtime on server and on
-  client machines. As such, a malicious user with appropriate permissions could
-  submit arbitrary code that will be executed at runtime on users' machines.
-  Using the Knowledge Repo in non-trusted environments is not recommended
-  until this is remedied.
+.. _`repo_config`: https://github.com/airbnb/knowledge-repo/blob/master/knowledge_repo/config_defaults.yml
 
 Git Knowledge Repositories
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
