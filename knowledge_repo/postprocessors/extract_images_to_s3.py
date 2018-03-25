@@ -3,21 +3,35 @@ import posixpath
 import random
 import string
 import logging
-import time
 import tempfile
-from knowledge_repo.postprocessors.extract_images import ExtractImages
+import time
+
+from .extract_images import ExtractImages
+
 
 logger = logging.getLogger(__name__)
-
-S3_IMAGE_ROOT = 's3://<aws images folder>'
-HTTP_IMAGE_ROOT = 'http://<url where images are exposed>'
 
 
 class ExtractImagesToS3(ExtractImages):
     '''
-    Use this to bootstrap your own KnowledgePostprocessor.
+    This KnowledgePostProcessor subclass extracts images from posts to S3. It
+    is designed to be used upon addition to a knowledge repository, which can
+    reduce the size of repositories. It replaces local images with remote urls
+    based on `http_image_root`.
+
+    `s3_image_root` should be the root of the image folder on an S3 remote, such
+    as "s3://my_bucket/images".
+    `http_image_root` should be the root of the server where the images will be
+    accessible after uploading.
+
+    Note: This requires that user AWS credentials are set up appropriately and
+    that they have installed the aws cli packages.
     '''
     _registry_keys = ['extract_images_to_s3']
+
+    def __init__(self, s3_image_root, http_image_root):
+        self.s3_image_root = s3_image_root
+        self.http_image_root = http_image_root
 
     def copy_image(self, kp, img_path, is_ref=False, repo_name='knowledge'):
         # Copy image data to new file
@@ -41,7 +55,7 @@ class ExtractImagesToS3(ExtractImages):
                 ext=img_ext).strip().replace(' ', '-')
 
             # Copy image to accessible folder on S3
-            fname_s3 = posixpath.join(S3_IMAGE_ROOT, repo_name, fname_img)
+            fname_s3 = posixpath.join(self.s3_image_root, repo_name, fname_img)
             # Note: The following command may need to be prefixed with a login agent;
             # for example, to handle multi-factor authentication.
             cmd = "aws s3 cp '{0}' {1}".format(tmp_path, fname_s3)
@@ -55,7 +69,7 @@ class ExtractImagesToS3(ExtractImages):
                 os.remove(tmp_path)
 
         # return uploaded path of file
-        return posixpath.join(HTTP_IMAGE_ROOT, repo_name, fname_img)
+        return posixpath.join(self.http_image_root, repo_name, fname_img)
 
     def skip_image(self, kp, image):
         import re

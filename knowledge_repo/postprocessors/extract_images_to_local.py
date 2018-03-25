@@ -1,24 +1,40 @@
 import os
 import shutil
-try:
-    from urllib.parse import urljoin
-except ImportError:  # Python 2
-    from urlparse import urljoin
 import random
 import string
 import logging
 import time
 import tempfile
-from knowledge_repo.postprocessors.extract_images import ExtractImages
+
+try:
+    from urllib.parse import urljoin
+except ImportError:  # Python 2
+    from urlparse import urljoin
+
+from .extract_images import ExtractImages
+
 
 logger = logging.getLogger(__name__)
 
-LOCAL_HTTP_SERVER_ROOT = 'http://localhost:8000'
-LOCAL_HTTP_SERVER_DIRECTORY = 'static-server'
-
 
 class ExtractImagesToLocalServer(ExtractImages):
+    """
+    This KnowledgePostProcessor subclass extracts images from posts to a local
+    directory. It is assumed that a local http server is then serving these images
+    from the local directory. It is designed to be used upon addition to a knowledge
+    repository, which can reduce the size of repositories. It replaces local images
+    with urls relative to `http_image_root` (the base url of the local http server).
+
+    `image_dir` should be the root of the image folder which is accessible locally.
+    `http_image_root` should be the root of the server where the images will be
+    accessible (e.g. 'http://localhost:8000').
+    """
+
     _registry_keys = ['extract_images_to_local']
+
+    def __init__(self, image_dir, http_image_root):
+        self.image_dir = image_dir
+        self.http_image_root = http_image_root
 
     def copy_image(self, kp, img_path, is_ref=False, repo_name='knowledge'):
         # Copy image data to new file
@@ -43,11 +59,11 @@ class ExtractImagesToLocalServer(ExtractImages):
                 ext=img_ext).strip().replace(' ', '-')
 
             # See if a static file directory exists, if not, let's create
-            if not os.path.exists(LOCAL_HTTP_SERVER_DIRECTORY):
-                os.makedirs(LOCAL_HTTP_SERVER_DIRECTORY)
+            if not os.path.exists(self.image_dir):
+                os.makedirs(self.image_dir)
 
             # Copy images to local http server directory
-            new_path = os.path.join(LOCAL_HTTP_SERVER_DIRECTORY, fname_img)
+            new_path = os.path.join(self.image_dir, fname_img)
             logger.info("Copying image {} to {}".format(tmp_path, new_path))
             try:
                 shutil.copyfile(tmp_path, new_path)
@@ -60,7 +76,7 @@ class ExtractImagesToLocalServer(ExtractImages):
                 os.remove(tmp_path)
 
         # return uploaded path of file
-        return urljoin(LOCAL_HTTP_SERVER_ROOT, fname_img)
+        return urljoin(self.http_image_root, fname_img)
 
     def skip_image(self, kp, image):
         import re
