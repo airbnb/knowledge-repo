@@ -13,6 +13,7 @@ import argparse
 import subprocess
 
 import git
+import gitdb
 import webbrowser
 from tabulate import tabulate
 
@@ -93,7 +94,7 @@ if args.repo is None:
 # initialised will be enforced.
 try:
     repo = knowledge_repo.KnowledgeRepository.for_uri(args.repo)
-except (ValueError, git.InvalidGitRepositoryError):  # TODO: Generalise error to cater for all KnowledgeRepository instances.
+except (ValueError, git.GitError, gitdb.exc.ODBError):  # TODO: Generalise error to cater for all KnowledgeRepository instances.
     repo = None
 
 
@@ -245,7 +246,7 @@ if args.action == 'init':
     assert not isinstance(args.repo, dict), "Only one repository can be initialised at a time."
     repo = knowledge_repo.KnowledgeRepository.create_for_uri(args.repo)
     if repo is not None:
-        print("Knowledge repository created for uri `{}`.".format(repo.uri))
+        print("Knowledge repository successfully initialized for uri `{}`.".format(repo.uri))
     else:
         print("Something weird happened while creating repository for uri `{}`. Please report!".format(repo.uri))
     sys.exit(0)

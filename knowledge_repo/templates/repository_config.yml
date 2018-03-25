@@ -1,0 +1,49 @@
+# A default YAML configuration for the repository.
+# Please refer to config_defaults.py for documentation on what these options do
+
+# The accepted path patterns should be provided as a dictionary mapping regex
+# patterns to descriptions of that pattern.
+path_patterns:
+  '.*': "All paths are valid."
+
+# A dictionary of aliases which point to knowledge posts. This allows you to alias posts
+# which may be useful to forward old links to new locations, or to give certain posts
+# precedence. It also allows the post path to violate the normal naming rules of posts.
+# The only condition is that they cannot mask an existing post url, in which case the
+# alias is silently ignored.
+aliases: {}
+
+# Postprocessors to apply when importing KnowledgePost objects into the repository.
+# Note that KnowledgePost objects by default run 'extract_images' and 'format_checks'.
+# Order is important. Should be a list of lists, of form:
+# ['name of postprocessor', {'init_kwarg': 'value'}]
+postprocessors: []
+
+# Usernames of users to keep informed of changes to the knowledge data repo
+editors: []
+
+# A regex pattern to which valid usernames must adhere
+username_pattern: '.*'
+
+# A tuple/list of strings, the first being a regex with named groups, and the
+# second being a format string with the group names available.
+username_to_name_pattern: ['(?P<username>.*)', '{username}']
+
+# A tuple/list of strings, the first being a regex with named groups, and the
+# second being a format string with the group names available.
+username_to_email_pattern: ['(?P<username>.*)', '{username}@example.com']
+
+# The base url of the server hosting this repository.
+web_uri_base: ~
+
+# If administrators of this knowledge repository want to suggest a specific
+# knowledge_repo version requirement when interacting with the repository using
+# the `knowledge_repo` script, they may do so here. Users can always work around
+# this restriction by using the `--dev` flag to the `knowledge_repo` script. If
+# the value supplied is a string starting with '!', it is taken to refer to a
+# git tag or commit hash on the upstream Knowledge Repo repository, and the
+# `knowledge_repo` script will clone the required  Knowledge Repo version and
+# chain commands to it. Otherwise, it is interpreted as a pip-like version
+# description (e.g. '==x.y.z', '>0.1.2<=0.8.0', etc), and the currently running
+# version of the `knowledge_repo` library is checked at runtime.
+required_tooling_version: ~

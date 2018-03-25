@@ -23,21 +23,41 @@ logger = logging.getLogger(__name__)
 class GitKnowledgeRepository(KnowledgeRepository):
     _registry_keys = ['', 'git']
 
+    TEMPLATES = {
+        'README.md': os.path.abspath(os.path.join(os.path.dirname(__file__), '../templates', 'repository_readme.md')),
+        '.knowledge_repo_config.yml': os.path.abspath(os.path.join(os.path.dirname(__file__), '../templates', 'repository_config.yml'))
+    }
+
     @classmethod
     def create(cls, uri):
         path = uri.replace('git://', '')
         if os.path.exists(path):
-            response = input('Repository already exists. Do you want to convert it to a knowledge data repository? Note that this will override any existing `README.md` and `.knowledge_repo_config.py` files, and replace any submodule at `.resources`. (y/n) ')
-            if response is not 'y':
-                logger.warning('Not updating existing repository. Aborting!')
-                return
+            try:
+                repo = git.Repo(path)
+                logger.warning("Repository already exists for uri '{}'. Checking if configuration is needed...".format(uri))
+            except git.InvalidGitRepositoryError:
+                if os.path.isdir(path):
+                    logger.warning("Upgrading existing directory at '{}' to a git knowledge repository...".format(path))
+                else:
+                    raise RuntimeError("File exists at nominated path: {}. Cannot proceed with repository initialization.".format(path))
+
         repo = git.Repo.init(path, mkdir=True)
-        shutil.copy(os.path.join(os.path.dirname(__file__), '../config_defaults.yml'),
-                    os.path.join(path, '.knowledge_repo_config.yml'))
-        shutil.copy(os.path.join(os.path.dirname(__file__), '../templates', 'repo_data_readme.md'),
-                    os.path.join(path, 'README.md'))
-        repo.index.add(['.knowledge_repo_config.yml', 'README.md'])
-        repo.index.commit("Initial creation of knowledge data repository structure.")
+
+        # Add README and configuration templates
+        added_files = 0
+
+        for filename, template in cls.TEMPLATES.items():
+            target = os.path.join(path, filename)
+            if not os.path.exists(target):
+                shutil.copy(template, target)
+                repo.index.add([filename])
+                added_files += 1
+            else:
+                logger.warning("Not overriding existing file '{}'.".format(filename))
+
+        if added_files > 0:
+            repo.index.commit("Initial creation of knowledge repository.")
+
         return GitKnowledgeRepository(path)
 
     def init(self, config='git:///.knowledge_repo_config.yml', auto_create=False):
