@@ -6,10 +6,20 @@
     z-index: 10000;
 }
 .navbar-inverse .navbar-nav>li>a {
-color: #fff;
+  color: #fff;
 }
 .navbar .navbar-brand {
-color: #fff;
+  float: none;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.navbar .navbar-brand img {
+  height: 30px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 @media (min-width: 768px) {
     #navbar {
