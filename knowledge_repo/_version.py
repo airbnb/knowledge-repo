@@ -25,7 +25,7 @@ __dependencies__ = [
     'pygments',  # Code highlighting support in markdown
     'gitpython',  # Git abstraction
     'tabulate',  # Rendering information prettily in knowledge_repo script
-    'pyaml',  # Used to configure knowledge repositories
+    'pyyaml',  # Used to configure knowledge repositories
 
     # Flask App Dependencies
     'flask',  # Main flask framework
