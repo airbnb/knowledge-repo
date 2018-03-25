@@ -180,13 +180,6 @@ def render_legacy():
     return redirect(url_for('.render', path=path), code=302)
 
 
-@blueprint.route('/about', methods=['GET'])
-@PageView.logged
-def about():
-    """Renders about page. This is the html version of REAMDE.md"""
-    return render_template("about.html")
-
-
 @blueprint.route('/ajax/post/download', methods=['GET'])
 @PageView.logged
 @permissions.post_download.require()
