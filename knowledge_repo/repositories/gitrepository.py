@@ -66,6 +66,19 @@ class GitKnowledgeRepository(KnowledgeRepository):
         self.auto_create = auto_create
         self.path = self.uri.replace('git://', '')
 
+        # Check if a legacy configuration exists, and if so, print a warning
+        try:
+            self.git_read('.knowledge_repo_config.py')
+            logger.warning(
+                "This knowledge repository has a legacy configuration file that "
+                "will not be loaded due to security issues "
+                "(.knowledge_repo_config.py). This may lead to unexpected "
+                "behavior. Please talk to your local Knowledge Repo admins "
+                "for advice if you are unsure."
+            )
+        except:
+            pass
+
         if config.startswith('git:///'):
             assert config.endswith('.yml'), "In-repository configuration must be a YAML file."
             try:
