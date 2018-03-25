@@ -124,7 +124,12 @@
               <li class="dropdown-header">Logged in as <em>{{name}}</em></li>
               <li><a href="/feed?authors={{username}}">My Posts</a></li>
               <li><a href="/favorites">My Favorites</a></li><li role="separator" class="divider"></li>
+              {% if current_user.can_logout %}
+              <li><a href="{{ url_for('auth.logout') }}">Sign out</a></li>
+              {% endif %}
               <li class="dropdown-header">Site Features</li>
+              {% else %}
+              <li><a href="{{ url_for('auth.login') }}">Sign in</a></li>
               {% endif %}
               <li><a id="stats_tab" href="/stats">Stats</a></li>
               <li><a id="help_tab" href="/about">About</a></li>
