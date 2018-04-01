@@ -2,7 +2,6 @@ import os
 import logging
 import subprocess
 import tempfile
-import frontmatter
 
 from ..converter import KnowledgePostConverter
 
