@@ -23,7 +23,7 @@ init:
   # Useful for debugging any issues with conda
   - conda info -a
   # Replace dep1 dep2 ... with your dependencies
-  - conda install -c r r r-knitr
+  - conda install -c r r-rmarkdown
 
 install:
   - "%PYTHON%/Scripts/pip.exe install autopep8 pep8"
