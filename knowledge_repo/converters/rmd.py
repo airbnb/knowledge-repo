@@ -50,11 +50,23 @@ class RmdConverter(KnowledgePostConverter):
             subprocess.check_output(runcmd, shell=True)
             Rmd_filename = tmp_path + ".md"
 
-        post = frontmatter.load(Rmd_filename)
-        if "plotly" in post.content:
-            post.content = plotly_header + post.content
+        # Split file header from footer
+        with open(Rmd_filename) as f:
+            header = body = ""
+            delim_num = 0
+            for line in f.readlines():
+                if delim_num < 2:
+                    header += line
+                else:
+                    body += line
+                if line.strip() == "---":
+                    delim_num += 1
 
-        self.kp.write(frontmatter.dumps(post))
+        # If notebook needs plotly, add plotly.js lib
+        if "plotly" in body:
+            body = plotly_header + body
+
+        self.kp.write(header + body)
         self.kp.add_srcfile(filename)
 
         # Clean up temporary file
