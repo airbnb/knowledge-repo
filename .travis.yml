@@ -21,6 +21,9 @@ before_install:
   # Replace dep1 dep2 ... with your dependencies
   - conda install -c r r
   - conda install -c r r-rmarkdown
+  # Install conda-forge packages
+  - conda config --add channels conda-forge
+  - conda install -c conda-forge pandoc
 install:
   - pip install pycodestyle
   - pip install .[all]
