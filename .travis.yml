@@ -32,6 +32,7 @@ before_install:
   - source activate testenv
   # Pin R to 3.6.3 for now
   - conda install -c conda-forge r-base=3.6.3 r-rmarkdown r-ggplot2 pandoc
+  - conda install -c plotly plotly
   # Install regex through conda to avoid issues with Mac wheels
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       conda install -c conda-forge regex;
