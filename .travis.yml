@@ -19,7 +19,8 @@ before_install:
   # Useful for debugging any issues with conda
   - conda info -a
   # Replace dep1 dep2 ... with your dependencies
-  - conda install -c r r-rmarkdown r-ggplot2
+  - conda install -c r r r-rmarkdown r-ggplot2
+  - conda install -c plotly plotly
   # Install conda-forge packages
   - conda config --add channels conda-forge
   - conda install -c conda-forge pandoc
