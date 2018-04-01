@@ -37,10 +37,8 @@ class RmdConverter(KnowledgePostConverter):
                         library(rmarkdown); \
                         render('{fname}', '{target_path}', \
                         output_format = html_document(keep_md = T))"
-                        """.format(
-                            fname = os.path.abspath(filename),
-                            target_path = tmp_path
-                        )
+                        """.format(fname=os.path.abspath(filename),
+                                   target_path=tmp_path)
 
             # Replace '\' with '\\' on Windows machines so R happy with filepath
             if os.name == 'nt':
