@@ -23,6 +23,7 @@ init:
   # Replace dep1 dep2 ... with your dependencies
   - conda install -c r r
   - conda install -c r r-rmarkdown
+  - conda install -c conda-forge pandoc
 
 install:
   - "%PYTHON%/Scripts/pip.exe install autopep8 pep8"
