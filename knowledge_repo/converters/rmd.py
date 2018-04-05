@@ -9,18 +9,24 @@ from ..converter import KnowledgePostConverter
 logger = logging.getLogger(__name__)
 
 # Added to markdown if plotly.js is needed
-plotly_header = """<script>
-requirejs.config({paths: { 'plotly': ['https://cdn.plot.ly/plotly-latest.min']},});
-$(document).on('ready', function(){
-    var widget = $(".plotly.html-widget");
-    widget.each(function(){
-        var div = this,
-            json = JSON.parse(this.nextElementSibling.innerHTML),
-            data = json.x.data,
-            layout = json.x.layout;
-        require(["plotly"], function(Plotly) { Plotly.newPlot(div, data, layout);});
-    })
-});</script>
+plotly_header = """
+<script>
+    requirejs.config({
+        paths: {
+            'plotly': ['https://cdn.plot.ly/plotly-latest.min']
+        }
+    });
+    $(document).on('ready', function(){
+        var widget = $(".plotly.html-widget");
+        widget.each(function(){
+            var div = this,
+                json = JSON.parse(this.nextElementSibling.innerHTML),
+                data = json.x.data,
+                layout = json.x.layout;
+            require(["plotly"], function(Plotly) { Plotly.newPlot(div, data, layout); });
+        })
+    });
+</script>
 """
 
 
@@ -33,12 +39,16 @@ class RmdConverter(KnowledgePostConverter):
             tmp_fd, tmp_path = tempfile.mkstemp()
             os.close(tmp_fd)
 
-            runcmd = """R --no-save --no-restore --slave -e " \
-                        library(rmarkdown); \
-                        render('{fname}', '{target_path}', \
-                        output_format = html_document(keep_md = T))"
-                        """.format(fname=os.path.abspath(filename),
-                                   target_path=tmp_path)
+            runcmd = (
+                "Rscript --no-save --no-restore --slave -e \""
+                "library(rmarkdown);"
+                "render('{fname}', '{target_path}', output_format = html_document(keep_md = T));"
+                "\""
+                .format(
+                    fname=os.path.abspath(filename),
+                    target_path=tmp_path
+                )
+            )
 
             # Replace '\' with '\\' on Windows machines so R happy with filepath
             if os.name == 'nt':
