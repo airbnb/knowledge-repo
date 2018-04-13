@@ -26,7 +26,7 @@ All backends also allow configuration using a YAML configuration file at
 this file is available `here <repo_config_>`__, if one does not already exist or
 the repository configuration has grown out of sync with upstream changes.
 
-.. _`repo_config`: https://github.com/airbnb/knowledge-repo/blob/master/knowledge_repo/config_defaults.yml
+.. _`repo_config`: https://github.com/airbnb/knowledge-repo/blob/master/knowledge_repo/templates/repository_config.yml
 
 Git Knowledge Repositories
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
