@@ -103,7 +103,7 @@ Please refer to the default configuration file itself for further documentation.
   or paste it into your `.knowledge_repo_config` file, and add it by name to
   your `postprocessors` configuration key.
 
-.. _`extract_images_postprocessor`: https://github.com/airbnb/knowledge-repo/blob/master/resources/extract_images_to_s3.py
+.. _`extract_images_postprocessor`: https://github.com/airbnb/knowledge-repo/blob/master/knowledge_repo/postprocessors/extract_images_to_s3.py
 
 Deploying the Web Application
 -----------------------------
