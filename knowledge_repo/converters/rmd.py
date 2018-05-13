@@ -34,7 +34,7 @@ class RmdConverter(KnowledgePostConverter):
     _registry_keys = ['rmd']
 
     def from_file(self, filename, rebuild=True):
-        Rmd_filename = filename
+
         if rebuild:
             tmp_fd, tmp_path = tempfile.mkstemp()
             os.close(tmp_fd)
@@ -55,10 +55,10 @@ class RmdConverter(KnowledgePostConverter):
                 runcmd = runcmd.replace("\\", "\\\\")
 
             subprocess.check_output(runcmd, shell=True)
-            Rmd_filename = tmp_path + ".md"
+            rmd_filename = tmp_path + ".md"
 
         # Split file header from footer
-        with open(Rmd_filename) as f:
+        with open(rmd_filename) as f:
             header = body = ""
             delim_num = 0
             for line in f.readlines():
