@@ -6,7 +6,8 @@
 .login-form {
     display: block;
     list-style-type: none;
-    margin: 10px;
+    width: 340px;
+    margin: 50px auto;
     padding: 1em;
     background: #fff;
     border: 1px solid #aaa;
@@ -27,12 +28,17 @@
 .login-form > input[type=submit] {
     margin-bottom: 0px;
 }
+.login-form > p {
+    font-size: 30px;
+    text-align: center;
+}
 </style>
 
 <form name='login' action='authorize' method='POST' class='login-form'>
+<p> Log in </p>
 <input type='text' placeholder="Username" name='username' />
 {% if not skip_password %}
-<input type='password' placeholder="Password" name='password' />
+<input type='password' placeholder="Password" name='password' required/>
 {% endif %}
 <input type='submit' value='Sign in'/>
 </form>
