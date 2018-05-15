@@ -39,7 +39,7 @@ The following command will create a new repository at `<repo_path>`:
 
 The result is a git repository at `<repo_path>` with a `.knowledge_repo_config`
 copied from the defaults found `in the repository source code <repo_config_>`__.
-If a git repository was alreaedy found at `<repo_path>` it will upgrade it to be
+If a git repository was already found at `<repo_path>` it will upgrade it to be
 a knowledge data repository. This is useful if you are starting a repository on
 a remote service like GitHub, as this allows you to clone the remote repository
 as per normal; run this script; and then push the initialization back into the
