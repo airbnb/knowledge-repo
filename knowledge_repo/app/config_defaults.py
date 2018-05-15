@@ -187,6 +187,18 @@ AUTH_USER_ATTRIBUTE_CACHE_LIFETIME = 24 * 60 * 60  # 1 day
 REMEMBER_COOKIE_DURATION = datetime.timedelta(days=365)
 
 # ---------------------------------------------------
+# LDAP configuration
+# ---------------------------------------------------
+# When using an LDAP server for user verification, you need to configure
+# the location of the server, and the directory structure used by your
+# organization.
+
+# Currently the port and protocol must both be included in the server address
+LDAP_SERVER = 'ldaps://127.0.0.1:389'
+# When entering this, note the "{0}" which denotes where the user_id is inserted.
+USERDN_SCHEMA = 'cn={0},ou=people,dc=planetexpress,dc=com'
+
+# ---------------------------------------------------
 # Policy configuration
 # ---------------------------------------------------
 # This section configures various policy related to access control.
