@@ -59,6 +59,11 @@ __optional_dependencies__ = {
         'requests_oauthlib'
     ],
 
+    # Optional ldap library for ldap authentication
+    'ldap': [
+        'ldap3'
+    ],
+
     # Testing dependencies
     'dev': [
         'pycodestyle',  # PEP8 conformance
