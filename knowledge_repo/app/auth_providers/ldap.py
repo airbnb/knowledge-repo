@@ -21,6 +21,5 @@ class LdapAuthProvider(KnowledgeAuthProvider):
         conn = Connection(self.server, user=userdn, password=password)
         return conn.bind()
 
-    # TODO: Populate User object with LDAP information. Put LDAP Schema in config file?
     def get_user(self):
         return User(identifier=request.form['username'])
