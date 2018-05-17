@@ -8,6 +8,7 @@ from ..converter import KnowledgePostConverter
 
 logger = logging.getLogger(__name__)
 
+<<<<<<< HEAD
 # Added to markdown if plotly.js is needed
 plotly_header = """
 <script>
@@ -29,6 +30,8 @@ plotly_header = """
 </script>
 """
 
+=======
+>>>>>>> 1d486a2... Revert "Rewrote rmd.py converter to add plotly divs and js, and to add plotly.js dependency"
 
 class RmdConverter(KnowledgePostConverter):
     _registry_keys = ['rmd']
@@ -55,6 +58,7 @@ class RmdConverter(KnowledgePostConverter):
                 runcmd = runcmd.replace("\\", "\\\\")
 
             subprocess.check_output(runcmd, shell=True)
+<<<<<<< HEAD
             rmd_filename = tmp_path + ".md"
 
         # Split file header from footer
@@ -74,6 +78,7 @@ class RmdConverter(KnowledgePostConverter):
             body = plotly_header + body
 
         self.kp.write(header + body)
+
         self.kp.add_srcfile(filename)
 
         # Clean up temporary file
