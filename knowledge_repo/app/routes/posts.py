@@ -72,7 +72,7 @@ def render(path):
     for comment in comments:
         author = db_session.query(User).filter(User.id == comment.user_id).first()
         if author is not None:
-            comment.author = author.identifier
+            comment.author = author.format_name
         else:
             comment.author = 'Anonymous'
         if mode != 'raw':

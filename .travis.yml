@@ -15,7 +15,6 @@ before_install:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
   # Replace dep1 dep2 ... with your dependencies
@@ -28,8 +27,6 @@ install:
 # Cache isn't working yet because problems with expiration header. Disable for now because it's breaking builds.
 # cache: pip
 
-before_script:
-  - "pycodestyle knowledge_repo scripts tests setup.py --exclude knowledge_repo/app/migrations,tests/test_repo --ignore=E501,E722"
 script:
   - bash run_tests.sh
 
