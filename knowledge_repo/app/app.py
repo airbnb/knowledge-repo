@@ -319,14 +319,14 @@ class KnowledgeFlask(Flask):
         # Repository uris will break as above (but less often since they are not often written too), but will also
         # end up being a separate repository per thread; breaking consistency of presented content.
 
-        if check_index:
-            index_db = self.config['SQLALCHEMY_DATABASE_URI']
-            if index_db.startswith('sqlite://'):
-                return False
-
-        if check_repositories:
-            for uri in self.repository.uris.values():
-                if uri.startswith('sqlite://') or ':memory:' in uri:
-                    return False
+        # if check_index:
+        #     index_db = self.config['SQLALCHEMY_DATABASE_URI']
+        #     if index_db.startswith('sqlite://'):
+        #         return False
+        #
+        # if check_repositories:
+        #     for uri in self.repository.uris.values():
+        #         if uri.startswith('sqlite://') or ':memory:' in uri:
+        #             return False
 
         return True

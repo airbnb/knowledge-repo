@@ -12,24 +12,33 @@ class uWSGIDeployer(KnowledgeDeployer):
 
     _registry_keys = ['uwsgi']
 
-    COMMAND = u"uwsgi --http {socket} --plugin python --wsgi-file {path} --callable app --master --processes {processes} --threads {threads} --uid --gid"
+    COMMAND = u"uwsgi {protocol} --plugin python --wsgi-file {{path}} --callable app --master --processes {{processes}} --threads {{threads}} --uid --gid"
 
     def run(self):
         if not self.app.check_thread_support():
             raise RuntimeError("Database configuration is not suitable for deployment (not thread-safe).")
 
         tmp_dir = self.write_temp_files()
+        config = self.app.config
 
-        config = {
+        uwsgi_config = {
             'socket': u'{}:{}'.format(self.host, self.port),
             'processes': self.workers,
             'threads': 2,
             'timeout': self.timeout,
-            'path': os.path.join(tmp_dir, 'server.py')
+            'path': os.path.join(tmp_dir, 'server.py'),
+            'cert': config['SSL_CERT']['cert'],
+            'key': config['SSL_CERT']['key']
         }
 
+        if config['DEPLOY_HTTPS']:
+            self.COMMAND = self.COMMAND.format(protocol="--https {socket},{cert},{key}")
+        else:
+            self.COMMAND = self.COMMAND.format(protocol="--http {socket}")
+
         try:
-            cmd = u"cd {};".format(tmp_dir) + self.COMMAND.format(**config)
+            print(self.COMMAND.format(**uwsgi_config))
+            cmd = u"cd {};".format(tmp_dir) + self.COMMAND.format(**uwsgi_config)
             logger.info("Starting server with command:  " + u" ".join(cmd))
             subprocess.check_output(cmd, shell=True)
         finally:
