@@ -10,6 +10,7 @@ import traceback
 import math
 import multiprocessing
 import uuid
+import mimetypes
 
 from flask import Flask, current_app, render_template, g, request, flash, redirect, url_for
 from flask_login import LoginManager, user_loaded_from_request
@@ -29,6 +30,8 @@ from .index import update_index, set_up_indexing_timers, time_since_index, time_
 from .models import db as sqlalchemy_db, Post, User, Tag
 from .utils.auth import AnonymousKnowledgeUser, populate_identity_roles, prepare_user
 
+# Needed to serve svg with correct mime type over https
+mimetypes.add_type('image/svg+xml', '.svg')
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -319,14 +322,14 @@ class KnowledgeFlask(Flask):
         # Repository uris will break as above (but less often since they are not often written too), but will also
         # end up being a separate repository per thread; breaking consistency of presented content.
 
-        # if check_index:
-        #     index_db = self.config['SQLALCHEMY_DATABASE_URI']
-        #     if index_db.startswith('sqlite://'):
-        #         return False
-        #
-        # if check_repositories:
-        #     for uri in self.repository.uris.values():
-        #         if uri.startswith('sqlite://') or ':memory:' in uri:
-        #             return False
+        if check_index:
+            index_db = self.config['SQLALCHEMY_DATABASE_URI']
+            if index_db.startswith('sqlite://'):
+                return False
+
+        if check_repositories:
+            for uri in self.repository.uris.values():
+                if uri.startswith('sqlite://') or ':memory:' in uri:
+                    return False
 
         return True

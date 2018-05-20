@@ -29,13 +29,16 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
                 self.cfg.set(key, value)
 
         # Update the configuration with the options specified via KnowledgeDeployer
-        deployer_args = {
+        options = {
             'bind': u'{}:{}'.format(self.host, self.port),
             'workers': self.workers,
             'timeout': self.timeout,
         }
-
-        for key, value in deployer_args.items():
+        config = self.app.config
+        if config['DEPLOY_HTTPS']:
+            options['certfile'] = config['SSL_CERT']['cert']
+            options['keyfile'] = config['SSL_CERT']['key']
+        for key, value in options.items():
             self.cfg.set(key, value)
 
     def load(self):

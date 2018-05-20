@@ -12,7 +12,7 @@ class uWSGIDeployer(KnowledgeDeployer):
 
     _registry_keys = ['uwsgi']
 
-    COMMAND = u"uwsgi {protocol} --plugin python --wsgi-file {{path}} --callable app --master --processes {{processes}} --threads {{threads}} --uid --gid"
+    COMMAND = u"uwsgi {protocol} --plugin python --wsgi-file {{path}} --callable app --master --processes {{processes}} --threads {{threads}}"
 
     def run(self):
         if not self.app.check_thread_support():
@@ -37,7 +37,6 @@ class uWSGIDeployer(KnowledgeDeployer):
             self.COMMAND = self.COMMAND.format(protocol="--http {socket}")
 
         try:
-            print(self.COMMAND.format(**uwsgi_config))
             cmd = u"cd {};".format(tmp_dir) + self.COMMAND.format(**uwsgi_config)
             logger.info("Starting server with command:  " + u" ".join(cmd))
             subprocess.check_output(cmd, shell=True)
