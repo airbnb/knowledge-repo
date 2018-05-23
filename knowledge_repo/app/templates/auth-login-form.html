@@ -40,6 +40,13 @@
 {% if not skip_password %}
 <input type='password' placeholder="Password" name='password' required/>
 {% endif %}
+{% if error_message %}
+<div class="alert alert-danger" role="alert">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <span class="sr-only">Error:</span>
+    {{ error_message }}
+</div>
+{% endif %}
 <input type='submit' value='Sign in'/>
 </form>
 {% endblock %}
