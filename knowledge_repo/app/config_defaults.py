@@ -179,9 +179,9 @@ REMEMBER_COOKIE_DURATION = datetime.timedelta(days=365)
 # organization.
 
 # Currently the port and protocol must both be included in the server address
-LDAP_SERVER = 'ldaps://127.0.0.1:389'
+# LDAP_SERVER = 'ldaps://127.0.0.1:389'
 # When entering this, note the "{0}" which denotes where the user_id is inserted.
-USERDN_SCHEMA = 'cn={0},ou=people,dc=planetexpress,dc=com'
+LDAP_USERDN_SCHEMA = 'cn={user_id},ou=people,dc=planetexpress,dc=com'
 
 # ---------------------------------------------------
 # Policy configuration
