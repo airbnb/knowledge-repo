@@ -7,7 +7,6 @@ This includes:
   - /favorites
 """
 import os
-import posixpath
 import json
 from builtins import str
 from flask import request, render_template, redirect, Blueprint, current_app, make_response
@@ -137,12 +136,14 @@ def render_cluster():
         author_to_posts = {}
         authors = (db_session.query(User).all())
         for author in authors:
-            author_posts = [post for
-                            post in author.posts
-                            if post.is_published and not post.contains_excluded_tag]
+            author_posts = [
+                [post.title, True, 0, post]
+                for post in author.posts
+                if post.is_published and not post.contains_excluded_tag
+            ]
             if author_posts:
                 author_to_posts[author.format_name] = author_posts
-        tuples = [(k, v) for (k, v) in author_to_posts.items()]
+        tuples = [[k, False, len(v), v] for (k, v) in author_to_posts.items()]
 
     elif group_by == "tags":
         tags_to_posts = {}
@@ -151,35 +152,72 @@ def render_cluster():
                               .all())
 
         for tag in all_tags:
-            tag_posts = [post for
-                         post in tag.posts
-                         if post.is_published and not post.contains_excluded_tag]
+            tag_posts = [
+                [post.title, True, 0, post]
+                for post in tag.posts
+                if post.is_published and not post.contains_excluded_tag
+            ]
             if tag_posts:
                 tags_to_posts[tag.name] = tag_posts
-        tuples = [(k, v) for (k, v) in tags_to_posts.items()]
+        tuples = [[k, False, len(v), v] for (k, v) in tags_to_posts.items()]
 
     elif group_by == "folder":
         posts = post_query.all()
+
         # group by folder
         folder_to_posts = {}
 
         for post in posts:
-            folder = posixpath.dirname(post.path)
-            if folder in folder_to_posts:
-                folder_to_posts[folder].append(post)
-            else:
-                folder_to_posts[folder] = [post]
+            folder_hierarchy = post.path.split('/')
+            cursor = folder_to_posts
 
-        tuples = [(k, v) for (k, v) in folder_to_posts.items()]
+            for folder in folder_hierarchy[:-1]:
+                if folder not in cursor:
+                    cursor[folder] = {}
+                cursor = cursor[folder]
+
+            cursor[folder_hierarchy[-1]] = post
+
+        def unpack(d):
+            """
+            Recusively unpack folder_to_posts
+            """
+            children = []
+            count = 0
+            for k, v in d.items():
+                if isinstance(v, dict):
+                    l, contents = unpack(v)
+                    count += l
+                    children.append([k, False, l, contents])
+                else:
+                    count += 1
+                    children.append([k, True, 1, v])
+            return count, children
+
+        _, tuples = unpack(folder_to_posts)
 
     else:
         raise ValueError(u"Group by `{}` not understood.".format(group_by))
 
-    if sort_by == 'alpha':
-        grouped_data = sorted(tuples, key=lambda x: x[0])
-    else:
-        grouped_data = sorted(
-            tuples, key=lambda x: len(x[1]), reverse=sort_desc)
+    def rec_sort(tuples, sort_by):
+        for tup in tuples:
+            if not tup[1]:
+                tup[3] = rec_sort(tup[3], sort_by)
+        # put folders above posts
+        clusters = [tup for tup in tuples if not tup[1]]
+        posts = [tup for tup in tuples if tup[1]]
+        if sort_by == "alpha":
+            return (
+                sorted(clusters, key=lambda x: x[0]) +
+                sorted(posts, key=lambda x: x[0])
+            )
+        else:
+            return (
+                sorted(clusters, key=lambda x: x[2], reverse=sort_desc) +
+                sorted(posts, key=lambda x: x[2], reverse=sort_desc)
+            )
+
+    grouped_data = rec_sort(tuples, sort_by)
 
     return render_template("index-cluster.html",
                            grouped_data=grouped_data,
