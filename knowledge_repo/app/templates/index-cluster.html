@@ -47,29 +47,32 @@
     </div>
   </div>
   <ul id="cluster_list">
-  {% for cluster, contents in grouped_data %}
-    {%- if contents|length > 0 and cluster|length > 0 %}
-    {% set cluster_id = cluster|replace('/', '__')|replace(' ', '__')|replace('-', '__') %}
-    <li>
-    <div id="{{ cluster_id|safe }}">
-      <h6 style="margin-bottom:0"> {{ [cluster,' (', contents|length, ')'] | join }}
-        <i class="glyphicon glyphicon-chevron-right cluster-dropdown"></i>
-      </h6>
-    </div>
-    </li>
-      <div id="{{ cluster_id|safe }}-content" style="display:none">
-        <ul>
-        {% for item in contents %}
-          <li>
-            <a href="{{'/post/' + item.path|urlencode }}">
-              {{ item.title|replace('_', ' ')|title }}
-            </a>
-          </li>
-        {% endfor %}
-        </ul>
-     </div>
-    {%- endif%}
-  {% endfor %}
+  {%- for cluster, is_post, count, contents in grouped_data recursive %}
+    {%- if is_post %}
+      <li class="cluster_post" style="list-style-type:circle">
+        <a href="{{'/post/' + contents.path|urlencode }}">
+          {{ contents.title|replace('_', ' '|title )}}
+        </a>
+      </li>
+    {%- else %}
+      {%- if contents|length > 0 and cluster|length > 0 %}
+      {% set cluster_id = cluster|replace(' ', '__')|replace('-', '__') %}
+        <li id="{{ cluster_id|safe }}" class="cluster_dir" style="list-style-type:disc">
+          <div>
+            <h6 style="margin-bottom:0;margin-top:0">
+              {{ [cluster,' (', count, ')'] | join }}
+              <i id="{{ cluster_id|safe }}-glyph" class="glyphicon glyphicon-chevron-right cluster-dropdown"></i>
+            </h6>
+          </div>
+        </li>
+        <div id="{{ cluster_id|safe }}-content" style="display:none">
+          <ul>
+            {{ loop(contents) }}
+          </ul>
+        </div>
+      {%- endif %}
+    {%- endif %}
+  {%- endfor %}
   </ul>
 
 {% endblock %}
