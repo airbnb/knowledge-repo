@@ -495,7 +495,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
     def __remote_host(self):
         if self.git_has_remote:
             # TODO: support more types of hosts
-            m = re.match('.*?@(.*?):\.*?', self.git_remote.url)
+            m = re.match(r'.*?@(.*?):\.*?', self.git_remote.url)
             if m:  # shorthand ssh uri
                 return m.group(1)
         return None

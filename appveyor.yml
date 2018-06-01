@@ -17,7 +17,6 @@ init:
   - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
 
   - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
   # Replace dep1 dep2 ... with your dependencies

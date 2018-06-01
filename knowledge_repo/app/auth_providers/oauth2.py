@@ -1,3 +1,4 @@
+import posixpath
 import json
 from flask import request, redirect
 from six.moves.urllib.parse import urljoin
@@ -112,9 +113,13 @@ class OAuth2Provider(KnowledgeAuthProvider):
         if self.verify_ssl_certs is None:
             self.verify_ssl_certs = True
 
-        redirect_url = self.app.config['SERVER_NAME'] or 'localhost:7000'
+        host = self.app.config['SERVER_NAME'] or 'localhost:7000'
+        scheme = self.app.config['PREFERRED_URL_SCHEME'] or 'http'
+        redirect_url = '{}://{}'.format(scheme, host)
+        redirect_path = '/auth/login/{}/authorize'.format(self.name)
         if self.app.config['APPLICATION_ROOT']:
-            redirect_url = '/'.join((redirect_url, self.app.config['APPLICATION_ROOT']))
+            redirect_path = posixpath.join(self.app.config['APPLICATION_ROOT'], redirect_path)
+        redirect_uri = urljoin(redirect_url, redirect_path)
 
         # Import OAuth deps here so we do not have a hard dependency on them
         from requests_oauthlib import OAuth2Session
@@ -123,7 +128,7 @@ class OAuth2Provider(KnowledgeAuthProvider):
         self.oauth_client = OAuth2Session(
             client_id=self.client_id,
             scope=self.scopes,
-            redirect_uri='http://{}/auth/login/{}/authorize'.format(redirect_url, self.name),
+            redirect_uri=redirect_uri,
             auto_refresh_url=self.auto_refresh_url
         )
 
