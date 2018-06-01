@@ -191,7 +191,7 @@ def render_cluster():
                     children.append([k, False, l, contents])
                 else:
                     count += 1
-                    children.append([k, True, 1, v])
+                    children.append([k, True, 0, v])
             return count, children
 
         _, tuples = unpack(folder_to_posts)
