@@ -131,20 +131,35 @@ AUTH_PROVIDERS = []
 #                 + user_validate_url + "] returned HTTP status ["
 #                 + str(resp.status_code) + "]")
 
-# You can also forgo a fully-fledged sign in process for users
-# by hosting the knowledge repository behind a proxy server that
-# pre-authenticates users, and adds the appropriate user identifier
-# to the http headers of the request. If the headers are
-# specified below, then they take precedence over any other forms
-# of authentication. If they are specified but not populated, then
-# the authentication flow will fall back to use any of the providers
-# specified above.
+# You can also forgo a fully-fledged sign in process for users by hosting the
+# knowledge repository behind a proxy server that pre-authenticates users, and
+# adds the appropriate user identifier to the http headers of the request. If
+# enabled below, then they take precedence over any other forms of
+# authentication. If the call to `AUTH_MAP_REQUEST_HEADERS` results in a null
+# user identifier, then the authentication flow will fall back to use any of the
+# providers specified above.
+AUTH_USE_REQUEST_HEADERS = False
+
+
+# If using headers to authenticate, the following function should be implemented
+# to transform a dictionary of headers into a dictionary of user attributes.
+# Currently only 'identifier', 'avatar_uri', 'name' and 'email' are supported.
+# If this method returns `None`, or `identifier` is not supplied, then the
+# authorization flow will fall back to other authentication methods.
+def AUTH_MAP_REQUEST_HEADERS(headers):
+    return {
+        # 'identifier': None,
+        # 'avatar_uri': None,
+        # 'name': None,
+        # 'email': None
+    }
+
+
+# The following AUTH_USER_IDENTIFIER* configuration keys are deprecated and
+# will be removed in v0.9.
 AUTH_USER_IDENTIFIER_REQUEST_HEADER = None
 
 
-# If the identifier used above needs some transformation to match the canonical
-# identifier format used in this repository, you can specify a mapping using
-# the below config option.
 def AUTH_USER_IDENTIFIER_REQUEST_HEADER_MAPPING(identifier):
     return identifier
 

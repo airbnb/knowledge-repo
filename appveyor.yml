@@ -17,12 +17,13 @@ init:
   - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
 
   - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
   # Replace dep1 dep2 ... with your dependencies
-  - conda install -c r r
-  - conda install -c r r-knitr
+  - conda install -c r r r-rmarkdown r-ggplot2 r-plotly
+  # Install conda-forge packages
+  - conda config --add channels conda-forge
+  - conda install -c conda-forge pandoc
 
 install:
   - "%PYTHON%/Scripts/pip.exe install autopep8 pep8"

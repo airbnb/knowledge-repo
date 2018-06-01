@@ -101,8 +101,22 @@ class KnowledgeFlask(Flask):
         def load_user(user_id):
             return User(identifier=user_id)
 
-        # Attempt login via http headers if header is specified
-        if self.config.get('AUTH_USER_IDENTIFIER_REQUEST_HEADER'):
+        # Attempt login via http headers
+        if self.config.get('AUTH_USE_REQUEST_HEADERS'):
+            @self.login_manager.request_loader
+            def load_user_from_request(request):
+                user_attributes = current_app.config.get('AUTH_MAP_REQUEST_HEADERS')(request.headers)
+                if isinstance(user_attributes, dict) and user_attributes.get('identifier', None):
+                    user = User(identifier=user_attributes['identifier'])
+                    user.can_logout = False
+                    for attribute in ['avatar_uri', 'email', 'name']:
+                        if user_attributes.get(attribute):
+                            setattr(user, attribute, user_attributes[attribute])
+                    user = prepare_user(user, session_start=False)
+                    return user
+        elif self.config.get('AUTH_USER_IDENTIFIER_REQUEST_HEADER'):
+            logger.warning("AUTH_USER_IDENTIFIER* configuration keys are deprecated and will be removed in v0.9.0 .")
+
             @self.login_manager.request_loader
             def load_user_from_request(request):
                 identifier = request.headers.get(current_app.config['AUTH_USER_IDENTIFIER_REQUEST_HEADER'])
