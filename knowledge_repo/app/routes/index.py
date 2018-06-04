@@ -229,15 +229,18 @@ def render_cluster():
         clusters = [c for c in content if not c.is_post]
         posts = [c for c in content if c.is_post]
         if sort_by == "alpha":
-            content = (
+            sorted_content = (
                 sorted(clusters, key=lambda x: x.name) +
                 sorted(posts, key=lambda x: x.name)
             )
         else:
-            content = (
+            sorted_content = (
                 sorted(clusters, key=lambda x: x.children_count, reverse=sort_desc) +
                 sorted(posts, key=lambda x: x.children_count, reverse=sort_desc)
             )
+        # namedtuple is an immutable type, so we modify in place
+        content.clear()
+        content.extend(sorted_content)
 
     rec_sort(grouped_data, sort_by)
 
