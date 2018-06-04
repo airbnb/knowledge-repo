@@ -9,6 +9,7 @@ This includes:
 import os
 import json
 from builtins import str
+from collections import namedtuple
 from flask import request, render_template, redirect, Blueprint, current_app, make_response
 from flask_login import login_required
 from sqlalchemy import case, desc
@@ -132,18 +133,28 @@ def render_cluster():
             elem_regexp = "%," + elem + ",%"
             post_query = post_query.filter(Post.keywords.like(elem_regexp))
 
+    ClusterPost = namedtuple(
+        'ClusterPost',
+        ['name', 'is_post', 'children_count', 'content']
+    )
+
     if group_by == "author":
         author_to_posts = {}
         authors = (db_session.query(User).all())
         for author in authors:
             author_posts = [
-                [post.title, True, 0, post]
+                ClusterPost(name=post.title, is_post=True,
+                            children_count=0, content=post)
                 for post in author.posts
                 if post.is_published and not post.contains_excluded_tag
             ]
             if author_posts:
                 author_to_posts[author.format_name] = author_posts
-        tuples = [[k, False, len(v), v] for (k, v) in author_to_posts.items()]
+        grouped_data = [
+            ClusterPost(name=k, is_post=False,
+                        children_count=len(v), content=v)
+            for (k, v) in author_to_posts.items()
+        ]
 
     elif group_by == "tags":
         tags_to_posts = {}
@@ -153,13 +164,18 @@ def render_cluster():
 
         for tag in all_tags:
             tag_posts = [
-                [post.title, True, 0, post]
+                ClusterPost(name=post.title, is_post=True,
+                            children_count=0, content=post)
                 for post in tag.posts
                 if post.is_published and not post.contains_excluded_tag
             ]
             if tag_posts:
                 tags_to_posts[tag.name] = tag_posts
-        tuples = [[k, False, len(v), v] for (k, v) in tags_to_posts.items()]
+        grouped_data = [
+            ClusterPost(name=k, is_post=False,
+                        children_count=len(v), content=v)
+            for (k, v) in tags_to_posts.items()
+        ]
 
     elif group_by == "folder":
         posts = post_query.all()
@@ -188,36 +204,42 @@ def render_cluster():
                 if isinstance(v, dict):
                     l, contents = unpack(v)
                     count += l
-                    children.append([k, False, l, contents])
+                    children.append(
+                        ClusterPost(name=k, is_post=False,
+                                    children_count=l, content=contents)
+                    )
                 else:
                     count += 1
-                    children.append([k, True, 0, v])
+                    children.append(
+                        ClusterPost(name=k, is_post=True,
+                                    children_count=0, content=v)
+                    )
             return count, children
 
-        _, tuples = unpack(folder_to_posts)
+        _, grouped_data = unpack(folder_to_posts)
 
     else:
         raise ValueError(u"Group by `{}` not understood.".format(group_by))
 
-    def rec_sort(tuples, sort_by):
-        for tup in tuples:
-            if not tup[1]:
-                tup[3] = rec_sort(tup[3], sort_by)
+    def rec_sort(content, sort_by):
+        for c in content:
+            if not c.is_post:
+                rec_sort(c.content, sort_by)
         # put folders above posts
-        clusters = [tup for tup in tuples if not tup[1]]
-        posts = [tup for tup in tuples if tup[1]]
+        clusters = [c for c in content if not c.is_post]
+        posts = [c for c in content if c.is_post]
         if sort_by == "alpha":
-            return (
-                sorted(clusters, key=lambda x: x[0]) +
-                sorted(posts, key=lambda x: x[0])
+            content = (
+                sorted(clusters, key=lambda x: x.name) +
+                sorted(posts, key=lambda x: x.name)
             )
         else:
-            return (
-                sorted(clusters, key=lambda x: x[2], reverse=sort_desc) +
-                sorted(posts, key=lambda x: x[2], reverse=sort_desc)
+            content = (
+                sorted(clusters, key=lambda x: x.children_count, reverse=sort_desc) +
+                sorted(posts, key=lambda x: x.children_count, reverse=sort_desc)
             )
 
-    grouped_data = rec_sort(tuples, sort_by)
+    rec_sort(grouped_data, sort_by)
 
     return render_template("index-cluster.html",
                            grouped_data=grouped_data,
