@@ -222,27 +222,32 @@ def render_cluster():
         raise ValueError(u"Group by `{}` not understood.".format(group_by))
 
     def rec_sort(content, sort_by):
+        sorted_content = []
         for c in content:
-            if not c.is_post:
-                rec_sort(c.content, sort_by)
+            if c.is_post:
+                sorted_content.append(c)
+            else:
+                sorted_content.append(ClusterPost(
+                    name=c.name,
+                    is_post=c.is_post,
+                    children_count=c.children_count,
+                    content=rec_sort(c.content, sort_by)
+                ))
         # put folders above posts
-        clusters = [c for c in content if not c.is_post]
-        posts = [c for c in content if c.is_post]
+        clusters = [c for c in sorted_content if not c.is_post]
+        posts = [c for c in sorted_content if c.is_post]
         if sort_by == "alpha":
-            sorted_content = (
+            return (
                 sorted(clusters, key=lambda x: x.name) +
                 sorted(posts, key=lambda x: x.name)
             )
         else:
-            sorted_content = (
+            return (
                 sorted(clusters, key=lambda x: x.children_count, reverse=sort_desc) +
                 sorted(posts, key=lambda x: x.children_count, reverse=sort_desc)
             )
-        # namedtuple is an immutable type, so we modify in place
-        del content[:]
-        content.extend(sorted_content)
 
-    rec_sort(grouped_data, sort_by)
+    grouped_data = rec_sort(grouped_data, sort_by)
 
     return render_template("index-cluster.html",
                            grouped_data=grouped_data,
