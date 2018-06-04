@@ -239,7 +239,7 @@ def render_cluster():
                 sorted(posts, key=lambda x: x.children_count, reverse=sort_desc)
             )
         # namedtuple is an immutable type, so we modify in place
-        content.clear()
+        del content[:]
         content.extend(sorted_content)
 
     rec_sort(grouped_data, sort_by)
