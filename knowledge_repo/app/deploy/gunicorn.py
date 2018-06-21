@@ -21,12 +21,21 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
         BaseApplication.__init__(self)
 
     def load_config(self):
-        options = {
+        env_args = self.cfg.parser().parse_args(self.cfg.get_cmd_args_from_env())
+
+        # Load up environment configuration.
+        for key, value in vars(env_args).items():
+            if key != 'args' and value is not None:
+                self.cfg.set(key, value)
+
+        # Lastly, update the configuration with any command line settings.
+        command_line_args = {
             'bind': u'{}:{}'.format(self.host, self.port),
             'workers': self.workers,
-            'timeout': self.timeout
+            'timeout': self.timeout,
         }
-        for key, value in options.items():
+
+        for key, value in command_line_args.items():
             self.cfg.set(key, value)
 
     def load(self):
