@@ -24,7 +24,9 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
         options = {
             'bind': u'{}:{}'.format(self.host, self.port),
             'workers': self.workers,
-            'timeout': self.timeout
+            'timeout': self.timeout,
+            'statsd_host': self.statsd_host,
+            'statsd_prefix': self.statsd_prefix,
         }
         for key, value in options.items():
             self.cfg.set(key, value)

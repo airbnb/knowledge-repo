@@ -200,6 +200,8 @@ deploy.set_defaults(action='deploy')
 deploy.add_argument('-p', '--port', default=7000, type=int, help="Specify the port on which to run the web server")
 deploy.add_argument('-w', '--workers', default=4, type=int, help="Number of gunicorn worker threads to spin up.")
 deploy.add_argument('-t', '--timeout', default=60, type=int, help="Specify the timeout (seconds) for the gunicorn web server")
+deploy.add_argument('-sh', '--statsd-host', dest='statsd_host', default=None, type=str, help="The gunicorn statsD host")
+deploy.add_argument('-sp', '--statsd-prefix', dest='statsd_prefix', default=None, type=str, help="The gunicorn statsD prefix")
 deploy.add_argument('-db', '--dburi', help='The SQLAlchemy database uri.')
 deploy.add_argument('-c', '--config', default=None, help="The config file from which to read server configuration.")
 deploy.add_argument('--engine', default='gunicorn', help='Which server engine to use when deploying; choose from: "flask", "gunicorn" (default) or "uwsgi".')
@@ -331,7 +333,9 @@ elif args.action == 'deploy':
         host='0.0.0.0',
         port=args.port,
         workers=args.workers,
-        timeout=args.timeout
+        timeout=args.timeout,
+        statsd_host=args.statsd_host,
+        statsd_prefix=args.statsd_prefix,
     )
     server.run()
 

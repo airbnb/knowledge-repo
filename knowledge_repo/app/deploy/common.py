@@ -22,13 +22,17 @@ class KnowledgeDeployer(with_metaclass(SubclassRegisteringABCMeta, object)):
                  host='0.0.0.0',
                  port=7000,
                  workers=4,
-                 timeout=60):
+                 timeout=60,
+                 statsd_host=None,
+                 statsd_prefix=None):
         assert isinstance(knowledge_builder, (str, types.FunctionType)), u"Unknown builder type {}".format(type(knowledge_builder))
         self.knowledge_builder = knowledge_builder
         self.host = host
         self.port = port
         self.workers = workers
         self.timeout = timeout
+        self.statsd_host = statsd_host
+        self.statsd_prefix = statsd_prefix
 
     @classmethod
     def using(cls, engine):
