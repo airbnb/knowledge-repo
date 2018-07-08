@@ -28,14 +28,14 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
             if key != 'args' and value is not None:
                 self.cfg.set(key, value)
 
-        # Lastly, update the configuration with any command line settings.
-        command_line_args = {
+        # Update the configuration with the options specified via KnowledgeDeployer
+        deployer_args = {
             'bind': u'{}:{}'.format(self.host, self.port),
             'workers': self.workers,
             'timeout': self.timeout,
         }
 
-        for key, value in command_line_args.items():
+        for key, value in deployer_args.items():
             self.cfg.set(key, value)
 
     def load(self):
