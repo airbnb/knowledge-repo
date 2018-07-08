@@ -712,7 +712,8 @@ border-color: #11b6aa;
   margin-top: 0px;
   margin-right: -15px;
   margin-left: -15px;
-  padding-top: 10px
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .cluster-dropdown {
