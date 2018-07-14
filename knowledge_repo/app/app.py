@@ -11,7 +11,7 @@ import math
 import multiprocessing
 import uuid
 
-from flask import Flask, current_app, render_template, g, request, flash, redirect, url_for
+from flask import Flask, current_app, render_template, g, request, flash, redirect, url_for, session
 from flask_login import LoginManager, user_loaded_from_request
 from flask_mail import Mail
 from flask_migrate import Migrate
@@ -146,6 +146,7 @@ class KnowledgeFlask(Flask):
 
         @self.errorhandler(PermissionDenied)
         def handle_insufficient_permissions(error):
+            session['requested_url'] = request.url
             return render_template('permission_denied.html'), 403
 
         # Add mail object if configuration is supplied
