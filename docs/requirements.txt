@@ -1,3 +1,4 @@
+bs4==0.0.1
 enum34==1.1.6
 flask==1.0.2
 flask_login==0.4.1
@@ -10,8 +11,11 @@ gunicorn==19.9.0
 inflection==0.3.1
 jinja2==2.10
 markdown==2.6.11
+nbconvert[execute]==5.3.1
+nbformat==4.4.0
 pygments==2.2.0
 pyyaml==3.13
 sqlalchemy==1.2.11
 tabulate==0.8.2
+traitlets==4.3.2
 werkzeug==0.14.1
