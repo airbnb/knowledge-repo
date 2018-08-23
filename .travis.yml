@@ -22,7 +22,7 @@ before_install:
   - conda install -c r r-knitr
 install:
   - pip install pycodestyle
-  - pip install .[all]
+  - pip install -r docs/requirements.txt
 
 # Cache isn't working yet because problems with expiration header. Disable for now because it's breaking builds.
 # cache: pip
