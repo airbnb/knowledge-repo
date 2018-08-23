@@ -659,4 +659,3 @@ class Group(db.Model):
     @users.setter
     def users(self, user_objs):
         self._users = self._users + user_objs
-        
