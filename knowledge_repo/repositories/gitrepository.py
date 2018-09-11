@@ -147,7 +147,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         logger.info("Fetching updates to the knowledge repository...")
         self.git_remote.fetch()
         current_branch = self.git.active_branch
-        self.git.branches.master.checkout()
+        self.git.branches[branch].checkout()
         self.git_remote.pull(branch)
         current_branch.checkout()
 
