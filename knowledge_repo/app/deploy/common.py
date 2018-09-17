@@ -1,6 +1,7 @@
 import os
 import types
 import inspect
+import sys
 import textwrap
 from abc import abstractmethod
 from future.utils import with_metaclass
@@ -32,6 +33,17 @@ class KnowledgeDeployer(with_metaclass(SubclassRegisteringABCMeta, object)):
 
     @classmethod
     def using(cls, engine):
+        if engine == 'gunicorn':
+            if sys.platform == 'win32':
+                raise RuntimeError(
+                    "`gunicorn` deployer is not available for Windows. Please use "
+                    "`uwsgi` or `flask` engines instead."
+                )
+            elif 'gunicorn' not in cls._registry:
+                raise RuntimeError(
+                    "`gunicorn` does not appear to be installed. Please install "
+                    "it and try again."
+                )
         return cls._get_subclass_for(engine)
 
     @property
