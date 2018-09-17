@@ -34,10 +34,9 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
             'workers': self.workers,
             'timeout': self.timeout,
         }
-        config = self.app.config
-        if config['DEPLOY_HTTPS']:
-            options['certfile'] = config['SSL_CERT']['cert']
-            options['keyfile'] = config['SSL_CERT']['key']
+        if self.app.config['DEPLOY_HTTPS']:
+            options['certfile'] = self.app.config['SSL_CERT']['cert']
+            options['keyfile'] = self.app.config['SSL_CERT']['key']
         for key, value in options.items():
             self.cfg.set(key, value)
 
