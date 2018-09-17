@@ -20,6 +20,18 @@ SERVER_NAME = None
 # static.
 SECRET_KEY = None
 
+# Set DEPLOY_HTTPS to True if you want to enable encrypted
+# communication with Flask. When enabled, you must provide
+# your ssl certificate, which consists of a .crt and .key
+# file.
+# Note: Even if you set DEPLOY_HTTPS to True, you still need
+# to set the port to 443 manually.
+DEPLOY_HTTPS = False
+SSL_CERT = {
+    'cert': '/path/to/cert',
+    'key': '/path/to/key'
+}
+
 # ---------------------------------------------------
 # Debug configuration
 # ---------------------------------------------------

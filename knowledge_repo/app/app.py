@@ -10,6 +10,7 @@ import traceback
 import math
 import multiprocessing
 import uuid
+import mimetypes
 
 from flask import Flask, current_app, render_template, g, request, flash, redirect, url_for, session
 from flask_login import LoginManager, user_loaded_from_request
@@ -29,6 +30,8 @@ from .index import update_index, set_up_indexing_timers, time_since_index, time_
 from .models import db as sqlalchemy_db, Post, User, Tag
 from .utils.auth import AnonymousKnowledgeUser, populate_identity_roles, prepare_user
 
+# Needed to serve svg with correct mime type over https
+mimetypes.add_type('image/svg+xml', '.svg')
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

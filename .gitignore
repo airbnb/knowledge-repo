@@ -78,6 +78,10 @@ celerybeat-schedule
 # dotenv
 .env
 
+# docker
+Dockerfile
+docker-compose.yml
+
 # virtualenv
 venv/
 ENV/
