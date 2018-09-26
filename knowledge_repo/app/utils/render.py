@@ -5,7 +5,7 @@ import pygments
 from flask import url_for
 from knowledge_repo.post import KnowledgePost
 
-MARKDOWN_EXTENSTIONS = ['markdown.extensions.extra',
+MARKDOWN_EXTENSIONS = ['markdown.extensions.extra',
                         'markdown.extensions.abbr',
                         'markdown.extensions.attr_list',
                         'markdown.extensions.def_list',
@@ -15,20 +15,19 @@ MARKDOWN_EXTENSTIONS = ['markdown.extensions.extra',
                         'markdown.extensions.smart_strong',
                         'markdown.extensions.admonition',
                         'markdown.extensions.codehilite',
-                        'markdown.extensions.headerid',
                         'markdown.extensions.meta',
                         'markdown.extensions.sane_lists',
                         'markdown.extensions.smarty',
-                        'markdown.extensions.toc(baselevel=1)',
+                        markdown.extensions.toc.TocExtension(baselevel=1),
                         'markdown.extensions.wikilinks',
                         'markdown.extensions.nl2br']
 
 
 def render_post_tldr(post):
     if isinstance(post, KnowledgePost):
-        return markdown.Markdown(extensions=MARKDOWN_EXTENSTIONS).convert(post.headers.get('tldr').strip())
+        return markdown.Markdown(extensions=MARKDOWN_EXTENSIONS).convert(post.headers.get('tldr').strip())
     else:
-        return markdown.Markdown(extensions=MARKDOWN_EXTENSTIONS).convert(post.tldr.strip())
+        return markdown.Markdown(extensions=MARKDOWN_EXTENSIONS).convert(post.tldr.strip())
 
 
 def render_post_header(post):
