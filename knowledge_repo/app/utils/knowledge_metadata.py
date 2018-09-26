@@ -11,8 +11,8 @@ class KnowledgeMetaExtension(Extension):
 
     def extendMarkdown(self, md):
         """ Add MetaPreprocessor to Markdown instance. """
-        md.preprocessors.register("knowledge_meta",
-                                  KnowledgeMetaPreprocessor(md),
+        md.preprocessors.register(KnowledgeMetaPreprocessor(md),
+                                  "knowledge_meta",
                                   35)
 
 
