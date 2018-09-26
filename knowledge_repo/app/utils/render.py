@@ -6,21 +6,21 @@ from flask import url_for
 from knowledge_repo.post import KnowledgePost
 
 MARKDOWN_EXTENSIONS = ['markdown.extensions.extra',
-                        'markdown.extensions.abbr',
-                        'markdown.extensions.attr_list',
-                        'markdown.extensions.def_list',
-                        'markdown.extensions.fenced_code',
-                        'markdown.extensions.footnotes',
-                        'markdown.extensions.tables',
-                        'markdown.extensions.smart_strong',
-                        'markdown.extensions.admonition',
-                        'markdown.extensions.codehilite',
-                        'markdown.extensions.meta',
-                        'markdown.extensions.sane_lists',
-                        'markdown.extensions.smarty',
-                        markdown.extensions.toc.TocExtension(baselevel=1),
-                        'markdown.extensions.wikilinks',
-                        'markdown.extensions.nl2br']
+                       'markdown.extensions.abbr',
+                       'markdown.extensions.attr_list',
+                       'markdown.extensions.def_list',
+                       'markdown.extensions.fenced_code',
+                       'markdown.extensions.footnotes',
+                       'markdown.extensions.tables',
+                       'markdown.extensions.smart_strong',
+                       'markdown.extensions.admonition',
+                       'markdown.extensions.codehilite',
+                       'markdown.extensions.meta',
+                       'markdown.extensions.sane_lists',
+                       'markdown.extensions.smarty',
+                       markdown.extensions.toc.TocExtension(baselevel=1),
+                       'markdown.extensions.wikilinks',
+                       'markdown.extensions.nl2br']
 
 
 def render_post_tldr(post):
