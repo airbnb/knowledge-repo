@@ -5,7 +5,8 @@ from markdown import Extension
 from markdown.blockprocessors import BlockProcessor
 from markdown.preprocessors import Preprocessor
 from markdown.util import AtomicString
-import markdown.extensions.codehilite
+from markdown.extensions import codehilite, toc
+
 import re
 import base64
 import mimetypes
@@ -13,25 +14,23 @@ import mimetypes
 from ..converter import KnowledgePostConverter
 from ..mapping import SubstitutionMapper
 
-MARKDOWN_EXTENSTIONS = ['markdown.extensions.extra',
-                        'markdown.extensions.abbr',
-                        'markdown.extensions.attr_list',
-                        'markdown.extensions.def_list',
-                        'markdown.extensions.fenced_code',
-                        'markdown.extensions.footnotes',
-                        'markdown.extensions.tables',
-                        'markdown.extensions.smart_strong',
-                        'markdown.extensions.admonition',
-                        markdown.extensions.codehilite.CodeHiliteExtension(guess_lang=False),
-                        'markdown.extensions.headerid',
-                        'markdown.extensions.meta',
-                        'markdown.extensions.sane_lists',
-                        'markdown.extensions.smarty',
-                        'markdown.extensions.toc(baselevel=1)',
-                        'markdown.extensions.wikilinks',
-                        'knowledge_repo.converters.html:KnowledgeMetaExtension',
-                        'knowledge_repo.converters.html:MathJaxExtension',
-                        'knowledge_repo.converters.html:IndentsAsCellOutput']
+MARKDOWN_EXTENSIONS = ['extra',
+                       'abbr',
+                       'attr_list',
+                       'def_list',
+                       'fenced_code',
+                       'footnotes',
+                       'tables',
+                       'admonition',
+                       codehilite.CodeHiliteExtension(guess_lang=False),
+                       'meta',
+                       'sane_lists',
+                       'smarty',
+                       toc.TocExtension(baselevel=1),
+                       'wikilinks',
+                       'knowledge_repo.converters.html:KnowledgeMetaExtension',
+                       'knowledge_repo.converters.html:MathJaxExtension',
+                       'knowledge_repo.converters.html:IndentsAsCellOutput']
 
 
 class IndentsAsCellOutputPreprocessor(Preprocessor):
@@ -101,8 +100,10 @@ class IndentsAsCellOutputProcessor(BlockProcessor):
 
 class IndentsAsCellOutput(Extension):
 
-    def extendMarkdown(self, md, md_globals):
-        md.preprocessors.add("code_isolation", IndentsAsCellOutputPreprocessor(md), "<html_block")
+    def extendMarkdown(self, md, md_globals=None):
+        md.preprocessors.add("code_isolation",
+                             IndentsAsCellOutputPreprocessor(md),
+                             "<html_block")
         md.parser.blockprocessors['code'] = IndentsAsCellOutputProcessor(md.parser)
 
 
@@ -123,7 +124,7 @@ class KnowledgeMetaPreprocessor(Preprocessor):
 class KnowledgeMetaExtension(Extension):
     """ Meta-Data extension for Python-Markdown. """
 
-    def extendMarkdown(self, md, md_globals):
+    def extendMarkdown(self, md, md_globals=None):
         """ Add MetaPreprocessor to Markdown instance. """
         md.preprocessors.add("knowledge_meta",
                              KnowledgeMetaPreprocessor(md),
@@ -142,7 +143,7 @@ class MathJaxPattern(markdown.inlinepatterns.Pattern):
 
 
 class MathJaxExtension(markdown.Extension):
-    def extendMarkdown(self, md, md_globals):
+    def extendMarkdown(self, md, md_globals=None):
         # Needs to come before escape matching because \ is pretty important in LaTeX
         md.inlinePatterns.add('mathjax', MathJaxPattern(), '<escape')
 
@@ -175,7 +176,7 @@ class HTMLConverter(KnowledgePostConverter):
         if not skip_headers:
             html += self.render_headers()
 
-        md = markdown.Markdown(extensions=MARKDOWN_EXTENSTIONS)
+        md = markdown.Markdown(extensions=MARKDOWN_EXTENSIONS)
         html += md.convert(self.kp.read())
 
         html = self.apply_url_remapping(html, urlmappers)
@@ -212,7 +213,7 @@ class HTMLConverter(KnowledgePostConverter):
         headers = self.kp.headers
 
         headers['authors_string'] = ', '.join(headers.get('authors'))
-        headers['tldr'] = markdown.Markdown(extensions=MARKDOWN_EXTENSTIONS[
+        headers['tldr'] = markdown.Markdown(extensions=MARKDOWN_EXTENSIONS[
                                             :-1]).convert(headers['tldr'])
         headers['date_created'] = headers['created_at'].isoformat()
         headers['date_updated'] = headers['updated_at'].isoformat()
