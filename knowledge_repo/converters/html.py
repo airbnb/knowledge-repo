@@ -100,8 +100,10 @@ class IndentsAsCellOutputProcessor(BlockProcessor):
 
 class IndentsAsCellOutput(Extension):
 
-    def extendMarkdown(self, md):
-        md.preprocessors.register(IndentsAsCellOutputPreprocessor(md), "code_isolation", 15)
+    def extendMarkdown(self, md, md_globals=None):
+        md.preprocessors.add("code_isolation",
+                             IndentsAsCellOutputPreprocessor(md),
+                             "<html_block")
         md.parser.blockprocessors['code'] = IndentsAsCellOutputProcessor(md.parser)
 
 
@@ -122,11 +124,11 @@ class KnowledgeMetaPreprocessor(Preprocessor):
 class KnowledgeMetaExtension(Extension):
     """ Meta-Data extension for Python-Markdown. """
 
-    def extendMarkdown(self, md):
+    def extendMarkdown(self, md, md_globals=None):
         """ Add MetaPreprocessor to Markdown instance. """
-        md.preprocessors.register(KnowledgeMetaPreprocessor(md),
-                                  "knowledge_meta",
-                                  35)
+        md.preprocessors.add("knowledge_meta",
+                             KnowledgeMetaPreprocessor(md),
+                             ">normalize_whitespace")
 
 
 class MathJaxPattern(markdown.inlinepatterns.Pattern):
@@ -141,9 +143,9 @@ class MathJaxPattern(markdown.inlinepatterns.Pattern):
 
 
 class MathJaxExtension(markdown.Extension):
-    def extendMarkdown(self, md):
+    def extendMarkdown(self, md, md_globals=None):
         # Needs to come before escape matching because \ is pretty important in LaTeX
-        md.inlinePatterns.register(MathJaxPattern(), 'mathjax', 175)
+        md.inlinePatterns.add('mathjax', MathJaxPattern(), '<escape')
 
 
 class HTMLConverter(KnowledgePostConverter):
