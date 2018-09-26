@@ -1,6 +1,8 @@
 import sys
 
 import markdown
+from markdown.extensions import toc
+
 import pygments
 from flask import url_for
 from knowledge_repo.post import KnowledgePost
@@ -18,7 +20,7 @@ MARKDOWN_EXTENSIONS = ['markdown.extensions.extra',
                        'markdown.extensions.meta',
                        'markdown.extensions.sane_lists',
                        'markdown.extensions.smarty',
-                       markdown.extensions.toc.TocExtension(baselevel=1),
+                       toc.TocExtension(baselevel=1),
                        'markdown.extensions.wikilinks',
                        'markdown.extensions.nl2br']
 

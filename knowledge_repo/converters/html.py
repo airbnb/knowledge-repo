@@ -5,6 +5,7 @@ from markdown import Extension
 from markdown.blockprocessors import BlockProcessor
 from markdown.preprocessors import Preprocessor
 from markdown.util import AtomicString
+from markdown.extensions import codehilite, toc
 
 import re
 import base64
@@ -22,12 +23,12 @@ MARKDOWN_EXTENSIONS = ['markdown.extensions.extra',
                        'markdown.extensions.tables',
                        'markdown.extensions.smart_strong',
                        'markdown.extensions.admonition',
-                       markdown.extensions.codehilite.CodeHiliteExtension(guess_lang=False),
+                       codehilite.CodeHiliteExtension(guess_lang=False),
                        'markdown.extensions.headerid',
                        'markdown.extensions.meta',
                        'markdown.extensions.sane_lists',
                        'markdown.extensions.smarty',
-                       markdown.extensions.toc.TocExtension(baselevel=1),
+                       toc.TocExtension(baselevel=1),
                        'markdown.extensions.wikilinks',
                        'knowledge_repo.converters.html:KnowledgeMetaExtension',
                        'knowledge_repo.converters.html:MathJaxExtension',
