@@ -1,3 +1,8 @@
+.container-fluid {
+    max-width: 110em;
+    margin: auto;
+}
+
 .navbar {
     background-color: #565a5c;
     border-color: #565a5c;
