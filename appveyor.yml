@@ -7,8 +7,8 @@ environment:
       PYTHON_ARCH: "32"
       MINICONDA: C:\Miniconda
 
-    - PYTHON: "C:\\Python37-x64"
-      PYTHON_VERSION: "3.7.0"
+    - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6.6"
       PYTHON_ARCH: "64"
       MINICONDA: C:\Miniconda3
 
