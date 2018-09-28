@@ -38,6 +38,7 @@ def set_up_indexing_timers(app):
                 time.sleep(app.config['INDEXING_TIMEOUT'])
 
         def index_sync_loop(app):
+            current_app.db.engine.dispose()
             while True:
                 with app.app_context():
                     update_index(check_timeouts=False)
