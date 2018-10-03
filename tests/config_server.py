@@ -3,7 +3,7 @@ import posixpath
 # This file is only needed for setting up a dedicated server configuration
 # with support for extracting username information and emailing users.
 
-SERVER_NAME = 'localhost'
+SERVER_NAME = 'localhost.localdomain'
 
 # ---------------------------------------------------
 # Database configuration
