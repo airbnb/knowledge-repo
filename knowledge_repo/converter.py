@@ -20,13 +20,14 @@ def get_format(filename, format=None):
 class KnowledgePostConverter(with_metaclass(SubclassRegisteringABCMeta, object)):
     _registry_keys = None  # File extensions
 
-    def __init__(self, kp, format=None, postprocessors=None, **kwargs):
+    def __init__(self, kp, format=None, postprocessors=None, interactive=False, **kwargs):
         check_dependencies(self.dependencies, "Whoops! You are missing some dependencies required to use `{}` instances.".format(self.__class__.__name__))
         self.kp = kp
         self.format = format
         if postprocessors is None:
             postprocessors = [('extract_images', {}), ('format_checks', {})]
         self.postprocessors = postprocessors
+        self.interactive = interactive
         self.init(**kwargs)
 
     @property
@@ -60,6 +61,9 @@ class KnowledgePostConverter(with_metaclass(SubclassRegisteringABCMeta, object))
             return self.__get_wrapped_with_postprocessors(object.__getattribute__(self, attr))
         return object.__getattribute__(self, attr)
 
+    def kp_write(self, md, headers=None, images={}):
+        return self.kp.write(md, headers=headers, images=images, interactive=self.interactive)
+
     def from_file(self, filename, **opts):
         raise NotImplementedError
 
@@ -73,12 +77,12 @@ class KnowledgePostConverter(with_metaclass(SubclassRegisteringABCMeta, object))
         raise NotImplementedError
 
     @classmethod
-    def for_file(cls, kp, filename, format=None, postprocessors=None):
-        return cls.for_format(kp, get_format(filename, format), postprocessors=postprocessors)
+    def for_file(cls, kp, filename, format=None, postprocessors=None, interactive=False):
+        return cls.for_format(kp, get_format(filename, format), postprocessors=postprocessors, interactive=interactive)
 
     @classmethod
-    def for_format(cls, kp, format, postprocessors=None):
+    def for_format(cls, kp, format, postprocessors=None, interactive=False):
         if format.lower() not in cls._registry:
             raise ValueError("The knowledge repository does not support files of type '{}'. Supported types are: {}."
                              .format(format, ','.join(list(cls._registry.keys()))))
-        return cls._get_subclass_for(format.lower())(kp, format=format, postprocessors=postprocessors)
+        return cls._get_subclass_for(format.lower())(kp, format=format, postprocessors=postprocessors, interactive=interactive)

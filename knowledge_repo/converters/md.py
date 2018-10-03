@@ -6,4 +6,4 @@ class MdConverter(KnowledgePostConverter):
 
     def from_file(self, filename):
         with open(filename) as f:
-            self.kp.write(f.read())
+            self.kp_write(f.read())

@@ -202,8 +202,7 @@ $(document).on('ready', function(){
 })
 
 //Turn all the headers to be links
-//h1 = Title, don't want that
-var all_headers = [$("h2"), $("h3"), $("h4"), $("h5"), $("h6")]
+var all_headers = [$("h1"), $("h2"), $("h3"), $("h4"), $("h5"), $("h6")]
 $.each(all_headers, function(index, value){
   $.each(value, function(i, v){
     var inner_html = v.innerHTML

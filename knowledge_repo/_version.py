@@ -26,6 +26,7 @@ __dependencies__ = [
     'gitpython',  # Git abstraction
     'tabulate',  # Rendering information prettily in knowledge_repo script
     'pyyaml',  # Used to configure knowledge repositories
+    'cooked_input',  # Used for interactive input from user in CLI tooling
 
     # Flask App Dependencies
     'flask',  # Main flask framework

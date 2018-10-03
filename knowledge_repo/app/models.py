@@ -365,6 +365,7 @@ class Post(db.Model):
     revision = db.Column(db.Integer())
 
     title = db.Column(db.Text())
+    subtitle = db.Column(db.Text())
     tldr = db.Column(db.Text)
     keywords = db.Column(db.Text)
     thumbnail = db.Column(db.Text())
@@ -597,6 +598,7 @@ class Post(db.Model):
         self.repository = kp.repository_uri
         self.revision = kp.revision
         self.title = headers['title']
+        self.subtitle = headers.get('subtitle')
         self.tldr = headers['tldr']
         self.authors = headers.get('authors', [])
         self.tags = headers.get('tags', [])
