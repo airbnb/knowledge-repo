@@ -28,9 +28,6 @@ db = SQLAlchemy()
 
 class IndexMetadata(db.Model):
     __tablename__ = 'index_metadata'
-    __table_args__ = (
-        UniqueConstraint('type', 'name', name='_uc_type_name'),
-    )
 
     id = db.Column(db.Integer, nullable=False, primary_key=True)
     type = db.Column(db.String(255), nullable=False)
@@ -362,7 +359,7 @@ class Post(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(db.String(100), unique=True)
-    path = db.Column(db.String(512), unique=True)
+    path = db.Column(db.String(512))
     project = db.Column(db.String(512), nullable=True)  # DEPRECATED
     repository = db.Column(db.String(512))
     revision = db.Column(db.Integer())
