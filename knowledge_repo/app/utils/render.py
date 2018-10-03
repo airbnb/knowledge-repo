@@ -5,6 +5,7 @@ from markdown.extensions import toc
 
 import pygments
 from flask import url_for
+from jinja2 import Template
 from knowledge_repo.post import KnowledgePost
 
 MARKDOWN_EXTENSIONS = ['extra',
@@ -33,29 +34,32 @@ def render_post_tldr(post):
 
 def render_post_header(post):
 
-    header_template = u"""
+    header_template = Template(u"""
     <div class='metadata'>
-    <h1>{title}</h1>
-    <span class='authors'>{authors}</span>
-    <span class='date_created'>{date_created}</span>
-    <span class='date_updated'>(Last Updated: {date_updated})</span>
-    <span class='tldr'>{tldr}</span>
+    <span class='title'>{{title}}</span>
+    {% if subtitle %}<span class='subtitle'>{{subtitle}}</span>{% endif %}
+    <span class='authors'>{{authors}}</span>
+    <span class='date_created'>{{date_created}}</span>
+    <span class='date_updated'>(Last Updated: {{date_updated}})</span>
+    <span class='tldr'>{{tldr}}</span>
     <span class='tags'></span>
     </div>
-    """
+    """)
 
     def get_authors(usernames, authors):
         authors = [u"<a href='{}'>{}</a>".format(url_for('index.render_feed', authors=username), author) for username, author in zip(usernames, authors)]
         return u' and '.join(u', '.join(authors).rsplit(', ', 1))
 
     if isinstance(post, KnowledgePost):
-        return header_template.format(title=post.headers['title'],
+        return header_template.render(title=post.headers['title'],
+                                      subtitle=post.headers.get('subtitle'),
                                       authors=get_authors(post.headers['authors'], post.headers['authors']),
                                       date_created=post.headers['created_at'].strftime("%B %d, %Y"),
                                       date_updated=post.headers['updated_at'].strftime("%B %d, %Y"),
                                       tldr=render_post_tldr(post))
     else:
-        return header_template.format(title=post.title,
+        return header_template.render(title=post.title,
+                                      subtitle=post.subtitle,
                                       authors=get_authors([author.identifier for author in post.authors], [author.format_name for author in post.authors]),
                                       date_created=post.created_at.strftime("%B %d, %Y"),
                                       date_updated=post.updated_at.strftime("%B %d, %Y"),

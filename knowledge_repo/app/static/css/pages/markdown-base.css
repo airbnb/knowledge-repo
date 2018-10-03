@@ -7,6 +7,7 @@
     margin-bottom: 2em;
     position: relative;
     box-shadow: 0px 2px 3px rgba(0,0,0,0.1);
+    font-size: 12pt;
 }
 
 @media (max-width: 992px) {
@@ -19,24 +20,37 @@
     }
 }
 
+.renderedMarkdown span.title,
 .renderedMarkdown h1,
 .renderedMarkdown h2,
 .renderedMarkdown h3,
 .renderedMarkdown h4,
 .renderedMarkdown h5,
 .renderedMarkdown h6 {
+  color: black;
   margin-top: 1.5em;
   margin-bottom: 0.5em;
   font-weight: bold;
 }
 
-.renderedMarkdown h1:nth-of-type(1) {
+.renderedMarkdown span.title:nth-of-type(1) {
   margin-top: 1em;
   text-align: center;
   display: block;
+  font-size: 2.2em;
+  margin-top: .67em;
+  margin-bottom: .3em;
 }
 
-.renderedMarkdown h2 {
+.renderedMarkdown span.subtitle {
+  text-align: center;
+  display: block;
+  font-size: 1.5em;
+  font-style: italic;
+  margin-bottom: .3em;
+}
+
+.renderedMarkdown h1 {
     border-bottom: 1px solid #eee;
     padding-bottom: 0.3em;
 }
@@ -171,8 +185,8 @@
 
 .renderedMarkdown .codehilite + .code-output  {
   margin-top: -1em;
-  margin-left: -21px;
-  margin-right: -21px;
+  margin-left: -1.5em;
+  margin-right: -1.5em;
   font-family: monospace;
 }
 
@@ -230,8 +244,8 @@
 
 .renderedMarkdown .codehilite {
     margin: 1em;
-    margin-left: -21px;
-    margin-right: -21px;
+    margin-left: -1.5em;
+    margin-right: -1.5em;
     padding: 0px;
 }
 

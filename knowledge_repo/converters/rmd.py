@@ -39,7 +39,7 @@ class RmdConverter(KnowledgePostConverter):
             Rmd_filename = tmp_path
 
         with open(Rmd_filename) as f:
-            self.kp.write(f.read())
+            self.kp_write(f.read())
         self.kp.add_srcfile(filename)
 
         # Clean up temporary file

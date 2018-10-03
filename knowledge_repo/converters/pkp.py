@@ -27,6 +27,8 @@ class IpynbFormat(KnowledgePostConverter):
         return data.read()
 
     def from_file(self, filename):
+        # Note: header checks are not applied here, since it should not be
+        # possible to create portable knowledge post with incorrect headers.
         zf = zipfile.ZipFile(filename, 'r')
 
         for ref in zf.namelist():
