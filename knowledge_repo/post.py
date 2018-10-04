@@ -371,7 +371,7 @@ class KnowledgePost(object):
                 "post source file.".format(missing_required_headers)
             )
 
-        for key, value in headers.items():
+        for key, value in list(headers.items()):
             if value is None:
                 del headers[key]
 
