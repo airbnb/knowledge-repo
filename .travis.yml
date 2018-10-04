@@ -1,7 +1,7 @@
 language: python
 python:
   - "2.7"
-  - "3.4"
+#   - "3.4"  # TODO: The anaconda mro_base package seems to be broken. Re-enable when fixed.
   - "3.5"
   - "3.6"
 
