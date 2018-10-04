@@ -371,6 +371,10 @@ class KnowledgePost(object):
                 "post source file.".format(missing_required_headers)
             )
 
+        for key, value in headers.items():
+            if value is None:
+                del headers[key]
+
         if 'tags' not in headers or not headers['tags']:
             headers['tags'] = []
         headers['updated_at'] = datetime.datetime.now()
