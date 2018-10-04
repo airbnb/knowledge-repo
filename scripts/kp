@@ -4,6 +4,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import argparse
+import cooked_input as ci
 import os
 import socket
 import sys
@@ -48,6 +49,7 @@ from_.set_defaults(action='from')
 from_.add_argument('source', help='The path or url of the source file.')
 from_.add_argument('--format', help='The format to assume for the source file (overriding default detection algorithms).')
 from_.add_argument('--src', nargs='+', help='Specify additional files to be added as source files.')
+from_.add_argument('--overwrite', action='store_true', help='Overwrite any existing knowledge post.')
 
 to = subparsers.add_parser('to', help='Export a knowledge post as another format.')
 to.set_defaults(action='to')
@@ -84,6 +86,11 @@ if not args.post_path.endswith('.kp'):
     args.post_path += '.kp'
 
 if args.action == 'from':
+    if not args.overwrite and os.path.exists(args.post_path):
+        if args.interactive:
+            args.overwrite = ci.get_boolean(prompt="File already exists at '{}'. Do you want to overwrite it? (y/n)".format(args.post_path))
+        if not args.overwrite:
+            raise RuntimeError("File already exists at '{}', but the `overwrite` flag is not set.".format(args.post_path))
     kp = KnowledgePost.from_file(args.source, format=args.format, src_paths=args.src, interactive=args.interactive)
     kp.to_file(args.post_path, format='kp')
     sys.exit(0)
