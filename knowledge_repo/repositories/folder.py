@@ -21,20 +21,47 @@ logger = logging.getLogger(__name__)
 
 
 class FolderKnowledgeRepository(KnowledgeRepository):
-    _registry_keys = ['']
+    _registry_keys = ['', 'file']
+
+    TEMPLATES = {
+        'README.md': os.path.abspath(os.path.join(os.path.dirname(__file__), '../templates', 'repository_readme.md')),
+        '.knowledge_repo_config.yml': os.path.abspath(os.path.join(os.path.dirname(__file__), '../templates', 'repository_config.yml'))
+    }
 
     @classmethod
     def create(cls, uri, embed_tooling=False):
+        if uri.startswith('file://'):
+            uri = uri[len('file://'):]
         path = os.path.abspath(uri)
         if not os.path.exists(path):
-            raise Exception("Folder does not exist. Not attempting to create it.")
-        shutil.copy(os.path.join(os.path.dirname(__file__), '../config_defaults.py'),
-                    os.path.join(path, '.knowledge_repo_config.py'))
-        shutil.copy(os.path.join(os.path.dirname(__file__), '../templates', 'repo_data_readme.md'),
-                    os.path.join(path, 'README.md'))
+            os.makedirs(path)
+
+        # Add README and configuration templates
+        for filename, template in cls.TEMPLATES.items():
+            target = os.path.join(path, filename)
+            if not os.path.exists(target):
+                shutil.copy(template, target)
+            else:
+                logger.warning("Not overriding existing file '{}'.".format(filename))
         return FolderKnowledgeRepository(path)
 
-    def init(self, config='.knowledge_repo_config.py', auto_create=False):
+    @classmethod
+    def from_uri(cls, uri, *args, **kwargs):
+        """
+        If this folder is actually a git repository, a `GitKnowledgeRepository`
+        is returned instead, unless the folder knowledge repository is explicitly
+        requested via the 'file://' protocol.
+        """
+        check_for_git = True
+        if uri.startswith('file://'):
+            check_for_git = False
+            uri = uri[len('file://'):]
+        if check_for_git and os.path.exists(os.path.join(uri, '.git')):
+            from .gitrepository import GitKnowledgeRepository
+            return GitKnowledgeRepository(uri, *args, **kwargs)
+        return cls(uri, *args, **kwargs)
+
+    def init(self, config='.knowledge_repo_config.yml', auto_create=False):
         self.auto_create = auto_create
         self.path = self.uri
         self.config.update(os.path.join(self.path, config))
@@ -77,6 +104,11 @@ class FolderKnowledgeRepository(KnowledgeRepository):
 
             for path, folders, files in os.walk(os.path.join(self.path, prefix or '')):
 
+                # Do not visit hidden folders
+                for folder in folders:
+                    if folder.startswith('.'):
+                        folders.remove(folder)
+
                 posts.update(
                     os.path.join(os.path.relpath(path, start=self.path), folder)
                     for folder in folders if folder.endswith('.kp')
@@ -97,10 +129,10 @@ class FolderKnowledgeRepository(KnowledgeRepository):
         pass
 
     def _submit(self, path=None, branch=None, force=False):
-        raise NotImplementedError
+        pass  # Added posts are already submitted
 
     def _publish(self, path):  # Publish a post for general perusal
-        raise NotImplementedError
+        pass  # Added posts are already published
 
     def _unpublish(self, path):  # unpublish a post for general perusal
         raise NotImplementedError
@@ -109,7 +141,7 @@ class FolderKnowledgeRepository(KnowledgeRepository):
         pass
 
     def _remove(self, path, all=False):
-        raise NotImplementedError
+        shutil.rmtree(os.path.join(self.path, path))
 
     # ------------ Knowledge Post Data Retrieval Methods -------------------------
 
@@ -136,12 +168,8 @@ class FolderKnowledgeRepository(KnowledgeRepository):
         except:
             return 0
 
-    def _kp_get_revisions(self, path):  # slow
-        # TODO: In the future, we may want to use something like:
-        #    self.git.iter_commits(paths=os.path.join(self.path, path, 'knowledge.md'))
-        # But this will require a lot of piping and may not make sense in the context
-        # of a non-bare git repository.
-        raise NotImplementedError()
+    def _kp_get_revisions(self, path):
+        raise NotImplementedError
 
     def _kp_write_ref(self, path, reference, data, uuid=None, revision=None):
         path = os.path.join(self.path, path)

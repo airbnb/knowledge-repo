@@ -1,10 +1,11 @@
 import zipfile
 import io
+import os
 
 from ..converter import KnowledgePostConverter
 
 
-class IpynbFormat(KnowledgePostConverter):
+class PkpConverter(KnowledgePostConverter):
     _registry_keys = ['kp', 'zip']
 
     def to_file(self, filename):

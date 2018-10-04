@@ -4,6 +4,7 @@ import logging
 import os
 import time
 import types
+import yaml
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +90,7 @@ class KnowledgeRepositoryConfig(dict):
             self.__set_from_module(d, config, force)
         elif filename.endswith('.yml'):
             with open(filename) as f:
-                config = yaml.load(f)
+                config = yaml.safe_load(f)
             self.update(config)
 
     def __set_from_module(self, d, module, force=False):
