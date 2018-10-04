@@ -47,20 +47,23 @@ class KnowledgePostConverter(with_metaclass(SubclassRegisteringABCMeta, object))
     def __get_wrapped_with_postprocessors(self, f):
         @wraps(f)
         def wrapped(*args, **kwargs):
-            kp = self.kp
-            f(*args, **kwargs)
-            postprocessors = self.postprocessors
+            try:
+                kp = self.kp
+                f(*args, **kwargs)
+                postprocessors = self.postprocessors
 
-            if f.__name__ == 'from_file':
-                filename = args[0] if len(args) > 0 else kwargs['filename']
-                kp.orig_context = os.path.dirname(filename)
+                if f.__name__ == 'from_file':
+                    filename = args[0] if len(args) > 0 else kwargs['filename']
+                    kp.orig_context = os.path.dirname(filename)
 
-            if postprocessors is None:
-                postprocessors = []
-            for postprocessor, kwargs in postprocessors:
-                KnowledgePostProcessor._get_subclass_for(postprocessor)(**kwargs).process(kp)
+                if postprocessors is None:
+                    postprocessors = []
+                for postprocessor, kwargs in postprocessors:
+                    KnowledgePostProcessor._get_subclass_for(postprocessor)(**kwargs).process(kp)
 
-            return kp
+                return kp
+            finally:
+                self.cleanup()
         return wrapped
 
     def __getattribute__(self, attr):
@@ -82,6 +85,9 @@ class KnowledgePostConverter(with_metaclass(SubclassRegisteringABCMeta, object))
 
     def to_string(self, **opts):
         raise NotImplementedError
+
+    def cleanup(self):
+        pass
 
     @classmethod
     def for_file(cls, kp, filename, format=None, postprocessors=None, interactive=False):

@@ -16,31 +16,33 @@ class DocxConverter(KnowledgePostConverter):
         return ['pypandoc']
 
     def from_file(self, filename, **opts):
-        wd = tempfile.mkdtemp()
+        self.tmp_dir = wd = tempfile.mkdtemp()
         target_file = os.path.join(wd, 'post.md')
-        try:
-            import pypandoc
 
-            pypandoc.convert_file(
-                filename,
-                format='docx',
-                to='markdown',
-                outputfile=target_file,
-                extra_args=[
-                    '--standalone',
-                    '--wrap=none',
-                    '--extract-media={}'.format(wd)
-                ]
-            )
+        import pypandoc
+        pypandoc.convert_file(
+            filename,
+            format='docx',
+            to='markdown-grid_tables',
+            outputfile=target_file,
+            extra_args=[
+                '--standalone',
+                '--wrap=none',
+                '--extract-media={}'.format(wd)
+            ]
+        )
 
-            with open(target_file) as f:
-                md = f.read()
+        with open(target_file) as f:
+            md = f.read()
 
-            # Image embeddings exported from docx files have fixed sizes in inches
-            # which browsers do not understand. We remove these annotations.
-            md = re.sub('(\!\[\]\([^\)]+\))\{[^\}]+\}', lambda m: m.group(1), md)
+        # Image embeddings exported from docx files have fixed sizes in inches
+        # which browsers do not understand. We remove these annotations.
+        md = re.sub(r'(\!\[[^\]]+?\]\([^\)]+?\))\{[^\}]+?\}', lambda m: m.group(1), md)
 
-            # Write markdown content to knowledge post (images will be extracted later)
-            self.kp_write(md)
-        finally:
-            shutil.rmtree(wd)
+        # Write markdown content to knowledge post (images will be extracted later)
+        self.kp_write(md)
+
+    def cleanup(self):
+        if hasattr(self, 'tmp_dir'):
+            shutil.rmtree(self.tmp_dir)
+            del self.tmp_dir

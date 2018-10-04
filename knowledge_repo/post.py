@@ -328,6 +328,8 @@ class KnowledgePost(object):
 
     def _get_headers_from_yaml(self, yaml_str):
         try:
+            if not yaml_str.strip().startswith('---'):
+                raise StopIteration()
             return next(yaml.load_all(yaml_str))
         except yaml.YAMLError as e:
             logger.info(
@@ -341,6 +343,8 @@ class KnowledgePost(object):
         return {}
 
     def _verify_headers(self, headers, interactive=False):
+        if not isinstance(headers, dict):
+            raise RuntimeError()
         missing_required_headers = (
             set(h.name for h in HEADER_REQUIRED_FIELD_TYPES).difference(headers)
         )

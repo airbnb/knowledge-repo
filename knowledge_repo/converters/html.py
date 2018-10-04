@@ -4,8 +4,9 @@ import markdown
 from markdown import Extension
 from markdown.blockprocessors import BlockProcessor
 from markdown.preprocessors import Preprocessor
-from markdown.util import AtomicString
+from markdown.util import AtomicString, etree
 from markdown.extensions import codehilite, toc
+from markdown.inlinepatterns import Pattern
 
 import re
 import base64
@@ -30,7 +31,44 @@ MARKDOWN_EXTENSIONS = ['extra',
                        'wikilinks',
                        'knowledge_repo.converters.html:KnowledgeMetaExtension',
                        'knowledge_repo.converters.html:MathJaxExtension',
-                       'knowledge_repo.converters.html:IndentsAsCellOutput']
+                       'knowledge_repo.converters.html:IndentsAsCellOutput',
+                       'knowledge_repo.converters.html:InlineSpanStyles']
+
+
+class InlineSpanStyles(Extension):
+
+    SPAN_PATTERN = r'\[([\s\S]*?)\]\{((?:\ ?.[^\,\}]+?)*?)\}'
+
+    class SpanMatchHandler(Pattern):
+        def handleMatch(self, m):
+            # Extract information from markdown tag
+            text = m.group(2)
+
+            ids = [
+                id
+                for id in m.group(3).split(',')
+                if id.startswith('#')
+            ]
+            id = ids[0] if ids else None
+
+            class_names = [
+                class_name[1:] if class_name.startswith('.') else class_name
+                for class_name in m.group(3).split(' ')
+                if class_name.startswith('.')
+            ]
+
+            # Generate HTML element for new span
+            el = etree.Element('span')
+            el.text = text
+            if id:
+                el.attrib['id'] = id
+            if class_names:
+                el.attrib['class'] = " ".join(class_names)
+            return el
+
+    def extendMarkdown(self, md, md_globals):
+        span_matcher = self.SpanMatchHandler(self.SPAN_PATTERN)
+        md.inlinePatterns['inline_span'] = span_matcher
 
 
 class IndentsAsCellOutputPreprocessor(Preprocessor):

@@ -78,8 +78,8 @@ class GDocConverter(DocxConverter):
         DocxConverter.from_file(self, filename, **opts)
 
         headers = self.kp.headers
-        if headers['title'].startswith('[]'):
+        if 'title' in headers and headers['title'].startswith('[]'):
             headers['title'] = re.sub('\[\]\{[^\}]+\}', '', headers['title'])
-        if headers['subtitle'].startswith('[]'):
+        if 'subtitle' in headers and headers['subtitle'].startswith('[]'):
             headers['subtitle'] = re.sub('\[\]\{[^\}]+\}', '', headers['subtitle'])
         self.kp.update_headers(**headers)

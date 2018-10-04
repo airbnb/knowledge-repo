@@ -170,6 +170,21 @@
 .renderedMarkdown tbody tr:hover {
     background: rgba(66, 165, 245, 0.2);
 }
+/* Footnotes for tables generated from other sources via pandoc are in a .footnotes div */
+.renderedMarkdown .footnotes {
+    background: #eee;
+    border: 1px solid #aaa;
+    border-top: none;
+    margin-top: -1em;
+    padding: 0.5em;
+}
+.renderedMarkdown .footnotes hr {
+    display: none;
+}
+
+.renderedMarkdown .underline {
+    text-decoration: underline;
+}
 
 .renderedMarkdown .codehilite {
   margin-top: 25px;
@@ -273,6 +288,21 @@
 
 .renderedMarkdown .codehilite:hover .codetoggle {
     opacity: 1;
+}
+
+.renderedMarkdown .footnote {
+    margin-top: 1.5em;
+    margin-left: -1.5em;
+    margin-right: -1.5em;
+    margin-bottom: -1.5em;
+    background: #eee;
+    border-top: 1px solid #ddd;
+    padding: 0.5em;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+.renderedMarkdown .footnote hr {
+    display: none;
 }
 
 .side-panel .btn-download {
