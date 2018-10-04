@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 class GitKnowledgeRepository(KnowledgeRepository):
-    _registry_keys = ['', 'git']
+    _registry_keys = ['git']
 
     TEMPLATES = {
         'README.md': os.path.abspath(os.path.join(os.path.dirname(__file__), '../templates', 'repository_readme.md')),

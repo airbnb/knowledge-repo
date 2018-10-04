@@ -43,7 +43,7 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         if isinstance(uri, dict):
             return cls.for_uris(uri)
         scheme = urlparse(uri).scheme
-        return cls._get_subclass_for(scheme)(uri, *args, **kwargs)
+        return cls._get_subclass_for(scheme).from_uri(uri, *args, **kwargs)
 
     @classmethod
     def for_uris(cls, uri):
@@ -56,6 +56,10 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
 
         krs = {name: cls.for_uri(uri) for name, uri in list(uris.items())}
         return MetaKnowledgeRepository(krs)
+
+    @classmethod
+    def from_uri(cls, url, *args, **kwargs):
+        return cls(url, *args, **kwargs)
 
     @classmethod
     def create_for_uri(cls, uri, **kwargs):
