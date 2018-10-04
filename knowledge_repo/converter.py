@@ -11,9 +11,16 @@ from future.utils import with_metaclass
 
 def get_format(filename, format=None):
     if format is None:
-        format = os.path.splitext(filename)[1]
-        if format.startswith('.'):
-            format = format[1:]
+        if filename.startswith('https://docs.google.com/document/d/'):
+            format = 'gdoc'
+        elif filename.startswith('http://') or filename.startswith('https://'):
+            format = 'proxy'
+        elif '.' in filename:
+            format = os.path.splitext(filename)[1]
+            if format.startswith('.'):
+                format = format[1:]
+        else:
+            raise RuntimeError("Unable to determine a format automatically. Please manually specify the format, and try again.")
     return format
 
 
