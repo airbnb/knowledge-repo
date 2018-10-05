@@ -126,7 +126,7 @@ if args.action == 'preview':
                                   debug=False,
                                   db_uri='sqlite:///:memory:',
                                   config=None,
-                                  REPOSITORY_INDEXING_ENABLED=False)
+                                  INDEXING_ENABLED=False)
 
     url = 'http://127.0.0.1:{}/post/{}'.format(port, post_path)
     threading.Timer(1.25, lambda: webbrowser.open(url)).start()
