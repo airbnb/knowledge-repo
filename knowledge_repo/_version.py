@@ -39,6 +39,7 @@ __dependencies__ = [
     'werkzeug',  # Development webserver
     'gunicorn',  # Deployed webserver
     'inflection',  # String transformation library
+    'pillow',  # Image thumbnailing
 ]
 
 __optional_dependencies__ = {

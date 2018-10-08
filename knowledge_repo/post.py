@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from builtins import next
 from builtins import object
 from collections import namedtuple
+import io
 import itertools
 import os
 import posixpath
@@ -10,11 +11,11 @@ import collections
 import logging
 import datetime
 import yaml
-import mimetypes
 import base64
 import uuid
 
 import cooked_input as ci
+import PIL.Image
 import six
 
 from .utils.encoding import encode, decode
@@ -421,11 +422,37 @@ class KnowledgePost(object):
         if ':' not in thumbnail:  # if thumbnail points to a local reference
             if not self._has_ref(thumbnail):
                 return None
-            data = base64.b64encode(self._read_ref(thumbnail))
-            image_mimetype = mimetypes.guess_type(thumbnail)[0]
-            if image_mimetype is not None:
-                return 'data:{};base64,'.format(image_mimetype) + data.decode('utf-8')
-            return None
+
+            data_in = io.BytesIO(self._read_ref(thumbnail))
+            data_out = io.BytesIO()
+
+            try:  # Attempt to generate 125x125 png thumbnail from resource
+                im = PIL.Image.open(data_in)
+
+                # 125x125 is approximately the maximum size we can guarantee
+                # will fit in the thumbnail uri data field, with max characters
+                # of 65535 for a PNG with 32 bits per pixel
+                im.thumbnail((125, 125))
+
+                data_out = io.BytesIO()
+                im.save(data_out, 'png')
+                data_out.seek(0)
+                thumbnail_data = data_out.read()
+
+                data = base64.b64encode(thumbnail_data)
+                thumbnail = (
+                    'data:{};base64,'.format('image/png') +
+                    data.decode('utf-8')
+                )
+            except Exception as e:
+                logger.warning(
+                    "Thumbnail generation failed for {}: {}."
+                    .format(self.path, e)
+                )
+                return None
+            finally:
+                data_in.close()
+                data_out.close()
 
         return thumbnail
 
