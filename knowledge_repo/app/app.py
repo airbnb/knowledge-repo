@@ -195,9 +195,6 @@ class KnowledgeFlask(Flask):
                 Tag(name=tag)
             db_session.commit()
 
-        # Set up indexing timers
-        set_up_indexing_timers(self)
-
         @self.before_request
         def open_repository_session():
             if not request.path.startswith('/static'):
@@ -321,6 +318,9 @@ class KnowledgeFlask(Flask):
     def db_update_index(self, check_timeouts=True, force=False, reindex=False):
         with self.app_context():
             update_index(check_timeouts=check_timeouts, force=force, reindex=reindex)
+
+    def start_indexing(self):
+        set_up_indexing_timers(self)
 
     def check_thread_support(self, check_index=True, check_repositories=True):
         # If index database is an sqlite database, it will lock on any write action, and so breaks on multiple threads
