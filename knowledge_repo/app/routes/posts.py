@@ -1,7 +1,7 @@
 import logging
 import os
 from builtins import str
-from flask import request, url_for, redirect, render_template, current_app, Blueprint, g, Response
+from flask import request, url_for, redirect, render_template, current_app, Blueprint, g, Response, abort
 
 from .. import permissions
 from ..proxies import db_session, current_repo, current_user
@@ -54,8 +54,8 @@ def render(path):
                               .filter(Post.path == knowledge_aliases[path])
                               .first())
     if not post:
-        raise Exception(u"unable to find post at {}".format(path))
-
+        logger.warning(u"unable to find post at {}".format(path))
+        return abort(404)
     if post.contains_excluded_tag:
         # It's possible that someone gets a direct link to a post that has an excluded tag
         return render_template("error.html")

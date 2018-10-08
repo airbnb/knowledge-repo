@@ -183,6 +183,10 @@ class KnowledgeFlask(Flask):
             else:
                 return render_template('error.html')
 
+        @self.errorhandler(404)
+        def show_404(self):
+            return render_template("404.html")
+
         @self.before_first_request
         def ensure_excluded_tags_exist():
             # For every tag in the excluded tags, create the tag object if it doesn't exist
