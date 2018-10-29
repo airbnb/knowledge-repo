@@ -95,6 +95,13 @@ class KnowledgeFlask(Flask):
         elif db_auto_upgrade:
             self.db_upgrade()
 
+        # Ensure that indexes are set up if required by the time first page is
+        # served.
+        @self.before_first_request
+        def start_indexing():
+            if self.config['INDEXING_ENABLED']:
+                self.start_indexing()
+
         # Initialise login manager to keep track of user sessions
         LoginManager().init_app(self)
         self.login_manager.login_view = 'auth.login'
@@ -294,6 +301,7 @@ class KnowledgeFlask(Flask):
 
             # Stamp table as being current
             command.stamp(self._alembic_config, "head")
+        return self
 
     @property
     def db_revision(self):
@@ -306,21 +314,28 @@ class KnowledgeFlask(Flask):
     def db_upgrade(self):
         with self.app_context():
             command.upgrade(self._alembic_config, "head")
+        return self
 
     def db_downgrade(self, revision):
         with self.app_context():
             command.downgrade(self._alembic_config, revision)
+        return self
 
     def db_migrate(self, message, autogenerate=True):
         with self.app_context():
             command.revision(self._alembic_config, message=message, autogenerate=autogenerate)
+        return self
 
     def db_update_index(self, check_timeouts=True, force=False, reindex=False):
         with self.app_context():
             update_index(check_timeouts=check_timeouts, force=force, reindex=reindex)
+        return self
 
     def start_indexing(self):
-        set_up_indexing_timers(self)
+        if not getattr(self, '_indexing_started', False):
+            set_up_indexing_timers(self)
+            self._indexing_started = True
+        return self
 
     def check_thread_support(self, check_index=True, check_repositories=True):
         # If index database is an sqlite database, it will lock on any write action, and so breaks on multiple threads
