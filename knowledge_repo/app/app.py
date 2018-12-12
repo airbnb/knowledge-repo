@@ -47,6 +47,7 @@ class KnowledgeFlask(Flask):
         # Add unique identifier for this application isinstance
         self.uuid = str(uuid.uuid4())
         if 'KNOWLEDGE_REPO_MASTER_UUID' not in os.environ:
+            logger.info("Set KNOWLEDGE_REPO_MASTER_UUID to '{}'.".format(self.uuid))
             os.environ['KNOWLEDGE_REPO_MASTER_UUID'] = self.uuid
 
         # Preload default configuration

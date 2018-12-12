@@ -41,10 +41,6 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
             self.cfg.set(key, value)
 
     def load(self):
-        return self.builder_func()
-
-    def run(self):
         if not self.app.check_thread_support():
             raise RuntimeError("Database configuration is not suitable for deployment (not thread-safe).")
-        self.app.start_indexing()
-        return BaseApplication.run(self)
+        return self.app.start_indexing()

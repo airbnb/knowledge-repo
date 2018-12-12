@@ -28,6 +28,8 @@ def set_up_indexing_timers(app):
             logger.info("Not spawning index-sync timers for non-master application instance: {}".format(app.uuid))
             return
 
+        logger.info("Spawning index-sync timers for master application instance: {}".format(app.uuid))
+
         def index_watchdog(app):
             while True:
                 if not hasattr(app, 'sync_thread') or not app.sync_thread.is_alive():
