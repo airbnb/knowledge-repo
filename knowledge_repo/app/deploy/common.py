@@ -75,7 +75,11 @@ class KnowledgeDeployer(with_metaclass(SubclassRegisteringABCMeta, object)):
 
     @property
     def app(self):
-        return self.builder_func()
+        try:
+            self.__app
+        except AttributeError:
+            self.__app = self.builder_func()
+        return self.__app
 
     def write_temp_files(self):
         import tempfile
