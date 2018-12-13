@@ -89,8 +89,8 @@ def get_posts(feed_params):
         (join_table, join_on) = joins[sort_by]
 
         query = (db_session.query(Post, order_col)
-                 .outerjoin(join_table, Post.path == join_on))
-        query = query.group_by(Post.path)
+                 .outerjoin(join_table, Post.id == join_on))
+        query = query.group_by(Post.id)
 
     # sort order
     if order_col is not None:
