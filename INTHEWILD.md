@@ -5,6 +5,7 @@ Organizations
 ----------
  - [Airbnb](https://github.com/airbnb)
  - [ASI Data Science](https://www.asidatascience.com)
+ - [Databricks](https://databricks.com)
  - [Postmates](https://github.com/postmates)
  - [Recursion Pharmaceuticals](http://recursionpharma.com)
 
