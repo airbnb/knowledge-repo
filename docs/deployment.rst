@@ -56,6 +56,27 @@ whichever service you plan to use) and then running:
 Users can then clone this repository, and point their local `knowledge_repo`
 script at it using :code:`--repo <path_of_cloned_repository>`.
 
+If the git repo is hosted on a remote service like Github, then the knowledge
+repo server will periodically fetch updates, while running as a server. If
+the remote service requires authentication (e.g. a private repository on Github),
+then these requests will fail.
+
+Taking Github as an example, it's possible to use SSH to authenticate in order
+to allow the knowledge repo server access. To set this up:
+
+ - Create a new SSH key and add it to your account per `Github documentation <https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/>`_
+ - Where the server is deployed, clone the git repo with a git: URI: :code:`git@github.com:<org>/<repo>.git`
+ - Add the SSH private key to :code:`~/.ssh/`
+ - Tell SSH to use the key for  :code:`github.com` by adding to :code:`~/.ssh/config`:
+
+   .. code-block:: shell
+
+      Host github.com
+        HostName github.com
+        IdentityFile ~/.ssh/<your key>
+
+Note that this leaves a private SSH key with access to your Github account on the server!
+
 Database Knowledge Repositories
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
