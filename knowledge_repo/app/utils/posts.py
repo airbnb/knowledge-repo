@@ -67,6 +67,7 @@ def get_posts(feed_params):
     join_order_col = {
         "uniqueviews": func.count(distinct(PageView.user_id)),
         "allviews": func.count(PageView.object_id),
+        "views": func.count(PageView.object_id),
         "upvotes": func.count(Vote.object_id),
         "comments": func.count(Comment.post_id)
     }
@@ -80,6 +81,7 @@ def get_posts(feed_params):
         joins = {
             "uniqueviews": (PageView, PageView.object_id),
             "allviews": (PageView, PageView.object_id),
+            "views": (PageView, PageView.object_id),
             "upvotes": (Vote, Vote.object_id),
             "comments": (Comment, Comment.post_id)
         }
@@ -87,8 +89,8 @@ def get_posts(feed_params):
         (join_table, join_on) = joins[sort_by]
 
         query = (db_session.query(Post, order_col)
-                 .outerjoin(join_table, Post.path == join_on))
-        query = query.group_by(Post.path)
+                 .outerjoin(join_table, Post.id == join_on))
+        query = query.group_by(Post.id)
 
     # sort order
     if order_col is not None:
