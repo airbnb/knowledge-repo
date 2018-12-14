@@ -56,26 +56,30 @@ whichever service you plan to use) and then running:
 Users can then clone this repository, and point their local `knowledge_repo`
 script at it using :code:`--repo <path_of_cloned_repository>`.
 
-If the git repo is hosted on a remote service like Github, then the knowledge
-repo server will periodically fetch updates, while running as a server. If
-the remote service requires authentication (e.g. a private repository on Github),
-then these requests will fail.
+When serving the posts from this repository using the Knowledge Repo web application,
+it will attempt to periodically fetch upstream changes to the repository. This can
+be disabled in the server configuration by setting :code:`INDEXING_UPDATES_REPOSITORIES=False`,
+in which case you will have to create your own external process for updating the repository
+in order for the Knowledge Repo to see new posts.
 
-Taking Github as an example, it's possible to use SSH to authenticate in order
-to allow the knowledge repo server access. To set this up:
+If the git repository is served on a remote host that requires authentication, the
+integrated fetching routines will fail unless you have properly set up your environment
+with the appropriate authentication.
 
- - Create a new SSH key and add it to your account per `Github documentation <https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/>`_
- - Where the server is deployed, clone the git repo with a git: URI: :code:`git@github.com:<org>/<repo>.git`
- - Add the SSH private key to :code:`~/.ssh/`
- - Tell SSH to use the key for  :code:`github.com` by adding to :code:`~/.ssh/config`:
+It's possible to use SSH to authenticate. Taking GitHub as an example, to set this up:
+
+ - Create a new SSH key and add it to your repository as a *read-only* deployment key per `GitHub documentation <https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys>`_
+ - Where the server is deployed, clone the git repo with a :code:`git:` URI (not :code:`https:`): :code:`git@github.com:<org>/<repo>.git`
+ - Add the deployment private key to the server at :code:`~/.ssh/`
+ - Tell SSH to use the key for :code:`github.com` by adding this to :code:`~/.ssh/config`:
 
    .. code-block:: shell
 
       Host github.com
         HostName github.com
-        IdentityFile ~/.ssh/<your key>
+        IdentityFile ~/.ssh/<your private deployment key file>
 
-Note that this leaves a private SSH key with access to your Github account on the server!
+Note that this leaves an SSH key with read access to your repository on the server, of course.
 
 Database Knowledge Repositories
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
