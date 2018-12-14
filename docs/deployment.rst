@@ -119,9 +119,9 @@ by running:
 which starts a web application instance on `http://127.0.0.1:7000` with the
 default (insecure) options. The command line also supports some high-level
 options, such as :code:`--port` and :code:`--dburi` which respectively change the local
-port on which the server is running, and the SQLAlchemy URI where the database
-can be found and/or initiated (which is necessary even when not using a
-database-backed knowledge repo).
+port on which the server is running, and the SQLAlchemy URI of the database to use
+and/or initialize for the post index (which is distinct from the database, if any,
+used to store knowledge posts).
 
 For shared deployments, however, you will probably need to create a server
 configuration file. A complete server configuration template can be found
