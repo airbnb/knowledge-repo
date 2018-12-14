@@ -84,7 +84,7 @@ one way. For more workflows, refer to: :doc:`workflows/writing`.
     $ knowledge_repo --repo <path/uri_of_repo> add example_post.ipynb -p project/example_ipynb
     $ knowledge_repo --repo <path/uri_of_repo> add example_post.Rmd -p project/example_rmd
 
-  Note that the `-p` option specifies the path in the repository to which the post
+  Note that the :code:`-p` option specifies the path in the repository to which the post
   should be added.
 
 .. topic:: Step 6: Preview the added post
