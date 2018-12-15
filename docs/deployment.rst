@@ -70,7 +70,7 @@ It's possible to use SSH to authenticate. Taking GitHub as an example, to set th
 
  - Create a new SSH key and add it to your repository as a *read-only* deployment key per `GitHub documentation <https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys>`_
  - Where the server is deployed, clone the git repo with a :code:`git:` URI (not :code:`https:`): :code:`git@github.com:<org>/<repo>.git`
- - Add the deployment private key to the server at :code:`~/.ssh/`
+ - Add the deployment private key to the server (for example, in :code:`~/.ssh/`)
  - Tell SSH to use the key for :code:`github.com` by adding this to :code:`~/.ssh/config`:
 
    .. code-block:: shell
@@ -79,7 +79,8 @@ It's possible to use SSH to authenticate. Taking GitHub as an example, to set th
         HostName github.com
         IdentityFile ~/.ssh/<your private deployment key file>
 
-Note that this leaves an SSH key with read access to your repository on the server, of course.
+Note that anyone with access to this machine can easily extract this key and gain
+read-only access to the repository.
 
 Database Knowledge Repositories
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
