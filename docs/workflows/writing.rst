@@ -53,7 +53,7 @@ will create a file, `~/Documents/my_first_knowledge_post.md`, the contents of
 which will be the boilerplate template of the knowledge post.
 
 The help menu for this command (and all following commands) can be reached by
-adding the `-h` flag, `knowledge_repo --repo <repo_path> create -h`.
+adding the :code:`-h` flag, `knowledge_repo --repo <repo_path> create -h`.
 
 Alternatively, by going to the `/create` route in the webapp, you can click the
 button for whichever template you would like to have, and that will download the
@@ -100,15 +100,15 @@ Using the example from above, if we wanted to add the post
   $ knowledge_repo --repo knowledge_data_repo add ~/Documents/my_first_knowledge_post.md -p projects/test_knowledge
 
 
-The `-p` flag specifies the location of the post in the knowledge data
+The :code:`-p` flag specifies the location of the post in the knowledge data
 repository - in this case, `knowledge_data_repo/projects/test_knowledge`. The
-`-p` flag does not need to be specified if `path` is included in the header of
+:code:`-p` flag does not need to be specified if `path` is included in the header of
 the knowledge post.
 
 Updating
 ^^^^^^^^
 
-To update an existing knowledge post, pass the `--update` flag to the `add`
+To update an existing knowledge post, pass the :code:`--update` flag to the `add`
 command. This will allow the add operation to override exiting knowledge posts.
 
 .. code-block:: shell
@@ -132,7 +132,7 @@ In the case from above, we would run:
 
   $ knowledge_repo --repo knowledge_data_repo preview projects/test_knowledge
 
-There are other arguments that can be passed to this command, adding the `-h`
+There are other arguments that can be passed to this command, adding the :code:`-h`
 flag shows them all along with further information about them.
 
 Submitting

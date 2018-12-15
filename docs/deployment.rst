@@ -144,9 +144,10 @@ by running:
 
 which starts a web application instance on `http://127.0.0.1:7000` with the
 default (insecure) options. The command line also supports some high-level
-options, such as `--port` and `--dburi` which respectively change the local
-port on which the server is running, and the sqlalchemy uri where the database
-can be found and/or initiated.
+options, such as :code:`--port` and :code:`--dburi` which respectively change the local
+port on which the server is running, and the SQLAlchemy URI of the database to use
+and/or initialize for the post index (which is distinct from the database, if any,
+used to store knowledge posts).
 
 For shared deployments, however, you will probably need to create a server
 configuration file. A complete server configuration template can be found
@@ -163,11 +164,12 @@ provided in the template, deploying the web application is as simple as:
 
   $ knowledge_repo --repo <repo_path> deploy --config <config_file>
 
-Supported options are `--port`, `--dburi`,`--workers`, `--timeout` and
-`--config`. The `--config` option allows you to specify a python config file
-from which to load the extended configuration. A template config file is
-provided in `knowledge_repo/app/config_defaults.py`. The `--port` and `--dburi`
-options are as before, with the `--workers` and `--timeout` options specifying
+Supported options are :code:`--port`, :code:`--dburi`, :code:`--workers`,
+:code:`--timeout` and :code:`--config`. The :code:`--config` option allows you
+to specify a python config file from which to load the extended configuration.
+A template config file is provided in `knowledge_repo/app/config_defaults.py`.
+The :code:`--port` and :code:`--dburi` options are as before, with the
+:code:`--workers` and :code:`--timeout` options specifying
 the number of threads to use when serving through gunicorn, and the timeout
 after which the threads are presumed to have died, and will be restarted.
 
@@ -178,9 +180,13 @@ No matter which knowledge repository backends are used, the web application
 itself requires a database backend in order to store its cache of the post
 index and user permissions. The database to be used can be specified via the
 CLI using the :code:`--dburi` option or via the config file passed in using
-:code:`--config`. Most datatabase backends supported by SQLAlchemy should work.
+:code:`--config`. Most database backends supported by SQLAlchemy should work.
 Database URIs will look something like:
-:code:`mysql://username:password@hostname/database:table_name`.
+:code:`mysql://username:password@hostname/database`.
+
+Note that it's also possible to use a SQLite database backed by a local
+file, or development or simple deployments. Use a URI like
+:code:`sqlite:///my-database.db` or :code:`sqlite:////path/to/my-database.db`.
 
 If the database does not exist, it is created (if that is possible) and
 initialised. When updates to the Knowledge Repo require changes to the database
