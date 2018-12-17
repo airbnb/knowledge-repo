@@ -128,7 +128,17 @@ if args.action == 'preview':
                                   config=None,
                                   INDEXING_ENABLED=False)
 
-    url = 'http://127.0.0.1:{}/post/{}'.format(port, post_path)
+    url = 'http://localhost:{}/post/{}'.format(port, post_path)
+    print(
+        "Previewing knowledge post at: {}\n\n"
+        "If you are using `kp` locally, a browser window will shortly open at "
+        "this address. Otherwise, please replace `localhost` with the hostname "
+        "of the server upon which you are running this script, and manually "
+        "point your browser at the resulting url.\n\n"
+        "When you are ready to exit the preview, simply kill this process using "
+        "`<Ctrl> + C`.\n"
+        .format(url)
+    )
     threading.Timer(1.25, lambda: webbrowser.open(url)).start()
 
     KnowledgeDeployer.using('flask')(
