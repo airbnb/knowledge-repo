@@ -1,33 +1,30 @@
 from __future__ import absolute_import
 
-import multiprocessing
-import time
-import atexit
 import os
 import imp
 import logging
 import traceback
 import math
-import multiprocessing
 import uuid
 import mimetypes
 
-from flask import Flask, current_app, render_template, g, request, flash, redirect, url_for, session
+import six
+from flask import Flask, current_app, render_template, request, session
 from flask_login import LoginManager, user_loaded_from_request
 from flask_mail import Mail
 from flask_migrate import Migrate
-from flask_principal import Principal, identity_loaded, identity_changed, Identity, RoleNeed, UserNeed, AnonymousIdentity, PermissionDenied
+from flask_principal import Principal, identity_loaded, Identity, AnonymousIdentity, PermissionDenied
 from alembic import command
 from alembic.migration import MigrationContext
 from datetime import datetime
 from werkzeug import url_encode
 
 import knowledge_repo
-from . import roles, routes
+from . import routes
 from .auth_provider import KnowledgeAuthProvider
 from .proxies import db_session, current_repo, current_user
 from .index import update_index, set_up_indexing_timers, time_since_index, time_since_index_check
-from .models import db as sqlalchemy_db, Post, User, Tag
+from .models import db as sqlalchemy_db, User, Tag
 from .utils.auth import AnonymousKnowledgeUser, populate_identity_roles, prepare_user
 
 # Needed to serve svg with correct mime type over https
@@ -55,7 +52,7 @@ class KnowledgeFlask(Flask):
 
         # Load configuration from file or provided object
         if config:
-            if isinstance(config, str):
+            if isinstance(config, six.string_types):
                 config = imp.load_source('knowledge_server_config', os.path.abspath(config))
             self.config.from_object(config)
 
