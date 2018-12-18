@@ -113,7 +113,7 @@ command. This will allow the add operation to override exiting knowledge posts.
 
 .. code-block:: shell
 
-  $ knowledge_repo --repo <repo_path> add --update <file with format {ipynb, Rmd, md}> <location in knowledge repo>
+  $ knowledge_repo --repo <repo_path> add --update <file with format {ipynb, Rmd, md}> -p <location in knowledge repo>
 
 Previewing
 ^^^^^^^^^^
