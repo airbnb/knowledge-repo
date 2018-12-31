@@ -1,0 +1,11 @@
+Assignment for the post at Elucidata, New Delhi
+
+#Purpose
+
+Tracking the analysis
+A very important part of a analysis is its reproducibility. To make analysis reproducible we need
+to preserve threads of thoughts and share it. One way to do this is to use a framework which
+preserves all the steps in an analysis and what else can be better than git. Fortunately, we
+already have solutions such as ​ knowledge repo​ available.
+Task: Use knowledge repo to track the analysis done above and host it on GitHub (don’t make
+the data public)
