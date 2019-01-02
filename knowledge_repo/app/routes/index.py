@@ -48,7 +48,7 @@ def site_map():
 @blueprint.route('/')
 @PageView.logged
 def render_index():
-    return redirect('/feed')
+    return redirect('/post/home.kp')
 
 
 @blueprint.route('/favorites')
@@ -79,19 +79,8 @@ def render_favorites():
 
 @blueprint.route('/feed')
 @PageView.logged
-@permissions.index_view.require()
 def render_feed():
-    """ Renders the index-feed view """
-    feed_params = from_request_get_feed_params(request)
-    posts, post_stats = get_posts(feed_params)
-    for post in posts:
-        post.tldr = render_post_tldr(post)
-
-    return render_template("index-feed.html",
-                           feed_params=feed_params,
-                           posts=posts,
-                           post_stats=post_stats,
-                           top_header='Knowledge Feed')
+    return redirect('/post/home.kp')
 
 
 @blueprint.route('/table')
@@ -244,7 +233,10 @@ def render_cluster():
         else:
             return (
                 sorted(clusters, key=lambda x: x.children_count, reverse=sort_desc) +
-                sorted(posts, key=lambda x: x.children_count, reverse=sort_desc)
+                sorted(
+                    posts,
+                    key=lambda x: x.children_count,
+                    reverse=sort_desc)
             )
 
     grouped_data = rec_sort(grouped_data, sort_by)
@@ -271,7 +263,8 @@ def create(knowledge_format=None):
     knowledge_template = "knowledge_template.{}".format(knowledge_format)
     filename = os.path.join(cur_dir, '../../templates', knowledge_template)
     response = make_response(open(filename).read())
-    response.headers["Content-Disposition"] = "attachment; filename=" + knowledge_template
+    response.headers["Content-Disposition"] = "attachment; filename=" + \
+        knowledge_template
     return response
 
 
@@ -285,7 +278,8 @@ def ajax_post_typeahead():
     search_terms = search_terms.split(" ")
     case_statements = []
     for term in search_terms:
-        case_stmt = case([(Post.keywords.ilike('%' + term.strip() + '%'), 1)], else_=0)
+        case_stmt = case(
+            [(Post.keywords.ilike('%' + term.strip() + '%'), 1)], else_=0)
         case_statements += [case_stmt]
 
     match_score = sum(case_statements).label("match_score")
