@@ -37,9 +37,17 @@ The following command will create a new repository at `<repo_path>`:
 
   $ knowledge_repo --repo <repo_path> init
 
-The result is a git repository at `<repo_path>` with a `.knowledge_repo_config`
-copied from the defaults found `in the repository source code <repo_config_>`__.
-If a git repository was already found at `<repo_path>` it will upgrade it to be
+The result is a knowledge repository at `<repo_path>` with a `.knowledge_repo_config`
+copied from the defaults found `in the repository source code <repo_config_>`__. By
+default, `init` treats the specified directory as a folder and not as a git repository. 
+In case you wish to create a git repository when initializing the knowledge repo, make
+sure to prefix :code:`git:///`:
+
+.. code-block:: shell
+
+  $ knowledge_repo --repo git:///<repo_path> init
+
+Otherwise, if a git repository was already found at `<repo_path>` it will upgrade it to be
 a knowledge data repository. This is useful if you are starting a repository on
 a remote service like GitHub, as this allows you to clone the remote repository
 as per normal; run this script; and then push the initialization back into the
