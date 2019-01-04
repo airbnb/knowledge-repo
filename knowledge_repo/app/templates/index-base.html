@@ -35,6 +35,7 @@
         <a href="{{ "#" if (page == page_count) else modify_query(start=page*results) }}" class="pagination-stepper{% if page == page_count %} disabled{% endif %}"{% if page == page_count %} onclick="return false;"{% endif %}>
           <i class="glyphicon glyphicon-chevron-right"></i>
         </a>
+        
       </div>
 
     {% endif %}
@@ -56,7 +57,7 @@
         </a>
         <a href="/cluster" class="btn btn-default btn-cluster no-underline" role="button">
           <i class="glyphicon glyphicon-post-org glyphicon-th-list"></i>
-          <span class="index-view-nane"> Cluster </span>
+          <span class="index-view-name"> Cluster </span>
         </a>
       </div>
     </div>
