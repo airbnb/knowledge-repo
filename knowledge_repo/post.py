@@ -287,7 +287,11 @@ class KnowledgePost(object):
         md = md.strip()
 
         if not headers:
-            headers = self._get_headers_from_yaml(md)
+            mtch = re.match('^---\n[\\s\\S]+?---\n', md)
+            if not mtch:
+                raise ValueError("YAML header is missing. Please ensure that the top of your post has a header of the following form:\n" + HEADER_SAMPLE)
+            md_head = mtch.group(0)
+            headers = self._get_headers_from_yaml(md_head)
 
         md = re.sub(r'^---(\n|\r)[\s\S]+?---(\n|\r)', '', md, count=1)
 
