@@ -1,0 +1,30 @@
+FROM ubuntu
+
+MAINTAINER perryism
+ 
+RUN apt-get update && \
+    apt-get -y install \
+	wget \
+	zip \
+	python-pip \
+	git \
+    && rm -rf /var/lib/apt/lists/* 
+
+ARG VERSION=0.8.8
+
+RUN wget https://github.com/airbnb/knowledge-repo/archive/v$VERSION.zip && \
+    unzip v$VERSION.zip -d /app
+
+WORKDIR /app/knowledge-repo-$VERSION
+
+COPY . /app/knowledge-repo-$VERSION
+
+RUN pip install --upgrade "knowledge-repo[all]"
+
+COPY entrypoint.sh /app/knowledge-repo-$VERSION
+
+VOLUME /data
+
+EXPOSE 7000
+
+CMD ["./entrypoint.sh"]
