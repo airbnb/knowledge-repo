@@ -19,7 +19,7 @@ WORKDIR /app/knowledge-repo-$VERSION
 
 COPY . /app/knowledge-repo-$VERSION
 
-RUN pip install --upgrade "knowledge-repo[all]"
+RUN pip install -r requirements.txt
 
 COPY entrypoint.sh /app/knowledge-repo-$VERSION
 
