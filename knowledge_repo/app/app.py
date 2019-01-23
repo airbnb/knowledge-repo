@@ -64,7 +64,6 @@ class KnowledgeFlask(Flask):
             repo = config.prepare_repo(repo)
         self.repository = repo
         assert isinstance(self.repository, knowledge_repo.KnowledgeRepository), "Invalid repository object provided."
-
         # Set debug mode from kwargs or else maintain current setting
         if debug is not None:
             self.config['DEBUG'] = debug
@@ -76,6 +75,7 @@ class KnowledgeFlask(Flask):
         if db_uri:
             self.config['SQLALCHEMY_DATABASE_URI'] = db_uri
         logger.debug(u"Using database: {}".format(self.config['SQLALCHEMY_DATABASE_URI']))
+
 
         # Register database schema with flask app
         sqlalchemy_db.init_app(self)
@@ -142,6 +142,7 @@ class KnowledgeFlask(Flask):
         # Add AnonymousIdentity fallback so that on_identity_loaded is called for
         # anonymous users too.
         self.principal.identity_loaders.append(lambda: AnonymousIdentity())
+
 
         # Synchronise user permissions with data model
         @user_loaded_from_request.connect
@@ -273,10 +274,20 @@ class KnowledgeFlask(Flask):
             except:
                 return date
 
+
+
+    def append_repo(self,name,uri):
+        temp = self.repository
+        self.repository = knowledge_repo.KnowledgeRepository.append_for_uri(name,uri,temp)
+        self.db_update_index(check_timeouts=False, force=True, reindex=True)
+        return self.repository
+        
+
     @property
     def repository(self):
         return getattr(self, '_repository')
 
+    
     @repository.setter
     def repository(self, repo):
         self._repository = repo

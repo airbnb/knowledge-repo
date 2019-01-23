@@ -42,6 +42,15 @@ if os.path.exists(os.path.join(contrib_dir, '__init__.py')):
 # we finish constructing the entire parser so that the syntax and arguments can change
 # from version to version of this script.
 
+# Repeating what the argparse already does
+def parse_repo_string(repo_str):
+    prefix_pattern = re.compile('^(?:\{(?P<name>[a-zA-Z_0-9]*)\})?(?P<uri>.*)$')
+
+    prefix = prefix_pattern.match(repo_str)
+    return prefix.groups()
+
+
+
 class ParseRepositories(argparse.Action):
 
     def __init__(self, **kwargs):
@@ -96,7 +105,6 @@ try:
     repo = knowledge_repo.KnowledgeRepository.for_uri(args.repo)
 except (ValueError, git.GitError, gitdb.exc.ODBError):  # TODO: Generalise error to cater for all KnowledgeRepository instances.
     repo = None
-
 
 # Update repository so that we can ensure git repository configuration is up to date
 # We wrap this in a try/except block because failing to update a repository can
@@ -236,6 +244,13 @@ if args.dev and os.path.exists(os.path.join(os.path.dirname(__file__), '..', '.g
     db_migrate.add_argument('--autogenerate', action='store_true', help="Whether alembic should automatically populate the migration script.")
 
 args = parser.parse_args()
+
+
+
+#new_name,new_uri = parse_repo_string("{3}kr-test")
+#repo = knowledge_repo.KnowledgeRepository.append_for_uri(new_name,new_uri,repo)
+#args.repo[new_name] = new_uri
+
 
 if not hasattr(args, 'action'):
     parser.print_help()
