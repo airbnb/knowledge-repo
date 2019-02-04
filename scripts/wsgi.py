@@ -5,13 +5,16 @@ if os.path.exists(os.path.join(os.path.dirname(script_dir), 'knowledge_repo', '_
 
 from knowledge_repo.app.deploy import KnowledgeDeployer, get_app_builder
 
-boilerplate_KR = dict({'dum':'../knowledge_repo/kr'})
-config_file = "../knowledge_repo/app/config_defaults.py"
+boilerplate_KR = dict({'dum':'kr'})
+config_file = "config_defaults.py"
 workers = 2
 port = 80
 timeout = 10
+dburi = 'mysql://polly:password@aav7gvtlaqdl6d.cr3v4l6m6o84.ap-northeast-2.rds.amazonaws.com:3306/aav7gvtlaqdl6d'
+#dburi = 'mysql://ar:ar@localhost/test_kr' 
 
 app_builder = get_app_builder(boilerplate_KR,
+                                  db_uri=dburi,
                                   debug=True,
                                   config=config_file)
 
