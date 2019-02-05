@@ -247,9 +247,6 @@ args = parser.parse_args()
 
 
 
-#new_name,new_uri = parse_repo_string("{3}kr-test")
-#repo = knowledge_repo.KnowledgeRepository.append_for_uri(new_name,new_uri,repo)
-#args.repo[new_name] = new_uri
 
 
 if not hasattr(args, 'action'):

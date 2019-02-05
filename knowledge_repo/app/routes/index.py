@@ -51,13 +51,6 @@ def render_index():
     return redirect('/feed')
 
 
-
-@blueprint.route('/uploadtrigger')
-@PageView.logged
-@login_required
-def new_repo_trigger():
-    return "Hi"    
-
 @blueprint.route('/testupload')
 @PageView.logged
 def test_upload():

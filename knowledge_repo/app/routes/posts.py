@@ -65,9 +65,6 @@ def render(path):
         allowed_users = set(user.id for group in post.groups for user in group.users)
         if user_id not in allowed_users:
             return render_template("permission_ask.html", authors=post.authors_string)
-    print(post.authors)
-    print(current_repo.config.editors)
-    print(username)
     rendered = render_post(post, with_toc=True)
     raw_post = render_post_raw(post) if mode == 'raw' else None
 
