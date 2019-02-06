@@ -281,6 +281,12 @@ class KnowledgeFlask(Flask):
         self.repository = knowledge_repo.KnowledgeRepository.append_for_uri(name,uri,temp)
         self.db_update_index(check_timeouts=False, force=True, reindex=True)
         return self.repository
+   
+    def append_repo_obj(self,name,obj):
+        temp = self.repository
+        self.repository = knowledge_repo.KnowledgeRepository.append_obj(name,obj,temp)
+        self.db_update_index(check_timeouts=False, force=True, reindex=True)
+        return self.repository
         
 
     @property

@@ -54,9 +54,12 @@ def render_index():
 @blueprint.route('/testupload')
 @PageView.logged
 def test_upload():
-    global current_repo
-    repo = current_app.append_repo("3","kr-test")
-    current_repo = repo
+    global current_repo,current_app
+    #repo = current_app.append_repo("3","kr-test")
+    #current_repo = repo
+    dbobj = current_repo.migrate_to_dbrepo("ucla_rnaseq_tcga_analysis","ucla-kr")
+
+    current_repo = current_app.append_repo_obj("3",dbobj)
     return redirect('/feed')    
 
 
@@ -92,10 +95,12 @@ def render_favorites():
 @permissions.index_view.require()
 def render_feed():
     """ Renders the index-feed view """
+    global current_repo,current_app
     feed_params = from_request_get_feed_params(request)
     posts, post_stats = get_posts(feed_params)
     for post in posts:
         post.tldr = render_post_tldr(post)
+    
 
     return render_template("index-feed.html",
                            feed_params=feed_params,

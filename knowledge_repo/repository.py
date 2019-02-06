@@ -59,6 +59,34 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         return MetaKnowledgeRepository(krs)
 
     @classmethod
+    def migrate_to_dbrepo(cls,gitpath,newpath):
+        # A new (supposedly) git repository is going to be uploaded
+        # That must be migrated to the database. 
+        # Inputs : 
+        # gitpath
+        # newpath
+
+        from .repositories.dbrepository import DbKnowledgeRepository
+        newpath = "mysql://abhi:1234@localhost/knowledgerepo:%s"%newpath
+        db_obj = DbKnowledgeRepository(newpath)
+        gitkr = cls.for_uri(gitpath)
+        for post in gitkr.posts():
+            new_post = db_obj.add(post)
+            new_post_status = new_post.status
+            db_obj.submit(new_post.path)
+            db_obj.accept(new_post.path)
+            db_obj.publish(new_post.path)
+        return db_obj
+    
+    @classmethod
+    def append_obj(cls,name,new_obj,meta_repo):
+        from .repositories.meta import MetaKnowledgeRepository
+        krs = meta_repo.uri
+        krs[name] = new_obj
+        meta_repo = MetaKnowledgeRepository(krs)
+        return meta_repo
+
+    @classmethod
     def append_for_uri(cls,name,uri,meta_repo):
         from .repositories.meta import MetaKnowledgeRepository
         krs = meta_repo.uri
