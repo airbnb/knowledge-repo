@@ -59,8 +59,6 @@ def test_upload():
     current_repo = repo
     return redirect('/feed')    
 
-
-
 @blueprint.route('/favorites')
 @PageView.logged
 @login_required

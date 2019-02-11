@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 from __future__ import print_function
 from __future__ import unicode_literals
 
@@ -48,8 +48,6 @@ def parse_repo_string(repo_str):
 
     prefix = prefix_pattern.match(repo_str)
     return prefix.groups()
-
-
 
 class ParseRepositories(argparse.Action):
 
@@ -105,6 +103,7 @@ try:
     repo = knowledge_repo.KnowledgeRepository.for_uri(args.repo)
 except (ValueError, git.GitError, gitdb.exc.ODBError):  # TODO: Generalise error to cater for all KnowledgeRepository instances.
     repo = None
+
 
 # Update repository so that we can ensure git repository configuration is up to date
 # We wrap this in a try/except block because failing to update a repository can
@@ -244,10 +243,6 @@ if args.dev and os.path.exists(os.path.join(os.path.dirname(__file__), '..', '.g
     db_migrate.add_argument('--autogenerate', action='store_true', help="Whether alembic should automatically populate the migration script.")
 
 args = parser.parse_args()
-
-
-
-
 
 if not hasattr(args, 'action'):
     parser.print_help()

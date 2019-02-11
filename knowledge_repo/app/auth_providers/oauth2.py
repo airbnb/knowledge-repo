@@ -163,7 +163,7 @@ class OAuth2Provider(KnowledgeAuthProvider):
             if isinstance(key, str):
                 return d[key]
             raise RuntimeError("Invalid key type: {}.".format(key))
-       
+ 
         response = self.oauth_client.get(self.get_endpoint_url(self.user_info_endpoint), verify=self.verify_ssl_certs)
         try:
             response_dict = json.loads(request.content.decode('utf-8'))
