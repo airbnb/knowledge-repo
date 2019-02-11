@@ -64,7 +64,7 @@ class KnowledgeFlask(Flask):
             repo = config.prepare_repo(repo)
         self.repository = repo
         assert isinstance(self.repository, knowledge_repo.KnowledgeRepository), "Invalid repository object provided."
-        
+ 
         # Set debug mode from kwargs or else maintain current setting
         if debug is not None:
             self.config['DEBUG'] = debug
@@ -282,7 +282,7 @@ class KnowledgeFlask(Flask):
     @property
     def repository(self):
         return getattr(self, '_repository')
-    
+
     @repository.setter
     def repository(self, repo):
         self._repository = repo
