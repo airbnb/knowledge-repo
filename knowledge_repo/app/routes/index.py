@@ -62,8 +62,6 @@ def test_upload():
     current_repo = current_app.append_repo_obj("3",dbobj)
     return redirect('/feed')    
 
-
-
 @blueprint.route('/favorites')
 @PageView.logged
 @login_required
