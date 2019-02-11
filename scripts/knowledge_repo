@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 from __future__ import print_function
 from __future__ import unicode_literals
 
@@ -41,6 +41,13 @@ if os.path.exists(os.path.join(contrib_dir, '__init__.py')):
 # constructing the argument parser, and checking the provided repo. We do this before
 # we finish constructing the entire parser so that the syntax and arguments can change
 # from version to version of this script.
+
+# Repeating what the argparse already does
+def parse_repo_string(repo_str):
+    prefix_pattern = re.compile('^(?:\{(?P<name>[a-zA-Z_0-9]*)\})?(?P<uri>.*)$')
+
+    prefix = prefix_pattern.match(repo_str)
+    return prefix.groups()
 
 class ParseRepositories(argparse.Action):
 

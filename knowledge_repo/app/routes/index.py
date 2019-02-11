@@ -51,6 +51,14 @@ def render_index():
     return redirect('/feed')
 
 
+@blueprint.route('/testupload')
+@PageView.logged
+def test_upload():
+    global current_repo
+    repo = current_app.append_repo("3","kr-test")
+    current_repo = repo
+    return redirect('/feed')    
+
 @blueprint.route('/favorites')
 @PageView.logged
 @login_required

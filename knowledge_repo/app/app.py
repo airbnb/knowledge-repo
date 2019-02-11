@@ -273,6 +273,12 @@ class KnowledgeFlask(Flask):
             except:
                 return date
 
+    def append_repo(self,name,uri):
+        temp = self.repository
+        self.repository = knowledge_repo.KnowledgeRepository.append_for_uri(name,uri,temp)
+        self.db_update_index(check_timeouts=False, force=True, reindex=True)
+        return self.repository
+
     @property
     def repository(self):
         return getattr(self, '_repository')

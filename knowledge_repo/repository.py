@@ -59,6 +59,14 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         return MetaKnowledgeRepository(krs)
 
     @classmethod
+    def append_for_uri(cls,name,uri,meta_repo):
+        from .repositories.meta import MetaKnowledgeRepository
+        krs = meta_repo.uri
+        krs[name] = cls.for_uri(uri)
+        meta_repo = MetaKnowledgeRepository(krs)
+        return meta_repo
+
+    @classmethod
     def from_uri(cls, url, *args, **kwargs):
         return cls(url, *args, **kwargs)
 
