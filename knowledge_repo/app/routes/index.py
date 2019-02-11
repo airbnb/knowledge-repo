@@ -98,7 +98,6 @@ def render_feed():
     posts, post_stats = get_posts(feed_params)
     for post in posts:
         post.tldr = render_post_tldr(post)
-    
 
     return render_template("index-feed.html",
                            feed_params=feed_params,
