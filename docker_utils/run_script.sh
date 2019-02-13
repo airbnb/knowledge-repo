@@ -6,6 +6,6 @@ SQLCONN="mysql://$USER:$PSWD@$DBPATH:$PORT/knowledgerepo"
 
 source /app/kr/bin/activate
 
-CMD="/app/knowledge-repo/scripts/knowledge_repo --repo {webpost}$SQLCONN:webposts --repo {webpost2}$SQLCONN:webposts2 runserver --config=/app/app_config.py --port 80"
+CMD="/app/scripts/knowledge_repo --repo {webpost}$SQLCONN:webposts --repo {webpost2}$SQLCONN:webposts2 runserver --config=/app/app_config.py --port 80"
 echo $CMD
 $($CMD)

@@ -1,0 +1,28 @@
+Metadata-Version: 2.1
+Name: Flask-Migrate
+Version: 2.3.1
+Summary: SQLAlchemy database migrations for Flask applications using Alembic
+Home-page: http://github.com/miguelgrinberg/flask-migrate/
+Author: Miguel Grinberg
+Author-email: miguelgrinberg50@gmail.com
+License: MIT
+Platform: any
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Dist: Flask (>=0.9)
+Requires-Dist: Flask-SQLAlchemy (>=1.0)
+Requires-Dist: alembic (>=0.7)
+
+Flask-Migrate
+--------------
+
+SQLAlchemy database migrations for Flask applications using Alembic.
+
+
