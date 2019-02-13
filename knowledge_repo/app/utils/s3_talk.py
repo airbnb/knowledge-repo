@@ -61,7 +61,7 @@ def download_dir(path):
 def download_from_s3(path):
     try: 
         fname = _extract_path(path)
-        temp_name = '/tmp/%s'%%fname
+        temp_name = '/tmp/%s'%fname
         S3.Bucket(BUCKET_NAME).download_file(path,temp_name)
     except botocore.exceptions.ClientError as e:
         if e.response['Error']['Code'] == "404":
