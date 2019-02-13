@@ -172,7 +172,7 @@ class KnowledgeFlask(Flask):
         self.register_blueprint(routes.editor.blueprint)
         self.register_blueprint(routes.groups.blueprint)
         self.register_blueprint(routes.auth.blueprint)
-        self.register_blueprint(routes.api.blueprint)
+        self.register_blueprint(routes.polly_api.blueprint)
         KnowledgeAuthProvider.register_auth_provider_blueprints(self)
 
         if self.config['DEBUG']:
