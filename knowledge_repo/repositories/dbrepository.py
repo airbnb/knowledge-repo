@@ -45,7 +45,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
                               Column('revision', Integer, default=0),
                               Column('status', Integer, default=self.PostStatus.DRAFT.value),
                               Column('ref', String(512)),
-                              Column('data', LargeBinary))
+                              Column('data', LargeBinary(length=(2**32)-1))) # Increased length to support large notebooks
         self.engine = create_engine(engine_uri, pool_recycle=3600)
         self.session = scoped_session(sessionmaker(bind=self.engine))
         if auto_create:
