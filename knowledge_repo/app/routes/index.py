@@ -102,8 +102,6 @@ def render_feed():
                               'total_likes': post.vote_count,
                               'total_comments': post.comment_count} for post in posts}
 
-
-#    posts, post_stats = get_posts(feed_params)
     for post in posts:
         post.tldr = render_post_tldr(post)
 
