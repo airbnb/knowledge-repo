@@ -25,7 +25,6 @@ blueprint = Blueprint('api', __name__, template_folder='../templates', static_fo
 
 @blueprint.route('/api/uploadkr')
 @PageView.logged
-@login_required
 def upload_kr():
     """
     API to upload a KR to the server
