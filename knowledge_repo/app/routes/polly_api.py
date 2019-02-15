@@ -34,7 +34,9 @@ def upload_kr():
     global current_repo,current_app
     path = request.args.get('path')
     dir_name,dir_path = download_dir(path)
-    dbobj  = current_repo.migrate_to_dbrepo(dir_path,dir_name)
+
+    db_path = current_app.config['KR_REPO_DB_PATH'] + ':' + dir_name
+    dbobj  = current_repo.migrate_to_dbrepo(dir_path,db_path)
     current_repo = current_app.append_repo_obj(dir_name,dbobj)
     return redirect('/feed')
 
