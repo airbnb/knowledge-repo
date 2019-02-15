@@ -1,0 +1,13 @@
+{
+	"AWSEBDockerrunVersion": "1",
+	"Image": {
+		"Name":"508105988628.dkr.ecr.ap-southeast-1.amazonaws.com/knowledgerepo:test_v1-0",
+		"Update":"true"
+	},
+	"Ports": [
+    {
+      "ContainerPort": 80,
+      "HostPort": 80
+    }
+  ]
+}

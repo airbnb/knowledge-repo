@@ -1,0 +1,118 @@
+# Script for CD of Knowledge Repo (KR) deployment on Elastic Beanstalk (EB)
+## Basic Functions:
+### 1 Pull the updated KR code
+### 2 Create a docker image, upload to Elastic Container Registry (ECR)
+### 3 Deploy ECR image on EB
+
+# CircleCI 2.0 configuration file
+version: 2
+
+aliases:
+  - &app_working_dir ~/knowledge-repo
+
+defaults: &defaults
+  working_directory: *app_working_dir
+  docker:
+    # Using Amazon Linux for Serverless code packaging
+    - image: elucidpulkit/ubunturpollyci
+      auth:
+        username: $DOCKERHUB_USERNAME
+        password: $DOCKERHUB_PASSWORD
+
+jobs:
+
+  build_initial:
+    <<: *defaults
+
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+          version: 17.05.0-ce
+
+      - run:
+          name: Load Docker image layer cache
+          command: |
+            set +o pipefail
+            if [[ -e /caches/$DOCKERTAG.tar ]]; then  docker load -i /caches/$DOCKERTAG.tar; fi
+
+      - persist_to_workspace:
+          root: *app_working_dir
+          paths: .
+
+  docker_create_push:
+    <<: *defaults
+
+    steps:
+
+      - attach_workspace:
+          at: *app_working_dir
+
+      - setup_remote_docker:
+          docker_layer_caching: true
+
+      - run:
+          name: Copy necessary docker files
+          command: |
+            cp -R docker_utils/* ./.
+
+      - run:
+          name: Build docker image
+          command: |
+            docker build -t hellowtest .
+
+      - run:
+          name: Push docker image to ecr
+          command: |
+            eval $(aws ecr get-login --no-include-email --region ap-southeast-1)
+            docker tag hellowtest:latest 508105988628.dkr.ecr.ap-southeast-1.amazonaws.com/knowledgerepo:test_v1-0
+            docker push 508105988628.dkr.ecr.ap-southeast-1.amazonaws.com/knowledgerepo:test_v1-0
+
+      - persist_to_workspace:
+          root: *app_working_dir
+          paths: .
+
+  deploy_eb_ecr:
+    <<: *defaults
+
+    steps:
+
+      - attach_workspace:
+          at: *app_working_dir
+
+      - run:
+          name: Deploy to eb
+          command: |
+            virtualenv -p python3 venv
+            . venv/bin/activate
+            pip install awsebcli
+            ls
+            cd eb_utils
+            echo "$EB_REGION_CODE $EB_APP_NAME $EB_REGION_CODE"
+            cd .elasticbeanstalk/
+            cat config_nonvar.yml
+            envsubst < config_nonvar.yml > config.yml
+            cat config.yml
+            cd ..
+            eb deploy $EB_ENV_NAME
+
+workflows:
+  version: 2
+
+  build_process:
+    jobs:
+
+      - build_initial:
+          filters:
+            branches:
+              only:
+                - ftr-deploy-aws
+
+      - docker_create_push:
+          requires:
+            - build_initial
+
+      - deploy_eb_ecr:
+          requires:
+            # - build_initial
+            - docker_create_push
