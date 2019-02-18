@@ -1,3 +1,0 @@
-[flask.commands]
-db = flask_migrate.cli:db
-
