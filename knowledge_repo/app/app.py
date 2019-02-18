@@ -274,6 +274,9 @@ class KnowledgeFlask(Flask):
             except:
                 return date
 
+    def test(self):
+        self.repository.test()
+        return ''
     def append_repo(self,name,uri):
         temp = self.repository
         self.repository = knowledge_repo.KnowledgeRepository.append_for_uri(name,uri,temp)

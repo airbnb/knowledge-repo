@@ -40,7 +40,7 @@ DEBUG = False
 # ---------------------------------------------------
 # Database configuration
 # ---------------------------------------------------
-SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+SQLALCHEMY_DATABASE_URI = 'mysql://abhi:1234@localhost/knowledgeapp'
 SQLALCHEMY_ECHO = False
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 

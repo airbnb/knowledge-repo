@@ -58,6 +58,19 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         krs = {name: cls.for_uri(uri) for name, uri in list(uris.items())}
         return MetaKnowledgeRepository(krs)
 
+    
+    def test(self):
+        c = 0
+        pat = self.path
+        for post in self.posts():
+            s = post.src_paths
+            pat = pat + '/' +post.path
+            #p = KnowledgePost.from_file(pat + '/'+s[0])
+            print(s)
+#            self.add(p,path='testpath%d'%c)
+ #           c+=1
+            #print(s[0])
+
     @classmethod
     def migrate_to_dbrepo(cls,gitpath,newpath):
         # A new (supposedly) git repository is going to be uploaded
@@ -70,9 +83,12 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         #newpath = "mysql://abhi:1234@localhost/knowledgerepo:%s"%newpath
         db_obj = DbKnowledgeRepository(newpath)
         gitkr = cls.for_uri(gitpath)
+        
         for post in gitkr.posts():
-            new_post = db_obj.add(post,update=True)
-            new_post_status = new_post.status
+            post_path  = gitpath + '/' + post.path
+            post_src_path = post_path + '/' + post.src_paths[0]
+            new_post = KnowledgePost.from_file(post_src_path)
+            new_post = db_obj.add(new_post,path=post.path,update=True)
             db_obj.submit(new_post.path)
             db_obj.accept(new_post.path)
             db_obj.publish(new_post.path)
