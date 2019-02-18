@@ -111,11 +111,11 @@ workflows:
                 - ftr-deploy-aws
                 - demo
 
-      # - docker_create_push:
-      #     requires:
-      #       - build_initial
+      - docker_create_push:
+          requires:
+            - build_initial
 
       - deploy_eb_ecr:
           requires:
-            - build_initial
-            # - docker_create_push
+            # - build_initial
+            - docker_create_push
