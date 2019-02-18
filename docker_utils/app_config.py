@@ -164,7 +164,7 @@ def AUTH_MAP_REQUEST_HEADERS(headers):
         # 'identifier': None,
         # 'avatar_uri': None,
         # 'name': None,
-        # 'email': None
+#         'email': headers.
     }
 
 

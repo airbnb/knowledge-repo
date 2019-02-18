@@ -1,4 +1,6 @@
 alembic==1.0.7
+boto3==1.9.96
+botocore==1.12.96
 blinker==1.4
 Click==7.0
 colorama==0.4.1

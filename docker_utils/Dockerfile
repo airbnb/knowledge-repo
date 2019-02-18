@@ -8,8 +8,7 @@ WORKDIR /app
 COPY . /app
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --trusted-host pypi.python.org -r requirements.txt
-
+RUN pip3 install --trusted-host pypi.python.org -r requirements.txt --upgrade
 # Make port 80 available to the world outside this container
 EXPOSE 80
 
