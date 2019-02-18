@@ -92,8 +92,19 @@ def render_favorites():
 def render_feed():
     """ Renders the index-feed view """
     global current_repo,current_app
+    #Always have feed display only user who is logged in 
     feed_params = from_request_get_feed_params(request)
-    posts, post_stats = get_posts(feed_params)
+    user_id = feed_params['user_id']
+    user = (db_session.query(User)
+            .filter(User.id == user_id)
+            .first())
+    posts = user.posts
+    post_stats = {post.path: {'all_views': post.view_count,
+                              'distinct_views': post.view_user_count,
+                              'total_likes': post.vote_count,
+                              'total_comments': post.comment_count} for post in posts}
+
+
     for post in posts:
         post.tldr = render_post_tldr(post)
     return render_template("index-feed.html",
