@@ -70,6 +70,14 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
 #            self.add(p,path='testpath%d'%c)
  #           c+=1
             #print(s[0])
+    
+
+    def upload_post(self,filepath,path):
+        self.add(KnowledgePost.from_file(filepath),path=path,update=True)
+        self.submit(path)
+        self.accept(path)
+        self.publish(path)
+        return 
 
     @classmethod
     def migrate_to_dbrepo(cls,gitpath,newpath):
