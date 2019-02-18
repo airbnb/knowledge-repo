@@ -1,0 +1,6 @@
+README.rst
+termcolor.py
+termcolor.egg-info/PKG-INFO
+termcolor.egg-info/SOURCES.txt
+termcolor.egg-info/dependency_links.txt
+termcolor.egg-info/top_level.txt

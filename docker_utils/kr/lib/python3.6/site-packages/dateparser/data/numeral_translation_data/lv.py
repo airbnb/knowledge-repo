@@ -1,0 +1,77 @@
+# -*- coding: utf-8 -*-
+info = {
+    "%%spellout-prefixed": {
+        "0": "ERROR;",
+        "1": "vien;",
+        "2": "div;",
+        "3": "trīs;",
+        "4": "četr;",
+        "5": "piec;",
+        "6": "seš;",
+        "7": "septiņ;",
+        "8": "astoņ;",
+        "9": "deviņ;",
+        "(10, 'inf')": "ERROR;"
+    },
+    "%spellout-cardinal-feminine": {
+        "0": "nulle;",
+        "1": "viena;",
+        "2": "divas;",
+        "3": "trīs;",
+        "4": "četras;",
+        "5": "piecas;",
+        "6": "sešas;",
+        "7": "septiņas;",
+        "8": "astoņas;",
+        "9": "deviņas;",
+        "(10, 19)": "=%spellout-cardinal-masculine=;",
+        "(20, 99)": "<%%spellout-prefixed<desmit[ >>];",
+        "(100, 199)": "simt[ >>];",
+        "(200, 999)": "<%%spellout-prefixed<simt[ >>];",
+        "(1000, 1999)": "tūkstoš[ >>];",
+        "(2000, 999999)": "<%%spellout-prefixed<tūkstoš[ >>];",
+        "(1000000, 1999999)": "viens miljons[ >>];",
+        "(2000000, 999999999)": "<%spellout-cardinal-masculine< miljoni[ >>];",
+        "(1000000000, 1999999999)": "viens miljards[ >>];",
+        "(2000000000, 999999999999)": "<%spellout-cardinal-masculine< miljardi[ >>];",
+        "(1000000000000, 1999999999999)": "viens biljons[ >>];",
+        "(2000000000000, 999999999999999)": "<%spellout-cardinal-masculine< biljoni[ >>];",
+        "(1000000000000000, 1999999999999999)": "viens biljards[ >>];",
+        "(2000000000000000, 999999999999999999)": "<%spellout-cardinal-masculine< biljardi[ >>];",
+        "(1000000000000000000, 'inf')": "=#,##0=;"
+    },
+    "%spellout-cardinal-masculine": {
+        "0": "nulle;",
+        "1": "viens;",
+        "2": "divi;",
+        "3": "trīs;",
+        "4": "četri;",
+        "5": "pieci;",
+        "6": "seši;",
+        "7": "septiņi;",
+        "8": "astoņi;",
+        "9": "deviņi;",
+        "10": "desmit;",
+        "(11, 19)": ">%%spellout-prefixed>padsmit;",
+        "(20, 99)": "<%%spellout-prefixed<desmit[ >>];",
+        "(100, 199)": "simt[ >>];",
+        "(200, 999)": "<%%spellout-prefixed<simt[ >>];",
+        "(1000, 1999)": "tūkstoš[ >>];",
+        "(2000, 999999)": "<%%spellout-prefixed<tūkstoš[ >>];",
+        "(1000000, 1999999)": "viens miljons[ >>];",
+        "(2000000, 999999999)": "<%spellout-cardinal-masculine< miljoni[ >>];",
+        "(1000000000, 1999999999)": "viens miljards[ >>];",
+        "(2000000000, 999999999999)": "<%spellout-cardinal-masculine< miljardi[ >>];",
+        "(1000000000000, 1999999999999)": "viens biljons[ >>];",
+        "(2000000000000, 999999999999999)": "<%spellout-cardinal-masculine< biljoni[ >>];",
+        "(1000000000000000, 1999999999999999)": "viens biljards[ >>];",
+        "(2000000000000000, 999999999999999999)": "<%spellout-cardinal-masculine< biljardi[ >>];",
+        "(1000000000000000000, 'inf')": "=#,##0=;"
+    },
+    "%spellout-numbering": {
+        "(0, 'inf')": "=%spellout-cardinal-masculine=;"
+    },
+    "%spellout-numbering-year": {
+        "(0, 'inf')": "=%spellout-numbering=;"
+    }
+}
