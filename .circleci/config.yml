@@ -92,14 +92,8 @@ jobs:
             virtualenv -p python3 venv
             . venv/bin/activate
             pip install awsebcli
-            ls
-            cd eb_utils
-            echo "$EB_REGION_CODE $EB_APP_NAME $EB_REGION_CODE"
-            cd .elasticbeanstalk/
-            cat config_nonvar.yml
-            envsubst < config_nonvar.yml > config.yml
-            cat config.yml
-            cd ..
+            # Substitute env variables
+            cd eb_utils/.elasticbeanstalk/ && envsubst < config_nonvar.yml > config.yml && cd ..
             eb deploy $EB_ENV_NAME
 
 workflows:
@@ -113,6 +107,7 @@ workflows:
             branches:
               only:
                 - ftr-deploy-aws
+                - demo
 
       - docker_create_push:
           requires:
