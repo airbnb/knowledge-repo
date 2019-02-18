@@ -71,8 +71,8 @@ jobs:
           name: Push docker image to ecr
           command: |
             eval $(aws ecr get-login --no-include-email --region ap-southeast-1)
-            docker tag hellowtest:latest 508105988628.dkr.ecr.ap-southeast-1.amazonaws.com/knowledgerepo:test_v1-0
-            docker push 508105988628.dkr.ecr.ap-southeast-1.amazonaws.com/knowledgerepo:test_v1-0
+            docker tag hellowtest:latest 508105988628.dkr.ecr.ap-southeast-1.amazonaws.com/knowledgerepo:$IMG_TAG
+            docker push 508105988628.dkr.ecr.ap-southeast-1.amazonaws.com/knowledgerepo:$IMG_TAG
 
       - persist_to_workspace:
           root: *app_working_dir
@@ -92,13 +92,9 @@ jobs:
             virtualenv -p python3 venv
             . venv/bin/activate
             pip install awsebcli
-            ls
-            cd eb_utils
-            echo "$EB_REGION_CODE $EB_APP_NAME $EB_REGION_CODE"
-            cd .elasticbeanstalk/
-            cat config_nonvar.yml
+            # Substitute env variables
+            cd eb_utils/.elasticbeanstalk/
             envsubst < config_nonvar.yml > config.yml
-            cat config.yml
             cd ..
             eb deploy $EB_ENV_NAME
 
@@ -113,12 +109,13 @@ workflows:
             branches:
               only:
                 - ftr-deploy-aws
+                - demo
 
-      - docker_create_push:
-          requires:
-            - build_initial
+      # - docker_create_push:
+      #     requires:
+      #       - build_initial
 
       - deploy_eb_ecr:
           requires:
-            # - build_initial
-            - docker_create_push
+            - build_initial
+            # - docker_create_push
