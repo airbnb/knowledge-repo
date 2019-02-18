@@ -10,6 +10,7 @@ COPY . /app
 # Install any needed packages specified in requirements.txt
 RUN pip3 install --trusted-host pypi.python.org -r requirements.txt --upgrade
 RUN pip3 install --upgrade nbformat nbconvert[execute] traitlets
+#RUN apt-get install littler
 # Make port 80 available to the world outside this container
 EXPOSE 80
 

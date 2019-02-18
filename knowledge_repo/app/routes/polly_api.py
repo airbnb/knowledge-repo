@@ -11,7 +11,7 @@ import os
 import json
 from builtins import str
 from collections import namedtuple
-from flask import request, render_template, redirect, Blueprint, current_app, make_response
+from flask import request, render_template, redirect, Blueprint, current_app, make_response,jsonify
 from flask_login import login_required
 from sqlalchemy import case, desc
 from werkzeug import secure_filename
@@ -59,12 +59,11 @@ def upload_kr():
         current_repo = current_app.append_repo_obj(dir_name,dbobj)
     except:
         error = 400
-    return {
+    return jsonify({
                 'statusCode': '400' if error==400 else '200',
                 'headers': {
                             'Content-Type': 'application/json',
                             'Access-Control-Allow-Origin': '*'
                             },
-            }
-
+                   })
 
