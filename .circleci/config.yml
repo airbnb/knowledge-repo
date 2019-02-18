@@ -3,6 +3,12 @@
 ### 1 Pull the updated KR code
 ### 2 Create a docker image, upload to Elastic Container Registry (ECR)
 ### 3 Deploy ECR image on EB
+# 
+# To-do
+## 1 Check for similarity of created docker image v. ECR image.
+##    If no diff, don't upload or deploy.
+## 2 Create a scheme for tagging multiple types of docker images
+##    This helps in differentiating purposes, also possibly analyse metrics for different use cases.
 
 # CircleCI 2.0 configuration file
 version: 2
