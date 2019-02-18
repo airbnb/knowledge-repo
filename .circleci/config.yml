@@ -71,8 +71,8 @@ jobs:
           name: Push docker image to ecr
           command: |
             eval $(aws ecr get-login --no-include-email --region ap-southeast-1)
-            docker tag hellowtest:latest 508105988628.dkr.ecr.ap-southeast-1.amazonaws.com/knowledgerepo:test_v1-0
-            docker push 508105988628.dkr.ecr.ap-southeast-1.amazonaws.com/knowledgerepo:test_v1-0
+            docker tag hellowtest:latest 508105988628.dkr.ecr.ap-southeast-1.amazonaws.com/knowledgerepo:test_v1-1
+            docker push 508105988628.dkr.ecr.ap-southeast-1.amazonaws.com/knowledgerepo:test_v1-1
 
       - persist_to_workspace:
           root: *app_working_dir
@@ -93,7 +93,9 @@ jobs:
             . venv/bin/activate
             pip install awsebcli
             # Substitute env variables
-            cd eb_utils/.elasticbeanstalk/ && envsubst < config_nonvar.yml > config.yml && cd ..
+            cd eb_utils/.elasticbeanstalk/
+            envsubst < config_nonvar.yml > config.yml
+            cd ..
             eb deploy $EB_ENV_NAME
 
 workflows:
