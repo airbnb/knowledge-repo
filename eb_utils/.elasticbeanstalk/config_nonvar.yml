@@ -14,15 +14,15 @@ branch-defaults:
     environment: $EB_ENV_NAME
 global:
   application_name: $EB_APP_NAME
-  default_ec2_keyname: null
-  default_platform: arn:aws:elasticbeanstalk:$EB_REGION_CODE::platform/Docker
-    running on 64bit Amazon Linux/2.12.8
+  default_ec2_keyname: aws-eb-kr
+  default_platform: arn:aws:elasticbeanstalk:$EB_REGION_CODE::platform/Docker running
+    on 64bit Amazon Linux/2.12.8
   default_region: $EB_REGION_CODE
   include_git_submodules: true
   instance_profile: null
   platform_name: null
   platform_version: null
-  sc: null
   # Do not include profile value here.
   # It is taken through CircleCI 2.0's environment variable.
+  sc: null
   workspace_type: Application
