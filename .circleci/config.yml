@@ -93,9 +93,8 @@ jobs:
             . venv/bin/activate
             pip install awsebcli
             # Substitute env variables
-            cd eb_utils/.elasticbeanstalk/
-            envsubst < config_nonvar.yml > config.yml
-            cd ..
+            cd eb_utils/.elasticbeanstalk/ && envsubst < config_nonvar.yml > config.yml
+            cd .. && envsubst < Dockerrun.aws.json > Dockerrun.aws.json
             eb deploy $EB_ENV_NAME
 
 workflows:
