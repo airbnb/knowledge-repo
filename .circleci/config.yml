@@ -117,5 +117,5 @@ workflows:
 
       - deploy_eb_ecr:
           requires:
-            - build_initial
+            # - build_initial
             - docker_create_push
