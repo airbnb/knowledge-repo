@@ -55,6 +55,7 @@ DB_AUTO_CREATE = True
 # performed using `knowledge_repo --repo <> db_upgrade ...`.
 DB_AUTO_UPGRADE = False
 
+KR_REPO_DB_PATH = "mysql://%s:%s@%s:%s/%s"%(os.environ['KR_REPO_DB_USER'],os.environ['KR_REPO_DB_PWD'],os.environ['KR_REPO_DB_URI'],os.environ['KR_REPO_DB_PORT'],'knowledgerepo')
 
 # ---------------------------------------------------
 # Authentication configuration
