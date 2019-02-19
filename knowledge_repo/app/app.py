@@ -173,21 +173,7 @@ class KnowledgeFlask(Flask):
         if self.config.get('MAIL_SERVER'):
             self.config['mail'] = Mail(self)
 
-<<<<<<< HEAD
-        # Register routes to be served
-        self.register_blueprint(routes.posts.blueprint)
-        self.register_blueprint(routes.health.blueprint)
-        self.register_blueprint(routes.index.blueprint)
-        self.register_blueprint(routes.tags.blueprint)
-        self.register_blueprint(routes.vote.blueprint)
-        self.register_blueprint(routes.comment.blueprint)
-        self.register_blueprint(routes.stats.blueprint)
-        self.register_blueprint(routes.editor.blueprint)
-        self.register_blueprint(routes.groups.blueprint)
-        self.register_blueprint(routes.auth.blueprint)
-        self.register_blueprint(routes.polly_api.blueprint)
-=======
-        # Register routes to be served 
+                # Register routes to be served 
         # For Polly, prefix the routes with Application Root config param
         self.register_blueprint(routes.posts.blueprint, url_prefix = self.config['APPLICATION_ROOT'])
         self.register_blueprint(routes.health.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
@@ -199,7 +185,6 @@ class KnowledgeFlask(Flask):
         self.register_blueprint(routes.editor.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
         self.register_blueprint(routes.groups.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
         self.register_blueprint(routes.auth.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
->>>>>>> 94cb2a12548851bf47d144977ebf4586f58c3104
         KnowledgeAuthProvider.register_auth_provider_blueprints(self)
 
         if self.config['DEBUG']:
