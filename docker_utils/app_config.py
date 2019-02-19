@@ -151,7 +151,7 @@ OAUTH_GITHUB_CLIENT_SECRET = '01750927087e549d1eebe1a3894f43ccd849b9ca'
 # authentication. If the call to `AUTH_MAP_REQUEST_HEADERS` results in a null
 # user identifier, then the authentication flow will fall back to use any of the
 # providers specified above.
-AUTH_USE_REQUEST_HEADERS = False
+AUTH_USE_REQUEST_HEADERS = True
 
 
 # If using headers to authenticate, the following function should be implemented
