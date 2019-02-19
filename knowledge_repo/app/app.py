@@ -39,7 +39,7 @@ class KnowledgeFlask(Flask):
     def __init__(self, repo, db_uri=None, debug=None, config=None, **kwargs):
         Flask.__init__(self, __name__,
                        template_folder='templates',
-                       static_folder='static')
+                       static_folder='None') # Set to none so that the static path is supplied by host and not this flask app
 
         # Add unique identifier for this application isinstance
         self.uuid = str(uuid.uuid4())
@@ -59,6 +59,14 @@ class KnowledgeFlask(Flask):
         # Add configuration passed in as keyword arguments
         self.config.update(kwargs)
 
+        # Configure static paths based on routes
+        self.static_folder = 'static'
+        if self.config['APPLICATION_ROOT'] is None:
+            self.static_url_path = '/static/'
+        else:
+            self.static_url_path = self.config['APPLICATION_ROOT'] + '/static/'
+
+        
         # Prepare repository, and add it to the app
         if hasattr(config, 'prepare_repo'):
             repo = config.prepare_repo(repo)
@@ -165,6 +173,7 @@ class KnowledgeFlask(Flask):
         if self.config.get('MAIL_SERVER'):
             self.config['mail'] = Mail(self)
 
+<<<<<<< HEAD
         # Register routes to be served
         self.register_blueprint(routes.posts.blueprint)
         self.register_blueprint(routes.health.blueprint)
@@ -177,10 +186,24 @@ class KnowledgeFlask(Flask):
         self.register_blueprint(routes.groups.blueprint)
         self.register_blueprint(routes.auth.blueprint)
         self.register_blueprint(routes.polly_api.blueprint)
+=======
+        # Register routes to be served 
+        # For Polly, prefix the routes with Application Root config param
+        self.register_blueprint(routes.posts.blueprint, url_prefix = self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.health.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.index.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.tags.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.vote.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.comment.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.stats.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.editor.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.groups.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.auth.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
+>>>>>>> 94cb2a12548851bf47d144977ebf4586f58c3104
         KnowledgeAuthProvider.register_auth_provider_blueprints(self)
 
         if self.config['DEBUG']:
-            self.register_blueprint(routes.debug.blueprint)
+            self.register_blueprint(routes.debug.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
 
         # Register error handler
         @self.errorhandler(500)
