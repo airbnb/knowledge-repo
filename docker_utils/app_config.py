@@ -160,6 +160,9 @@ AUTH_USE_REQUEST_HEADERS = True
 # If this method returns `None`, or `identifier` is not supplied, then the
 # authorization flow will fall back to other authentication methods.
 def AUTH_MAP_REQUEST_HEADERS(headers):
+    print('keys')
+    for i in headers.keys():
+        print(i)
     return {
         # 'identifier': None,
         # 'avatar_uri': None,
