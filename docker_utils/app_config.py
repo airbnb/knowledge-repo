@@ -3,7 +3,7 @@ import os
 # ---------------------------------------------------
 # Host configuration
 # ---------------------------------------------------
-APPLICATION_ROOT='ccbd24f370707c33603102adc7b77123'
+APPLICATION_ROOT='/ccbd24f370707c33603102adc7b77123'
 # The server name is used by Flask to limit access to the
 # served content to request to a particular domain. It
 # is also used by some authentication providers (in particular
