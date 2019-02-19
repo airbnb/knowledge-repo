@@ -66,7 +66,7 @@ KR_REPO_DB_PATH = "mysql://%s:%s@%s:%s/%s"%(os.environ['KR_REPO_DB_USER'],os.env
 # used for that class below.
 # By default, the knowledge repo offers:
 # ['debug', 'oauth2', 'bitbucket', 'github', 'google']
-AUTH_PROVIDERS = ['debug']
+AUTH_PROVIDERS = []
 
 # If you are going to use a OAuth provider, you will need to specify client ids
 # and private tokens. This can be done by instantiating instances of
@@ -160,9 +160,6 @@ AUTH_USE_REQUEST_HEADERS = False
 # If this method returns `None`, or `identifier` is not supplied, then the
 # authorization flow will fall back to other authentication methods.
 def AUTH_MAP_REQUEST_HEADERS(headers):
-    print('keys')
-    for i in headers.keys():
-        print(i)
     return {
         # 'identifier': None,
         # 'avatar_uri': None,
