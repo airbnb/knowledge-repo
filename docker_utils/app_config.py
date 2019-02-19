@@ -177,6 +177,7 @@ AUTH_USER_IDENTIFIER_REQUEST_HEADER = 'polly-auth'
 
 
 def AUTH_USER_IDENTIFIER_REQUEST_HEADER_MAPPING(identifier):
+    print('identifier:',identifier)
     return identifier
 
 
