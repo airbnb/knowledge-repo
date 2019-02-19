@@ -151,7 +151,7 @@ OAUTH_GITHUB_CLIENT_SECRET = '01750927087e549d1eebe1a3894f43ccd849b9ca'
 # authentication. If the call to `AUTH_MAP_REQUEST_HEADERS` results in a null
 # user identifier, then the authentication flow will fall back to use any of the
 # providers specified above.
-AUTH_USE_REQUEST_HEADERS = True
+AUTH_USE_REQUEST_HEADERS = False
 
 
 # If using headers to authenticate, the following function should be implemented
@@ -167,13 +167,13 @@ def AUTH_MAP_REQUEST_HEADERS(headers):
         # 'identifier': None,
         # 'avatar_uri': None,
         # 'name': None,
-         'email': headers['polly-auth']
+#         'email': headers['polly-auth']
     }
 
 
 # The following AUTH_USER_IDENTIFIER* configuration keys are deprecated and
 # will be removed in v0.9.
-AUTH_USER_IDENTIFIER_REQUEST_HEADER = None
+AUTH_USER_IDENTIFIER_REQUEST_HEADER = 'polly-auth'
 
 
 def AUTH_USER_IDENTIFIER_REQUEST_HEADER_MAPPING(identifier):
