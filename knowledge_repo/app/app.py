@@ -109,9 +109,14 @@ class KnowledgeFlask(Flask):
         def load_user(user_id):
             return User(identifier=user_id)
         # Attempt login via http headers
+        
         if self.config.get('AUTH_USE_REQUEST_HEADERS'):
             @self.login_manager.request_loader
             def load_user_from_request(request):
+                logger.info("ABHI Got here")
+                logger.info("Headers:")
+                for i in request.headers.keys():
+                    logger.info(i)
                 user_attributes = current_app.config.get('AUTH_MAP_REQUEST_HEADERS')(request.headers)
                 if isinstance(user_attributes, dict) and user_attributes.get('identifier', None):
                     user = User(identifier=user_attributes['identifier'])
