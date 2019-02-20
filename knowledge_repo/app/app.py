@@ -63,8 +63,10 @@ class KnowledgeFlask(Flask):
         self.static_folder = 'static'
         if self.config['APPLICATION_ROOT'] is None:
             self.static_url_path = '/static/'
+            self.static_folder = 'static'
         else:
             self.static_url_path = self.config['APPLICATION_ROOT'] + '/static/'
+            self.static_folder = self.config['APPLICATION_ROOT'] + '/static'
 
         
         # Prepare repository, and add it to the app
@@ -185,6 +187,7 @@ class KnowledgeFlask(Flask):
         self.register_blueprint(routes.editor.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
         self.register_blueprint(routes.groups.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
         self.register_blueprint(routes.auth.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.polly_api.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
         KnowledgeAuthProvider.register_auth_provider_blueprints(self)
 
         if self.config['DEBUG']:
