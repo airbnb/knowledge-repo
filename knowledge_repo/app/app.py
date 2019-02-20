@@ -39,7 +39,7 @@ class KnowledgeFlask(Flask):
     def __init__(self, repo, db_uri=None, debug=None, config=None, **kwargs):
         Flask.__init__(self, __name__,
                        template_folder='templates',
-                       static_folder='None') # Set to none so that the static path is supplied by host and not this flask app
+                       static_folder='static') # Set to none so that the static path is supplied by host and not this flask app
 
         # Add unique identifier for this application isinstance
         self.uuid = str(uuid.uuid4())
