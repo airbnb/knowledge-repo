@@ -2,7 +2,7 @@
 
 {% block content %}
 <table>
-      <form action = "/api/uploadpost" method = "POST" 
+      <form action = "{{ url_for('api.upload_post')}}" method = "PUT" 
          enctype = "multipart/form-data">
 <tr> <td>Select File to upload :    <td>      <input type = "file" name ="file" /> </tr>
 <tr><td>Path to upload file to : <td> <input type = "text" name="path" /> </tr>
