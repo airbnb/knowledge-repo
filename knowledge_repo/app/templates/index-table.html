@@ -101,7 +101,7 @@
 {% block scripts %}
 
 {{ super () }}
-<script src="{{ url_for('static', filename='js/helpers.js')}}"></script>
+<script src="{{ url_for('admin.static', filename='js/helpers.js')}}"></script>
 <script type="text/javascript">
 var start = {{ feed_params['start']|default(0) }}
 var results = {{ feed_params['results']|default(0) }}

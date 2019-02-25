@@ -79,7 +79,7 @@
 
 {% block scripts %}
 {{ super() }}
-<script src="{{ url_for('static', filename='js/index-cluster.js') }}"></script>
+<script src="{{ url_for('admin.static', filename='js/index-cluster.js') }}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
     var cluster_button = $(".btn-cluster")[0];

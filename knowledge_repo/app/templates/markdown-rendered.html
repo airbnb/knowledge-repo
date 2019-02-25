@@ -2,7 +2,7 @@
 
 {% block style_links %}
 {{ super() }}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/codehilite-friendly.css')}}">
+<link rel="stylesheet" href="{{ url_for('admin.static', filename='css/codehilite-friendly.css')}}">
 {% endblock %}
 
 {% block content %}
@@ -90,10 +90,10 @@
 
 {% block scripts %}
 {{ super() }}
-<script src="{{ url_for('static', filename='js/helpers.js') }}"></script>
-<script src="{{ url_for('static', filename='js/tags.js') }}" type="text/javascript"></script>
-<script src="{{ url_for('static', filename='js/icons.js') }}" type="text/javascript"></script>
-<script src="{{ url_for('static', filename='js/comments.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('admin.static', filename='js/helpers.js') }}"></script>
+<script src="{{ url_for('admin.static', filename='js/tags.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('admin.static', filename='js/icons.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('admin.static', filename='js/comments.js') }}" type="text/javascript"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({

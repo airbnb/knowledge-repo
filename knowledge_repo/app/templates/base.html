@@ -7,21 +7,21 @@
     <title>{% block title %}Knowledge Repo{% endblock %}</title>
 
     <!-- js includes at the top as post embedded js colliding -->
-    <script src="{{ url_for('static', filename='modules/jquery/jquery.min.js')}}"></script>
-    <script src="{{ url_for('static', filename='modules/tether/js/tether.min.js')}}"></script>
-    <script src="{{ url_for('static', filename='modules/bootstrap/js/bootstrap.min.js')}}"></script>
-    <script src="{{ url_for('static', filename='modules/bootstrap-slider/js/bootstrap-slider.min.js')}}"></script>
-    <script src="{{ url_for('static', filename='modules/typeahead.js/typeahead.bundle.min.js')}}"></script>
-    <script src="{{ url_for('static', filename='modules/handlebars/js/handlebars.js')}}"></script>
-    <script src="{{ url_for('static', filename='js/helpers.js')}}"></script>
-    <script src="{{ url_for('static', filename='modules/select2/js/select2.min.js')}}"></script>
-    <script src="{{ url_for('static', filename='modules/hightlight.pack.js/highlight.pack.js')}}"></script>
-    <script src="{{ url_for('static', filename='modules/marked.js/marked.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='modules/jquery/jquery.min.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='modules/tether/js/tether.min.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='modules/bootstrap/js/bootstrap.min.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='modules/bootstrap-slider/js/bootstrap-slider.min.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='modules/typeahead.js/typeahead.bundle.min.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='modules/handlebars/js/handlebars.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='js/helpers.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='modules/select2/js/select2.min.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='modules/hightlight.pack.js/highlight.pack.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='modules/marked.js/marked.js')}}"></script>
 
     <!-- require js is used for plotly, but has a bunch of collisions with other js packages
              make sure to have it be last js package imported -->
-    <script src="{{ url_for('static', filename='modules/require.js/require.min.js')}}"></script>
-    <script src="{{ url_for('static', filename='js/pages/base.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='modules/require.js/require.min.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='js/pages/base.js')}}"></script>
 
     <!-- Set explicit mobile collapse behaviour -->
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -32,19 +32,19 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6.2/html5shiv.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/2.1.0/es5-shim.min.js"></script>
         <![endif]-->
-    <link rel="stylesheet" href="{{ url_for('static', filename='modules/bootstrap/css/bootstrap.min.css')}}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='modules/bootstrap-slider/css/bootstrap-slider.min.css')}}">
-    <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='css/pages/base.css') }}">
-    <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='modules/select2/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('admin.static', filename='modules/bootstrap/css/bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{ url_for('admin.static', filename='modules/bootstrap-slider/css/bootstrap-slider.min.css')}}">
+    <link rel="stylesheet" type='text/css' href="{{ url_for('admin.static', filename='css/pages/base.css') }}">
+    <link rel="stylesheet" type='text/css' href="{{ url_for('admin.static', filename='modules/select2/css/select2.min.css') }}">
     <link href='https://fonts.googleapis.com/css?family=Lato:400,900|Playfair+Display|Source+Serif+Pro:400,700' rel='stylesheet' type='text/css'>
-    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}"> {% block style_links %}{% endblock %}
+    <link rel="shortcut icon" href="{{ url_for('admin.static', filename='images/favicon.png') }}"> {% block style_links %}{% endblock %}
 
     <!-- Favicon and app settings -->
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
-    <link rel="manifest" href="{{ url_for('static', filename='images/site.manifest') }}">
-    <link rel="mask-icon" href="{{ url_for('static', filename='images/safari-pinned-tab.svg') }}" color="#5bbad5">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('admin.static', filename='images/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('admin.static', filename='images/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('admin.static', filename='images/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('admin.static', filename='images/site.manifest') }}">
+    <link rel="mask-icon" href="{{ url_for('admin.static', filename='images/safari-pinned-tab.svg') }}" color="#5bbad5">
     <meta name="theme-color" content="#ffffff">
 
     {% block extra_headers %}
@@ -101,7 +101,7 @@
             <ul class="nav navbar-nav navbar-right visible-sm-block visible-md-block visible-lg-block">
               <li class="dropdown">
                 <a href="#" class="avatar-dropdown dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true" style='padding: 5px;'>
-                    <img class="avatar" src="{% if current_user.is_anonymous %}{{ url_for('static', filename='images/profile_photo_logged_out.png') }}{%else%}{{ current_user.avatar_uri or url_for('static', filename='images/profile_photo_default.png') }}{%endif%}" />
+                    <img class="avatar" src="{% if current_user.is_anonymous %}{{ url_for('admin.static', filename='images/profile_photo_logged_out.png') }}{%else%}{{ current_user.avatar_uri or url_for('admin.static', filename='images/profile_photo_default.png') }}{%endif%}" />
                     <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">

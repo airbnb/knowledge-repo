@@ -9,7 +9,7 @@ import uuid
 import mimetypes
 
 import six
-from flask import Flask, current_app, render_template, request, session
+from flask import Flask, current_app, render_template, request, session, Blueprint
 from flask_login import LoginManager, user_loaded_from_request
 from flask_mail import Mail
 from flask_migrate import Migrate
@@ -60,6 +60,7 @@ class KnowledgeFlask(Flask):
         self.config.update(kwargs)
 
         # Configure static paths based on routes
+        
         self.static_folder = 'static'
         if self.config['APPLICATION_ROOT'] is None:
             self.static_url_path = '/static/'
@@ -67,7 +68,6 @@ class KnowledgeFlask(Flask):
         else:
             self.static_url_path = self.config['APPLICATION_ROOT'] + '/static/'
             self.static_folder = self.config['APPLICATION_ROOT'] + '/static'
-
         
         # Prepare repository, and add it to the app
         if hasattr(config, 'prepare_repo'):
@@ -123,10 +123,6 @@ class KnowledgeFlask(Flask):
         if self.config.get('AUTH_USE_REQUEST_HEADERS'):
             @self.login_manager.request_loader
             def load_user_from_request(request):
-                logger.info("ABHI Got here")
-                logger.info("Headers:")
-                for i in request.headers.keys():
-                    logger.info(i)
                 user_attributes = current_app.config.get('AUTH_MAP_REQUEST_HEADERS')(request.headers)
                 if isinstance(user_attributes, dict) and user_attributes.get('identifier', None):
                     user = User(identifier=user_attributes['identifier'])
@@ -188,6 +184,7 @@ class KnowledgeFlask(Flask):
         self.register_blueprint(routes.groups.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
         self.register_blueprint(routes.auth.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
         self.register_blueprint(routes.polly_api.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(Blueprint('admin',__name__,static_folder = 'static',static_url_path=self.config['APPLICATION_ROOT']+'/static'))
         KnowledgeAuthProvider.register_auth_provider_blueprints(self)
 
         if self.config['DEBUG']:
