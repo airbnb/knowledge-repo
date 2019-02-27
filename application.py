@@ -1,4 +1,10 @@
 import os,sys
+
+
+script_dir = os.path.dirname(__file__)
+if os.path.exists(os.path.join(os.path.dirname(script_dir), 'knowledge_repo', '__init__.py')):
+    sys.path.insert(0, os.path.join(script_dir, '.'))
+
 import knowledge_repo  
 from knowledge_repo.repositories.gitrepository import GitKnowledgeRepository  # nopep8
 from knowledge_repo.app.deploy import KnowledgeDeployer, get_app_builder
@@ -14,7 +20,7 @@ workers = 2
 port = 7000
 timeout = 10
 
-repo_db_conn = u'mysql://%s:%s@%s:%s/knowledgerepo'%(KR_REPO_DB_USER,KR_REPO_DB_PWD,KR_REPO_DB_URI,KR_REPO_DB_PORT)
+repo_db_conn = u'mysql+mysqlconnector://%s:%s@%s:%s/knowledgerepo'%(KR_REPO_DB_USER,KR_REPO_DB_PWD,KR_REPO_DB_URI,KR_REPO_DB_PORT)
 
 boilerplate_KR = dict({"webpost":"%s:webposts"%repo_db_conn,"webpost2":"%s:webposts2"%repo_db_conn})
 app_builder = get_app_builder(boilerplate_KR,
@@ -27,8 +33,7 @@ application = KnowledgeDeployer.using('flask')(
         host='0.0.0.0',
         port=port,
         workers=workers,
-        timeout=timeout
-    )
+        timeout=timeout).app
 
 
 if __name__=="__main__":
