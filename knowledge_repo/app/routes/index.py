@@ -10,7 +10,7 @@ import os
 import json
 from builtins import str
 from collections import namedtuple
-from flask import request, render_template, redirect, Blueprint, current_app, make_response
+from flask import request, render_template, redirect, Blueprint, current_app, make_response, url_for
 from flask_login import login_required
 from sqlalchemy import case, desc
 
@@ -48,7 +48,7 @@ def site_map():
 @blueprint.route('/')
 @PageView.logged
 def render_index():
-    return redirect('/feed')
+    return redirect(url_for('index.render_feed'))
 
 
 @blueprint.route('/testupload')
@@ -58,7 +58,7 @@ def test_upload():
     #repo = current_app.append_repo("3","kr-test")
     #current_repo = repo
     current_app.test()
-    return redirect('/feed')    
+    return redirect(url_for('index.render_feed'))
 
 @blueprint.route('/favorites')
 @PageView.logged

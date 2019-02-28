@@ -11,7 +11,7 @@ import os
 import json
 from builtins import str
 from collections import namedtuple
-from flask import request, render_template, redirect, Blueprint, current_app, make_response,jsonify
+from flask import request, render_template, redirect, Blueprint, current_app, make_response,jsonify,url_for
 from flask_login import login_required
 from sqlalchemy import case, desc
 from werkzeug import secure_filename
@@ -39,7 +39,7 @@ def upload_post():
     print(request.args.keys())
     current_repo.upload_post(temp_path,path)
     current_app.db_update_index(check_timeouts=False,force=True)
-    return redirect('/feed')
+    return redirect(url_for('index.render_feed'))
 
 @blueprint.route('/api/uploadkr')
 @PageView.logged
