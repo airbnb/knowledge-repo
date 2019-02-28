@@ -116,7 +116,7 @@ class OAuth2Provider(KnowledgeAuthProvider):
         if self.verify_ssl_certs is None:
             self.verify_ssl_certs = True
 
-        host = self.app.config['SERVER_NAME'] or 'localhost:7000'
+        host = self.app.config['SERVER_NAME'] or 'localhost' #'localhost:7000'
         scheme = self.app.config['PREFERRED_URL_SCHEME'] or 'http'
         redirect_url = '{}://{}'.format(scheme, host)
         redirect_path = '/auth/login/{}/authorize'.format(self.name)
