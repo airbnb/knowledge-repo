@@ -93,6 +93,7 @@ def render_feed():
     """ Renders the index-feed view """
     global current_repo,current_app
     #Always have feed display only user who is logged in 
+    # TODO : Move the user restriction of posts to a decorator to restrict usably on other APIs
     feed_params = from_request_get_feed_params(request)
     user_id = feed_params['user_id']
     user = (db_session.query(User)
@@ -103,7 +104,6 @@ def render_feed():
                               'distinct_views': post.view_user_count,
                               'total_likes': post.vote_count,
                               'total_comments': post.comment_count} for post in posts}
-
 
     for post in posts:
         post.tldr = render_post_tldr(post)

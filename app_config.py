@@ -55,7 +55,7 @@ DB_AUTO_CREATE = True
 # performed using `knowledge_repo --repo <> db_upgrade ...`.
 DB_AUTO_UPGRADE = False
 
-KR_REPO_DB_PATH = "mysql://%s:%s@%s:%s/%s"%(os.environ['KR_REPO_DB_USER'],os.environ['KR_REPO_DB_PWD'],os.environ['KR_REPO_DB_URI'],os.environ['KR_REPO_DB_PORT'],'knowledgerepo')
+KR_REPO_DB_PATH = "mysql+mysqlconnector://%s:%s@%s:%s/%s"%(os.environ['KR_REPO_DB_USER'],os.environ['KR_REPO_DB_PWD'],os.environ['KR_REPO_DB_URI'],os.environ['KR_REPO_DB_PORT'],'knowledgerepo')
 
 # ---------------------------------------------------
 # Authentication configuration
@@ -160,8 +160,11 @@ AUTH_USE_REQUEST_HEADERS = True
 # If this method returns `None`, or `identifier` is not supplied, then the
 # authorization flow will fall back to other authentication methods.
 def AUTH_MAP_REQUEST_HEADERS(headers):
-    for i in headers.keys():
-        print(i)
+    if 'polly-auth' not in headers.keys():
+        return {
+            'identifier' : 'test-user'
+            }
+
     return {
 
          'identifier': headers['polly-auth'],

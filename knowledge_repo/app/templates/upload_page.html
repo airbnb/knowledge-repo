@@ -1,11 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
+      <form action = "/ccbd24f370707c33603102adc7b77123/api/uploadpost" method=post enctype = "multipart/form-data">
 <table>
-      <form action = "https://testkrenv.wgbpzh8mz2.ap-southeast-1.elasticbeanstalk.com/ccbd24f370707c33603102adc7b77123/api/uploadpost" method = "PUT" 
-         enctype = "multipart/form-data">
 <tr> <td>Select File to upload :    <td>      <input type = "file" name ="file" /> </tr>
 <tr><td>Path to upload file to : <td> <input type = "text" name="path" /> </tr>
 <tr><td><td>         <input type = "submit" value="Upload the post"/>   </tr>
-      </form> </table>
+       </table> </form>
 {% endblock %}
