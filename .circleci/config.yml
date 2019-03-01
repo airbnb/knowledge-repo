@@ -63,6 +63,7 @@ jobs:
           command: |
             virtualenv -p python3 venv
             . venv/bin/activate
+            sudo apt-get install git -y
             pip install awsebcli     
             # Substitute env variables
             cp -R eb_utils/.elasticbeanstalk ./.
