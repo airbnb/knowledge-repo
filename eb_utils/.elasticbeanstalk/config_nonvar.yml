@@ -1,12 +1,12 @@
 # Config file for Elastic Beanstalk (EB)
 # Major edits to modify/ verify before deployment:
-## environment name
-### 1 environment
-### 2 environment-defaults
-## application_name
-## region
-### 1 default_platform - check arn for region
-### 2 default_region
+#   > environment name at:
+#       1 environment
+#       2 environment-defaults
+#   > application_name
+#   > region at:
+#       1 default_platform - check arn for region
+#       2 default_region
 
 ---
 branch-defaults:
@@ -15,8 +15,7 @@ branch-defaults:
 global:
   application_name: $EB_APP_NAME
   default_ec2_keyname: aws-eb-kr
-  default_platform: arn:aws:elasticbeanstalk:$EB_REGION_CODE::platform/Docker running
-    on 64bit Amazon Linux/2.12.8
+  default_platform: Python 3.4
   default_region: $EB_REGION_CODE
   include_git_submodules: true
   instance_profile: null
