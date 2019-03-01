@@ -160,7 +160,7 @@ AUTH_USE_REQUEST_HEADERS = True
 # If this method returns `None`, or `identifier` is not supplied, then the
 # authorization flow will fall back to other authentication methods.
 def AUTH_MAP_REQUEST_HEADERS(headers):
-    if 'polly-auth' not in headers.keys():
+    if 'Polly-Auth' not in headers.keys():
         return {
             'identifier' : 'test-user'
             }

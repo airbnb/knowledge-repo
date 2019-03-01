@@ -36,11 +36,10 @@ def upload_post():
     tempfile.save(temp_path)
     path = request.form.get('path')
     
-    print(request.args.keys())
     current_repo.upload_post(temp_path,path)
     current_app.db_update_index(check_timeouts=False,force=True)
-    return redirect(url_for('index.render_feed'))
-
+    #return redirect(url_for('index.render_feed'))
+    return redirect('https://devpollyx.elucidata.io/ccbd24f370707c33603102adc7b77123/feed')
 @blueprint.route('/api/uploadkr')
 @PageView.logged
 def upload_kr():
