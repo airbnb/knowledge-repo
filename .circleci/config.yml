@@ -1,14 +1,18 @@
 # Script for CD of Knowledge Repo (KR) deployment on Elastic Beanstalk (EB)
-## Basic Functions:
-### 1 Pull the updated KR code
-### 2 Create a docker image, upload to Elastic Container Registry (ECR)
-### 3 Deploy ECR image on EB
-# 
-# To-do
-## 1 Check for similarity of created docker image v. ECR image.
-##    If no diff, don't upload or deploy.
-## 2 Create a scheme for tagging multiple types of docker images
-##    This helps in differentiating purposes, also possibly analyse metrics for different use cases.
+# Method: Native approach - direct deployment, without docker.
+#   > For Docker approach config, refer to: 
+#       1 https://github.com/ElucidataInc/knowledge-repo/blob/10f0fb134fee6466971000b4e57f8033cc9920c8/.circleci/config.yml
+#       2 https://github.com/ElucidataInc/knowledge-repo/blob/e1555583952fccffa6315b1096128202d59c4743/eb_utils/Dockerrun_notag.aws.json
+#
+# Basic Functions:
+#   1 Pull the updated KR code
+#   2 Deploy on eb
+#     2.1 Install awsebcli
+#     2.2 Substitute environment variables using envsubst
+#     2.3 Deploy
+#
+# To Do:
+#   > Consider - updating elucidpulkit/ubunturpollyci to include awsebcli?
 
 # CircleCI 2.0 configuration file
 version: 2
@@ -46,39 +50,7 @@ jobs:
           root: *app_working_dir
           paths: .
 
-  docker_create_push:
-    <<: *defaults
-
-    steps:
-
-      - attach_workspace:
-          at: *app_working_dir
-
-      - setup_remote_docker:
-          docker_layer_caching: true
-
-      - run:
-          name: Copy necessary docker files
-          command: |
-            cp -R docker_utils/* ./.
-
-      - run:
-          name: Build docker image
-          command: |
-            docker build -t hellowtest .
-
-      - run:
-          name: Push docker image to ecr
-          command: |
-            eval $(aws ecr get-login --no-include-email --region ap-southeast-1)
-            docker tag hellowtest:latest 508105988628.dkr.ecr.ap-southeast-1.amazonaws.com/knowledgerepo:$IMG_TAG
-            docker push 508105988628.dkr.ecr.ap-southeast-1.amazonaws.com/knowledgerepo:$IMG_TAG
-
-      - persist_to_workspace:
-          root: *app_working_dir
-          paths: .
-
-  deploy_eb_ecr:
+  deploy_eb:
     <<: *defaults
 
     steps:
@@ -91,11 +63,12 @@ jobs:
           command: |
             virtualenv -p python3 venv
             . venv/bin/activate
-            pip install awsebcli
+            sudo apt-get install git -y
+            pip install awsebcli     
             # Substitute env variables
-            cd eb_utils/.elasticbeanstalk/ && envsubst < config_nonvar.yml > config.yml
-            cd ..
-            envsubst < Dockerrun_notag.aws.json > Dockerrun.aws.json
+            cp -R eb_utils/.elasticbeanstalk ./.
+            cd .elasticbeanstalk/ && envsubst < config_nonvar.yml > config.yml && cd ..
+            # Deploy to eb
             eb deploy $EB_ENV_NAME
 
 workflows:
@@ -108,14 +81,8 @@ workflows:
           filters:
             branches:
               only:
-                - ftr-deploy-aws
                 - demo
 
-      - docker_create_push:
+      - deploy_eb:
           requires:
             - build_initial
-
-      - deploy_eb_ecr:
-          requires:
-            # - build_initial
-            - docker_create_push
