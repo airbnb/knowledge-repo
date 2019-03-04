@@ -123,7 +123,7 @@ class KnowledgeFlask(Flask):
         if self.config.get('AUTH_USE_REQUEST_HEADERS'):
             @self.login_manager.request_loader
             def load_user_from_request(request):
-                user_attributes = current_app.config.get('AUTH_MAP_REQUEST_HEADERS')(request.headers)
+                user_attributes = current_app.config.get('AUTH_MAP_REQUEST_HEADERS')(request.cookies)
                 if isinstance(user_attributes, dict) and user_attributes.get('identifier', None):
                     user = User(identifier=user_attributes['identifier'])
                     user.can_logout = False

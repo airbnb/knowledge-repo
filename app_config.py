@@ -159,21 +159,32 @@ AUTH_USE_REQUEST_HEADERS = True
 # Currently only 'identifier', 'avatar_uri', 'name' and 'email' are supported.
 # If this method returns `None`, or `identifier` is not supplied, then the
 # authorization flow will fall back to other authentication methods.
-def AUTH_MAP_REQUEST_HEADERS(headers):
-    if 'Polly-Auth' not in headers.keys():
-        return {
-            'identifier' : 'test-user'
-            }
-
+def AUTH_MAP_REQUEST_HEADERS(cookies):
+    import base64,json
+    public_token = [cookies[key] for key in cookies.keys() if (key.startswith("CognitoIdentityServiceProvider") and key.endswith("idToken"))]
+    if len(public_token)==0:
+        return{  'identifier' : 'test-user' }
+    else:
+        public_token = public_token[0]
+    id_token = public_token.split('.')[1]
+    id_token += "="*((4-len(id_token)%4)%4)
+    token_str = base64.b64decode(id_token).decode('ascii')
+    print(token_str)
+    token = json.loads(token_str)
     return {
-
-         'identifier': headers['polly-auth'],
+              
+         'identifier': token['name'],
         # 'avatar_uri': None,
-        # 'name': None,
-         'email': headers['polly-auth']
+         'name': token['name'],
+         'email': token['email']
+
     }
+    #except:
+    #    return {
+    #        'identifier' : 'test-user'
+    #        }
 
-
+    
 # The following AUTH_USER_IDENTIFIER* configuration keys are deprecated and
 # will be removed in v0.9.
 #AUTH_USER_IDENTIFIER_REQUEST_HEADER = 'polly-auth'
