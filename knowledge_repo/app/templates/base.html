@@ -73,7 +73,7 @@
             </button>
 
             <!-- Brand name / logo -->
-            <a class="navbar-brand" href="/" class="logo-image">
+            <a class="navbar-brand" href="{{url_for('index.render_feed')}}" class="logo-image">
               <img src='{{ url_for("admin.static", filename = "images/logo-white.svg")}}' />
               <text>Knowledge Repo</text>
             </a>
@@ -97,6 +97,9 @@
               Add a Post!
             </a>
 
+            <a href="{{ url_for('api.force_reindex') }}" class="btn btn-primary navbar-button">
+              Refresh
+            </a>
             <!-- Drop down menu to surface less used links on large screens -->
             <ul class="nav navbar-nav navbar-right visible-sm-block visible-md-block visible-lg-block">
               <li class="dropdown">
@@ -107,8 +110,8 @@
                 <ul class="dropdown-menu">
                   {% if current_user.is_authenticated %}
                   <li class="dropdown-header">Logged in as <em>{{ current_user.format_name }}</em></li>
-                  <li><a href="/feed?authors={{ current_user.identifier }}">My Posts</a></li>
-                  <li><a href="/favorites">My Favorites</a></li>
+                  <li><a href="{{url_for('index.render_feed')}}?authors={{ current_user.identifier }}">My Posts</a></li>
+                  <li><a href="{{url_for('index.render_favorites')}}">My Favorites</a></li> 
                   {% if current_user.can_logout %}
                   <li><a href="{{ url_for('auth.logout') }}">Sign out</a></li>
                   {% endif %}
@@ -117,7 +120,7 @@
                   {% else %}
                   <li><a href="{{ url_for('auth.login') }}">Sign in</a></li>
                   {% endif %}
-                  <li><a href="/stats">Stats</a></li>
+<!--                  <li><a href="/stats">Stats</a></li> -->
                   <li><a href="http://knowledge-repo.readthedocs.io/" target="_blank" rel="nofollow noreferrer">Documentation</a></li>
                 </ul>
               </li>
@@ -127,8 +130,8 @@
             <ul class="nav navbar-nav navbar-right visible-xs-block">
               {% if current_user.is_authenticated %}
               <li class="dropdown-header">Logged in as <em>{{name}}</em></li>
-              <li><a href="/feed?authors={{username}}">My Posts</a></li>
-              <li><a href="/favorites">My Favorites</a></li><li role="separator" class="divider"></li>
+              <li><a href="{{url_for('index.render_feed')}}?authors={{username}}">My Posts</a></li>
+              <li><a href="{{url_for('index.render_favorites')}}">My Favorites</a></li><li role="separator" class="divider"></li>
               {% if current_user.can_logout %}
               <li><a href="{{ url_for('auth.logout') }}">Sign out</a></li>
               {% endif %}
@@ -136,7 +139,7 @@
               {% else %}
               <li><a href="{{ url_for('auth.login') }}">Sign in</a></li>
               {% endif %}
-              <li><a href="/stats">Stats</a></li>
+<!--              <li><a href="/stats">Stats</a></li> -->
               <li><a href="http://knowledge-repo.readthedocs.io/" target="_blank" rel="nofollow noreferrer">Documentation</a></li>
             </ul>
 

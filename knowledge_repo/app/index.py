@@ -129,9 +129,11 @@ def index_up_to_date():
 def update_index(check_timeouts=True, force=False, reindex=False):
 
     if not current_app.config['INDEXING_ENABLED']:
+        print("Returning because I thought indexing is disabled")
         return False
 
     if check_timeouts and not index_due_for_update():
+        print("Returning because I thought it isn't time to index")
         return False
 
     is_index_master = acquire_index_lock()
@@ -144,10 +146,12 @@ def update_index(check_timeouts=True, force=False, reindex=False):
         current_repo.update()
 
     # Short-circuit if not the index master (unless force is True)
-    if not is_index_master and not force or index_up_to_date():
-        return False
+    if not force:
+        if not is_index_master and not force or index_up_to_date():
+            return False
 
     try:
+        print("Now indexing")
         IndexMetadata.set('lock', 'index', LOCKED)
         db_session.commit()
 
@@ -198,5 +202,6 @@ def update_index(check_timeouts=True, force=False, reindex=False):
         for uri, revision in current_repo.revisions.items():
             IndexMetadata.set('repository_revision', uri, str(revision))
     finally:
+        print("Done indexing")
         IndexMetadata.set('lock', 'index', UNLOCKED)
         db_session.commit()

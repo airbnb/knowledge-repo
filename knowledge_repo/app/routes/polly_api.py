@@ -22,6 +22,7 @@ from ..models import Post, Tag, User, PageView
 from ..utils.requests import from_request_get_feed_params
 from ..utils.render import render_post_tldr
 from ..utils.s3_talk import download_dir,download_from_s3  
+from ..index import update_index
 blueprint = Blueprint('api', __name__, template_folder='../templates', static_folder='../static')
 
 @blueprint.route('/api/uploadpage')
@@ -38,8 +39,8 @@ def upload_post():
     
     current_repo.upload_post(temp_path,path)
     current_app.db_update_index(check_timeouts=False,force=True)
-    #return redirect(url_for('index.render_feed'))
-    return redirect('https://devpollyx.elucidata.io/ccbd24f370707c33603102adc7b77123/feed')
+    return redirect(url_for('index.render_feed'))
+#    return redirect('https://devpollyx.elucidata.io/ccbd24f370707c33603102adc7b77123/feed')
 @blueprint.route('/api/uploadkr')
 @PageView.logged
 def upload_kr():
@@ -55,7 +56,9 @@ def upload_kr():
     try:
         db_path = current_app.config['KR_REPO_DB_PATH'] + ':' + dir_name
         dbobj  = current_repo.migrate_to_dbrepo(dir_path,db_path)
-        current_repo = current_app.append_repo_obj(dir_name,dbobj)
+        current_app.append_repo_obj(dir_name,dbobj)
+        print("Calling re-indexing")
+        current_app.db_update_index(check_timeouts=False,force=True)
     except:
         error = 400
     return jsonify({
@@ -66,3 +69,14 @@ def upload_kr():
                             },
                    })
 
+
+@blueprint.route('/api/reindex')
+@PageView.logged
+def force_reindex():
+   print("Calling re-indexing")
+   ans = current_app.db_update_index(check_timeouts=False,force=True)
+   if not ans == False:
+       print("Good to go")
+   else:
+       print("Had error")
+   return redirect(url_for('index.render_feed'))

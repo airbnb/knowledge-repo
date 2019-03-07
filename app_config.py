@@ -169,20 +169,14 @@ def AUTH_MAP_REQUEST_HEADERS(cookies):
     id_token = public_token.split('.')[1]
     id_token += "="*((4-len(id_token)%4)%4)
     token_str = base64.b64decode(id_token).decode('ascii')
-    print(token_str)
     token = json.loads(token_str)
     return {
               
          'identifier': token['name'],
-        # 'avatar_uri': None,
          'name': token['name'],
          'email': token['email']
 
     }
-    #except:
-    #    return {
-    #        'identifier' : 'test-user'
-    #        }
 
     
 # The following AUTH_USER_IDENTIFIER* configuration keys are deprecated and
@@ -273,8 +267,8 @@ def prepare_repo(repo):
 # `INDEXING_TIMEOUT` seconds, whereby the lock is ceded to the next requesting
 # process. Note that `INDEXING_TIMEOUT` must be larger than `INDEXING_INTERVAL`
 # or strange things might begin to happen.
-INDEXING_INTERVAL = 5 * 60  # 5 minutes
-INDEXING_TIMEOUT = 10 * 60  # 10 minutes
+INDEXING_INTERVAL = 1 * 60  # 5 minutes
+INDEXING_TIMEOUT = 1.1 * 60  # 10 minutes
 
 # Whether an index operation should update repositories
 INDEXING_UPDATES_REPOSITORIES = True
