@@ -151,7 +151,6 @@ def update_index(check_timeouts=True, force=False, reindex=False):
             return False
 
     try:
-        print("Now indexing")
         IndexMetadata.set('lock', 'index', LOCKED)
         db_session.commit()
 
@@ -202,6 +201,5 @@ def update_index(check_timeouts=True, force=False, reindex=False):
         for uri, revision in current_repo.revisions.items():
             IndexMetadata.set('repository_revision', uri, str(revision))
     finally:
-        print("Done indexing")
         IndexMetadata.set('lock', 'index', UNLOCKED)
         db_session.commit()
