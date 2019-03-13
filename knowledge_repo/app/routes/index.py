@@ -50,16 +50,6 @@ def site_map():
 def render_index():
     return redirect(url_for('index.render_feed'))
 
-
-@blueprint.route('/testupload')
-@PageView.logged
-def test_upload():
-    global current_repo,current_app
-    #repo = current_app.append_repo("3","kr-test")
-    #current_repo = repo
-    current_app.test()
-    return redirect(url_for('index.render_feed'))
-
 @blueprint.route('/favorites')
 @PageView.logged
 @login_required
