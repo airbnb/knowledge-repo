@@ -129,11 +129,9 @@ def index_up_to_date():
 def update_index(check_timeouts=True, force=False, reindex=False):
 
     if not current_app.config['INDEXING_ENABLED']:
-        print("Returning because I thought indexing is disabled")
         return False
 
     if check_timeouts and not index_due_for_update():
-        print("Returning because I thought it isn't time to index")
         return False
 
     is_index_master = acquire_index_lock()
