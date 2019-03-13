@@ -22,7 +22,16 @@ timeout = 1000
 
 repo_db_conn = u'mysql+mysqlconnector://%s:%s@%s:%s/knowledgerepo'%(KR_REPO_DB_USER,KR_REPO_DB_PWD,KR_REPO_DB_URI,KR_REPO_DB_PORT)
 
-boilerplate_KR = dict({"webpost":"%s:webposts"%repo_db_conn,"webpost2":"%s:webposts2"%repo_db_conn})
+
+from sqlalchemy import create_engine
+engine = create_engine(repo_db_conn)
+kr_names  = engine.table_names()
+
+boilerplate_KR = {}
+for i in kr_names:
+    boilerplate_KR[i] = "%s:%s"%(repo_db_conn,i)
+
+#boilerplate_KR = dict({"webpost":"%s:webposts"%repo_db_conn,"webpost2":"%s:webposts2"%repo_db_conn})
 app_builder = get_app_builder(boilerplate_KR,
                                   db_uri=KR_APP_DB_URI,
                                   debug=True,
