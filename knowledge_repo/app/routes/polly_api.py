@@ -32,15 +32,16 @@ def upload_post_page():
 
 @blueprint.route('/api/uploadpost',methods=['POST','GET','PUT'])
 def upload_post():
+    # Access the file
     tempfile = request.files['file']
     temp_path = os.path.join('/tmp',secure_filename(tempfile.filename))
     tempfile.save(temp_path)
     path = request.form.get('path')
-    
+    # Just post the post to the path
     current_repo.upload_post(temp_path,path)
     current_app.db_update_index(check_timeouts=False,force=True)
-    return redirect(url_for('index.render_feed'))
-#    return redirect('https://devpollyx.elucidata.io/ccbd24f370707c33603102adc7b77123/feed')
+    return redirect(url_for('post.render',path=path))
+
 @blueprint.route('/api/uploadkr')
 @PageView.logged
 def upload_kr():
@@ -57,9 +58,9 @@ def upload_kr():
         db_path = current_app.config['KR_REPO_DB_PATH'] + ':' + dir_name
         dbobj  = current_repo.migrate_to_dbrepo(dir_path,db_path)
         current_app.append_repo_obj(dir_name,dbobj)
-        print("Calling re-indexing")
         current_app.db_update_index(check_timeouts=False,force=True)
     except:
+    #TODO: do more precise exception handling
         error = 400
     return jsonify({
                 'statusCode': '400' if error==400 else '200',
@@ -69,14 +70,3 @@ def upload_kr():
                             },
                    })
 
-
-@blueprint.route('/api/reindex')
-@PageView.logged
-def force_reindex():
-   print("Calling re-indexing")
-   ans = current_app.db_update_index(check_timeouts=False,force=True)
-   if not ans == False:
-       print("Good to go")
-   else:
-       print("Had error")
-   return redirect(url_for('index.render_feed'))
