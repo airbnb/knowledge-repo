@@ -58,19 +58,6 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         krs = {name: cls.for_uri(uri) for name, uri in list(uris.items())}
         return MetaKnowledgeRepository(krs)
 
-    
-    def test(self):
-        c = 0
-        pat = self.path
-        for post in self.posts():
-            s = post.src_paths
-            pat = pat + '/' +post.path
-            #p = KnowledgePost.from_file(pat + '/'+s[0])
-            print(s)
-#            self.add(p,path='testpath%d'%c)
- #           c+=1
-            #print(s[0])
-    
 
     def upload_post(self,filepath,path):
         self.add(KnowledgePost.from_file(filepath),path=path,update=True)

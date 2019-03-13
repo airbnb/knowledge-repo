@@ -92,8 +92,6 @@ def render_post(post, with_toc=False):
             return url_for('posts.render', path=url.split('knowledge:')[1]).replace('%2F', '/')  # Temporary fix before url revamp
         return None
     
-    print("AB:",post)
-    print("AB:",post.kp)
     md, html = HTMLConverter(post if isinstance(post, KnowledgePost) else post.kp)._render_markdown(skip_headers=True, urlmappers=[intra_knowledge_urlmapper])
 
     html = render_post_header(post) + html
