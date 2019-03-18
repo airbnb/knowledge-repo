@@ -19,13 +19,14 @@ KR_REPO_DB_USER = os.environ['KR_REPO_DB_USER']
 KR_REPO_DB_PWD = os.environ['KR_REPO_DB_PWD']
 KR_REPO_DB_PORT = os.environ['KR_REPO_DB_PORT']
 KR_APP_DB_URI = os.environ['KR_APP_DB_URI']
+KR_REPO_DB_NAME = os.environ['KR_REPO_DB_NAME']
 
 config_file = "app_config.py" # also available in the root folder
 workers = 2
 port = 5000
 timeout = 1000
 
-repo_db_conn = u'mysql+mysqlconnector://%s:%s@%s:%s/knowledgerepo'%(KR_REPO_DB_USER,KR_REPO_DB_PWD,KR_REPO_DB_URI,KR_REPO_DB_PORT)
+repo_db_conn = u'mysql+mysqlconnector://%s:%s@%s:%s/%s'%(KR_REPO_DB_USER,KR_REPO_DB_PWD,KR_REPO_DB_URI,KR_REPO_DB_PORT,KR_REPO_DB_NAME)
 
 # Pull names of all KRs that have been loaded on this server so far. If the server goes down and wants to come up, it should now load ALL the repositories that were up before it went down. 
 # ToDo : this will need augmentation when GIT integration is done to do something similar for all the mounted GIT repos
@@ -35,7 +36,7 @@ engine = create_engine(repo_db_conn)
 kr_names  = engine.table_names()
 
 # prepare boilerplate KR object with all the table names in the DB since they represent individual KRs that were uploaded.
-boilerplate_KR = {}
+boilerplate_KR = {"webpost":"%s:%s"%(repo_db_conn,"webpost")}
 for i in kr_names:
     boilerplate_KR[i] = "%s:%s"%(repo_db_conn,i)
 

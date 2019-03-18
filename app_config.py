@@ -55,7 +55,7 @@ DB_AUTO_CREATE = True
 # performed using `knowledge_repo --repo <> db_upgrade ...`.
 DB_AUTO_UPGRADE = False
 
-KR_REPO_DB_PATH = "mysql+mysqlconnector://%s:%s@%s:%s/%s"%(os.environ['KR_REPO_DB_USER'],os.environ['KR_REPO_DB_PWD'],os.environ['KR_REPO_DB_URI'],os.environ['KR_REPO_DB_PORT'],'knowledgerepo')
+KR_REPO_DB_PATH = "mysql+mysqlconnector://%s:%s@%s:%s/%s"%(os.environ['KR_REPO_DB_USER'],os.environ['KR_REPO_DB_PWD'],os.environ['KR_REPO_DB_URI'],os.environ['KR_REPO_DB_PORT'],os.environ['KR_REPO_DB_NAME'])
 
 # ---------------------------------------------------
 # Authentication configuration
@@ -267,8 +267,8 @@ def prepare_repo(repo):
 # `INDEXING_TIMEOUT` seconds, whereby the lock is ceded to the next requesting
 # process. Note that `INDEXING_TIMEOUT` must be larger than `INDEXING_INTERVAL`
 # or strange things might begin to happen.
-INDEXING_INTERVAL = 1 * 60  # 5 minutes
-INDEXING_TIMEOUT = 1.1 * 60  # 10 minutes
+INDEXING_INTERVAL = 5 * 60  # 5 minutes
+INDEXING_TIMEOUT = 10 * 60  # 10 minutes
 
 # Whether an index operation should update repositories
 INDEXING_UPDATES_REPOSITORIES = True
