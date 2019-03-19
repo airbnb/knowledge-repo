@@ -33,6 +33,7 @@ def upload_post_page():
 @blueprint.route('/api/uploadpost',methods=['POST'])
 def upload_post():
     # Access the file
+    #TODO: Put everything in try catch
     tempfile = request.files['file']
     temp_path = os.path.join('/tmp',secure_filename(tempfile.filename))
     tempfile.save(temp_path)
