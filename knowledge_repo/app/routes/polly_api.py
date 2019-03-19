@@ -22,7 +22,7 @@ from ..models import Post, Tag, User, PageView
 from ..utils.requests import from_request_get_feed_params
 from ..utils.render import render_post_tldr
 from ..utils.s3_talk import download_dir,download_from_s3  
-from ..index import update_index
+from ..index import update_index, update_index_for_post
 blueprint = Blueprint('api', __name__, template_folder='../templates', static_folder='../static')
 
 @blueprint.route('/api/uploadpage')
@@ -38,8 +38,9 @@ def upload_post():
     tempfile.save(temp_path)
     path = request.form.get('path')
     # Just post the post to the path
-    current_repo.upload_post(temp_path,path)
-    current_app.db_update_index(check_timeouts=False,force=True)
+    new_post = current_repo.upload_post(temp_path,path)
+    update_index_for_post(new_post)
+#    current_app.db_update_index(check_timeouts=False,force=True)
     return redirect(url_for('posts.render',path=path+".kp"))
 
 @blueprint.route('/api/uploadkr')

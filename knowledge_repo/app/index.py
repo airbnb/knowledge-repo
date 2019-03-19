@@ -124,6 +124,30 @@ def index_up_to_date():
             return False
     return True
 
+@ErrorLog.logged
+def update_index_for_post(kp):
+    is_index_master = acquire_index_lock()
+    print(kp)
+    try:
+        IndexMetadata.set('lock', 'index', LOCKED)
+        db_session.commit()
+        if not kp.is_valid():
+            logger.warning(u'New post at "{}" is corrupt.'.format(kp.path))
+            return
+        logger.info(u'creating new post from path {}'.format(kp.path))
+        post = Post()
+        db_session.add(post)
+        db_session.commit()
+        db_session.flush()  # (matthew) Fix groups logic so this is not necessary
+        print("Done all this")
+        post.update_metadata_from_kp(kp)
+
+        # Record revision
+        for uri, revision in current_repo.revisions.items():
+            IndexMetadata.set('repository_revision', uri, str(revision))
+    finally:
+        IndexMetadata.set('lock', 'index', UNLOCKED)
+        db_session.commit()
 
 @ErrorLog.logged
 def update_index(check_timeouts=True, force=False, reindex=False):
