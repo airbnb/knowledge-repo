@@ -25,7 +25,6 @@ def render(path):
     Render the knowledge post with all the related formatting.
     """
     import time
-    print("Entering the render fn:",time.time())
     mode = request.args.get('render', 'html')
     username, user_id = current_user.identifier, current_user.id
 
@@ -47,7 +46,6 @@ def render(path):
     post = (db_session.query(Post)
                       .filter(Post.path == path)
                       .first())
-    print("Post queried from the backend:",time.time())
     if not post:
         knowledge_aliases = current_repo.config.aliases
         if path in knowledge_aliases:
@@ -67,10 +65,8 @@ def render(path):
         if user_id not in allowed_users:
             return render_template("permission_ask.html", authors=post.authors_string)
 
-    print("Starting Render:",time.time())
     rendered = render_post(post, with_toc=True)
     raw_post = render_post_raw(post) if mode == 'raw' else None
-    print("Finished Render:",time.time())
 
     comments = post.comments
     for comment in comments:
@@ -94,7 +90,6 @@ def render(path):
     if web_editor_prefixes:
         is_webpost = any(prefix for prefix in web_editor_prefixes if path.startswith(prefix))
     
-    print("Starting Rendering of Template:",time.time())
     rendered = render_template(tmpl,
                                html=rendered['html'],
                                toc=rendered['toc'],
@@ -119,7 +114,6 @@ def render(path):
                                is_author=is_author,
                                can_download=permissions.post_download.can(),
                                downloads=post.kp.src_paths)
-    print("Finished Rendering of Template:",time.time())
     return rendered
 
 

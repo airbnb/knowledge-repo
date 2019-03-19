@@ -39,7 +39,7 @@ def upload_post():
     path = request.form.get('path')
     # Just post the post to the path
     new_post = current_repo.upload_post(temp_path,path)
-    update_index_for_post(new_post)
+    update_index_for_post(new_post,path)
 #    current_app.db_update_index(check_timeouts=False,force=True)
     return redirect(url_for('posts.render',path=path+".kp"))
 
