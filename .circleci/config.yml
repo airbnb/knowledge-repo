@@ -1,0 +1,88 @@
+# Script for CD of Knowledge Repo (KR) deployment on Elastic Beanstalk (EB)
+# Method: Native approach - direct deployment, without docker.
+#   > For Docker approach config, refer to: 
+#       1 https://github.com/ElucidataInc/knowledge-repo/blob/10f0fb134fee6466971000b4e57f8033cc9920c8/.circleci/config.yml
+#       2 https://github.com/ElucidataInc/knowledge-repo/blob/e1555583952fccffa6315b1096128202d59c4743/eb_utils/Dockerrun_notag.aws.json
+#
+# Basic Functions:
+#   1 Pull the updated KR code
+#   2 Deploy on eb
+#     2.1 Install awsebcli
+#     2.2 Substitute environment variables using envsubst
+#     2.3 Deploy
+#
+# To Do:
+#   > Consider - updating elucidpulkit/ubunturpollyci to include awsebcli?
+
+# CircleCI 2.0 configuration file
+version: 2
+
+aliases:
+  - &app_working_dir ~/knowledge-repo
+
+defaults: &defaults
+  working_directory: *app_working_dir
+  docker:
+    # Using Amazon Linux for Serverless code packaging
+    - image: elucidpulkit/ubunturpollyci
+      auth:
+        username: $DOCKERHUB_USERNAME
+        password: $DOCKERHUB_PASSWORD
+
+jobs:
+
+  build_initial:
+    <<: *defaults
+
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+          version: 17.05.0-ce
+
+      - run:
+          name: Load Docker image layer cache
+          command: |
+            set +o pipefail
+            if [[ -e /caches/$DOCKERTAG.tar ]]; then  docker load -i /caches/$DOCKERTAG.tar; fi
+
+      - persist_to_workspace:
+          root: *app_working_dir
+          paths: .
+
+  deploy_eb:
+    <<: *defaults
+
+    steps:
+
+      - attach_workspace:
+          at: *app_working_dir
+
+      - run:
+          name: Deploy to eb
+          command: |
+            virtualenv -p python3 venv
+            . venv/bin/activate
+            sudo apt-get install git -y
+            pip install awsebcli     
+            # Substitute env variables
+            cp -R eb_utils/.elasticbeanstalk ./.
+            cd .elasticbeanstalk/ && envsubst < config_nonvar.yml > config.yml && cd ..
+            # Deploy to eb
+            eb deploy $EB_ENV_NAME
+
+workflows:
+  version: 2
+
+  build_process:
+    jobs:
+
+      - build_initial:
+          filters:
+            branches:
+              only:
+                - demo
+
+      - deploy_eb:
+          requires:
+            - build_initial

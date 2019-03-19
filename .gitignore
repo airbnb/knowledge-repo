@@ -81,7 +81,7 @@ celerybeat-schedule
 # docker
 Dockerfile
 docker-compose.yml
-
+run_script.sh
 # virtualenv
 venv/
 ENV/

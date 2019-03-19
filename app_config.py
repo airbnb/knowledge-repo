@@ -1,8 +1,9 @@
 import datetime
+import os
 # ---------------------------------------------------
 # Host configuration
 # ---------------------------------------------------
-
+APPLICATION_ROOT='/ccbd24f370707c33603102adc7b77123'
 # The server name is used by Flask to limit access to the
 # served content to request to a particular domain. It
 # is also used by some authentication providers (in particular
@@ -10,15 +11,14 @@ import datetime
 # not provided, it is assumed in these contexts to be
 # 'localhost:7000'. Be sure to specify this before deploying
 # into production.
-SERVER_NAME = None
-
+SERVER_NAME=None
 # The knowledge repository uses the secret key to sign user
 # sessions. If not specified, a unique secret key will be
 # generated every time the server starts up. If hosting
 # in a multi-server environment, or you want sessions
 # to persist accross server restarts, set this to something
 # static.
-SECRET_KEY = None
+#SECRET_KEY = None
 
 # Set DEPLOY_HTTPS to True if you want to enable encrypted
 # communication with Flask. When enabled, you must provide
@@ -40,7 +40,7 @@ DEBUG = False
 # ---------------------------------------------------
 # Database configuration
 # ---------------------------------------------------
-SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+SQLALCHEMY_DATABASE_URI = os.environ['KR_APP_DB_URI']
 SQLALCHEMY_ECHO = False
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -55,6 +55,7 @@ DB_AUTO_CREATE = True
 # performed using `knowledge_repo --repo <> db_upgrade ...`.
 DB_AUTO_UPGRADE = False
 
+KR_REPO_DB_PATH = "mysql+mysqlconnector://%s:%s@%s:%s/%s"%(os.environ['KR_REPO_DB_USER'],os.environ['KR_REPO_DB_PWD'],os.environ['KR_REPO_DB_URI'],os.environ['KR_REPO_DB_PORT'],os.environ['KR_REPO_DB_NAME'])
 
 # ---------------------------------------------------
 # Authentication configuration
@@ -71,8 +72,8 @@ AUTH_PROVIDERS = []
 # and private tokens. This can be done by instantiating instances of
 # `OAuth2Provider` and adding them to the above list, or by specifying OAuth
 # connection properties as demonstrated below for the GitHub authenticator.
-# OAUTH_GITHUB_CLIENT_ID = '<client id>'
-# OAUTH_GITHUB_CLIENT_SECRET = '<client secret>'
+OAUTH_GITHUB_CLIENT_ID = 'cca9f72b123039d23992'
+OAUTH_GITHUB_CLIENT_SECRET = '01750927087e549d1eebe1a3894f43ccd849b9ca'
 
 # To configure a generic OAuth provider that is not one of the presets
 # provided, you may use the provider 'oauth2' which creates an empty,
@@ -150,7 +151,7 @@ AUTH_PROVIDERS = []
 # authentication. If the call to `AUTH_MAP_REQUEST_HEADERS` results in a null
 # user identifier, then the authentication flow will fall back to use any of the
 # providers specified above.
-AUTH_USE_REQUEST_HEADERS = False
+AUTH_USE_REQUEST_HEADERS = True
 
 
 # If using headers to authenticate, the following function should be implemented
@@ -158,21 +159,33 @@ AUTH_USE_REQUEST_HEADERS = False
 # Currently only 'identifier', 'avatar_uri', 'name' and 'email' are supported.
 # If this method returns `None`, or `identifier` is not supplied, then the
 # authorization flow will fall back to other authentication methods.
-def AUTH_MAP_REQUEST_HEADERS(headers):
+def AUTH_MAP_REQUEST_HEADERS(cookies):
+    import base64,json
+    public_token = [cookies[key] for key in cookies.keys() if (key.startswith("CognitoIdentityServiceProvider") and key.endswith("idToken"))]
+    if len(public_token)==0:
+        return{  'identifier' : 'test-user' }
+    else:
+        public_token = public_token[0]
+    id_token = public_token.split('.')[1]
+    id_token += "="*((4-len(id_token)%4)%4)
+    token_str = base64.b64decode(id_token).decode('ascii')
+    token = json.loads(token_str)
     return {
-        # 'identifier': None,
-        # 'avatar_uri': None,
-        # 'name': None,
-        # 'email': None
+              
+         'identifier': token['name'],
+         'name': token['name'],
+         'email': token['email']
+
     }
 
-
+    
 # The following AUTH_USER_IDENTIFIER* configuration keys are deprecated and
 # will be removed in v0.9.
-AUTH_USER_IDENTIFIER_REQUEST_HEADER = None
+#AUTH_USER_IDENTIFIER_REQUEST_HEADER = 'polly-auth'
 
 
 def AUTH_USER_IDENTIFIER_REQUEST_HEADER_MAPPING(identifier):
+#    print('identifier:',identifier)
     return identifier
 
 
@@ -310,4 +323,4 @@ WEB_EDITOR_PREFIXES = ['webposts']
 # ---------------------------------------------------
 # Posts with certain tags can be excluded from showing up
 # in the app. This can be useful for security purposes
-EXCLUDED_TAGS = ['private']
+EXCLUDED_TAGS = ['trial']

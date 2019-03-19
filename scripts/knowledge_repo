@@ -184,6 +184,10 @@ submit = subparsers.add_parser('submit', help='Submit a knowledge post for revie
 submit.set_defaults(action='submit')
 submit.add_argument('path', help='The path of the knowledge post to submit for review.')
 
+submit = subparsers.add_parser('accept', help='accept a knowledge post')
+submit.set_defaults(action='accept')
+submit.add_argument('path', help='The path of the knowledge post to accept')
+
 push = subparsers.add_parser('push', help='DEPRECATED: Use `submit` instead.')
 push.set_defaults(action='push')
 push.add_argument('path', help='The path of the knowledge post to submit for review.')
@@ -303,6 +307,9 @@ if args.action in ['submit', 'push'] or (args.action == 'add' and args.submit):
     repo.submit(path=args.path)
     sys.exit(0)
 
+if args.action == 'accept' :
+    repo.accept(args.path)
+    repo.publish(args.path)
 # Everything below this point has to do with running and/or managing the web app
 from knowledge_repo.app.deploy import KnowledgeDeployer, get_app_builder
 

@@ -50,7 +50,7 @@
   {%- for cluster, is_post, count, contents in grouped_data recursive %}
     {%- if is_post %}
       <li class="cluster_post" style="list-style-type:circle">
-        <a href="{{'/post/' + contents.path|urlencode }}">
+        <a href="{{'/ccbd24f370707c33603102adc7b77123/post/' + contents.path|urlencode }}">
           {{ contents.title|replace('_', ' '|title )}}
         </a>
       </li>
@@ -79,7 +79,7 @@
 
 {% block scripts %}
 {{ super() }}
-<script src="{{ url_for('static', filename='js/index-cluster.js') }}"></script>
+<script src="{{ url_for('admin.static', filename='js/index-cluster.js') }}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
     var cluster_button = $(".btn-cluster")[0];

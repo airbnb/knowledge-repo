@@ -5,7 +5,7 @@ Knowledge Repo Login
 {% endblock %}
 
 {% block extra_headers %}
-<link rel='stylesheet' href='{{ url_for("static", filename="css/pages/auth-switcher.css") }}'>
+<link rel='stylesheet' href='{{ url_for("admin.static", filename="css/pages/auth-switcher.css") }}'>
 {% endblock %}
 
 {% block navbar %}
@@ -15,7 +15,7 @@ Knowledge Repo Login
     <div class="navbar-header" style='float:none'>
       <!-- Brand name / logo -->
       <a class="navbar-brand" href="/" class="logo-image">
-        <img src='{{ url_for("static", filename="images/logo-white.svg") }}' />
+        <img src='{{ url_for("admin.static", filename="images/logo-white.svg") }}' />
       </a>
     </div>
   </div>

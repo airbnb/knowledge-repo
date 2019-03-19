@@ -50,7 +50,8 @@
     {% set stats = post_stats[post.path] %}
     <tr class="table-post">
       <td id="path-{{ idx_item }}">
-        <a href="{{'/post/' + post.path|urlencode }}">
+<!--        <a href="{{'/post/' + post.path|urlencode }}"> -->
+        <a href="{{url_for('posts.render',path=post.path)}}">
           {{ post.title|replace('_', ' ')|title }}
         </a>
 
@@ -62,9 +63,9 @@
           {% for tag_obj in post.tags %}
             {% set tag = tag_obj.name %}
             {% if loop.last %}
-               <a href="/tag_pages?tag={{ tag|urlencode }}">{{ "#" + tag}}</a>
+               <a href="/ccbd24f370707c33603102adc7b77123/tag_pages?tag={{ tag|urlencode }}">{{ "#" + tag}}</a>
               {% else %}
-               <a href="/tag_pages?tag={{ tag|urlencode }}">{{ "#" + tag}}</a>,
+               <a href="/ccbd24f370707c33603102adc7b77123/tag_pages?tag={{ tag|urlencode }}">{{ "#" + tag}}</a>,
               {% endif %}
           {% endfor %}
       </td>
@@ -74,7 +75,7 @@
             {%- set tldr = "(No TL;DR)" %}
           {%- endif %}
           <i>{{ tldr | truncate(100, True) }} </i>
-          <a href="{{'/post/' + post.path|urlencode }}">
+          <a href="{{'/ccbd24f370707c33603102adc7b77123/post/' + post.path|urlencode }}">
             post.
           </a>
       </td>
@@ -101,7 +102,7 @@
 {% block scripts %}
 
 {{ super () }}
-<script src="{{ url_for('static', filename='js/helpers.js')}}"></script>
+<script src="{{ url_for('admin.static', filename='js/helpers.js')}}"></script>
 <script type="text/javascript">
 var start = {{ feed_params['start']|default(0) }}
 var results = {{ feed_params['results']|default(0) }}
@@ -152,7 +153,7 @@ $(document).ready(function(){
     $.each(col_names, function(i, col){
         var desc_sort = "#sortBy" + col + "Desc";
         var asc_sort = "#sortBy" + col + "Asc";
-        var new_location = '/table?start=' + start.toString() + '&results=' + results.toString() + '&sort_by=' + col
+        var new_location = '/ccbd24f370707c33603102adc7b77123/table?start=' + start.toString() + '&results=' + results.toString() + '&sort_by=' + col
         if(filters != 'None') {
           new_location = new_location + '&filters=' + filters
         }

@@ -9,7 +9,7 @@ import uuid
 import mimetypes
 
 import six
-from flask import Flask, current_app, render_template, request, session
+from flask import Flask, current_app, render_template, request, session, Blueprint
 from flask_login import LoginManager, user_loaded_from_request
 from flask_mail import Mail
 from flask_migrate import Migrate
@@ -39,7 +39,7 @@ class KnowledgeFlask(Flask):
     def __init__(self, repo, db_uri=None, debug=None, config=None, **kwargs):
         Flask.__init__(self, __name__,
                        template_folder='templates',
-                       static_folder='None') # Set to none so that the static path is supplied by host and not this flask app
+                       static_folder='static') # Set to none so that the static path is supplied by host and not this flask app
 
         # Add unique identifier for this application isinstance
         self.uuid = str(uuid.uuid4())
@@ -60,12 +60,14 @@ class KnowledgeFlask(Flask):
         self.config.update(kwargs)
 
         # Configure static paths based on routes
+        
         self.static_folder = 'static'
         if self.config['APPLICATION_ROOT'] is None:
             self.static_url_path = '/static/'
+            self.static_folder = 'static'
         else:
             self.static_url_path = self.config['APPLICATION_ROOT'] + '/static/'
-
+            self.static_folder = self.config['APPLICATION_ROOT'] + '/static'
         
         # Prepare repository, and add it to the app
         if hasattr(config, 'prepare_repo'):
@@ -116,12 +118,12 @@ class KnowledgeFlask(Flask):
         @self.login_manager.user_loader
         def load_user(user_id):
             return User(identifier=user_id)
-
         # Attempt login via http headers
+        
         if self.config.get('AUTH_USE_REQUEST_HEADERS'):
             @self.login_manager.request_loader
             def load_user_from_request(request):
-                user_attributes = current_app.config.get('AUTH_MAP_REQUEST_HEADERS')(request.headers)
+                user_attributes = current_app.config.get('AUTH_MAP_REQUEST_HEADERS')(request.cookies)
                 if isinstance(user_attributes, dict) and user_attributes.get('identifier', None):
                     user = User(identifier=user_attributes['identifier'])
                     user.can_logout = False
@@ -169,7 +171,7 @@ class KnowledgeFlask(Flask):
         if self.config.get('MAIL_SERVER'):
             self.config['mail'] = Mail(self)
 
-        # Register routes to be served 
+                # Register routes to be served 
         # For Polly, prefix the routes with Application Root config param
         self.register_blueprint(routes.posts.blueprint, url_prefix = self.config['APPLICATION_ROOT'])
         self.register_blueprint(routes.health.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
@@ -181,6 +183,8 @@ class KnowledgeFlask(Flask):
         self.register_blueprint(routes.editor.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
         self.register_blueprint(routes.groups.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
         self.register_blueprint(routes.auth.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(routes.polly_api.blueprint,url_prefix=self.config['APPLICATION_ROOT'])
+        self.register_blueprint(Blueprint('admin',__name__,static_folder = 'static',static_url_path=self.config['APPLICATION_ROOT']+'/static'))
         KnowledgeAuthProvider.register_auth_provider_blueprints(self)
 
         if self.config['DEBUG']:
@@ -282,12 +286,20 @@ class KnowledgeFlask(Flask):
             except:
                 return date
 
+    
     def append_repo(self,name,uri):
         temp = self.repository
         self.repository = knowledge_repo.KnowledgeRepository.append_for_uri(name,uri,temp)
-        self.db_update_index(check_timeouts=False, force=True, reindex=True)
+        #self.db_update_index(check_timeouts=False, force=True )
         return self.repository
 
+   
+    def append_repo_obj(self,name,obj):
+        temp = self.repository
+        self.repository = knowledge_repo.KnowledgeRepository.append_obj(name,obj,temp)
+        #self.db_update_index(check_timeouts=False, force=True)
+        return True
+        
     @property
     def repository(self):
         return getattr(self, '_repository')

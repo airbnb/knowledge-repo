@@ -103,8 +103,8 @@
 
 {% block scripts %}
 {{ super () }}
-<script src="{{ url_for('static', filename='js/helpers.js')}}"></script>
-<script src="{{ url_for('static', filename='js/tags.js')}}" type='text/javascript'></script>
+<script src="{{ url_for('admin.static', filename='js/helpers.js')}}"></script>
+<script src="{{ url_for('admin.static', filename='js/tags.js')}}" type='text/javascript'></script>
 <script type="text/javascript">
 
   $(".pop").popover({ trigger: "manual" , html: true, animation:false, delay: 100})

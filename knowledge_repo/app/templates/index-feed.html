@@ -2,7 +2,7 @@
 
 {% block style_links %}
 {{ super() }}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/index-feed.css')}}">
+<link rel="stylesheet" href="{{ url_for('admin.static', filename='css/pages/index-feed.css')}}">
 {% endblock %}
 
 {% macro render_tag(tag, post_id) %}
@@ -68,9 +68,9 @@
 
 {% block scripts %}
 {{ super () }}
-<script src="{{ url_for('static', filename='js/pages/index-feed.js') }}"></script>
-<script src="{{ url_for('static', filename='js/helpers.js')}}" type='text/javascript'></script>
-<script src="{{ url_for('static', filename='js/tags.js')}}" type='text/javascript'></script>
+<script src="{{ url_for('admin.static', filename='js/pages/index-feed.js') }}"></script>
+<script src="{{ url_for('admin.static', filename='js/helpers.js')}}" type='text/javascript'></script>
+<script src="{{ url_for('admin.static', filename='js/tags.js')}}" type='text/javascript'></script>
 <script type="text/javascript">
 
   $(".pop").popover({ trigger: "manual" , html: true, animation:false, delay: 100})

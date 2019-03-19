@@ -10,7 +10,7 @@ import os
 import json
 from builtins import str
 from collections import namedtuple
-from flask import request, render_template, redirect, Blueprint, current_app, make_response
+from flask import request, render_template, redirect, Blueprint, current_app, make_response, url_for
 from flask_login import login_required
 from sqlalchemy import case, desc
 
@@ -48,16 +48,7 @@ def site_map():
 @blueprint.route('/')
 @PageView.logged
 def render_index():
-    return redirect('/feed')
-
-
-@blueprint.route('/testupload')
-@PageView.logged
-def test_upload():
-    global current_repo
-    repo = current_app.append_repo("3","kr-test")
-    current_repo = repo
-    return redirect('/feed')    
+    return redirect(url_for('index.render_feed'))
 
 @blueprint.route('/favorites')
 @PageView.logged
@@ -90,6 +81,7 @@ def render_favorites():
 @permissions.index_view.require()
 def render_feed():
     """ Renders the index-feed view """
+    global current_repo,current_app
     #Always have feed display only user who is logged in 
     # TODO : Move the user restriction of posts to a decorator to restrict usably on other APIs
     feed_params = from_request_get_feed_params(request)
@@ -105,7 +97,6 @@ def render_feed():
 
     for post in posts:
         post.tldr = render_post_tldr(post)
-
     return render_template("index-feed.html",
                            feed_params=feed_params,
                            posts=posts,
