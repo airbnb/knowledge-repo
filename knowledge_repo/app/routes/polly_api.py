@@ -30,7 +30,7 @@ blueprint = Blueprint('api', __name__, template_folder='../templates', static_fo
 def upload_post_page(): 
     return render_template('upload_page.html')
 
-@blueprint.route('/api/uploadpost',methods=['POST','GET','PUT'])
+@blueprint.route('/api/uploadpost',methods=['POST'])
 def upload_post():
     # Access the file
     tempfile = request.files['file']
