@@ -41,6 +41,8 @@ aliases = {}
 # Order is important. Should be a list of tuples, of form:
 # ('name of postprocessor', {'init_kwarg': 'value'})
 postprocessors = [('extract_images_to_s3',{'s3_image_root':'s3://knowledge-repo-public-dev','http_image_root':'https://s3-ap-southeast-1.amazonaws.com/knowledge-repo-public-dev'})]
+postprocessors = [('extract_images_to_s3',{'s3_image_root':'%s'%os.environ['KR_STATIC_BUCKET'],'http_image_root':'%s'%os.environ['KR_STATIC_URL']})]
+
 
 
 # Usernames of users to keep informed of changes to the knowledge data repo
