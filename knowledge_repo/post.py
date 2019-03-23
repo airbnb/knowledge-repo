@@ -243,11 +243,11 @@ class KnowledgePost(object):
             md = ''
         else:
             md = decode(self._read_ref('knowledge.md'))
-            mtch = re.match('^---\n[\\s\\S]+?---\n', md)
+            mtch = re.match('^---(\n|\r)[\\s\\S]+?---(\n|\r)', md)
             if not mtch:
                 raise ValueError("YAML header is missing. Please ensure that the top of your post has a header of the following form:\n" + HEADER_SAMPLE)
             if not headers:
-                md = re.sub('^---\n[\\s\\S]+?---\n', '', md, count=1)
+                md = re.sub('^---(\n|\r)[\\s\\S]+?---(\n|\r)', '', md, count=1)
             if not body:
                 md = mtch.group(0)
         if images:
@@ -289,7 +289,7 @@ class KnowledgePost(object):
         if not headers:
             headers = self._get_headers_from_yaml(md)
 
-        md = re.sub(r'^---\n[\s\S]+?---\n', '', md, count=1)
+        md = re.sub(r'^---(\n|\r)[\s\S]+?---(\n|\r)', '', md, count=1)
 
         headers = self._verify_headers(headers, interactive=interactive)
 
