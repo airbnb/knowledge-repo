@@ -62,6 +62,8 @@ def populate_identity_roles(identity, user=None):
             identity.provides.add(roles.post_view)
         if current_app.config['POLICY_ANONYMOUS_VIEW_STATS']:
             identity.provides.add(roles.stats_view)
+        if current_app.config['POLICY_ANONYMOUS_VIEW_TAGS']:
+            identity.provides.add(roles.tags_view)
         if current_app.config['POLICY_ANONYMOUS_DOWNLOADS']:
             identity.provides.add(roles.post_download)
 
