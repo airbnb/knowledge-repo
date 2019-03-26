@@ -1,7 +1,7 @@
 # Default configuration for knowledge repositories
 
 import re
-
+import os
 
 # A function called to see whether a specified path is permitted in the repository
 # Only enforced when creating/modifying posts. It should return the path as a standard
