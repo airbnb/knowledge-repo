@@ -126,7 +126,6 @@ def index_up_to_date():
 
 @ErrorLog.logged
 def update_index_for_post(kp,path):
-    import time
     is_index_master = acquire_index_lock()
     
     try:
