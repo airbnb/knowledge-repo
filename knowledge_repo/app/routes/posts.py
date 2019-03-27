@@ -24,7 +24,6 @@ def render(path):
     """
     Render the knowledge post with all the related formatting.
     """
-    import time
     mode = request.args.get('render', 'html')
     username, user_id = current_user.identifier, current_user.id
 
