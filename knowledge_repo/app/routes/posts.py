@@ -24,7 +24,6 @@ def render(path):
     """
     Render the knowledge post with all the related formatting.
     """
-
     mode = request.args.get('render', 'html')
     username, user_id = current_user.identifier, current_user.id
 
@@ -89,7 +88,7 @@ def render(path):
     is_webpost = False
     if web_editor_prefixes:
         is_webpost = any(prefix for prefix in web_editor_prefixes if path.startswith(prefix))
-
+    
     rendered = render_template(tmpl,
                                html=rendered['html'],
                                toc=rendered['toc'],
