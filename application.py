@@ -34,6 +34,8 @@ repo_db_conn = u'mysql+mysqlconnector://%s:%s@%s:%s/%s'%(KR_REPO_DB_USER,KR_REPO
 from sqlalchemy import create_engine
 engine = create_engine(repo_db_conn)
 kr_names  = engine.table_names()
+engine.dispose()
+
 
 # prepare boilerplate KR object with all the table names in the DB since they represent individual KRs that were uploaded.
 boilerplate_KR = {"webpost":"%s:%s"%(repo_db_conn,"webpost")}
