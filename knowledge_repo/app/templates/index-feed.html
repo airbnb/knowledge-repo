@@ -40,7 +40,7 @@
     {% for post in posts %}
     <div class="row feed-post" data-path='{{post.path|urlencode}}' data-url="{{url_for('posts.render', path=post.path)}}">
         <div class='feed-thumbnail'>
-            <img src="{{ post['thumbnail'] if post['thumbnail'] else '/static/images/default_thumbnail.png' }}" />
+            <img src="{{ post['thumbnail'] if post['thumbnail'] else url_for('admin.static', filename='/images/default_thumbnail.png') }}" />
         </div>
         <div class='feed-metadata'>
                 <span class="feed-title">{{ post.title }}</span>
