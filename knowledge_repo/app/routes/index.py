@@ -12,7 +12,7 @@ from builtins import str
 from collections import namedtuple
 from flask import request, render_template, redirect, Blueprint, current_app, make_response, url_for
 from flask_login import login_required
-from sqlalchemy import case, desc
+from sqlalchemy import case, desc, or_, func
 
 from .. import permissions
 from ..proxies import db_session, current_repo
@@ -89,8 +89,16 @@ def render_feed():
     user = (db_session.query(User)
             .filter(User.id == user_id)
             .first())
-    posts = user.posts
-    post_stats = {post.path: {'all_views': post.view_count,
+    if ('kr' not in request.args.keys()):
+        if ('authors' not in request.args.keys()):
+            return redirect(url_for("index.render_feed")+"?authors="+user.identifier)
+        else:
+            posts, post_stats = get_posts(feed_params)
+    else:
+        folder = request.args.get('kr')
+        posts = (db_session.query(Post)
+                .filter(func.lower(Post.path).like(folder + '%')))
+        post_stats = {post.path: {'all_views': post.view_count,
                               'distinct_views': post.view_user_count,
                               'total_likes': post.vote_count,
                               'total_comments': post.comment_count} for post in posts}
