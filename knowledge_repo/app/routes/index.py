@@ -82,8 +82,10 @@ def render_favorites():
 def render_feed():
     """ Renders the index-feed view """
     global current_repo,current_app
-    #Always have feed display only user who is logged in 
-    # TODO : Move the user restriction of posts to a decorator to restrict usably on other APIs
+    
+    # Given a KR argument, show the contents of that KR
+    # If no such argument, redirect to "My Posts"
+
     feed_params = from_request_get_feed_params(request)
     user_id = feed_params['user_id']
     user = (db_session.query(User)
@@ -91,12 +93,12 @@ def render_feed():
             .first())
     if ('kr' not in request.args.keys()):
         if ('authors' not in request.args.keys()):
-            return redirect(url_for("index.render_feed")+"?authors="+user.identifier)
+            return redirect(url_for("index.render_feed")+"?authors="+user.identifier) # Redirection to this function itself. Redirecting instead of continuiung here to maintain consistent URL as far as user is concerned
         else:
-            posts, post_stats = get_posts(feed_params)
+            posts, post_stats = get_posts(feed_params) # If authors already present, we are in the "My Post" situation. Just go ahead. 
     else:
         folder = request.args.get('kr')
-        posts = (db_session.query(Post)
+        posts = (db_session.query(Post)   # Query the posts table by seeing which path starts with the folder name. All Folder names start with <kr-name>/<rest of path>
                 .filter(func.lower(Post.path).like(folder + '%')))
         post_stats = {post.path: {'all_views': post.view_count,
                               'distinct_views': post.view_user_count,
