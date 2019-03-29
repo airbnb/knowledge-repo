@@ -19,6 +19,8 @@ from alembic.migration import MigrationContext
 from datetime import datetime
 from werkzeug import url_encode
 
+import requests
+import ast
 import knowledge_repo
 from . import routes
 from .auth_provider import KnowledgeAuthProvider
@@ -292,6 +294,18 @@ class KnowledgeFlask(Flask):
         self.repository = knowledge_repo.KnowledgeRepository.append_for_uri(name,uri,temp)
         #self.db_update_index(check_timeouts=False, force=True )
         return self.repository
+    
+    def get_kr_list(self): 
+        host=request.host
+        resp = requests.get("https://%s/api/project"%(host),cookies=request.cookies)
+        krs_total = []
+#        json_data = ast.literal_eval(resp.text)
+        for item in resp.json():
+            pid = item['id']
+            kr_proj = requests.get("https://%s/api/project?id=%s"%(host,pid),cookies=request.cookies)
+        krs_total = krs_total + kr_proj.json()['Knowledge_repo']
+        return krs_total
+
 
    
     def append_repo_obj(self,name,obj):
