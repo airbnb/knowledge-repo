@@ -33,6 +33,8 @@ python-dateutil==2.8.0
 python-editor==1.0.4
 pytz==2018.9
 PyYAML==3.13
+requests==2.21.0
+requests-unixsocket==0.1.5
 regex==2019.2.21
 setuptools-git==1.2
 six==1.12.0
