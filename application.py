@@ -9,7 +9,7 @@ if os.path.exists(os.path.join(os.path.dirname(script_dir), 'knowledge_repo', '_
 
 import knowledge_repo  
 from knowledge_repo.repositories.gitrepository import GitKnowledgeRepository  # nopep8
-from knowledge_repo.app.deploy import KnowledgeDeployer, get_app_builder, get_polly_app_builder
+from knowledge_repo.app.deploy import KnowledgeDeployer, get_app_builder
 
 
 # Pick major URLs/ bucket names etc from environment variables
