@@ -24,7 +24,7 @@ Mako==1.0.7
 Markdown==3.0.1
 MarkupSafe==1.1.1
 mysqlclient==1.4.2.post1
-mysql-connector==2.1.4
+mysql-connector
 nbconvert==5.4.0
 nbformat==4.4.0
 Pillow==5.4.1
