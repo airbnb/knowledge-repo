@@ -20,7 +20,6 @@ from datetime import datetime
 from werkzeug import url_encode
 
 import requests
-import ast
 import knowledge_repo
 from . import routes
 from .auth_provider import KnowledgeAuthProvider
@@ -299,7 +298,6 @@ class KnowledgeFlask(Flask):
         host=request.host
         resp = requests.get("https://%s/api/project"%(host),cookies=request.cookies)
         krs_total = []
-#        json_data = ast.literal_eval(resp.text)
         for item in resp.json():
             pid = item['id']
             kr_proj = requests.get("https://%s/api/project?id=%s"%(host,pid),cookies=request.cookies)
