@@ -98,6 +98,10 @@ def render_feed():
             posts, post_stats = get_posts(feed_params) # If authors already present, we are in the "My Post" situation. Just go ahead. 
     else:
         folder = request.args.get('kr')
+        try:
+            kr_list = current_app.get_kr_list()
+        except ValueError:
+            return redirect("https://%s/?next=%s"%(request.host,request.full_path))
         if folder not in current_app.get_kr_list():
             return render_template("permission_denied.html")
             
