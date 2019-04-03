@@ -27,12 +27,12 @@
     <script src="{{ url_for('admin.static', filename='js/jsbn2.js')}}"></script>
     <script src="{{ url_for('admin.static', filename='js/aws-cognito-sdk.min.js')}}"></script>
     <script src="{{ url_for('admin.static', filename='js/amazon-cognito-identity.min.js')}}"></script>
-   <!-- <script src="{{ url_for('admin.static', filename='js/jwt-decode.min.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='js/jwt-decode.min.js')}}"></script>
     <script type="text/javascript"> 
     console.log(window);
     
     </script>
-    -->
+   
 
 
     <!-- require js is used for plotly, but has a bunch of collisions with other js packages
@@ -206,8 +206,8 @@
     
  <script type="text/javascript">
     const cognitodata = {
-      'cognito_api_endpoint': null,
-      'cognito_client_id': '6m8av0ejgn5cu1bg3hmdqi13gr',
+      'cognito_api_endpoint':  'https://cognito-idp.ap-southeast-1.amazonaws.com/',
+      'cognito_client_id': '5e0c2gcin3sp33vmjsonrmd35d',
       'cognito_user_pool': 'ap-southeast-1_glHRwpNfj',
       'cognito_user_pool_region': 'ap-southeast-1'
     }
