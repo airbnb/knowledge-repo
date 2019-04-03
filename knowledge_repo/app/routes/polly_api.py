@@ -28,7 +28,10 @@ blueprint = Blueprint('api', __name__, template_folder='../templates', static_fo
 @blueprint.route('/api/uploadpage')
 @PageView.logged
 def upload_post_page(): 
-    kr_list = current_app.get_kr_list()
+    try:
+        kr_list = current_app.get_kr_list()
+    except ValueError:
+        return redirect("https://%s/?next=%s"%(request.host,request.full_path))
     return render_template('upload_page.html',krs = kr_list)
 
 @blueprint.route('/api/uploadpost',methods=['POST'])
