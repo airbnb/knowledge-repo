@@ -34,7 +34,7 @@ repo_db_conn = u'mysql+mysqlconnector://%s:%s@%s:%s/%s'%(KR_REPO_DB_USER,KR_REPO
 from sqlalchemy import create_engine
 engine = create_engine(repo_db_conn)
 kr_names  = engine.table_names()
-engine.dispose()
+#engine.dispose()
 
 
 # prepare boilerplate KR object with all the table names in the DB since they represent individual KRs that were uploaded.
@@ -43,10 +43,11 @@ for i in kr_names:
     boilerplate_KR[i] = "%s:%s"%(repo_db_conn,i)
 
 # build app using KR's internal functionality
-app_builder = get_app_builder(boilerplate_KR,
+app_builder = get_polly_app_builder(boilerplate_KR,
                                   db_uri=KR_APP_DB_URI,
                                   debug=True,
-                                  config=config_file)
+                                  config=config_file,
+                                  engine = engine)
 
 
 # Instantiate a flask application object. This handler is what will be used by EB to run. 
