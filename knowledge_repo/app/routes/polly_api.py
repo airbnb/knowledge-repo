@@ -28,7 +28,11 @@ blueprint = Blueprint('api', __name__, template_folder='../templates', static_fo
 @blueprint.route('/api/uploadpage')
 @PageView.logged
 def upload_post_page(): 
-    return render_template('upload_page.html')
+    try:
+        kr_list = current_app.get_kr_list()
+    except ValueError:
+        return redirect("https://%s/?next=%s"%(request.host,request.full_path))
+    return render_template('upload_page.html',krs = kr_list)
 
 @blueprint.route('/api/uploadpost',methods=['POST'])
 def upload_post():
@@ -37,7 +41,8 @@ def upload_post():
     tempfile = request.files['file']
     temp_path = os.path.join('/tmp',secure_filename(tempfile.filename))
     tempfile.save(temp_path)
-    path = request.form.get('path')
+    repo = request.form.get('repo')
+    path = repo + '/' + request.form.get('path')
     # Just post the post to the path
     new_post = current_repo.upload_post(temp_path,path)
     update_index_for_post(new_post,path)

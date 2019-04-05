@@ -5,8 +5,10 @@
     <meta charset="utf-8">
 
     <title>{% block title %}Knowledge Repo{% endblock %}</title>
+    
+   
 
-    <!-- js includes at the top as post embedded js colliding -->
+         <!-- js includes at the top as post embedded js colliding -->
     <script src="{{ url_for('admin.static', filename='modules/jquery/jquery.min.js')}}"></script>
     <script src="{{ url_for('admin.static', filename='modules/tether/js/tether.min.js')}}"></script>
     <script src="{{ url_for('admin.static', filename='modules/bootstrap/js/bootstrap.min.js')}}"></script>
@@ -17,12 +19,29 @@
     <script src="{{ url_for('admin.static', filename='modules/select2/js/select2.min.js')}}"></script>
     <script src="{{ url_for('admin.static', filename='modules/hightlight.pack.js/highlight.pack.js')}}"></script>
     <script src="{{ url_for('admin.static', filename='modules/marked.js/marked.js')}}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+
+    
+    
+    <script src="{{ url_for('admin.static', filename='js/aws-sdk.min.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='js/jsbn.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='js/jsbn2.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='js/aws-cognito-sdk.min.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='js/amazon-cognito-identity.min.js')}}"></script>
+    <script src="{{ url_for('admin.static', filename='js/jwt-decode.min.js')}}"></script>
+    <script type="text/javascript"> 
+    console.log(window);
+    
+    </script>
+   
+
 
     <!-- require js is used for plotly, but has a bunch of collisions with other js packages
              make sure to have it be last js package imported -->
     <script src="{{ url_for('admin.static', filename='modules/require.js/require.min.js')}}"></script>
     <script src="{{ url_for('admin.static', filename='js/pages/base.js')}}"></script>
 
+ 
     <!-- Set explicit mobile collapse behaviour -->
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -56,7 +75,7 @@
   </head>
 
   <body>
-    {% block navbar %}
+     {% block navbar %}
     <!-- Top-level navbar -->
     <nav class="navbar navbar-fixed-top navbar-inverse">
       <div class="container-fluid">
@@ -185,7 +204,56 @@
     </div>
 
     <!-- Placeholder for additional ad-hoc scripts. -->
+    
+ <script type="text/javascript">
+    const cognitodata = {
+      'cognito_api_endpoint':  'https://cognito-idp.ap-southeast-1.amazonaws.com/',
+      'cognito_client_id': '5e0c2gcin3sp33vmjsonrmd35d',
+      'cognito_user_pool': 'ap-southeast-1_glHRwpNfj',
+      'cognito_user_pool_region': 'ap-southeast-1'
+    }
+
+    function refreshSessionOnExpire() {
+      AWS.config.region = cognitodata.cognito_user_pool_region
+      // Setting the pool
+      var poolData = {
+        UserPoolId: cognitodata.cognito_user_pool,
+        ClientId: cognitodata.cognito_client_id,
+        Storage: new AmazonCognitoIdentity.CookieStorage({
+          domain: window.location.hostname,
+          secure: false
+        })
+      };
+      return new Promise((resolve, reject) => {
+        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+        var cognitoUser = userPool.getCurrentUser();
+        if (cognitoUser === null) {
+        //  window.location.href = "/?next=" + window.location.href;
+        console.log("CognitoUserNotFound");
+        } else {
+          cognitoUser.getSession(function (err, session) {
+            if (err) {
+              //window.location.href = "/?next=" + window.location.href;
+              console.log("Some error in getting session for Cognito");
+            } else if (!session.isValid()) {
+              //window.location.href = "/?next=" + window.location.href;
+              console.log("Session is invalid");
+            } else {
+              var idtoken = session.getIdToken().getJwtToken();
+              Cookies.set('public-token', idtoken, { expires: new Date(jwt_decode(idtoken).exp * 1000), path: '' });
+              resolve(true);
+            }
+          });
+        }
+      });
+    }
+    refreshSessionOnExpire();
+    setInterval(() => { refreshSessionOnExpire ()}, 3000000);
+  </script>
+
+
     {% block scripts %}
+    
     {% endblock %}
 
   </body>
