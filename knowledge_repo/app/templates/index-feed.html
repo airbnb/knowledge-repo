@@ -8,7 +8,7 @@
 {% macro render_tag(tag, post_id) %}
 
 {% set tag_flat = tag.replace("/", "__") %}
-    <a  href="/tag_pages?tag={{ tag|urlencode }}"
+    <a  href="{{url_for('tag.render_tag_pages')}}?tag={{ tag|urlencode }}"
         data-tag-name="{{ tag_flat }}"
         data-container="body"
         data-toggle="popover"
@@ -40,7 +40,7 @@
     {% for post in posts %}
     <div class="row feed-post" data-path='{{post.path|urlencode}}' data-url="{{url_for('posts.render', path=post.path)}}">
         <div class='feed-thumbnail'>
-            <img src="{{ post['thumbnail'] if post['thumbnail'] else '/static/images/default_thumbnail.png' }}" />
+            <img src="{{ post['thumbnail'] if post['thumbnail'] else url_for('admin.static', filename='/images/default_thumbnail.png') }}" />
         </div>
         <div class='feed-metadata'>
                 <span class="feed-title">{{ post.title }}</span>

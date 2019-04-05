@@ -2,7 +2,7 @@
 
 {% macro format_authors(authors) %}
   {% for author in authors %}
-    <a href='/feed?authors={{ author.identifier|urlencode }}'>
+    <a href='{{url_for('index.render_feed')}}?authors={{ author.identifier|urlencode }}'>
       {{ author.format_name }}
     </a>
     {% if not loop.last %}
