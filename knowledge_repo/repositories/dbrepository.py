@@ -28,7 +28,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
                       'mssql+pymssql',
                       'sqlite']  # TODO: Use regex matching and add the rest?
 
-    def init(self, engine = None, auto_create=True):
+    def init(self, engine = None, auto_create=True, session = None):
 
         # TODO handle if user does not pass in table sqlite://path.db
         uri_splt = self.uri.split(":")
@@ -48,9 +48,11 @@ class DbKnowledgeRepository(KnowledgeRepository):
                               Column('data', LargeBinary(length=(2**32)-1))) # Increased length to support large notebooks
         if not engine:
             self.engine = create_engine(engine_uri, pool_recycle=3600)
+            self.session = scoped_session(sessionmaker(bind=self.engine))
         else:
+            print("used existing engine")
             self.engine = engine
-        self.session = scoped_session(sessionmaker(bind=self.engine))
+            self.session = session
         if auto_create:
             postref_table.create(self.engine, checkfirst=True)
 
@@ -64,7 +66,8 @@ class DbKnowledgeRepository(KnowledgeRepository):
         pass
 
     def session_end(self):
-        self.session.remove()
+        #self.session.remove()
+        pass
 
     @property
     def revision(self):
