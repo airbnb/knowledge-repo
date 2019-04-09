@@ -58,14 +58,14 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         return MetaKnowledgeRepository(krs)
 
     @classmethod
-    def for_uris_polly(cls, uri,engine):
+    def for_uris_polly(cls, uri,engine,session):
         # Import this within this method so as not to cause import resolution problems
         from .repositories.meta import MetaKnowledgeRepository
         if isinstance(uri, six.string_types):
             uris = {'': uri}
         else:
             uris = uri
-        krs = {name: cls.for_uri(uri,engine=engine) for name, uri in list(uris.items())}
+        krs = {name: cls.for_uri(uri,engine=engine,session = session) for name, uri in list(uris.items())}
         return MetaKnowledgeRepository(krs)
 
     def upload_post(self,filepath,path):

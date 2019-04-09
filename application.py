@@ -32,8 +32,12 @@ repo_db_conn = u'mysql+mysqlconnector://%s:%s@%s:%s/%s'%(KR_REPO_DB_USER,KR_REPO
 # ToDo : this will need augmentation when GIT integration is done to do something similar for all the mounted GIT repos
 
 from sqlalchemy import create_engine
-engine = create_engine(repo_db_conn)
+from sqlalchemy.orm import scoped_session,sessionmaker
+
+engine = create_engine(repo_db_conn,pool_recycle=1800,pool_size=10)
 kr_names  = engine.table_names()
+db_repo_session = scoped_session(sessionmaker(bind = engine))
+
 #engine.dispose()
 
 
@@ -47,7 +51,8 @@ app_builder = get_polly_app_builder(boilerplate_KR,
                                   db_uri=KR_APP_DB_URI,
                                   debug=True,
                                   config=config_file,
-                                  engine = engine)
+                                  engine = engine,
+                                  db_session = db_repo_session)
 
 
 # Instantiate a flask application object. This handler is what will be used by EB to run. 
