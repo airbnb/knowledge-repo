@@ -102,7 +102,8 @@ def render_feed():
             kr_list = current_app.get_kr_list()
         except ValueError:
             return redirect("https://%s/?next=%s"%(request.host,request.full_path))
-        if folder not in current_app.get_kr_list():
+        
+        if folder not in kr_list:
             return render_template("permission_denied.html")
             
         posts = (db_session.query(Post)   # Query the posts table by seeing which path starts with the folder name. All Folder names start with <kr-name>/<rest of path>
