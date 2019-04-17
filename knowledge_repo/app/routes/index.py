@@ -12,7 +12,6 @@ from builtins import str
 from collections import namedtuple
 from flask import request, render_template, redirect, Blueprint, current_app, make_response, url_for
 from flask_login import login_required
-
 from sqlalchemy import case, desc, func
 
 from .. import permissions

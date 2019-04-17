@@ -21,11 +21,11 @@ def get_app_builder(uris, debug, db_uri, config, **kwargs):
     return get_app
 
 
-def get_polly_app_builder(uris, debug, db_uri, config, engine,**kwargs):
+def get_polly_app_builder(uris, debug, db_uri, config, engine,db_session,**kwargs):
     def get_app():
         return (
             knowledge_repo.KnowledgeRepository
-            .for_uris_polly(uris,engine = engine)
+            .for_uris_polly(uris,engine = engine,session = db_session)
             .get_app(db_uri=db_uri, debug=debug, config=config, **kwargs)
         )
     return get_app
