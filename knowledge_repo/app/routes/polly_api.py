@@ -44,8 +44,12 @@ def upload_post():
     repo = request.form.get('repo')
     path = repo + '/' + request.form.get('path')
     # Just post the post to the path
-    new_post = current_repo.upload_post(temp_path,path)
-    update_index_for_post(new_post,path)
+    try:
+        new_post = current_repo.upload_post(temp_path,path)
+        update_index_for_post(new_post,path)
+    except:
+         
+        return render_template("error.html")
     return redirect(url_for('posts.render',path=path+".kp"))
 
 @blueprint.route('/api/uploadkr')
