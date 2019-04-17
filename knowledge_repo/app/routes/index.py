@@ -102,7 +102,8 @@ def render_feed():
             kr_list = current_app.get_kr_list()
         except ValueError:
             return redirect("https://%s/?next=%s"%(request.host,request.full_path))
-        if folder not in current_app.get_kr_list():
+        
+        if folder not in kr_list:
             return render_template("permission_denied.html")
             
         posts = (db_session.query(Post)   # Query the posts table by seeing which path starts with the folder name. All Folder names start with <kr-name>/<rest of path>
@@ -126,14 +127,15 @@ def render_feed():
 @permissions.index_view.require()
 def render_table():
     """Renders the index-table view"""
-    feed_params = from_request_get_feed_params(request)
-    posts, post_stats = get_posts(feed_params)
+    #feed_params = from_request_get_feed_params(request)
+    #posts, post_stats = get_posts(feed_params)
     # TODO reference stats inside the template
-    return render_template("index-table.html",
-                           posts=posts,
-                           post_stats=post_stats,
-                           top_header="Knowledge Table",
-                           feed_params=feed_params)
+    return render_template("permission_denied.html")
+    #return render_template("index-table.html",
+    #                       posts=posts,
+    #                       post_stats=post_stats,
+    #                       top_header="Knowledge Table",
+    #                       feed_params=feed_params)
 
 
 @blueprint.route('/cluster')
@@ -143,6 +145,8 @@ def render_cluster():
     """ Render the cluster view """
     # we don't use the from_request_get_feed_params because some of the
     # defaults are different
+    
+    return render_template("permission_denied.html")
     filters = request.args.get('filters', '')
     sort_by = request.args.get('sort_by', 'alpha')
     group_by = request.args.get('group_by', 'folder')
