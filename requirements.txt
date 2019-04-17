@@ -6,7 +6,7 @@ Click==7.0
 colorama==0.4.1
 cooked-input==0.5.1
 dateparser==0.7.1
-enum34==1.1.6
+enum-compat==0.0.2
 Flask==1.0.2
 Flask-Login==0.4.1
 Flask-Mail==0.9.1
