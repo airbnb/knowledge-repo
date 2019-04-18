@@ -48,7 +48,6 @@ def upload_post():
         new_post = current_repo.upload_post(temp_path,path)
         update_index_for_post(new_post,path)
     except:
-         
         return render_template("error.html")
     return redirect(url_for('posts.render',path=path+".kp"))
 

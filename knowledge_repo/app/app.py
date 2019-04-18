@@ -301,7 +301,7 @@ class KnowledgeFlask(Flask):
         for item in resp.json():
             pid = item['id']
             kr_proj = requests.get("https://%s/api/project?id=%s"%(host,pid),cookies=request.cookies)
-        krs_total = krs_total + kr_proj.json()['Knowledge_repo']
+            krs_total = krs_total + kr_proj.json()['Knowledge_repo']
         return krs_total
 
 

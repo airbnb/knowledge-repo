@@ -34,7 +34,7 @@ repo_db_conn = u'mysql+mysqlconnector://%s:%s@%s:%s/%s'%(KR_REPO_DB_USER,KR_REPO
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session,sessionmaker
 
-engine = create_engine(repo_db_conn,pool_recycle=3600,pool_size=300, max_overflow =100)
+engine = create_engine(repo_db_conn,pool_recycle=3600,pool_size=300, max_overflow =100, pool_pre_ping=True)
 kr_names  = engine.table_names()
 db_repo_session = scoped_session(sessionmaker(bind = engine))
 

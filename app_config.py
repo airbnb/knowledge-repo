@@ -267,8 +267,8 @@ def prepare_repo(repo):
 # `INDEXING_TIMEOUT` seconds, whereby the lock is ceded to the next requesting
 # process. Note that `INDEXING_TIMEOUT` must be larger than `INDEXING_INTERVAL`
 # or strange things might begin to happen.
-INDEXING_INTERVAL = 5 * 60  # 5 minutes
-INDEXING_TIMEOUT = 10 * 60  # 10 minutes
+INDEXING_INTERVAL = 60 * 60  # 5 minutes
+INDEXING_TIMEOUT = 60 * 60  # 10 minutes
 
 # Whether an index operation should update repositories
 INDEXING_UPDATES_REPOSITORIES = True
