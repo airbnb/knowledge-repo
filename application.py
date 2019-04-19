@@ -54,7 +54,6 @@ app_builder = get_polly_app_builder(boilerplate_KR,
                                   engine = engine,
                                   db_session = db_repo_session)
 
-
 # Instantiate a flask application object. This handler is what will be used by EB to run. 
 application = KnowledgeDeployer.using('flask')(
         app_builder,

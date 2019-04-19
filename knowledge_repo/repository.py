@@ -462,4 +462,5 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
     # ----------- Interface with web app ----------------------------------
     def get_app(self, *args, **kwargs):
         from . import app
+        print("called")
         return self.config.prepare_app(app.KnowledgeFlask(self, *args, **kwargs))

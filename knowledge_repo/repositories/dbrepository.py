@@ -10,6 +10,9 @@ from sqlalchemy.sql import func
 from sqlalchemy import Table, Column, Integer, String, DateTime, LargeBinary, MetaData
 from ..repository import KnowledgeRepository
 
+from ..app import db_repo_session, db_repo_engine
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -28,7 +31,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
                       'mssql+pymssql',
                       'sqlite']  # TODO: Use regex matching and add the rest?
 
-    def init(self, engine = None, auto_create=True, session = None):
+    def init(self, auto_create=True):
 
         # TODO handle if user does not pass in table sqlite://path.db
         uri_splt = self.uri.split(":")
@@ -46,15 +49,17 @@ class DbKnowledgeRepository(KnowledgeRepository):
                               Column('status', Integer, default=self.PostStatus.DRAFT.value),
                               Column('ref', String(512)),
                               Column('data', LargeBinary(length=(2**32)-1))) # Increased length to support large notebooks
-        if not engine:
-            self.engine = create_engine(engine_uri, pool_recycle=3600)
-            self.session = scoped_session(sessionmaker(bind=self.engine))
-        else:
-            print("used existing engine")
-            self.engine = engine
-            self.session = session
+        #if not engine:
+        #    db_repo_engine = create_engine(engine_uri, pool_recycle=3600)
+        #    db_repo_session = scoped_session(sessionmaker(bind=db_repo_engine))
+        #else:
+        #    print("used existing engine")
+        #    db_repo_engine = engine
+        #    db_repo_session = session
+        print(db_repo_engine)
+        print(db_repo_session)
         if auto_create:
-            postref_table.create(self.engine, checkfirst=True)
+            postref_table.create(db_repo_engine, checkfirst=True)
 
         class PostRef(object):
             pass
@@ -66,12 +71,12 @@ class DbKnowledgeRepository(KnowledgeRepository):
         pass
 
     def session_end(self):
-        #self.session.remove()
+        #db_repo_session.remove()
         pass
 
     @property
     def revision(self):
-        return str(self.session.query(func.max(self.PostRef.updated_at)).first()[0])
+        return str(db_repo_session.query(func.max(self.PostRef.updated_at)).first()[0])
 
     def update(self):
         pass
@@ -81,6 +86,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
 
     @property
     def status(self):
+        pass
         try:
             session = self.Session()
             session.remove()
@@ -95,7 +101,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
     # -------------- Post retrieval methods --------------------------------------
 
     def _dir(self, prefix, statuses):
-        query = self.session.query(self.PostRef.path)
+        query = db_repo_session.query(self.PostRef.path)
         if prefix is not None:
             query = query.filter(self.PostRef.status.like('{}%'.format(prefix)))
         query = query.filter(self.PostRef.status.in_([status.value for status in statuses]))
@@ -138,16 +144,16 @@ class DbKnowledgeRepository(KnowledgeRepository):
 
     def __set_post_status(self, path, status, revision=None):
         revision = revision or self._kp_get_revision(path, enforce_exists=True)
-        postrefs = (self.session.query(self.PostRef)
+        postrefs = (db_repo_session.query(self.PostRef)
                                 .filter(self.PostRef.path == path)
                                 .filter(self.PostRef.revision == revision)).all()
         for postref in postrefs:
             postref.status = status.value
-        self.session.commit()
+        db_repo_session.commit()
 
     def __get_post_status(self, path, revision=None):
         revision = revision or self._kp_get_revision(path, enforce_exists=True)
-        post_refs = (self.session.query(self.PostRef)
+        post_refs = (db_repo_session.query(self.PostRef)
                                  .filter(self.PostRef.path == path)
                                  .filter(self.PostRef.revision == revision)
                                  .distinct()).all()
@@ -156,13 +162,13 @@ class DbKnowledgeRepository(KnowledgeRepository):
     # ----------- Knowledge Post Data Retrieval/Pushing Methods --------------------
 
     def _kp_uuid(self, path):
-        result = self.session.query(self.PostRef.uuid).filter(self.PostRef.path == path).first()
+        result = db_repo_session.query(self.PostRef.uuid).filter(self.PostRef.path == path).first()
         if result:
             return result[0]
         return None
 
     def _kp_exists(self, path, revision=None):
-        query = (self.session.query(self.PostRef)
+        query = (db_repo_session.query(self.PostRef)
                              .filter(self.PostRef.path == path))
         if revision:
             query = query.filter(self.PostRef.revision == revision)
@@ -172,7 +178,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
     def _kp_status(self, path, revision=None, detailed=False):
         revision = revision or self._kp_get_revision(path, enforce_exists=True)
 
-        postref = (self.session.query(self.PostRef)
+        postref = (db_repo_session.query(self.PostRef)
                                .filter(self.PostRef.path == path)
                                .filter(self.PostRef.revision == revision)).first()
 
@@ -184,7 +190,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
         return self.__get_post_status(path, revision)
 
     def _kp_get_revision(self, path, status=None, enforce_exists=False):
-        query = self.session.query(self.PostRef.revision).filter(self.PostRef.path == path)
+        query = db_repo_session.query(self.PostRef.revision).filter(self.PostRef.path == path)
         if status is not None:
             query.filter(self.PostRef.status == status.value)
         revision = query.order_by(self.PostRef.revision.desc()).first()
@@ -197,14 +203,14 @@ class DbKnowledgeRepository(KnowledgeRepository):
         return revision or 0
 
     def _kp_get_revisions(self, path):
-        revisions = (self.session.query(self.PostRef.revision)
+        revisions = (db_repo_session.query(self.PostRef.revision)
                                  .filter(self.PostRef.path == path)
                                  .distinct()).all()
         return revisions
 
     def _kp_read_ref(self, path, reference, revision=None):
         revision = revision or self._kp_get_revision(path, enforce_exists=True)
-        data = (self.session.query(self.PostRef)
+        data = (db_repo_session.query(self.PostRef)
                             .filter(self.PostRef.path == path)
                             .filter(self.PostRef.ref == reference)
                             .filter(self.PostRef.revision == revision)).first().data
@@ -213,7 +219,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
     def _kp_dir(self, path, parent=None, revision=None):
         ref_prefix = parent + '/' if parent else ''
         revision = revision or self._kp_get_revision(path, enforce_exists=True)
-        refs = (self.session.query(self.PostRef.ref)
+        refs = (db_repo_session.query(self.PostRef.ref)
                             .filter(self.PostRef.path == path)
                             .filter(self.PostRef.ref.like(ref_prefix + '%'))
                             .filter(self.PostRef.revision == revision)).all()
@@ -223,7 +229,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
 
     def _kp_has_ref(self, path, reference, revision=None):
         revision = revision or self._kp_get_revision(path, enforce_exists=True)
-        ref = (self.session.query(self.PostRef.ref)
+        ref = (db_repo_session.query(self.PostRef.ref)
                            .filter(self.PostRef.path == path)
                            .filter(self.PostRef.ref == reference)
                            .filter(self.PostRef.revision == revision)).first()
@@ -236,7 +242,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
     def _kp_write_ref(self, path, reference, data, uuid=None, revision=None):
         revision = revision or self._kp_get_revision(path, enforce_exists=False) or 0
 
-        postref = (self.session.query(self.PostRef)
+        postref = (db_repo_session.query(self.PostRef)
                                .filter(self.PostRef.path == path)
                                .filter(self.PostRef.ref == reference)
                                .filter(self.PostRef.revision == revision)).first()
@@ -247,10 +253,10 @@ class DbKnowledgeRepository(KnowledgeRepository):
             postref.ref = reference
             postref.uuid = uuid
             postref.revision = revision
-            self.session.add(postref)
+            db_repo_session.add(postref)
 
         postref.data = data
-        self.session.commit()
+        db_repo_session.commit()
 
     def _kp_new_revision(self, path, uuid=None):
         revision = self._kp_get_revision(path, enforce_exists=False) or 0
