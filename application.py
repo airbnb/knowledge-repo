@@ -11,6 +11,7 @@ import knowledge_repo
 from knowledge_repo.repositories.gitrepository import GitKnowledgeRepository  # nopep8
 from knowledge_repo.app.deploy import KnowledgeDeployer, get_app_builder, get_polly_app_builder
 
+from knowledge_repo.app import db_repo_session, db_repo_engine
 
 # Pick major URLs/ bucket names etc from environment variables
 
@@ -34,9 +35,9 @@ repo_db_conn = u'mysql+mysqlconnector://%s:%s@%s:%s/%s'%(KR_REPO_DB_USER,KR_REPO
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session,sessionmaker
 
-engine = create_engine(repo_db_conn,pool_recycle=3600,pool_size=300, max_overflow =100, pool_pre_ping=True)
-kr_names  = engine.table_names()
-db_repo_session = scoped_session(sessionmaker(bind = engine))
+#engine = create_engine(repo_db_conn,pool_recycle=3600,pool_size=300, max_overflow =100, pool_pre_ping=True)
+kr_names  = db_repo_engine.table_names()
+#db_repo_session = scoped_session(sessionmaker(bind = engine))
 
 #engine.dispose()
 
@@ -47,12 +48,12 @@ for i in kr_names:
     boilerplate_KR[i] = "%s:%s"%(repo_db_conn,i)
 
 # build app using KR's internal functionality
-app_builder = get_polly_app_builder(boilerplate_KR,
+app_builder = get_app_builder(boilerplate_KR,
                                   db_uri=KR_APP_DB_URI,
                                   debug=True,
-                                  config=config_file,
-                                  engine = engine,
-                                  db_session = db_repo_session)
+                                  config=config_file)
+#                                  engine = engine,
+#                                  db_session = db_repo_session)
 
 # Instantiate a flask application object. This handler is what will be used by EB to run. 
 application = KnowledgeDeployer.using('flask')(
