@@ -2,6 +2,7 @@ import os
 
 from ..converter import KnowledgePostConverter
 from .._version import __optional_dependencies__
+from textwrap import dedent
 
 TEMPLATE = '''
 {%- extends 'markdown.tpl' -%}
@@ -62,6 +63,17 @@ class IpynbFormat(KnowledgePostConverter):
                                                  'text/plain']
 
         nb = nbformat.read(filename, as_version=4)
+        # The following patch is to allow HTML that has prepended
+        # whitespace (e.g. plotly) to still be executed as HTML and
+        # not interpretted as verbatim. This should probably be
+        # implemented in nbconvert.
+        for cell in nb['cells']:
+            if cell['cell_type'] == 'code':
+                for output in cell['outputs']:
+                    data = output.get('data', {})
+                    if 'text/html' in data:
+                        data['text/html'] = dedent(data['text/html'])
+        # end patch
 
         dl = DictLoader({'full.tpl': TEMPLATE})
         md_exporter = MarkdownExporter(config=c, extra_loaders=[
