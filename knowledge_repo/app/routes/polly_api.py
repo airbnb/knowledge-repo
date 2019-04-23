@@ -59,6 +59,7 @@ def upload_kr():
     args:
         S3-Path 
     """
+    import shutil
     global current_repo,current_app
     path = request.args.get('path')
     dir_name,dir_path = download_dir(path)
@@ -71,6 +72,7 @@ def upload_kr():
     except:
     #TODO: do more precise exception handling
         error = 400
+    shutil.rmtree(dir_path)
     return jsonify({
                 'statusCode': '400' if error==400 else '200',
                 'headers': {
