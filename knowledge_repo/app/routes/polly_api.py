@@ -14,6 +14,7 @@ from collections import namedtuple
 from flask import request, render_template, redirect, Blueprint, current_app, make_response,jsonify,url_for
 from flask_login import login_required
 from sqlalchemy import case, desc
+from sqlalchemy.exc import IntegrityError
 from werkzeug import secure_filename
 from .. import permissions
 from ..proxies import db_session, current_repo
@@ -24,6 +25,40 @@ from ..utils.render import render_post_tldr
 from ..utils.s3_talk import download_dir,download_from_s3  
 from ..index import update_index, update_index_for_post
 blueprint = Blueprint('api', __name__, template_folder='../templates', static_folder='../static')
+
+
+
+
+def publish_post_db(kp,path):
+    if not kp.is_valid():
+        print("KP was invalid")
+        return
+    querypath = path+'.kp'
+    post = (db_session.query(Post).filter(Post.path==querypath).first())
+    if not post:
+        print(u'creating new post from path {}'.format(kp.path))
+        post = Post()
+        db_session.add(post)
+        db_session.commit()
+        db_session.flush()  # (matthew) Fix groups logic so this is not necessary
+    try:
+        post.update_metadata_from_kp(kp)
+        print("After update:", post.path)
+    except IntegrityError:
+        import uuid
+        db_session.rollback()
+        print("from the caller:",kp.path)
+        kp.uuid = str(uuid.uuid4())
+        post.update_metadata_from_kp(kp)
+        print("After update:", post.path)
+    db_session.commit()
+    db_session.flush()
+
+        # Record revision
+#    for uri, revision in current_repo.revisions.items():
+#        IndexMetadata.set('repository_revision', uri, str(revision))
+
+
 
 @blueprint.route('/api/uploadpage')
 @PageView.logged
@@ -46,7 +81,8 @@ def upload_post():
     # Just post the post to the path
     try:
         new_post = current_repo.upload_post(temp_path,path)
-        update_index_for_post(new_post,path)
+    #    update_index_for_post(new_post,path)
+        publish_post_db(new_post,path)
     except:
         return render_template("error.html")
     return redirect(url_for('posts.render',path=path+".kp"))
@@ -61,6 +97,7 @@ def upload_kr():
     """
     import shutil
     global current_repo,current_app
+    from ...repositories.meta import MetaKnowledgeRepository
     path = request.args.get('path')
     dir_name,dir_path = download_dir(path)
     error = 200
@@ -68,7 +105,10 @@ def upload_kr():
         db_path = current_app.config['KR_REPO_DB_PATH'] + ':' + dir_name
         dbobj  = current_repo.migrate_to_dbrepo(dir_path,db_path)
         current_app.append_repo_obj(dir_name,dbobj)
-        current_app.db_update_index(check_timeouts=False,force=True)
+        temp_kr = MetaKnowledgeRepository({dir_name:dbobj})
+        for post in temp_kr.posts():
+            publish_post_db(post,post.path)
+        #current_app.db_update_index(check_timeouts=False,force=True)
     except:
     #TODO: do more precise exception handling
         error = 400

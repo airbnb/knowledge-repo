@@ -591,7 +591,7 @@ class Post(db.Model):
         :rtype: None
         """
         headers = kp.headers
-
+        print("From the mdoel:",kp.path)
         self.uuid = kp.uuid
         self.path = kp.path
         self.project = headers.get('project')
