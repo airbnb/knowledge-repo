@@ -59,6 +59,7 @@ def publish_post_db(kp,path):
 #    for uri, revision in current_repo.revisions.items():
 #        IndexMetadata.set('repository_revision', uri, str(revision))
 
+<<<<<<< HEAD
 def prep_kr_path(path,dir_name):
     path_parts = path.split('/')
     if path_parts[0] != dir_name:
@@ -71,6 +72,10 @@ def prep_post_path(path):
     if not path.endswith('.kp'):
         path = path + '.kp'
     return path
+=======
+
+
+>>>>>>> working setup
 @blueprint.route('/api/uploadpage')
 @PageView.logged
 def upload_post_page(): 
@@ -93,7 +98,10 @@ def upload_post():
     try:
         new_post = current_repo.upload_post(temp_path,path)
     #    update_index_for_post(new_post,path)
+<<<<<<< HEAD
         path = prep_post_path(path)
+=======
+>>>>>>> working setup
         publish_post_db(new_post,path)
     except:
         return render_template("error.html")
@@ -119,9 +127,14 @@ def upload_kr():
         current_app.append_repo_obj(dir_name,dbobj)
         temp_kr = MetaKnowledgeRepository({dir_name:dbobj})
         for post in temp_kr.posts():
+<<<<<<< HEAD
             post_path = prep_kr_path(post.path,dir_name)
             publish_post_db(post,post_path)
             print("Tried pushing:",post_path)
+=======
+            publish_post_db(post,post.path)
+        #current_app.db_update_index(check_timeouts=False,force=True)
+>>>>>>> working setup
     except:
     #TODO: do more precise exception handling
         error = 400
