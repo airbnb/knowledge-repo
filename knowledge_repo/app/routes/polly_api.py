@@ -33,8 +33,9 @@ def publish_post_db(kp,path):
     if not kp.is_valid():
         print("KP was invalid")
         return
-    querypath = path+'.kp'
-    post = (db_session.query(Post).filter(Post.path==querypath).first())
+
+    print("Checking the DB for this:",path)
+    post = (db_session.query(Post).filter(Post.path==path).first())
     if not post:
         print(u'creating new post from path {}'.format(kp.path))
         post = Post()
@@ -58,8 +59,18 @@ def publish_post_db(kp,path):
 #    for uri, revision in current_repo.revisions.items():
 #        IndexMetadata.set('repository_revision', uri, str(revision))
 
+def prep_kr_path(path,dir_name):
+    path_parts = path.split('/')
+    if path_parts[0] != dir_name:
+        path = dir_name + '/' + path
+    if not path.endswith('.kp'):
+        path = path + '.kp'
+    return path
 
-
+def prep_post_path(path):
+    if not path.endswith('.kp'):
+        path = path + '.kp'
+    return path
 @blueprint.route('/api/uploadpage')
 @PageView.logged
 def upload_post_page(): 
@@ -82,6 +93,7 @@ def upload_post():
     try:
         new_post = current_repo.upload_post(temp_path,path)
     #    update_index_for_post(new_post,path)
+        path = prep_post_path(path)
         publish_post_db(new_post,path)
     except:
         return render_template("error.html")
@@ -107,7 +119,9 @@ def upload_kr():
         current_app.append_repo_obj(dir_name,dbobj)
         temp_kr = MetaKnowledgeRepository({dir_name:dbobj})
         for post in temp_kr.posts():
-            publish_post_db(post,post.path)
+            post_path = prep_kr_path(post.path,dir_name)
+            publish_post_db(post,post_path)
+            print("Tried pushing:",post_path)
         #current_app.db_update_index(check_timeouts=False,force=True)
     except:
     #TODO: do more precise exception handling
