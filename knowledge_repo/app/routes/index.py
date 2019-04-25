@@ -99,7 +99,7 @@ def render_feed():
     else:
         folder = request.args.get('kr')
         try:
-            kr_list = current_app.get_kr_list()
+            kr_list = current_app.is_kr_shared(folder)
         except ValueError:
             return redirect("https://%s/?next=%s"%(request.host,request.full_path))
         

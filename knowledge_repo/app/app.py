@@ -309,6 +309,17 @@ class KnowledgeFlask(Flask):
             krs_total = krs_total + kr_proj.json()['Knowledge_repo']
         return krs_total
 
+    def is_kr_shared(self,kr): 
+        host=request.host
+        pid, repo = kr.split('/')
+        
+        resp = requests.get("https://%s/api/project?id=%s"%(host,pid),cookies=request.cookies)
+        resp_obj = resp.json()
+        if 'messages' in resp_obj.keys():
+            return False
+        else:
+            return True
+
 
    
     def append_repo_obj(self,name,obj):
