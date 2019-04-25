@@ -59,7 +59,6 @@ def publish_post_db(kp,path):
 #    for uri, revision in current_repo.revisions.items():
 #        IndexMetadata.set('repository_revision', uri, str(revision))
 
-<<<<<<< HEAD
 def prep_kr_path(path,dir_name):
     path_parts = path.split('/')
     if path_parts[0] != dir_name:
@@ -72,10 +71,8 @@ def prep_post_path(path):
     if not path.endswith('.kp'):
         path = path + '.kp'
     return path
-=======
 
 
->>>>>>> working setup
 @blueprint.route('/api/uploadpage')
 @PageView.logged
 def upload_post_page(): 
@@ -121,6 +118,7 @@ def upload_kr():
     path = request.args.get('path')
     dir_name,dir_path = download_dir(path)
     error = 200
+<<<<<<< HEAD
     try:
         db_path = current_app.config['KR_REPO_DB_PATH'] + ':' + dir_name
         dbobj  = current_repo.migrate_to_dbrepo(dir_path,db_path)
@@ -136,8 +134,19 @@ def upload_kr():
         #current_app.db_update_index(check_timeouts=False,force=True)
 >>>>>>> working setup
     except:
+=======
+#    try:
+    db_path = current_app.config['KR_REPO_DB_PATH'] + ':' + dir_name
+    dbobj  = current_repo.migrate_to_dbrepo(dir_path,db_path)
+    current_app.append_repo_obj(dir_name,dbobj)
+    temp_kr = MetaKnowledgeRepository({dir_name:dbobj})
+    for post in temp_kr.posts():
+        publish_post_db(post,post.path)
+        #current_app.db_update_index(check_timeouts=False,force=True)
+ #   except:
+>>>>>>> allowing images to be saved from uploaded KRs
     #TODO: do more precise exception handling
-        error = 400
+    error = 400
     shutil.rmtree(dir_path)
     return jsonify({
                 'statusCode': '400' if error==400 else '200',
