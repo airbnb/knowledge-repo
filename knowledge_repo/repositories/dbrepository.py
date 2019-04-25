@@ -50,13 +50,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
                               Column('status', Integer, default=self.PostStatus.DRAFT.value),
                               Column('ref', String(512)),
                               Column('data', LargeBinary(length=(2**32)-1))) # Increased length to support large notebooks
-        #if not engine:
-        #    db_repo_engine = create_engine(engine_uri, pool_recycle=3600)
-        #    db_repo_session = scoped_session(sessionmaker(bind=db_repo_engine))
-        #else:
-        #    print("used existing engine")
-        #    db_repo_engine = engine
-        #    db_repo_session = session
+        
         if auto_create:
             postref_table.create(db_repo_engine, checkfirst=True)
 
