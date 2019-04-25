@@ -122,7 +122,6 @@ def upload_kr():
             post_path = prep_kr_path(post.path,dir_name)
             publish_post_db(post,post_path)
             print("Tried pushing:",post_path)
-        #current_app.db_update_index(check_timeouts=False,force=True)
     except:
     #TODO: do more precise exception handling
         error = 400
