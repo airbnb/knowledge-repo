@@ -154,7 +154,7 @@ def update_index_for_post(kp,path):
 @ErrorLog.logged
 def update_index(check_timeouts=True, force=False, reindex=False):
 
-    if not current_app.config['INDEXING_ENABLED']:
+    if not current_app.config['INDEXING_ENABLED'] and not force:
         return False
 
     if check_timeouts and not index_due_for_update():

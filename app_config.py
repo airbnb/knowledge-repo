@@ -287,7 +287,7 @@ INDEXING_UPDATES_REPOSITORIES_WITHOUT_LOCK = True
 # only ever used by the Knowledge Post previewer. Disabling the index means that
 # posts will not be discoverable, but if know the path in the repository you can
 # view the post with a direct link.
-INDEXING_ENABLED = True
+INDEXING_ENABLED = False
 
 # ---------------------------------------------------
 # Flask Mail Configuration
