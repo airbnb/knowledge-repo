@@ -102,8 +102,8 @@ class ExtractImages(KnowledgePostProcessor):
     def skip_image(self, kp, image):
         if re.match('http[s]?://', image['src']):
             return True
-        if image['src'].startswith('images/') and image['src'] in kp.image_paths:
-            return True 
+        #if image['src'].startswith('images/') and image['src'] in kp.image_paths:
+        #    return True 
         return False
 
     def copy_image(self, kp, path, is_ref=False):
