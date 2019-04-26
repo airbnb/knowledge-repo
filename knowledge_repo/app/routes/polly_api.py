@@ -61,7 +61,7 @@ def publish_post_db(kp,path):
 
 def prep_kr_path(path,dir_name):
     path_parts = path.split('/')
-    if path_parts[0] != dir_name:
+    if '/'.join(path_parts[:2]) != dir_name:
         path = dir_name + '/' + path
     if not path.endswith('.kp'):
         path = path + '.kp'
@@ -113,10 +113,12 @@ def upload_kr():
     global current_repo,current_app
     from ...repositories.meta import MetaKnowledgeRepository
     path = request.args.get('path')
+    pid = path.split('/')[-2]
     dir_name,dir_path = download_dir(path)
+    dir_name = pid + '/' + dir_name
     error = 200
     try:
-        db_path = current_app.config['KR_REPO_DB_PATH'] + ':' + dir_name
+        db_path = current_app.config['KR_REPO_DB_PATH'] + ':' +  dir_name
         dbobj  = current_repo.migrate_to_dbrepo(dir_path,db_path)
         current_app.append_repo_obj(dir_name,dbobj)
         temp_kr = MetaKnowledgeRepository({dir_name:dbobj})

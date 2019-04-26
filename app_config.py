@@ -163,7 +163,8 @@ def AUTH_MAP_REQUEST_HEADERS(cookies):
     import base64,json
     public_token = [cookies[key] for key in cookies.keys() if (key.startswith("CognitoIdentityServiceProvider") and key.endswith("idToken"))]
     if len(public_token)==0:
-        return{  'identifier' : 'test-user' }
+        return{  'identifier' : 'Anonymous' ,
+                'email' : 'Anonymous' }
     else:
         public_token = public_token[0]
     id_token = public_token.split('.')[1]

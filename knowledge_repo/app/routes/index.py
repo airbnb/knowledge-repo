@@ -93,21 +93,19 @@ def render_feed():
             .first())
     if ('kr' not in request.args.keys()):
         if ('authors' not in request.args.keys()):
-            return redirect(url_for("index.render_feed")+"?authors="+user.identifier) # Redirection to this function itself. Redirecting instead of continuiung here to maintain consistent URL as far as user is concerned
+            return redirect(url_for("index.render_feed")+"?authors="+user.email) # Redirection to this function itself. Redirecting instead of continuiung here to maintain consistent URL as far as user is concerned
         else:
             posts, post_stats = get_posts(feed_params) # If authors already present, we are in the "My Post" situation. Just go ahead. 
     else:
         folder = request.args.get('kr')
         try:
-            kr_list = current_app.get_kr_list()
+            if not current_app.is_kr_shared(folder):
+                return render_template("permission_denied.html")
         except ValueError:
             return redirect("https://%s/?next=%s"%(request.host,request.full_path))
-        
-        if folder not in kr_list:
-            return render_template("permission_denied.html")
             
         posts = (db_session.query(Post)   # Query the posts table by seeing which path starts with the folder name. All Folder names start with <kr-name>/<rest of path>
-                .filter(func.lower(Post.path).like(folder + '%')))
+                .filter(func.lower(Post.path).like(folder + '/%')))
         post_stats = {post.path: {'all_views': post.view_count,
                               'distinct_views': post.view_user_count,
                               'total_likes': post.vote_count,
