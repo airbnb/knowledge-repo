@@ -10,6 +10,9 @@
 {% endblock %}
 
 {% block panel_left %}
+{% if post_page %}
+<a href={{krlink}}>Back to {{krname}} </a>
+{% endif %}
 {% if toc %}
 <div class='visible-lg-block'>
 <span class='section'>Table of Contents</span>
