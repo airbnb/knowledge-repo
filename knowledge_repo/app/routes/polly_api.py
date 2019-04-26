@@ -95,10 +95,7 @@ def upload_post():
     try:
         new_post = current_repo.upload_post(temp_path,path)
     #    update_index_for_post(new_post,path)
-<<<<<<< HEAD
         path = prep_post_path(path)
-=======
->>>>>>> working setup
         publish_post_db(new_post,path)
     except:
         return render_template("error.html")
@@ -118,35 +115,18 @@ def upload_kr():
     path = request.args.get('path')
     dir_name,dir_path = download_dir(path)
     error = 200
-<<<<<<< HEAD
     try:
         db_path = current_app.config['KR_REPO_DB_PATH'] + ':' + dir_name
         dbobj  = current_repo.migrate_to_dbrepo(dir_path,db_path)
         current_app.append_repo_obj(dir_name,dbobj)
         temp_kr = MetaKnowledgeRepository({dir_name:dbobj})
         for post in temp_kr.posts():
-<<<<<<< HEAD
             post_path = prep_kr_path(post.path,dir_name)
             publish_post_db(post,post_path)
             print("Tried pushing:",post_path)
-=======
-            publish_post_db(post,post.path)
-        #current_app.db_update_index(check_timeouts=False,force=True)
->>>>>>> working setup
     except:
-=======
-#    try:
-    db_path = current_app.config['KR_REPO_DB_PATH'] + ':' + dir_name
-    dbobj  = current_repo.migrate_to_dbrepo(dir_path,db_path)
-    current_app.append_repo_obj(dir_name,dbobj)
-    temp_kr = MetaKnowledgeRepository({dir_name:dbobj})
-    for post in temp_kr.posts():
-        publish_post_db(post,post.path)
-        #current_app.db_update_index(check_timeouts=False,force=True)
- #   except:
->>>>>>> allowing images to be saved from uploaded KRs
-    #TODO: do more precise exception handling
-    error = 400
+   #TODO: do more precise exception handling
+        error = 400
     shutil.rmtree(dir_path)
     return jsonify({
                 'statusCode': '400' if error==400 else '200',
