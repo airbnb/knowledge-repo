@@ -117,18 +117,18 @@ def upload_kr():
     dir_name,dir_path = download_dir(path)
     dir_name = pid + '/' + dir_name
     error = 200
-    try:
-        db_path = current_app.config['KR_REPO_DB_PATH'] + ':' +  dir_name
-        dbobj  = current_repo.migrate_to_dbrepo(dir_path,db_path)
-        current_app.append_repo_obj(dir_name,dbobj)
-        temp_kr = MetaKnowledgeRepository({dir_name:dbobj})
-        for post in temp_kr.posts():
-            post_path = prep_kr_path(post.path,dir_name)
-            publish_post_db(post,post_path)
-            print("Tried pushing:",post_path)
-    except:
+    #try:
+    db_path = current_app.config['KR_REPO_DB_PATH'] + ':' +  dir_name
+    dbobj  = current_repo.migrate_to_dbrepo(dir_path,db_path)
+    current_app.append_repo_obj(dir_name,dbobj)
+    temp_kr = MetaKnowledgeRepository({dir_name:dbobj})
+    for post in temp_kr.posts():
+        post_path = prep_kr_path(post.path,dir_name)
+        print("Tried pushing:",post_path)
+        publish_post_db(post,post_path)
+    #except:
    #TODO: do more precise exception handling
-        error = 400
+    #    error = 400
     shutil.rmtree(dir_path)
     return jsonify({
                 'statusCode': '400' if error==400 else '200',
