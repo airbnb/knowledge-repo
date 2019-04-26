@@ -11,6 +11,7 @@ import knowledge_repo
 from knowledge_repo.repositories.gitrepository import GitKnowledgeRepository  # nopep8
 from knowledge_repo.app.deploy import KnowledgeDeployer, get_app_builder, get_polly_app_builder
 
+from knowledge_repo.app import db_repo_session, db_repo_engine
 
 # Pick major URLs/ bucket names etc from environment variables
 
@@ -31,14 +32,7 @@ repo_db_conn = u'mysql+mysqlconnector://%s:%s@%s:%s/%s'%(KR_REPO_DB_USER,KR_REPO
 # Pull names of all KRs that have been loaded on this server so far. If the server goes down and wants to come up, it should now load ALL the repositories that were up before it went down. 
 # ToDo : this will need augmentation when GIT integration is done to do something similar for all the mounted GIT repos
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session,sessionmaker
-
-engine = create_engine(repo_db_conn,pool_recycle=3600,pool_size=300, max_overflow =100, pool_pre_ping=True)
-kr_names  = engine.table_names()
-db_repo_session = scoped_session(sessionmaker(bind = engine))
-
-#engine.dispose()
+kr_names  = db_repo_engine.table_names()
 
 
 # prepare boilerplate KR object with all the table names in the DB since they represent individual KRs that were uploaded.
@@ -47,12 +41,10 @@ for i in kr_names:
     boilerplate_KR[i] = "%s:%s"%(repo_db_conn,i)
 
 # build app using KR's internal functionality
-app_builder = get_polly_app_builder(boilerplate_KR,
+app_builder = get_app_builder(boilerplate_KR,
                                   db_uri=KR_APP_DB_URI,
                                   debug=True,
-                                  config=config_file,
-                                  engine = engine,
-                                  db_session = db_repo_session)
+                                  config=config_file)
 
 
 # Instantiate a flask application object. This handler is what will be used by EB to run. 

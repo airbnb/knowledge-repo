@@ -9,7 +9,7 @@ import uuid
 import mimetypes
 
 import six
-from flask import Flask, current_app, render_template, request, session, Blueprint
+from flask import Flask, current_app, render_template, request, session, Blueprint, g
 from flask_login import LoginManager, user_loaded_from_request
 from flask_mail import Mail
 from flask_migrate import Migrate
@@ -27,8 +27,9 @@ from .proxies import db_session, current_repo, current_user
 from .index import update_index, set_up_indexing_timers, time_since_index, time_since_index_check
 from .models import db as sqlalchemy_db, User, Tag
 from .utils.auth import AnonymousKnowledgeUser, populate_identity_roles, prepare_user
-
 # Needed to serve svg with correct mime type over https
+from sqlalchemy.orm import  scoped_session
+
 mimetypes.add_type('image/svg+xml', '.svg')
 
 logging.basicConfig(level=logging.INFO)
@@ -41,7 +42,7 @@ class KnowledgeFlask(Flask):
         Flask.__init__(self, __name__,
                        template_folder='templates',
                        static_folder='static') # Set to none so that the static path is supplied by host and not this flask app
-
+        print("KNowledgeFlask was initialised though")
         # Add unique identifier for this application isinstance
         self.uuid = str(uuid.uuid4())
         if 'KNOWLEDGE_REPO_MASTER_UUID' not in os.environ:
@@ -217,12 +218,16 @@ class KnowledgeFlask(Flask):
         @self.before_request
         def open_repository_session():
             if not request.path.startswith('/static'):
+                from . import db_repo_session
+                g.Session = scoped_session(db_repo_session)
+                g.db_repo_session = g.Session()
                 current_repo.session_begin()
 
         @self.after_request
         def close_repository_session(response):
             if not request.path.startswith('/static'):
                 current_repo.session_end()
+                g.Session.remove()
             return response
 
         @self.context_processor
