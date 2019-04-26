@@ -90,13 +90,15 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         gitkr = cls.for_uri(gitpath)
         
         for post in gitkr.posts():
+            '''
             post_path  = gitpath + '/' + post.path
             if len(post.src_paths)>0:
                 post_src_path = post_path + '/' + post.src_paths[0]
                 new_post = KnowledgePost.from_file(post_src_path)
             else:
                 new_post = post
-            new_post = db_obj.add(new_post,path=post.path,update=True)
+            '''
+            new_post = db_obj.add(post,path=post.path,update=True)
             db_obj.submit(new_post.path)
             db_obj.accept(new_post.path)
             db_obj.publish(new_post.path)

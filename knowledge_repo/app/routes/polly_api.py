@@ -71,6 +71,8 @@ def prep_post_path(path):
     if not path.endswith('.kp'):
         path = path + '.kp'
     return path
+
+
 @blueprint.route('/api/uploadpage')
 @PageView.logged
 def upload_post_page(): 
@@ -122,9 +124,8 @@ def upload_kr():
             post_path = prep_kr_path(post.path,dir_name)
             publish_post_db(post,post_path)
             print("Tried pushing:",post_path)
-        #current_app.db_update_index(check_timeouts=False,force=True)
     except:
-    #TODO: do more precise exception handling
+   #TODO: do more precise exception handling
         error = 400
     shutil.rmtree(dir_path)
     return jsonify({

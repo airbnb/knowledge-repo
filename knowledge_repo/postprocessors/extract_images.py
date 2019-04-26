@@ -13,8 +13,12 @@ class ExtractImages(KnowledgePostProcessor):
     _registry_keys = ['extract_images']
 
     def process(self, kp):
+        print("Extracting images in : ",kp.path)
         images = self.find_images(kp.read())
+        print("Number of images found : ",images)
+        print("Image paths:",kp.image_paths)
         image_mapping = self.collect_images(kp, images)
+        print("found this mapping : ")
         self.update_thumbnail_uri(kp, images, image_mapping)
         self.cleanup(kp)
 
@@ -35,7 +39,11 @@ class ExtractImages(KnowledgePostProcessor):
 
         # if thumbnail is a url, copy it locally to the post unless already collected during collection
         if thumbnail and not self.skip_image(kp, {'src': thumbnail}):
-            orig_path = os.path.join(kp.orig_context, os.path.expanduser(thumbnail))
+            
+            if thumbnail.startswith('images/') and thumbnail in kp.image_paths:
+                orig_path = os.path.join(os.path.expanduser(thumbnail))
+            else:
+                orig_path = os.path.join(kp.orig_context, os.path.expanduser(thumbnail))
             if thumbnail in image_mapping:
                 thumbnail = image_mapping[thumbnail]
             elif os.path.exists(orig_path):
@@ -70,7 +78,11 @@ class ExtractImages(KnowledgePostProcessor):
         for image in images:
             if self.skip_image(kp, image):
                 continue
-            orig_path = os.path.join(kp.orig_context, os.path.expanduser(image['src']))
+
+            if image['src'].startswith('images/') and image['src'] in kp.image_paths:
+                orig_path = os.path.join(os.path.expanduser(image['src']))
+            else:
+                orig_path = os.path.join(kp.orig_context, os.path.expanduser(image['src']))
             new_path = None
             if image['src'] in image_mapping:
                 new_path = image_mapping[image['src']]
@@ -90,8 +102,8 @@ class ExtractImages(KnowledgePostProcessor):
     def skip_image(self, kp, image):
         if re.match('http[s]?://', image['src']):
             return True
-        if image['src'].startswith('images/') and image['src'] in kp.image_paths:
-            return True
+        #if image['src'].startswith('images/') and image['src'] in kp.image_paths:
+        #    return True 
         return False
 
     def copy_image(self, kp, path, is_ref=False):
