@@ -99,7 +99,7 @@ def upload_post():
         publish_post_db(new_post,path)
     except:
         return render_template("error.html")
-    return redirect(url_for('posts.render',path=path+".kp"))
+    return redirect(url_for('posts.render',path=path))
 
 @blueprint.route('/api/uploadkr')
 @PageView.logged

@@ -5,8 +5,8 @@
 <table align="center">
 <tr> <td style="padding:5px;">Select File to upload     <td style="padding:5px;">      <input type = "file" name ="file" /> </tr>
 <tr> <td style="padding:5px;">Select Repository     <td style="padding:5px;">      <select name="repo">      
-{% for kr in krs %}
-<option value={{kr}}>{{kr}}</option>
+{% for pid,kr in krs %}
+<option value={{pid}}/{{kr}}>{{kr}}</option>
 {% endfor %}
 </select>
 </tr>
