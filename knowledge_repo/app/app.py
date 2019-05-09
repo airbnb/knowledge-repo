@@ -300,21 +300,23 @@ class KnowledgeFlask(Flask):
         return self.repository
     
     def get_kr_list(self): 
-        host=request.host
-        resp = requests.get("https://%s/api/project"%(host),cookies=request.cookies)
+        host=os.environ['POLLY_API_URL']
+        header = {'public-token' : request.cookies.get('public-token')}
+        resp = requests.get("https://{host}/project".format(host=host),headers=header)
         krs_total = []
         for item in resp.json():
             pid = item['id']
-            kr_proj = requests.get("https://%s/api/project?id=%s"%(host,pid),cookies=request.cookies)
+            kr_proj = requests.get("https://{host}/project?id={pid}".format(host=host,pid=pid),headers = header)
             krs_total = krs_total + [(pid,kr) for kr in kr_proj.json()['Knowledge_repo']]
 
         return krs_total
 
     def is_kr_shared(self,kr): 
-        host=request.host
+        host=os.environ['POLLY_API_URL']
         pid, repo = kr.split('/')
         
-        resp = requests.get("https://%s/api/project?id=%s"%(host,pid),cookies=request.cookies)
+        resp = requests.get("https://%s/project?id=%s"%(host,pid),cookies=request.cookies)
+        
         resp_obj = resp.json()
         if 'messages' in resp_obj.keys():
             return False

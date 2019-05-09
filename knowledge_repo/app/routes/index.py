@@ -102,7 +102,7 @@ def render_feed():
             if not current_app.is_kr_shared(folder):
                 return render_template("permission_denied.html")
         except ValueError:
-            return redirect("https://%s/?next=%s"%(request.host,request.full_path))
+            return redirect("https://{host}/?next={url}".format('.'.join(request.host.split('.')[1:]),request.url))
             
         posts = (db_session.query(Post)   # Query the posts table by seeing which path starts with the folder name. All Folder names start with <kr-name>/<rest of path>
                 .filter(func.lower(Post.path).like(folder + '/%')))
