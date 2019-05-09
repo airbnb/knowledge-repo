@@ -82,7 +82,6 @@ def upload_post_page():
         return redirect("https://%s/?next=%s"%(request.host,request.full_path))
     return render_template('upload_page.html',krs = kr_list)
 
-
 @blueprint.route('/api/uploadpost',methods=['POST'])
 def upload_post():
     # Access the file
