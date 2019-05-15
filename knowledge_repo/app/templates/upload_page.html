@@ -3,7 +3,7 @@
 {% block content %}
       <form action = "{{ url_for('api.upload_post') }}" method=post enctype = "multipart/form-data">
 <table align="center">
-<tr> <td style="padding:5px;">Select File to upload     <td style="padding:5px;">      <input type = "file" name ="file" /> </tr>
+<tr> <td style="padding:5px;">Select File to upload     <td style="padding:5px;">      <input type = "file" name ="file" onclick="googleAnalyticsObject.googleAnalytics(gaUpload,'ipython_upload',categoryKr);"/> </tr>
 <tr> <td style="padding:5px;">Select Repository     <td style="padding:5px;">      <select name="repo">      
 {% for pid,kr in krs %}
 <option value={{pid}}/{{kr}}>{{kr}}</option>
@@ -12,6 +12,6 @@
 </tr>
 
 <tr><td style="padding:5px;">Path to upload post to  <td style="padding:5px;"> <input type = "text" name="path" /> </tr>
-<tr><td style="padding:10px;" align="center" colspan=2>         <input type = "submit" value="Upload Post"/>   </tr>
+<tr><td style="padding:10px;" align="center" colspan=2>         <input type = "submit" value="Upload Post" onclick="googleAnalyticsObject.googleAnalytics(gaUpload,'post_upload',categoryKr);"/>   </tr>
        </table> </form>
 {% endblock %}

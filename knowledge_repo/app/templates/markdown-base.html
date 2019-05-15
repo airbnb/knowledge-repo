@@ -11,7 +11,7 @@
 
 {% block panel_left %}
 {% if post_page %}
-<a style="padding-top: 25px; font-weight:bold; font-size:18px" href={{krlink}}>&larr; BACK TO {{krname}} </a>
+<a style="padding-top: 25px; font-weight:bold; font-size:18px" href={{krlink}} onclick="googleAnalyticsObject.googleAnalytics(gaUIInteraction,'back_from_post',categoryKr);" >&larr; BACK TO {{krname}} </a>
 {% endif %}
 {% if toc %}
 <div class='visible-lg-block'>
