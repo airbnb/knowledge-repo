@@ -29,11 +29,14 @@
     <script src="{{ url_for('admin.static', filename='js/aws-cognito-sdk.min.js')}}"></script>
     <script src="{{ url_for('admin.static', filename='js/amazon-cognito-identity.min.js')}}"></script>
     <script src="{{ url_for('admin.static', filename='js/jwt-decode.min.js')}}"></script>
-    <script type="text/javascript"> 
-    console.log(window);
+    
+    <!-- GA -->
+    <script src="https://s3.us-west-2.amazonaws.com/mithoo-public-data/google-analytics/ga.js"></script>
+     <script type="text/javascript"> 
+        const categoryKr = "knowledge_repo";
     
     </script>
-   
+    <!-- End GA -->
 
 
     <!-- require js is used for plotly, but has a bunch of collisions with other js packages
@@ -92,7 +95,7 @@
             </button>
 
             <!-- Brand name / logo -->
-            <a class="navbar-brand" href="{{url_for('index.render_feed')}}" class="logo-image">
+            <a class="navbar-brand" href="{{url_for('index.render_feed')}}" class="logo-image" onclick="googleAnalyticsObject.googleAnalytics(gaUIInteraction,'home',categoryKr);" >
               <img src='{{ url_for("admin.static", filename = "images/logo-white.svg")}}' />
               <text>Knowledge Repo</text>
             </a>
@@ -112,7 +115,7 @@
             </form>
 
             <!-- "Write a Post" button -->
-            <a href="{{ url_for('api.upload_post_page') }}" class="btn btn-primary navbar-button">
+            <a href="{{ url_for('api.upload_post_page') }}" class="btn btn-primary navbar-button" onclick="googleAnalyticsObject.googleAnalytics(gaUIInteraction,'add_post',categoryKr);">
               Add a Post!
             </a>
 

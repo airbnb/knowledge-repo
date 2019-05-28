@@ -46,7 +46,7 @@
   <div class="row">
     <div class="col-md-5">
       <div class="btn-group btn-group-justified index-view-btn-group" role="group">
-        <a href="{{url_for('index.render_feed')}}" class="btn btn-default btn-card no-underline" role="button">
+        <a href="{{url_for('index.render_feed')}}" class="btn btn-default btn-card no-underline" role="button" onclick="googleAnalyticsObject.googleAnalytics(gaUIInteraction,'card_filter',categoryKr);" >
           <i class="glyphicon glyphicon-post-org glyphicon-align-justify"></i>
           <span class="index-view-name"> Card </span>
         </a>
