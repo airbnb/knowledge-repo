@@ -65,7 +65,7 @@ jobs:
           command:
             virtualenv -p python3 venv
             . venv/bin/activate
-            pip install awsebcli --user
+            pip install awsebcli
 
       - run:
           name: Deploy to eb
