@@ -111,7 +111,7 @@ jobs:
 
     steps:
       - attach_workspace:
-          at: ~/.
+          at: *app_workspace_dir
 
       - run:
           name: Push to << parameters.ENV >>
@@ -120,7 +120,6 @@ jobs:
             cp -R eb_utils/.elasticbeanstalk ./.
             cd .elasticbeanstalk/ && envsubst < {<< parameters.CONFIG_FILE >>}.yml > config.yml && cd ..
             # Deploy to eb
-            eb init
             eb deploy $<< parameters.EB_ENV_NAME >>
       - persist_to_workspace:
           root: ~/.
