@@ -68,6 +68,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
+            pip install --upgrade setuptools
             pip install awsebcli
 
       - restore_cache:
