@@ -28,7 +28,7 @@ defaults: &defaults
   working_directory: *app_workspace_dir
   docker:
     # Using Amazon Linux for Serverless code packaging
-    - image: elucidpulkit/ubunturpollyci
+    - image: elucidpulkit/amazonlinuxpollyci
       auth:
         username: $DOCKERHUB_USERNAME # elucidpulkit
         password: $DOCKERHUB_PASSWORD # circlecipassword
