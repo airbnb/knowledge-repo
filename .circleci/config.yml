@@ -61,6 +61,13 @@ jobs:
             aws configure set aws_secret_access_key $PROD_AWS_SECRET_KEY --profile prod
 
       - run:
+          name: git install
+          command: |
+            apt-get update
+            apt install git -y
+            which git
+
+      - run:
           name: Install dependencies
           command: |
             virtualenv -p python3 venv
@@ -85,7 +92,7 @@ jobs:
             - /caches/${CIRCLE_PROJECT_REPONAME}.tar
 
       - persist_to_workspace:
-          root: *app_workspace_dir
+          root: ~/.
           paths: .
 
   deploy: &deploy
@@ -106,14 +113,7 @@ jobs:
 
     steps:
       - attach_workspace:
-          at: *app_workspace_dir
-
-      - run:
-          name: git install
-          command: |
-            apt-get update
-            apt install git -y
-            echo exit 0 > /usr/sbin/policy-rc.d
+          at: ~/.
 
       - run:
           name: Push to << parameters.ENV >>
