@@ -69,7 +69,7 @@ jobs:
             cp -R eb_utils/.elasticbeanstalk ./.
             cd .elasticbeanstalk/ && envsubst < config_nonvar.yml > config.yml && cd ..
             # Deploy to eb
-            eb deploy $EB_ENV_NAME
+            eb deploy KnowledgeRepo-Dev
 
 workflows:
   version: 2
