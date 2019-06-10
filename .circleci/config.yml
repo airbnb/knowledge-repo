@@ -68,7 +68,8 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            pip install --upgrade setuptools
+            virtualenv -p python3 venv
+            . venv/bin/activate
             pip install awsebcli
 
       - restore_cache:
@@ -115,6 +116,7 @@ jobs:
       - run:
           name: Push to << parameters.ENV >>
           command: |
+            . venv/bin/activate
             cp -R eb_utils/.elasticbeanstalk ./.
             cd .elasticbeanstalk/ && envsubst < {<< parameters.CONFIG_FILE >>}.yml > config.yml && cd ..
             # Deploy to eb
