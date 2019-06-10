@@ -11,12 +11,12 @@
 ---
 branch-defaults:
   default:
-    environment: $EB_ENV_NAME
+    environment: $PROD_EB_ENV_NAME
 global:
-  application_name: $EB_APP_NAME
+  application_name: $PROD_EB_APP_NAME
   default_ec2_keyname: aws-eb-kr
   default_platform: Python 3.4
-  default_region: $EB_REGION_CODE
+  default_region: $PROD_REGION_CODE
   include_git_submodules: true
   instance_profile: null
   platform_name: null

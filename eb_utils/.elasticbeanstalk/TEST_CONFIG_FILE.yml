@@ -1,0 +1,27 @@
+# Config file for Elastic Beanstalk (EB)
+# Major edits to modify/ verify before deployment:
+#   > environment name at:
+#       1 environment
+#       2 environment-defaults
+#   > application_name
+#   > region at:
+#       1 default_platform - check arn for region
+#       2 default_region
+
+---
+branch-defaults:
+  default:
+    environment: $TEST_EB_ENV_NAME
+global:
+  application_name: $TEST_EB_APP_NAME
+  default_ec2_keyname: aws-eb-kr
+  default_platform: Python 3.4
+  default_region: $TEST_REGION_CODE
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
+  # Do not include profile value here.
+  # It is taken through CircleCI 2.0's environment variable.
+  sc: null
+  workspace_type: Application
