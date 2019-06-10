@@ -90,7 +90,7 @@ jobs:
             - /caches/${CIRCLE_PROJECT_REPONAME}.tar
 
       - persist_to_workspace:
-          root: ~/.
+          root: *app_workspace_dir
           paths: .
 
   deploy: &deploy
