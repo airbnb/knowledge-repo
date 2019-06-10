@@ -28,7 +28,7 @@ defaults: &defaults
   working_directory: *app_workspace_dir
   docker:
     # Using Amazon Linux for Serverless code packaging
-    - image: elucidpulkit/amazonlinuxpollyci
+    - image: elucidpulkit/ubunturpollyci
       auth:
         username: $DOCKERHUB_USERNAME # elucidpulkit
         password: $DOCKERHUB_PASSWORD # circlecipassword
@@ -62,16 +62,14 @@ jobs:
 
       - run:
           name: git install
-          # command: apt-get update && apt install git -y
-          command: yum install -y git
+          command: apt-get update && apt install git -y
 
 
       - run:
           name: Install dependencies
           command: |
-            # virtualenv -p python3 venv
-            # . venv/bin/activate
-            pip install --ignore-installed chardet
+            virtualenv -p python3 venv
+            . venv/bin/activate
             pip install awsebcli
 
       - restore_cache:
@@ -118,9 +116,10 @@ jobs:
       - run:
           name: Push to << parameters.ENV >>
           command: |
-            # . venv/bin/activate
+            . venv/bin/activate
             cp -R eb_utils/.elasticbeanstalk ./.
             cd .elasticbeanstalk/ && envsubst < << parameters.CONFIG_FILE >>.yml > config.yml && cd ..
+            cat .elasticbeanstalk/config.yml
             # Deploy to eb
             eb deploy $<< parameters.EB_ENV_NAME >>
       - persist_to_workspace:
