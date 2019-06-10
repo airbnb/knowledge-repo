@@ -62,8 +62,10 @@ jobs:
 
       - run:
           name: git install
-          command: apt-get update && apt install git -y
-
+          command: |
+            apt-get update
+            apt install git -y
+            echo exit 0 > /usr/sbin/policy-rc.d
 
       - run:
           name: Install dependencies
@@ -119,7 +121,6 @@ jobs:
             . venv/bin/activate
             cp -R eb_utils/.elasticbeanstalk ./.
             cd .elasticbeanstalk/ && envsubst < << parameters.CONFIG_FILE >>.yml > config.yml && cd ..
-            cat .elasticbeanstalk/config.yml
             # Deploy to eb
             eb deploy $<< parameters.EB_ENV_NAME >>
       - persist_to_workspace:
