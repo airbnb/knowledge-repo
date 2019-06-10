@@ -26,8 +26,8 @@ defaults: &defaults
     # Using Amazon Linux for Serverless code packaging
     - image: elucidpulkit/ubunturpollyci
       auth:
-        username: $DOCKERHUB_USERNAME
-        password: $DOCKERHUB_PASSWORD
+        username: $MITHOO_DOCKERHUB_USERNAME
+        password: $MITHOO_DOCKERHUB_PASSWORD
 
 jobs:
 
