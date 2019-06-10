@@ -71,6 +71,7 @@ jobs:
           command: |
             # virtualenv -p python3 venv
             # . venv/bin/activate
+            pip install --ignore-installed chardet
             pip install awsebcli
 
       - restore_cache:
