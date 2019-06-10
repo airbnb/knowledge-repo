@@ -60,12 +60,12 @@ jobs:
             aws configure set aws_access_key_id $PROD_AWS_ACCESS_KEY_ID --profile prod
             aws configure set aws_secret_access_key $PROD_AWS_SECRET_KEY --profile prod
 
-      - run:
-          name: git install
-          command: |
-            apt-get update
-            apt install git -y
-            which git
+      # - run:
+      #     name: git install
+      #     command: |
+      #       apt-get update
+      #       apt install git -y
+      #       which git
 
       - run:
           name: Install dependencies
@@ -114,6 +114,12 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/.
+
+      - run:
+          name: git install
+          command: |
+            apt-get update
+            apt install git -y
 
       - run:
           name: Push to << parameters.ENV >>
