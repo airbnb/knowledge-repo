@@ -63,6 +63,7 @@ jobs:
           command: |
             virtualenv -p python3 venv
             . venv/bin/activate
+            apt-get update
             apt install git -y
             # yum install -y git
             pip install awsebcli
