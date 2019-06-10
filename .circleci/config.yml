@@ -26,8 +26,8 @@ defaults: &defaults
     # Using Amazon Linux for Serverless code packaging
     - image: elucidpulkit/ubunturpollyci
       auth:
-        username: $MITHOO_DOCKERHUB_USERNAME
-        password: $MITHOO_DOCKERHUB_PASSWORD
+        username: $DOCKERHUB_USERNAME
+        password: $DOCKERHUB_PASSWORD
 
 jobs:
 
@@ -58,20 +58,94 @@ jobs:
       - attach_workspace:
           at: *app_working_dir
 
+      - run: apt-get update && apt install git -y
+
+      - run:
+          name: awsebcli install
+          command:
+            virtualenv -p python3 venv
+            . venv/bin/activate
+            pip install awsebcli --user
+
       - run:
           name: Deploy to eb
           command: |
-            virtualenv -p python3 venv
             . venv/bin/activate
-            apt-get update
-            apt install git -y
-            # yum install -y git
-            pip install awsebcli
             # Substitute env variables
             cp -R eb_utils/.elasticbeanstalk ./.
             cd .elasticbeanstalk/ && envsubst < config_nonvar.yml > config.yml && cd ..
             # Deploy to eb
             eb deploy $EB_ENV_NAME
+
+  # deploy_eb_dev:
+  #   <<: *defaults
+
+  #   steps:
+
+  #     - attach_workspace:
+  #         at: *app_working_dir
+
+  #     - run:
+  #         name: Deploy to eb devpolly
+  #         command: |
+  #           virtualenv -p python3 venv
+  #           . venv/bin/activate
+  #           apt-get update
+  #           apt install git -y
+  #           # yum install -y git
+  #           pip install awsebcli
+  #           # Substitute env variables
+  #           cp -R eb_utils/.elasticbeanstalk ./.
+  #           cd .elasticbeanstalk/ && envsubst < config_nonvar.yml > config.yml && cd ..
+  #           # Deploy to eb
+  #           eb deploy $EB_DEVPOLLY_ENV_NAME
+
+  # deploy_eb_test:
+  #   <<: *defaults
+
+  #   steps:
+
+  #     - attach_workspace:
+  #         at: *app_working_dir
+
+  #     - run:
+  #         name: Deploy to eb testpolly
+  #         command: |
+  #           virtualenv -p python3 venv
+  #           . venv/bin/activate
+  #           apt-get update
+  #           apt install git -y
+  #           # yum install -y git
+  #           pip install awsebcli
+  #           # Substitute env variables
+  #           cp -R eb_utils/.elasticbeanstalk ./.
+  #           cd .elasticbeanstalk/ && envsubst < config_nonvar.yml > config.yml && cd ..
+  #           # Deploy to eb
+  #           eb deploy $EB_TESTPOLLY_ENV_NAME
+
+  # deploy_eb_polly:
+  #   <<: *defaults
+
+  #   steps:
+
+  #     - attach_workspace:
+  #         at: *app_working_dir
+
+  #     - run:
+  #         name: Deploy to eb polly
+  #         command: |
+  #           virtualenv -p python3 venv
+  #           . venv/bin/activate
+  #           apt-get update
+  #           apt install git -y
+  #           # yum install -y git
+  #           pip install awsebcli
+  #           # Substitute env variables
+  #           cp -R eb_utils/.elasticbeanstalk ./.
+  #           cd .elasticbeanstalk/ && envsubst < config_nonvar.yml > config.yml && cd ..
+  #           # Deploy to eb
+  #           eb deploy $EB_POLLY_ENV_NAME
+
 
 workflows:
   version: 2
@@ -88,3 +162,33 @@ workflows:
       - deploy_eb:
           requires:
             - build_initial
+
+# workflows:
+#   version: 2
+
+#   build_process:
+#     jobs:
+
+#       - build_initial:
+#           filters:
+
+#       - deploy_eb_dev:
+#           requires:
+#             - build_initial
+#             branches:
+#               only:
+#                 - _dev
+
+#       - deploy_eb_test:
+#           requires:
+#             - build_initial
+#             branches:
+#               only:
+#                 - develop
+
+#       - deploy_eb_polly:
+#           requires:
+#             - build_initial
+#             branches:
+#               only:
+#                 - master
