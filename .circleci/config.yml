@@ -75,7 +75,7 @@ jobs:
             cp -R eb_utils/.elasticbeanstalk ./.
             cd .elasticbeanstalk/ && envsubst < config_nonvar.yml > config.yml && cd ..
             # Deploy to eb
-            eb deploy $EB_ENV_NAME
+            eb deploy $EB_DEVPOLLY_ENV_NAME
 
   # deploy_eb_dev:
   #   <<: *defaults
