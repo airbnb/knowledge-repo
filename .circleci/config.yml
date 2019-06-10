@@ -101,7 +101,7 @@ jobs:
         default: DEV_EB_ENV_NAME
       CONFIG_FILE:
         type: string
-        default: DEV_CONFIG
+        default: DEV_CONFIG_FILE
       ENV:
         type: string
         default: Devpolly
