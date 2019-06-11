@@ -20,7 +20,7 @@ from .. import permissions
 from ..proxies import db_session, current_repo
 from ..utils.posts import get_posts
 from ..models import Post, Tag, User, PageView
-from ..utils.requests import from_request_get_feed_params
+from ..utils.requests import from_url_get_feed_params
 from ..utils.render import render_post_tldr
 from ..utils.s3_talk import download_dir,download_from_s3  
 from ..index import update_index, update_index_for_post

@@ -14,177 +14,75 @@
 # To Do:
 #   > Consider - updating elucidpulkit/ubunturpollyci to include awsebcli?
 
-# CircleCI 2.1 configuration file
----
-version: 2.1
+# CircleCI 2.0 configuration file
+version: 2
 
 aliases:
-  # Variables.
-  # For YAML support of anchors and references,
-  # @see http://blog.daemonl.com/2016/02/yaml.html
-  - &app_workspace_dir  ~/knowledge-repo
+  - &app_working_dir ~/knowledge-repo
 
 defaults: &defaults
-  working_directory: *app_workspace_dir
+  working_directory: *app_working_dir
   docker:
     # Using Amazon Linux for Serverless code packaging
     - image: elucidpulkit/ubunturpollyci
       auth:
-        username: $DOCKERHUB_USERNAME # elucidpulkit
-        password: $DOCKERHUB_PASSWORD # circlecipassword
+        username: $DOCKERHUB_USERNAME
+        password: $DOCKERHUB_PASSWORD
 
 jobs:
-  Build:
+
+  build_initial:
     <<: *defaults
+
     steps:
       - checkout
-      # Docker setting up
       - setup_remote_docker:
           docker_layer_caching: true
           version: 17.05.0-ce
 
       - run:
-          name: Configuring aws dev credentials
-          command: |
-            aws configure set aws_access_key_id $DEV_AWS_ACCESS_KEY_ID --profile dev
-            aws configure set aws_secret_access_key $DEV_AWS_SECRET_KEY --profile dev
-      - run:
-          name: Configuring aws test credentials
-          command: |
-            aws configure set aws_access_key_id $TEST_AWS_ACCESS_KEY_ID --profile test
-            aws configure set aws_secret_access_key $TEST_AWS_SECRET_KEY --profile test
-
-      - run:
-          name: Configuring aws prod credentials
-          command: |
-            aws configure set aws_access_key_id $PROD_AWS_ACCESS_KEY_ID --profile prod
-            aws configure set aws_secret_access_key $PROD_AWS_SECRET_KEY --profile prod
-
-      # - run:
-      #     name: git install
-      #     command: |
-      #       apt-get update
-      #       apt install git -y
-      #       which git
-
-      - run:
-          name: Install dependencies
-          command: |
-            virtualenv -p python3 venv
-            . venv/bin/activate
-            pip install awsebcli
-
-      - restore_cache:
-          keys:
-            - v1-{{ .Branch }}
-          paths:
-            - /caches/${CIRCLE_PROJECT_REPONAME}.tar
-
-      - run:
           name: Load Docker image layer cache
           command: |
             set +o pipefail
-            if [[ -e /caches/${CIRCLE_PROJECT_REPONAME}.tar ]]; then  docker load -i /caches/${CIRCLE_PROJECT_REPONAME}.tar; fi
-
-      - save_cache:
-          key: v1-{{ .Branch }}-{{ epoch }}
-          paths:
-            - /caches/${CIRCLE_PROJECT_REPONAME}.tar
+            if [[ -e /caches/$DOCKERTAG.tar ]]; then  docker load -i /caches/$DOCKERTAG.tar; fi
 
       - persist_to_workspace:
-          root: ~/.
+          root: *app_working_dir
           paths: .
 
-  deploy: &deploy
+  deploy_eb:
     <<: *defaults
-    parameters:
-      EB_ENV_NAME:
-        type: string
-        default: DEV_EB_ENV_NAME
-      CONFIG_FILE:
-        type: string
-        default: DEV_CONFIG_FILE
-      ENV:
-        type: string
-        default: Devpolly
-      PROFILE:
-        type: string
-        default: dev
 
     steps:
+
       - attach_workspace:
-          at: ~/.
+          at: *app_working_dir
 
       - run:
-          name: git install
+          name: Deploy to eb
           command: |
-            apt-get update
-            apt install git -y
-
-      - run:
-          name: Push to << parameters.ENV >>
-          command: |
+            virtualenv -p python3 venv
             . venv/bin/activate
+            sudo apt-get install git -y
+            pip install awsebcli     
+            # Substitute env variables
             cp -R eb_utils/.elasticbeanstalk ./.
-            cd .elasticbeanstalk/ && envsubst < << parameters.CONFIG_FILE >>.yml > config.yml && cd ..
+            cd .elasticbeanstalk/ && envsubst < config_nonvar.yml > config.yml && cd ..
             # Deploy to eb
-            eb deploy $<< parameters.EB_ENV_NAME >>
-      - persist_to_workspace:
-          root: ~/.
-          paths: .
+            eb deploy $EB_ENV_NAME
 
-
-  polly:
-    <<: *deploy
-  testpolly:
-    <<: *deploy
-  devpolly:
-    <<: *deploy
 workflows:
   version: 2
 
   build_process:
     jobs:
-      - Build:
-          context: el-git-vars
 
-      - devpolly:
-          context: el-git-vars
-          requires:
-            - Build
+      - build_initial:
           filters:
             branches:
               only:
-                - /.*_dev/
-                - develop
-                - test
-      - hold_for_testpolly:
-          type: approval
+                - demo
+
+      - deploy_eb:
           requires:
-            - Build
-          filters:
-            branches:
-              only: develop
-      - testpolly:
-          context: el-git-vars
-          EB_ENV_NAME: TEST_EB_ENV_NAME
-          CONFIG_FILE: TEST_CONFIG_FILE
-          ENV: Testpolly
-          PROFILE: test
-          requires:
-            - hold_for_testpolly
-      # - hold_for_polly:
-      #     type: approval
-      #     requires:
-      #       - Build
-      #     filters:
-      #       branches:
-      #         only: master
-      # - polly:
-      #     context: el-git-vars
-      #     EB_ENV_NAME: PROD_EB_ENV_NAME
-      #     CONFIG_FILE: PROD_CONFIG_FILE
-      #     ENV: Polly
-      #     PROFILE: prod
-      #     requires:
-      #       - hold_for_polly
+            - build_initial

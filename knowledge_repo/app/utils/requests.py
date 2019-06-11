@@ -3,7 +3,7 @@
 Functions include:
     - check_user
     - from_request_get_user_info
-    - from_request_get_feed_params
+    - from_url_get_feed_params
 """
 import inflection
 from flask import g
@@ -13,7 +13,7 @@ from ..models import User
 from ..proxies import current_user
 
 
-def from_request_get_feed_params(request):
+def from_url_get_feed_params(url):
     """Given the request, return an object that contains the parameters.
 
     :param request: The request obj
@@ -22,15 +22,22 @@ def from_request_get_feed_params(request):
     :rtype: object
     """
 
-    feed_params = {}
+    feed_params = {'kr': None, 'filters': None, 'authors': None, 'start': 0, 'results': 10, 'sort_by': 'updated_at', 'sort_desc': True}
+    # default values of all filters if they are not present in url
 
-    feed_params["filters"] = request.args.get('filters')
-    feed_params["authors"] = request.args.get('authors')
-    feed_params["start"] = int(request.args.get('start', 0))
-    feed_params["results"] = int(request.args.get('results', 10))
-    feed_params["sort_by"] = inflection.underscore(
-        request.args.get('sort_by', 'updated_at'))
-    feed_params["sort_desc"] = not bool(request.args.get('sort_asc', ''))
+    qidx = url.find('?')
+    posts = []
+    if qidx != -1:
+      url_search = url[qidx+1:]
+      url_search_arr = url_search.split('&')
+      for filter in url_search_arr:
+        query, val = filter.split('=')
+        if '%2F' in val:
+          val=val.split('%2F')
+          val=val[0]+'/'+val[1]
+        feed_params[query] = val
+
+      
     username, user_id = current_user.identifier, current_user.id
     feed_params["username"] = username
     feed_params["user_id"] = user_id

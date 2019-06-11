@@ -7,7 +7,7 @@ from sqlalchemy import func
 from .. import permissions
 from ..proxies import db_session
 from ..models import PageView, Post
-from ..utils.requests import from_request_get_feed_params
+from ..utils.requests import from_url_get_feed_params
 from ..utils.posts import get_posts
 
 blueprint = Blueprint('stats', __name__,
@@ -45,7 +45,7 @@ def stats():
         pageviews daily, weekly, post creation weekly and
         cumulative posts per week
     """
-    feed_params = from_request_get_feed_params(request)
+    feed_params = from_url_get_feed_params(request.url)
 
     # count daily and weekly pageviews
     datetime_pageviews = (db_session.query(PageView.created_at, func.count(PageView.id))

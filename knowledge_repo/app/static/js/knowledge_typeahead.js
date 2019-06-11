@@ -53,8 +53,20 @@ knowledgeTypeahead = (function(){
     $('#searchbar').keypress(function(event){
       var keycode = event.keyCode || event.which;
       if(keycode === 13){
-           var path = document.location.pathname;
-           window.location = path + '?filters=' + $('#searchbar').val()
+        var path = document.location.pathname;
+        var search_path = window.location.search;
+        search_path = search_path.slice(1);
+        search_path_split = search_path.split('&');
+        url = '/feed?filters=' + $('#searchbar').val();
+        for(var i = 0;i < search_path_split.length;i ++)
+        {
+          query = search_path_split[i];
+          if (query.slice(0,7) == 'filters')
+            continue
+          url = url + '&';
+          url = url + query;
+        }
+        window.location = url;
       }
     });
 

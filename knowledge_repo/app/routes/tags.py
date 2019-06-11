@@ -21,7 +21,7 @@ from .. import permissions
 from ..proxies import db_session
 from ..models import PageView, Post, assoc_post_tag, Subscription, Tag
 from ..proxies import current_user
-from ..utils.requests import from_request_get_feed_params
+from ..utils.requests import from_url_get_feed_params
 from ..utils.emails import send_subscription_email
 
 blueprint = Blueprint('tag', __name__,
@@ -44,7 +44,7 @@ def render_batch_tags():
     sort_by = request.args.get('sort_by', '')
     sort_asc = request.args.get('sort_asc', '')
     sort_desc = not sort_asc
-    feed_params = from_request_get_feed_params(request)
+    feed_params = from_url_get_feed_params(request.url)
 
     excluded_tags = current_app.config.get('EXCLUDED_TAGS', [])
     all_tags = db_session.query(Tag).all()
@@ -118,7 +118,7 @@ def delete_tags_from_posts():
 @PageView.logged
 @permissions.post_comment.require()
 def render_tag_pages():
-    feed_params = from_request_get_feed_params(request)
+    feed_params = from_url_get_feed_params(request.url)
     start = feed_params['start']
     num_results = feed_params['results']
     tag = request.args.get('tag', '')
