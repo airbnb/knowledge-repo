@@ -56,7 +56,7 @@ def username_parse(repo, username):
     if not re.match(repo.config.username_pattern, username):
         raise ValueError(
             "Username '{}' does not follow the required pattern: '{}'"
-            .format(repo.config.username_pattern)
+            .format(username, repo.config.username_pattern)
         )
     return username
 
