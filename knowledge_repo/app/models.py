@@ -10,7 +10,7 @@ from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from collections import defaultdict
 
-from sqlalchemy import func, distinct, and_, select, UniqueConstraint
+from sqlalchemy import func, distinct, and_, select, Index, UniqueConstraint
 
 from knowledge_repo._version import __version__
 from knowledge_repo.repository import KnowledgeRepository
@@ -155,6 +155,8 @@ class PageView(db.Model):
     ip_address = db.Column(db.String(64))
     created_at = db.Column(db.DateTime, default=func.now())
     version = db.Column(db.String(100), default=__version__)
+
+    __table_args__ = (Index("object_id_type_action_index", object_id, object_type, object_action),)
 
     class logged(object):
 
