@@ -32,7 +32,7 @@ ul.auth-providers > li > a {
 ul.auth-providers > li > a:hover {
     padding: 1em;
     display: block;
-    background: #d2f1ee;
+    background: #565a5c;
     transition: background 0.2s;
     opacity: 1;
 }

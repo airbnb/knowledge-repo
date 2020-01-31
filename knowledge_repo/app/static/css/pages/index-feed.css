@@ -17,7 +17,7 @@
 }
 .feed-post:hover {
     background: #fff;
-    border: 1px solid #00a699;
+    border: 1px solid #565a5c;
     transition: background 0.4s, border 0.4s;
 }
 .feed-post:active {
@@ -94,7 +94,7 @@
     background: rgba(0,0,0,0.03);
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
-    color: #00a699;
+    color: #565a5c;
     margin-bottom: 0.3em;
     }
 .feed-post .feed-tldr-expander:hover {

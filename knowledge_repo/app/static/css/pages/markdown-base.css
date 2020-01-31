@@ -236,7 +236,7 @@
 }
 
 .codetoggle:hover, .codetoggleall:hover {
-  background-color: #00a699;
+  background-color: #565a5c;
   color: #fff;
     cursor: pointer;
   opacity: 1;
@@ -266,7 +266,7 @@
 
 .renderedMarkdown .codehilite pre {
     border: none;
-    border-left: solid #00a699 10px;
+    border-left: solid #565a5c 10px;
     margin: 0px;
     border-radius: 0px;
 }
@@ -315,7 +315,7 @@
 }
 
 .side-panel .btn-download:hover {
-    background: #00a699;
+    background: #565a5c;
     color: #fff;
     opacity: 1;
     transition: background-color 0.2s;
