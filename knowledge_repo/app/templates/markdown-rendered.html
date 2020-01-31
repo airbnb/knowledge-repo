@@ -194,12 +194,21 @@ $(document).on('ready', function(){
 	  $(".codetoggle").each(function() {
 		  var label = $(this).html();
 		  $(this).parent().css("overflow","hidden");
-		  $(this).parent().css("height","35px");
+		  $(this).parent().css("height","0px");
+      $(this).parent().css("padding","0px");
 		  $(this).html(label.replace("Collapse", "Expand"));
 	  });
     }
   });
+
+  {% if collapse_code %}
+   $('.codetoggleall').trigger( "click" )
+  {% endif %}
 })
+
+$(document).ready(function() {
+   $("#panel-main > div.renderedMarkdown > div.codetoggleall").click();
+});
 
 //Turn all the headers to be links
 var all_headers = [$("h1"), $("h2"), $("h3"), $("h4"), $("h5"), $("h6")]

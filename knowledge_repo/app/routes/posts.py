@@ -113,7 +113,8 @@ def render(path):
                                is_private=(post.private == 1),
                                is_author=is_author,
                                can_download=permissions.post_download.can(),
-                               downloads=post.kp.src_paths)
+                               downloads=post.kp.src_paths,
+			       collapse_code=current_app.config['COLLAPSE_CODE_DEFAULT'])
     return rendered
 
 

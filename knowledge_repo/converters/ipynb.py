@@ -19,6 +19,7 @@ var element = $('#{{ div_id }}');
 
 {%- block input -%}
 {%- if cell['metadata'].get('slideshow',{}).get('slide_type','') == 'skip' -%}
+{%- elif cell['metadata'].get('slideshow',{}).get('slide_type','') == 'skip-in' -%}
 {%- else %}
 ```python
 {{ cell.source }}
@@ -31,9 +32,11 @@ var element = $('#{{ div_id }}');
 {%- endblock %}
 
 
-{# remove stderr output #}
+{# remove stderr output and skip cells #}
 {%- block stream scoped -%}
-    {%- if output.name == 'stdout' -%}
+    {%- if cell['metadata'].get('slideshow',{}).get('slide_type','') == 'skip' -%}
+    {%- elif cell['metadata'].get('slideshow',{}).get('slide_type','') == 'skip-out' -%}
+    {%- elif output.name == 'stdout' -%}
         {{ super () }}
     {%- elif output.name == 'stderr' -%}
     {%- endif -%}

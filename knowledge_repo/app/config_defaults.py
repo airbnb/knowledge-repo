@@ -311,3 +311,9 @@ WEB_EDITOR_PREFIXES = ['webposts']
 # Posts with certain tags can be excluded from showing up
 # in the app. This can be useful for security purposes
 EXCLUDED_TAGS = ['private']
+
+
+# -------------
+# Collapse Code as Default Display Option
+# -------------
+COLLAPSE_CODE_DEFAULT = True
