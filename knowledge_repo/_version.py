@@ -29,7 +29,7 @@ __dependencies__ = [
     'cooked_input',  # Used for interactive input from user in CLI tooling
 
     # Flask App Dependencies
-    'flask',  # Main flask framework
+    'Flask>=1.1.1',  # Main flask framework
     'flask_login',  # User management framework
     'flask_principal',  # Permissions management framework
     'flask_mail',  # Mail client and utilities
