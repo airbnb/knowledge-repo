@@ -17,7 +17,7 @@ from flask_principal import Principal, identity_loaded, Identity, AnonymousIdent
 from alembic import command
 from alembic.migration import MigrationContext
 from datetime import datetime
-from werkzeug import url_encode
+from werkzeug.urls import url_encode
 
 import knowledge_repo
 from . import routes
