@@ -156,9 +156,11 @@ class OAuth2Provider(KnowledgeAuthProvider):
             if isinstance(key, (list, tuple)):
                 if len(key) == 1:
                     key = key[0]
+                elif d[key[0]] is None:
+                    return extract_from_dict(d, key[1:])
                 else:
-                    return extract_from_dict(d[key[0]], key[1:])
-            if isinstance(key, six.string_types):
+                    return extract_from_dict(d, key[0])
+            if isinstance(key, str):
                 return d[key]
             raise RuntimeError("Invalid key type: {}.".format(key))
 
