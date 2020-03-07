@@ -35,11 +35,12 @@ __dependencies__ = [
     'flask_mail',  # Mail client and utilities
     'Flask-Migrate',  # Database migration utilities
     'sqlalchemy',  # Database abstractions
-    'jinja2>=2.7',  # Templating engine
+    'jinja2==2.10.1',  # Templating engine
     'werkzeug',  # Development webserver
     'gunicorn',  # Deployed webserver
     'inflection',  # String transformation library
     'pillow',  # Image thumbnailing
+    'requests-oauthlib', # OAuth lib
 ]
 
 __optional_dependencies__ = {
