@@ -36,7 +36,7 @@ __dependencies__ = [
     'Flask-Migrate',  # Database migration utilities
     'sqlalchemy',  # Database abstractions
     'jinja2>=2.7',  # Templating engine
-    'werkzeug',  # Development webserver
+    'werkzeug>=1.0',  # Development webserver
     'gunicorn',  # Deployed webserver
     'inflection',  # String transformation library
     'pillow',  # Image thumbnailing
@@ -45,7 +45,7 @@ __dependencies__ = [
 __optional_dependencies__ = {
     # ipynb notebook conversion suport
     'ipynb': [
-        'nbformat',
+        'nbformat<5.0.0',
         'nbconvert[execute]',
         'traitlets'
     ],

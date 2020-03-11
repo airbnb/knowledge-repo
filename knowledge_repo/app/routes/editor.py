@@ -6,7 +6,7 @@ from builtins import str
 from datetime import datetime
 from flask import request, render_template, Blueprint, current_app, url_for, send_from_directory, g
 from sqlalchemy import or_
-from werkzeug import secure_filename
+from werkzeug.utils import secure_filename
 
 from knowledge_repo.post import KnowledgePost
 from .. import permissions
