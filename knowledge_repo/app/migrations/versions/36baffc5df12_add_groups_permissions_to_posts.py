@@ -33,11 +33,15 @@ def upgrade():
     sa.ForeignKeyConstraint(['group_id'], ['groups.id'], ),
     sa.ForeignKeyConstraint(['post_id'], ['posts.id'], )
     )
-    op.add_column(u'posts', sa.Column('private', sa.Integer(), nullable=True))
+
+    with op.batch_alter_table('posts') as batch_op:
+        batch_op.add_column(sa.Column('private', sa.Integer(), nullable=True))
 
 
 def downgrade():
-    op.drop_column(u'posts', 'private')
+    with op.batch_alter_table('posts') as batch_op:
+        op.drop_column('private')
+
     op.drop_table('assoc_post_group')
     op.drop_table('assoc_group_user')
     op.drop_table('groups')

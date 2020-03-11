@@ -15,29 +15,28 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    # Migrate from `usernames` to `identifiers`
     op.alter_column('users', 'username', new_column_name='identifier', existing_type=sa.String(length=500))
-    op.add_column('users', sa.Column('username', sa.String(length=500), nullable=True))
 
-    # Add new fields
-    op.add_column('users', sa.Column('password', sa.String(length=500), nullable=True))
-    op.add_column('users', sa.Column('active', sa.Boolean(), nullable=True))
-    op.add_column('users', sa.Column('name', sa.String(length=500), nullable=True))
-    op.add_column('users', sa.Column('preferred_name', sa.String(length=500), nullable=True))
-    op.add_column('users', sa.Column('avatar_uri', sa.Text(), nullable=True))
-    op.add_column('users', sa.Column('email', sa.String(length=500), nullable=True))
-    op.add_column('users', sa.Column('last_login_at', sa.DateTime(), nullable=True))
+    with op.batch_alter_table('users') as batch_op:
+        batch_op.add_column(sa.Column('username', sa.String(length=500), nullable=True))
+        batch_op.add_column(sa.Column('password', sa.String(length=500), nullable=True))
+        batch_op.add_column(sa.Column('active', sa.Boolean(), nullable=True))
+        batch_op.add_column(sa.Column('name', sa.String(length=500), nullable=True))
+        batch_op.add_column(sa.Column('preferred_name', sa.String(length=500), nullable=True))
+        batch_op.add_column(sa.Column('avatar_uri', sa.Text(), nullable=True))
+        batch_op.add_column(sa.Column('email', sa.String(length=500), nullable=True))
+        batch_op.add_column(sa.Column('last_login_at', sa.DateTime(), nullable=True))
 
 
 def downgrade():
-    op.drop_column('users', 'username')
-    op.alter_column('users', 'identifier', new_column_name='username', existing_type=sa.String(length=500))
+    with op.batch_alter_table('users') as batch_op:
+        batch_op.drop_column('username')
+        batch_op.drop_column('preferred_name')
+        batch_op.drop_column('password')
+        batch_op.drop_column('name')
+        batch_op.drop_column('last_login_at')
+        batch_op.drop_column('email')
+        batch_op.drop_column('active')
+        batch_op.drop_column('avatar_uri')
 
-    # Remove new fields
-    op.drop_column('users', 'preferred_name')
-    op.drop_column('users', 'password')
-    op.drop_column('users', 'name')
-    op.drop_column('users', 'last_login_at')
-    op.drop_column('users', 'email')
-    op.drop_column('users', 'active')
-    op.drop_column('users', 'avatar_uri')
+    op.alter_column('users', 'identifier', new_column_name='username', existing_type=sa.String(length=500))
