@@ -14,6 +14,7 @@ from sqlalchemy import func, distinct, and_, select, Index, UniqueConstraint
 
 from knowledge_repo._version import __version__
 from knowledge_repo.repository import KnowledgeRepository
+from knowledge_repo.utils.types import MediumText
 from .proxies import current_user, current_repo, db_session
 from .utils.models import unique_constructor
 from .utils.search import get_keywords
@@ -633,7 +634,7 @@ class Email(db.Model):
     object_type = db.Column(db.String(100))
     sent_at = db.Column(db.DateTime, default=func.now())
     subject = db.Column(db.Text)
-    text = db.Column(db.Text)
+    text = db.Column(MediumText())
 
 
 @unique_constructor(
