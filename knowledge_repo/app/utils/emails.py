@@ -5,6 +5,7 @@ import base64
 import logging
 import re
 
+import requests
 from flask import render_template, current_app, url_for
 from flask_mail import Message
 
@@ -88,16 +89,27 @@ def send_subscription_email(post, tag):
         return
 
     default_recipients = ['knowledge_consumer@notreal.com']
-    subject = u"New KR post: {}".format(post.title)
+    subject = u"New knowledge post with tag [{}]!".format(tag.name)
     post_authors = [p.format_name for p in post.authors]
     post_tags = [t.name for t in post.tags]
     msg = Message(subject=subject, recipients=default_recipients, bcc=recipients_bcc)
 
     # Extract bytes from post thumbnail or fallback to the default one
+    thumb_bytes = None
     if post.thumbnail:
-        reg_search = re.search('data:.*;base64,(.*)', post.thumbnail)
-        thumb_bytes = base64.b64decode(reg_search.group(1))
-    else:
+        try:
+            reg_search = re.search('data:.*;base64,(.*)', post.thumbnail)
+            if reg_search:
+                thumb_bytes = base64.b64decode(reg_search.group(1))
+            else:
+                # Download image from url
+                response = requests.get(post.thumbnail)
+                if response.ok:
+                    thumb_bytes = response.content
+        except:
+            pass
+
+    if not thumb_bytes:
         with current_app.open_resource('static/images/default_thumbnail.png') as f:
             thumb_bytes = f.read()
 
