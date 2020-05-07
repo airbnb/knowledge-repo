@@ -1,3 +1,4 @@
+import base64
 import unittest
 import datetime
 from sqlalchemy import and_
@@ -20,12 +21,15 @@ class EmailTest(unittest.TestCase):
 
         self.knowledge_username = 'email_test_user'
         self.post_path = 'tests/test_email_functionality'
+        self.thumbnail = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEX/TQBcNTh/AAAAAXR' \
+                         'STlPM0jRW/QAAAApJREFUeJxjYgAAAAYAAzY3fKgAAAAASUVORK5CYII='  # Red pixel
         kp = KnowledgePost(self.post_path)
 
         headers = {'title': 'Test Email Functionality',
                    'authors': [self.knowledge_username],
                    'tags': ['test_tag'],
                    'tldr': 'This is the test tldr for the post',
+                   'thumbnail': 'data:image/png;base64,{}'.format(self.thumbnail),
                    'created_at': datetime.date.today(),
                    'updated_at': datetime.date.today()}
         kp.write(md='Test Text', headers=headers)
@@ -140,7 +144,13 @@ class EmailTest(unittest.TestCase):
             assert len(emails_sent) == 1, 'One subscription email should recorded as sent'
             # Check outbox of messages
             assert len(outbox[0].bcc) == 1, 'One subscription email should be actually sent to one user'
-            assert "A knowledge post was just posted under tag" in outbox[0].body, 'Email should be the subscription email'
+            assert "Title: " in outbox[0].body, 'Plain email should use the txt template'
+            assert "cid:Thumb" in outbox[0].html, 'Rich email should use the html template'
+            # Check thumbnail attachment
+            assert len(outbox[0].attachments) == 1, 'One attachment should be sent'
+            thumbnail = outbox[0].attachments[0]
+            assert base64.b64decode(self.thumbnail) == thumbnail.data, 'Attachment should match'
+            assert [['Content-ID', '<Thumb>']] == thumbnail.headers, 'Attachment id should match'
 
             username_to_email = self.app.repository.config.username_to_email
             assert outbox[0].bcc[0] == username_to_email(self.knowledge_username)
