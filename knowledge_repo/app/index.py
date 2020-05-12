@@ -143,8 +143,8 @@ def update_index(check_timeouts=True, force=False, reindex=False):
     ):
         current_repo.update()
 
-    # Short-circuit if not the index master (unless force is True)
-    if not is_index_master and not force or index_up_to_date():
+    # Short-circuit if necessary
+    if not force and (not is_index_master or index_up_to_date()):
         return False
 
     try:
