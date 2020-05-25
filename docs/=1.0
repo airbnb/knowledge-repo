@@ -1,0 +1,96 @@
+Collecting future
+  Using cached https://files.pythonhosted.org/packages/45/0b/38b06fd9b92dc2b68d58b75f900e97884c45bedd2ff83203d933cf5851c9/future-0.18.2.tar.gz
+Collecting enum34
+  Using cached https://files.pythonhosted.org/packages/63/f6/ccb1c83687756aeabbf3ca0f213508fcfb03883ff200d201b3a4c60cedcc/enum34-1.1.10-py3-none-any.whl
+Collecting pyyaml
+  Using cached https://files.pythonhosted.org/packages/64/c2/b80047c7ac2478f9501676c988a5411ed5572f35d1beff9cae07d321512c/PyYAML-5.3.1.tar.gz
+Collecting markdown
+  Using cached https://files.pythonhosted.org/packages/a4/63/eaec2bd025ab48c754b55e8819af0f6a69e2b1e187611dd40cbbe101ee7f/Markdown-3.2.2-py3-none-any.whl
+Collecting gitpython
+  Using cached https://files.pythonhosted.org/packages/44/33/917e6fde1cad13daa7053f39b7c8af3be287314f75f1b1ea8d3fe37a8571/GitPython-3.1.2-py3-none-any.whl
+Collecting tabulate
+  Using cached https://files.pythonhosted.org/packages/c4/f4/770ae9385990f5a19a91431163d262182d3203662ea2b5739d0fcfc080f1/tabulate-0.8.7-py3-none-any.whl
+Collecting cooked_input
+  Using cached https://files.pythonhosted.org/packages/9b/3f/92a480c00c3e5305eb67223234dd2909e92f5c9bdb505a0eaf539120efa7/cooked_input-0.5.2-py2.py3-none-any.whl
+Collecting flask
+  Using cached https://files.pythonhosted.org/packages/f2/28/2a03252dfb9ebf377f40fba6a7841b47083260bf8bd8e737b0c6952df83f/Flask-1.1.2-py2.py3-none-any.whl
+Collecting flask_login
+  Using cached https://files.pythonhosted.org/packages/2b/83/ac5bf3279f969704fc1e63f050c50e10985e50fd340e6069ec7e09df5442/Flask_Login-0.5.0-py2.py3-none-any.whl
+Collecting flask_principal
+  Using cached https://files.pythonhosted.org/packages/14/c7/2531aca6ab7baa3774fde2dfc9c9dd6d5a42576a1013a93701bfdc402fdd/Flask-Principal-0.4.0.tar.gz
+Collecting flask_mail
+  Using cached https://files.pythonhosted.org/packages/05/2f/6a545452040c2556559779db87148d2a85e78a26f90326647b51dc5e81e9/Flask-Mail-0.9.1.tar.gz
+Collecting Flask-Migrate
+  Using cached https://files.pythonhosted.org/packages/e5/64/c75f173ba5420f5174be6f04dfa8d8250d4808c12a9cd781e84c0b31684f/Flask_Migrate-2.5.3-py2.py3-none-any.whl
+Collecting sqlalchemy
+  Using cached https://files.pythonhosted.org/packages/b9/9f/326aaeda67ccbc9765551da7f9359f1bc5b33ecd3552b0c47233f94b801f/SQLAlchemy-1.3.17-cp37-cp37m-macosx_10_14_x86_64.whl
+Collecting werkzeug
+  Using cached https://files.pythonhosted.org/packages/cc/94/5f7079a0e00bd6863ef8f1da638721e9da21e5bacee597595b318f71d62e/Werkzeug-1.0.1-py2.py3-none-any.whl
+Collecting gunicorn
+  Using cached https://files.pythonhosted.org/packages/69/ca/926f7cd3a2014b16870086b2d0fdc84a9e49473c68a8dff8b57f7c156f43/gunicorn-20.0.4-py2.py3-none-any.whl
+Collecting inflection
+  Using cached https://files.pythonhosted.org/packages/52/c1/36be286d85dbd76527fb613527222a795d7c071da195fa916e7bf3cb03cb/inflection-0.4.0-py2.py3-none-any.whl
+Collecting pillow
+  Using cached https://files.pythonhosted.org/packages/98/83/0fdb0910c909f40c090ba09184feb59001b7fcc89c676fb77986a262af85/Pillow-7.1.2-cp37-cp37m-macosx_10_10_x86_64.whl
+Collecting importlib-metadata; python_version < "3.8" (from markdown)
+  Using cached https://files.pythonhosted.org/packages/ad/e4/891bfcaf868ccabc619942f27940c77a8a4b45fd8367098955bb7e152fb1/importlib_metadata-1.6.0-py2.py3-none-any.whl
+Collecting gitdb<5,>=4.0.1 (from gitpython)
+  Using cached https://files.pythonhosted.org/packages/48/11/d1800bca0a3bae820b84b7d813ad1eff15a48a64caea9c823fc8c1b119e8/gitdb-4.0.5-py3-none-any.whl
+Collecting dateparser (from cooked_input)
+  Using cached https://files.pythonhosted.org/packages/ad/0c/aba72d8454c28ab3800f3efd1ab3fe4f3fa41eb2746adc0cdcb318200796/dateparser-0.7.4-py2.py3-none-any.whl
+Collecting validus (from cooked_input)
+  Using cached https://files.pythonhosted.org/packages/b6/f0/4c16002db1bcbe0dab97a58bd36a57aa23a0d6e5384b0d34d9cd02d7a167/validus-0.3.0-py2.py3-none-any.whl
+Collecting veryprettytable (from cooked_input)
+  Using cached https://files.pythonhosted.org/packages/50/43/d2695870d2b175be4c8a8f2f150626c6aec11469eeb6af284347b4bcf8ad/veryprettytable-0.8.1.tar.gz
+Collecting setuptools-git (from cooked_input)
+  Using cached https://files.pythonhosted.org/packages/05/97/dd99fa9c0d9627a7b3c103a00f1566d8193aca8d473884ed258cca82b06f/setuptools_git-1.2-py2.py3-none-any.whl
+Requirement already satisfied, skipping upgrade: Jinja2>=2.10.1 in /Users/Bilguun1/dev/open_source/knowledge-repo/python/lib/python3.7/site-packages (from flask) (2.11.2)
+Collecting itsdangerous>=0.24 (from flask)
+  Using cached https://files.pythonhosted.org/packages/76/ae/44b03b253d6fade317f32c24d100b3b35c2239807046a4c953c7b89fa49e/itsdangerous-1.1.0-py2.py3-none-any.whl
+Collecting click>=5.1 (from flask)
+  Using cached https://files.pythonhosted.org/packages/d2/3d/fa76db83bf75c4f8d338c2fd15c8d33fdd7ad23a9b5e57eb6c5de26b430e/click-7.1.2-py2.py3-none-any.whl
+Collecting blinker (from flask_principal)
+  Using cached https://files.pythonhosted.org/packages/1b/51/e2a9f3b757eb802f61dc1f2b09c8c99f6eb01cf06416c0671253536517b6/blinker-1.4.tar.gz
+Collecting alembic>=0.7 (from Flask-Migrate)
+Collecting Flask-SQLAlchemy>=1.0 (from Flask-Migrate)
+  Using cached https://files.pythonhosted.org/packages/1e/65/226d95466c75e34e291a76890ed0e27af2e46ab913002847856f11d4d59d/Flask_SQLAlchemy-2.4.1-py2.py3-none-any.whl
+Requirement already satisfied, skipping upgrade: setuptools>=3.0 in /Users/Bilguun1/dev/open_source/knowledge-repo/python/lib/python3.7/site-packages (from gunicorn) (41.2.0)
+Collecting zipp>=0.5 (from importlib-metadata; python_version < "3.8"->markdown)
+  Using cached https://files.pythonhosted.org/packages/b2/34/bfcb43cc0ba81f527bc4f40ef41ba2ff4080e047acb0586b56b3d017ace4/zipp-3.1.0-py3-none-any.whl
+Collecting smmap<4,>=3.0.1 (from gitdb<5,>=4.0.1->gitpython)
+  Using cached https://files.pythonhosted.org/packages/b0/9a/4d409a6234eb940e6a78dfdfc66156e7522262f5f2fecca07dc55915952d/smmap-3.0.4-py2.py3-none-any.whl
+Collecting python-dateutil (from dateparser->cooked_input)
+  Using cached https://files.pythonhosted.org/packages/d4/70/d60450c3dd48ef87586924207ae8907090de0b306af2bce5d134d78615cb/python_dateutil-2.8.1-py2.py3-none-any.whl
+Collecting regex!=2019.02.19 (from dateparser->cooked_input)
+  Using cached https://files.pythonhosted.org/packages/14/8d/d44863d358e9dba3bdfb06099bbbeddbac8fb360773ba73250a849af4b01/regex-2020.5.14.tar.gz
+Requirement already satisfied, skipping upgrade: pytz in /Users/Bilguun1/dev/open_source/knowledge-repo/python/lib/python3.7/site-packages (from dateparser->cooked_input) (2020.1)
+Collecting tzlocal (from dateparser->cooked_input)
+  Using cached https://files.pythonhosted.org/packages/5d/94/d47b0fd5988e6b7059de05720a646a2930920fff247a826f61674d436ba4/tzlocal-2.1-py2.py3-none-any.whl
+Collecting termcolor (from veryprettytable->cooked_input)
+  Using cached https://files.pythonhosted.org/packages/8a/48/a76be51647d0eb9f10e2a4511bf3ffb8cc1e6b14e9e4fab46173aa79f981/termcolor-1.1.0.tar.gz
+Collecting colorama (from veryprettytable->cooked_input)
+  Using cached https://files.pythonhosted.org/packages/c9/dc/45cdef1b4d119eb96316b3117e6d5708a08029992b2fee2c143c7a0a5cc5/colorama-0.4.3-py2.py3-none-any.whl
+Requirement already satisfied, skipping upgrade: MarkupSafe>=0.23 in /Users/Bilguun1/dev/open_source/knowledge-repo/python/lib/python3.7/site-packages (from Jinja2>=2.10.1->flask) (1.1.1)
+Collecting Mako (from alembic>=0.7->Flask-Migrate)
+  Using cached https://files.pythonhosted.org/packages/50/78/f6ade1e18aebda570eed33b7c534378d9659351cadce2fcbc7b31be5f615/Mako-1.1.2-py2.py3-none-any.whl
+Collecting python-editor>=0.3 (from alembic>=0.7->Flask-Migrate)
+  Using cached https://files.pythonhosted.org/packages/c6/d3/201fc3abe391bbae6606e6f1d598c15d367033332bd54352b12f35513717/python_editor-1.0.4-py3-none-any.whl
+Requirement already satisfied, skipping upgrade: six>=1.5 in /Users/Bilguun1/dev/open_source/knowledge-repo/python/lib/python3.7/site-packages (from python-dateutil->dateparser->cooked_input) (1.15.0)
+Installing collected packages: future, enum34, pyyaml, zipp, importlib-metadata, markdown, smmap, gitdb, gitpython, tabulate, python-dateutil, regex, tzlocal, dateparser, validus, termcolor, colorama, veryprettytable, setuptools-git, cooked-input, itsdangerous, click, werkzeug, flask, flask-login, blinker, flask-principal, flask-mail, sqlalchemy, Mako, python-editor, alembic, Flask-SQLAlchemy, Flask-Migrate, gunicorn, inflection, pillow
+  Running setup.py install for future: started
+    Running setup.py install for future: finished with status 'done'
+  Running setup.py install for pyyaml: started
+    Running setup.py install for pyyaml: finished with status 'done'
+  Running setup.py install for regex: started
+    Running setup.py install for regex: finished with status 'done'
+  Running setup.py install for termcolor: started
+    Running setup.py install for termcolor: finished with status 'done'
+  Running setup.py install for veryprettytable: started
+    Running setup.py install for veryprettytable: finished with status 'done'
+  Running setup.py install for blinker: started
+    Running setup.py install for blinker: finished with status 'done'
+  Running setup.py install for flask-principal: started
+    Running setup.py install for flask-principal: finished with status 'done'
+  Running setup.py install for flask-mail: started
+    Running setup.py install for flask-mail: finished with status 'done'
+Successfully installed Flask-Migrate-2.5.3 Flask-SQLAlchemy-2.4.1 Mako-1.1.2 alembic-1.4.2 blinker-1.4 click-7.1.2 colorama-0.4.3 cooked-input-0.5.2 dateparser-0.7.4 enum34-1.1.10 flask-1.1.2 flask-login-0.5.0 flask-mail-0.9.1 flask-principal-0.4.0 future-0.18.2 gitdb-4.0.5 gitpython-3.1.2 gunicorn-20.0.4 importlib-metadata-1.6.0 inflection-0.4.0 itsdangerous-1.1.0 markdown-3.2.2 pillow-7.1.2 python-dateutil-2.8.1 python-editor-1.0.4 pyyaml-5.3.1 regex-2020.5.14 setuptools-git-1.2 smmap-3.0.4 sqlalchemy-1.3.17 tabulate-0.8.7 termcolor-1.1.0 tzlocal-2.1 validus-0.3.0 veryprettytable-0.8.1 werkzeug-1.0.1 zipp-3.1.0
