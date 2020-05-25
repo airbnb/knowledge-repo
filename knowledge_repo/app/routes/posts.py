@@ -189,12 +189,19 @@ def download():
     post = current_repo.post(request.args.get('post'))  # Note: `post` is expected to be a post path
     resource_type = request.args.get('type', 'source')
 
-    if resource_type == 'post':
-        format = request.args.get('format', 'zip')
-        filename = os.path.basename(post.path)[:-2] + format
+    if resource_type in ('kp', 'zip'):
+        filename = os.path.basename(post.path)
+        if resource_type == 'zip':
+            filename = filename[:-3] + '.zip'
         return Response(
-            post.to_string(format=format),
-            mimetype="application/octet-stream",
+            post.to_string(format=resource_type),
+            mimetype="application/zip",
+            headers={u"Content-disposition": "attachment; filename={}".format(filename)})
+    elif resource_type == 'pdf':
+        filename = os.path.basename(post.path)[:-3] + '.pdf'
+        return Response(
+            post.to_string(format=resource_type),
+            mimetype="application/pdf",
             headers={u"Content-disposition": "attachment; filename={}".format(filename)})
     elif resource_type == 'source':
         path = request.args.get('path', None)
