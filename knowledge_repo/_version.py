@@ -41,6 +41,7 @@ __dependencies__ = [
     'gunicorn',  # Deployed webserver
     'inflection',  # String transformation library
     'pillow',  # Image thumbnailing
+    'weasyprint', # Post PDF download option
 ]
 
 __optional_dependencies__ = {
