@@ -25,6 +25,6 @@ class PDFConverter(KnowledgePostConverter):
             f.write(self.to_string())
 
     def to_string(self, **opts):
-        from weasyprint import HTML
+        from weasyprint import HTML, CSS
         html = HTMLConverter(self.kp).to_string()
-        return HTML(string=html).write_pdf()
+        return HTML(string=html).write_pdf(stylesheets=[CSS(string='body { font-family: Helvetica, sans-serif !important }')])
