@@ -36,6 +36,7 @@ pip-delete-this-directory.txt
 
 # Unit test / coverage reports
 htmlcov/
+tests/test_repo/
 .tox/
 .coverage
 .coverage.*
@@ -78,15 +79,23 @@ celerybeat-schedule
 # dotenv
 .env
 
+# docker
+Dockerfile
+docker-compose.yml
+
 # virtualenv
 venv/
 ENV/
 
+# Eclipse/PyDev project settings
+/.project
+/.pydevproject
+
 # Spyder project settings
-.spyderproject
+/.spyderproject
 
 # Rope project settings
-.ropeproject
+/.ropeproject
 
 *.iml
 **/.idea
@@ -96,13 +105,9 @@ ENV/
 *.sw*
 *#
 *.pk
-*.coverage
 *node_modules
-web/js/knowledgeconf.js
-app/config/knowledge.cfg
-web/data/repo.json
-*.pyc
 /build
 /dist
 
+# Mac OS X filesystem artifacts
 .DS_Store

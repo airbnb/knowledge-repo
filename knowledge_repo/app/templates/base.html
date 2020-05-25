@@ -23,6 +23,11 @@
     <script src="{{ url_for('static', filename='modules/require.js/require.min.js')}}"></script>
     <script src="{{ url_for('static', filename='js/pages/base.js')}}"></script>
 
+    <!-- Set explicit mobile collapse behaviour -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!-- fix for IE compatability mode -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!--[if lt IE 9]>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6.2/html5shiv.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/2.1.0/es5-shim.min.js"></script>
@@ -33,6 +38,17 @@
     <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='modules/select2/css/select2.min.css') }}">
     <link href='https://fonts.googleapis.com/css?family=Lato:400,900|Playfair+Display|Source+Serif+Pro:400,700' rel='stylesheet' type='text/css'>
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}"> {% block style_links %}{% endblock %}
+
+    <!-- Favicon and app settings -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.manifest') }}">
+    <link rel="mask-icon" href="{{ url_for('static', filename='images/safari-pinned-tab.svg') }}" color="#5bbad5">
+    <meta name="theme-color" content="#ffffff">
+
+    {% block extra_headers %}
+    {% endblock %}
     <style>
       {% block style %}
       {% endblock %}
@@ -40,72 +56,95 @@
   </head>
 
   <body>
-
+    {% block navbar %}
     <!-- Top-level navbar -->
     <nav class="navbar navbar-fixed-top navbar-inverse">
-      <div class="container">
-        <div class="navbar-header">
-          <!-- Hamburger button to display collapsed menu -->
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
+      <div class="container-fluid">
+        <div class='col-lg-2'></div>
+        <div class='col-lg-8'>
 
-          <!-- Brand name / logo -->
-          <a class="navbar-brand" href="/" class="logo-image">
-            <img style='height:100%;' src='{{ url_for("static", filename = "images/logo-white.svg")}}' />
-          </a>
-        </div>
+          <div class="navbar-header">
+            <!-- Hamburger button to display collapsed menu -->
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
 
-        <!-- Navigation items -->
-        <div id="navbar" class="navbar-collapse collapse">
+            <!-- Brand name / logo -->
+            <a class="navbar-brand" href="/" class="logo-image">
+              <img src='{{ url_for("static", filename = "images/logo-white.svg")}}' />
+              <text>Knowledge Repo</text>
+            </a>
+          </div>
 
-          <!-- Search bar -->
-          <form class="navbar-form navbar-left searchbar" role="search" action="{{url_for('index.render_feed')}}">
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="Search" name="filters" id="searchbar" value="{% if feed_params and feed_params['filters'] %}{{ feed_params['filters'] }}{% endif %}">
-              <div class="input-group-btn">
-                <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+          <!-- Navigation items -->
+          <div id="navbar" class="navbar-collapse collapse">
+
+            <!-- Search bar -->
+            <form class="navbar-form navbar-left searchbar" role="search" action="{{url_for('index.render_feed')}}">
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search" name="filters" id="searchbar" value="{% if feed_params and feed_params['filters'] %}{{ feed_params['filters'] }}{% endif %}">
+                <div class="input-group-btn">
+                  <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+                </div>
               </div>
-            </div>
-          </form>
+            </form>
 
-          <!-- "Write a Post" button -->
-          <a href="/create" class="btn btn-primary navbar-button">
-            Write a Post!
-          </a>
+            <!-- "Write a Post" button -->
+            <a href="/create" class="btn btn-primary navbar-button">
+              Write a Post!
+            </a>
 
-          <!-- Drop down menu to surface less used links on large screens -->
-          <ul class="nav navbar-nav navbar-right visible-sm-block visible-md-block visible-lg-block">
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true"><span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li class="dropdown-header">Logged in as <em>{{name}}</em></li>
-                <li><a href="/feed?authors={{username}}">My Posts</a></li>
-                <li><a href="/favorites">My Favorites</a></li>
-                <li role="separator" class="divider"></li>
-                <li class="dropdown-header">Site Features</li>
-                <li><a href="/stats">Stats</a></li>
-                <li><a href="/about">About</a></li>
-              </ul>
-            </li>
-          </ul>
+            <!-- Drop down menu to surface less used links on large screens -->
+            <ul class="nav navbar-nav navbar-right visible-sm-block visible-md-block visible-lg-block">
+              <li class="dropdown">
+                <a href="#" class="avatar-dropdown dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true" style='padding: 5px;'>
+                    <img class="avatar" src="{% if current_user.is_anonymous %}{{ url_for('static', filename='images/profile_photo_logged_out.png') }}{%else%}{{ current_user.avatar_uri or url_for('static', filename='images/profile_photo_default.png') }}{%endif%}" />
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  {% if current_user.is_authenticated %}
+                  <li class="dropdown-header">Logged in as <em>{{ current_user.format_name }}</em></li>
+                  <li><a href="/feed?authors={{ current_user.identifier }}">My Posts</a></li>
+                  <li><a href="/favorites">My Favorites</a></li>
+                  {% if current_user.can_logout %}
+                  <li><a href="{{ url_for('auth.logout') }}">Sign out</a></li>
+                  {% endif %}
+                  <li role="separator" class="divider"></li>
+                  <li class="dropdown-header">Site Features</li>
+                  {% else %}
+                  <li><a href="{{ url_for('auth.login') }}">Sign in</a></li>
+                  {% endif %}
+                  <li><a href="/stats">Stats</a></li>
+                  <li><a href="http://knowledge-repo.readthedocs.io/" target="_blank" rel="nofollow noreferrer">Documentation</a></li>
+                </ul>
+              </li>
+            </ul>
 
-          <!-- Expose the same links as above in the collapsed navbar header -->
-          <ul class="nav navbar-nav navbar-right visible-xs-block">
-            <li class="dropdown-header">Logged in as <em>{{name}}</em></li>
-            <li><a href="/feed?authors={{username}}">My Posts</a></li>
-            <li><a href="/favorites">My Favorites</a></li><li role="separator" class="divider"></li>
-            <li class="dropdown-header">Site Features</li>
-            <li><a id="stats_tab" href="/stats">Stats</a></li>
-            <li><a id="help_tab" href="/about">About</a></li>
-          </ul>
+            <!-- Expose the same links as above in the collapsed navbar header -->
+            <ul class="nav navbar-nav navbar-right visible-xs-block">
+              {% if current_user.is_authenticated %}
+              <li class="dropdown-header">Logged in as <em>{{name}}</em></li>
+              <li><a href="/feed?authors={{username}}">My Posts</a></li>
+              <li><a href="/favorites">My Favorites</a></li><li role="separator" class="divider"></li>
+              {% if current_user.can_logout %}
+              <li><a href="{{ url_for('auth.logout') }}">Sign out</a></li>
+              {% endif %}
+              <li class="dropdown-header">Site Features</li>
+              {% else %}
+              <li><a href="{{ url_for('auth.login') }}">Sign in</a></li>
+              {% endif %}
+              <li><a href="/stats">Stats</a></li>
+              <li><a href="http://knowledge-repo.readthedocs.io/" target="_blank" rel="nofollow noreferrer">Documentation</a></li>
+            </ul>
 
+          </div>
         </div>
       </div>
     </nav>
+    {% endblock %}
 
     <!-- Main content place holder, with a sidebar on both the left and right,
          which collapse to form a single column on smaller screens. -->
@@ -119,6 +158,15 @@
         </div>
         <!-- Main content placeholder -->
         <div class='col-lg-8' id='panel-main'>
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <ul class=flashes>
+                {% for message in messages %}
+                  <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+              {% endif %}
+            {% endwith %}
           {% block content %} {% endblock %}
         </div>
         <!-- Right sidebar -->

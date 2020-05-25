@@ -1,3 +1,8 @@
+.container-fluid {
+    max-width: 100em;
+    margin: auto;
+}
+
 .navbar {
     background-color: #565a5c;
     border-color: #565a5c;
@@ -6,10 +11,20 @@
     z-index: 10000;
 }
 .navbar-inverse .navbar-nav>li>a {
-color: #fff;
+  color: #fff;
 }
 .navbar .navbar-brand {
-color: #fff;
+  float: none;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.navbar .navbar-brand img {
+  height: 30px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 @media (min-width: 768px) {
     #navbar {
@@ -93,6 +108,21 @@ color: #fff;
 #navbar .btn-default:focus,
 #navbar .btn-default:active {
     opacity: 1;
+}
+
+#navbar .avatar-dropdown {
+    padding-left: 5px;
+    margin-left: 5px;
+}
+
+#navbar .avatar-dropdown img.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius:20px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border: 1px solid #000;
+    background-color: #eee;
 }
 
 .spinner {
@@ -277,7 +307,7 @@ color: #fff;
 body {
   color: #565a5c;
   background-color: whitesmoke;
-  font-size: 14px;
+  font-size: 12pt;
   font-family: 'Lato', sans-serif;
   /*background-color: #F8F8F8;*/
 }
@@ -298,11 +328,12 @@ ul {
     margin-bottom: 10px;
 }
 
-h1              { font-size: 2em; margin: .67em 0 }
+h1              { font-size: 1.8em; margin: .67em 0 }
 h2              { font-size: 1.5em; margin: .75em 0 }
-h3              { font-size: 1.17em; margin: .83em 0 }
-h5              { font-size: .83em; margin: 1.5em 0 }
-h6              { font-size: .75em; margin: 1.67em 0 }
+h3              { font-size: 1.3em; margin: .83em 0 }
+h4              { font-size: 1.1em; margin: 1em 0 }
+h5              { font-size: 1em; margin: 1.5em 0 }
+h6              { font-size: 1em; margin: 1.67em 0; font-style: italic;}
 h1, h2, h3, h4,
 h5, h6          { font-weight: bolder }
 
@@ -687,7 +718,8 @@ border-color: #11b6aa;
   margin-top: 0px;
   margin-right: -15px;
   margin-left: -15px;
-  padding-top: 10px
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .cluster-dropdown {

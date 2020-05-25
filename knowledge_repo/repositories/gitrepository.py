@@ -5,13 +5,14 @@ import os
 import shutil
 import logging
 import re
-import git
 import socket
 from io import open
 
-from knowledge_repo._version import __git_uri__
+import git
+import six
+import yaml
+
 from ..repository import KnowledgeRepository
-from ..utils.exec_code import get_module_for_source
 from ..utils.types import str_types
 from ..utils.encoding import encode
 
@@ -19,56 +20,72 @@ logger = logging.getLogger(__name__)
 
 
 class GitKnowledgeRepository(KnowledgeRepository):
-    _registry_keys = ['', 'git']
+    _registry_keys = ['git']
+
+    TEMPLATES = {
+        'README.md': os.path.abspath(os.path.join(os.path.dirname(__file__), '../templates', 'repository_readme.md')),
+        '.knowledge_repo_config.yml': os.path.abspath(os.path.join(os.path.dirname(__file__), '../templates', 'repository_config.yml'))
+    }
 
     @classmethod
-    def create(cls, uri, embed_tooling=False):
+    def create(cls, uri):
         path = uri.replace('git://', '')
         if os.path.exists(path):
-            response = input('Repository already exists. Do you want to convert it to a knowledge data repository? Note that this will override any existing `README.md` and `.knowledge_repo_config.py` files, and replace any submodule at `.resources`. (y/n) ')
-            if response is not 'y':
-                logger.warning('Not updating existing repository. Aborting!')
-                return
-        repo = git.Repo.init(path, mkdir=True)
-        sm = None
-        if embed_tooling is True or isinstance(embed_tooling, dict):
-            if not isinstance(embed_tooling, dict):
-                embed_tooling = {}
-            tooling_repo = embed_tooling.get('repository', __git_uri__)
-            tooling_branch = embed_tooling.get('branch', 'master')
-            # Delete any existing submodule at .resources
             try:
-                if '.resources' in repo.tree():
-                    obj = repo.tree()['.resources']
-                    if isinstance(obj, git.Submodule):
-                        sm = repo.tree()['.resources']
-                        sm._name = 'embedded_knowledge_repo'
-                        sm.remove()
-                    else:
-                        repo.git.rm(obj.path)
-            except ValueError:  # Repository has no active refs
-                pass
-            sm = repo.create_submodule(name='embedded_knowledge_repo', path='.resources', url=tooling_repo, branch=tooling_branch)
-        shutil.copy(os.path.join(os.path.dirname(__file__), '../config_defaults.py'),
-                    os.path.join(path, '.knowledge_repo_config.py'))
-        shutil.copy(os.path.join(os.path.dirname(__file__), '../templates', 'repo_data_readme.md'),
-                    os.path.join(path, 'README.md'))
-        repo.index.add(['.knowledge_repo_config.py', 'README.md'])
-        repo.index.commit("Initial creation of knowledge data repository structure.")
-        if sm is not None:
-            repo.submodule('embedded_knowledge_repo').update()
+                repo = git.Repo(path)
+                logger.warning("Repository already exists for uri '{}'. Checking if configuration is needed...".format(uri))
+            except git.InvalidGitRepositoryError:
+                if os.path.isdir(path):
+                    logger.warning("Upgrading existing directory at '{}' to a git knowledge repository...".format(path))
+                else:
+                    raise RuntimeError("File exists at nominated path: {}. Cannot proceed with repository initialization.".format(path))
+
+        repo = git.Repo.init(path, mkdir=True)
+
+        # Add README and configuration templates
+        added_files = 0
+
+        for filename, template in cls.TEMPLATES.items():
+            target = os.path.join(path, filename)
+            if not os.path.exists(target):
+                shutil.copy(template, target)
+                repo.index.add([filename])
+                added_files += 1
+            else:
+                logger.warning("Not overriding existing file '{}'.".format(filename))
+
+        if added_files > 0:
+            repo.index.commit("Initial creation of knowledge repository.")
+
         return GitKnowledgeRepository(path)
 
-    def init(self, config='git:////.knowledge_repo_config.py', auto_create=False):
+    def init(self, config='git:///.knowledge_repo_config.yml', auto_create=False):
         self.config.update_defaults(published_branch='master')
         self.config.update_defaults(remote_name='origin')
         self.auto_create = auto_create
         self.path = self.uri.replace('git://', '')
 
-        if config.startswith('git:////'):
-            self.config.update(get_module_for_source(self.git_read(config.replace('git:////', '')), 'git_config'))
+        # Check if a legacy configuration exists, and if so, print a warning
+        try:
+            self.git_read('.knowledge_repo_config.py')
+            logger.warning(
+                "This knowledge repository has a legacy configuration file that "
+                "will not be loaded due to security issues "
+                "(.knowledge_repo_config.py). This may lead to unexpected "
+                "behavior. Please talk to your local Knowledge Repo admins "
+                "for advice if you are unsure."
+            )
+        except:
+            pass
+
+        if config.startswith('git:///'):
+            assert config.endswith('.yml'), "In-repository configuration must be a YAML file."
+            try:
+                self.config.update(yaml.load(self.git_read(config.replace('git:///', ''))))
+            except KeyError:
+                logger.warning("Repository missing configuration file: {}".format(config))
         else:
-            self.config.update(os.path.join(self.path, config))
+            self.config.update(config)
 
     @property
     def path(self):
@@ -76,7 +93,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
     @path.setter
     def path(self, path):
-        assert isinstance(path, str), "The path specified must be a string."
+        assert isinstance(path, six.string_types), "The path specified must be a string."
         path = os.path.abspath(os.path.expanduser(path))
         if not os.path.exists(path):
             path = os.path.abspath(path)
@@ -129,28 +146,8 @@ class GitKnowledgeRepository(KnowledgeRepository):
         logger.info("Fetching updates to the knowledge repository...")
         self.git_remote.fetch()
         current_branch = self.git.active_branch
-        self.git.branches.master.checkout()
+        self.git.branches[branch].checkout()
         self.git_remote.pull(branch)
-        try:
-            sm = self.git.submodule('embedded_knowledge_repo')
-        except ValueError:  # This repository does not use embedded knowledge_repo tools or it is misnamed
-            # Check for misnamed submodule
-            sm = None
-            for submodule in self.git.submodules:
-                if submodule.path == '.resources':
-                    sm = submodule
-                    break
-        if sm is not None:
-            sm_target_url = sm.config_reader().get_value('url')
-            try:
-                sm_actual_url = sm.module().git.config('--get', 'remote.origin.url')
-            except git.InvalidGitRepositoryError:
-                sm_actual_url = "the uninitialized state"
-            if sm_target_url != sm_actual_url:
-                logging.info('Migrating embedded tooling from {} to {}.'.format(sm_actual_url, sm_target_url))
-                self.git.git.submodule('sync')
-                self.git.git.submodule('update', '--init', '--recursive', '--remote', '--force', '--checkout')
-            sm.update(init=True, force=True)
         current_branch.checkout()
 
     def set_active_draft(self, path):  # TODO: deprecate
@@ -497,7 +494,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
     def __remote_host(self):
         if self.git_has_remote:
             # TODO: support more types of hosts
-            m = re.match('.*?@(.*?):\.*?', self.git_remote.url)
+            m = re.match(r'.*?@(.*?):\.*?', self.git_remote.url)
             if m:  # shorthand ssh uri
                 return m.group(1)
         return None

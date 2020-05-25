@@ -6,6 +6,5 @@ from future.utils import with_metaclass
 class KnowledgePostProcessor(with_metaclass(SubclassRegisteringABCMeta, object)):
     _registry_keys = []
 
-    @classmethod
-    def process(cls, kp):
+    def process(self, kp):
         return None

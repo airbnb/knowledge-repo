@@ -1,62 +1,66 @@
 import sys
 
 import markdown
+from markdown.extensions import toc
+
 import pygments
 from flask import url_for
+from jinja2 import Template
 from knowledge_repo.post import KnowledgePost
 
-MARKDOWN_EXTENSTIONS = ['markdown.extensions.extra',
-                        'markdown.extensions.abbr',
-                        'markdown.extensions.attr_list',
-                        'markdown.extensions.def_list',
-                        'markdown.extensions.fenced_code',
-                        'markdown.extensions.footnotes',
-                        'markdown.extensions.tables',
-                        'markdown.extensions.smart_strong',
-                        'markdown.extensions.admonition',
-                        'markdown.extensions.codehilite',
-                        'markdown.extensions.headerid',
-                        'markdown.extensions.meta',
-                        'markdown.extensions.sane_lists',
-                        'markdown.extensions.smarty',
-                        'markdown.extensions.toc(baselevel=1)',
-                        'markdown.extensions.wikilinks',
-                        'markdown.extensions.nl2br']
+MARKDOWN_EXTENSIONS = ['extra',
+                       'abbr',
+                       'attr_list',
+                       'def_list',
+                       'fenced_code',
+                       'footnotes',
+                       'tables',
+                       'admonition',
+                       'codehilite',
+                       'meta',
+                       'sane_lists',
+                       'smarty',
+                       toc.TocExtension(baselevel=1),
+                       'wikilinks',
+                       'nl2br']
 
 
 def render_post_tldr(post):
     if isinstance(post, KnowledgePost):
-        return markdown.Markdown(extensions=MARKDOWN_EXTENSTIONS).convert(post.headers.get('tldr').strip())
+        return markdown.Markdown(extensions=MARKDOWN_EXTENSIONS).convert(post.headers.get('tldr').strip())
     else:
-        return markdown.Markdown(extensions=MARKDOWN_EXTENSTIONS).convert(post.tldr.strip())
+        return markdown.Markdown(extensions=MARKDOWN_EXTENSIONS).convert(post.tldr.strip())
 
 
 def render_post_header(post):
 
-    header_template = u"""
+    header_template = Template(u"""
     <div class='metadata'>
-    <h1>{title}</h1>
-    <span class='authors'>{authors}</span>
-    <span class='date_created'>{date_created}</span>
-    <span class='date_updated'>(Last Updated: {date_updated})</span>
-    <span class='tldr'>{tldr}</span>
+    <span class='title'>{{title}}</span>
+    {% if subtitle %}<span class='subtitle'>{{subtitle}}</span>{% endif %}
+    <span class='authors'>{{authors}}</span>
+    <span class='date_created'>{{date_created}}</span>
+    <span class='date_updated'>(Last Updated: {{date_updated}})</span>
+    <span class='tldr'>{{tldr}}</span>
     <span class='tags'></span>
     </div>
-    """
+    """)
 
     def get_authors(usernames, authors):
         authors = [u"<a href='{}'>{}</a>".format(url_for('index.render_feed', authors=username), author) for username, author in zip(usernames, authors)]
         return u' and '.join(u', '.join(authors).rsplit(', ', 1))
 
     if isinstance(post, KnowledgePost):
-        return header_template.format(title=post.headers['title'],
+        return header_template.render(title=post.headers['title'],
+                                      subtitle=post.headers.get('subtitle'),
                                       authors=get_authors(post.headers['authors'], post.headers['authors']),
                                       date_created=post.headers['created_at'].strftime("%B %d, %Y"),
                                       date_updated=post.headers['updated_at'].strftime("%B %d, %Y"),
                                       tldr=render_post_tldr(post))
     else:
-        return header_template.format(title=post.title,
-                                      authors=get_authors([author.username for author in post.authors], [author.format_name for author in post.authors]),
+        return header_template.render(title=post.title,
+                                      subtitle=post.subtitle,
+                                      authors=get_authors([author.identifier for author in post.authors], [author.format_name for author in post.authors]),
                                       date_created=post.created_at.strftime("%B %d, %Y"),
                                       date_updated=post.updated_at.strftime("%B %d, %Y"),
                                       tldr=render_post_tldr(post))
@@ -74,9 +78,6 @@ def render_post_raw(post):
         formatter=pygments.formatters.get_formatter_by_name('html')
     )
 
-    # NOTE: `str.encode()` returns a `bytes` object in Python 3
-    if sys.version_info.major >= 3:
-        return raw_post.decode('ascii', 'ignore')
     return raw_post
 
 

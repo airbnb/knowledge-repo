@@ -4,7 +4,7 @@ from sqlalchemy import and_
 
 from knowledge_repo import KnowledgeRepository
 from knowledge_repo.app.models import User, Vote, Post
-from knowledge_repo.app.app import db_session
+from knowledge_repo.app.proxies import db_session
 
 
 class FavoriteTest(unittest.TestCase):
@@ -16,8 +16,7 @@ class FavoriteTest(unittest.TestCase):
         self.headers = {}
 
         self.knowledge_username = 'favorite_test_user'
-        username_request_header = self.repo_app.config.get(
-            "AUTH_USERNAME_REQUEST_HEADER")
+        username_request_header = self.repo_app.config.get("AUTH_USER_IDENTIFIER_REQUEST_HEADER")
         self.headers = {
             username_request_header: self.knowledge_username
         }
@@ -88,7 +87,7 @@ class FavoriteTest(unittest.TestCase):
                 'div', {'class': 'row row-space-4 panel feed-post'})
 
             user = (db_session.query(User)
-                    .filter(User.username == self.knowledge_username)
+                    .filter(User.identifier == self.knowledge_username)
                     .first())
             votes = (db_session.query(Vote)
                      .filter(Vote.user_id == user.id)

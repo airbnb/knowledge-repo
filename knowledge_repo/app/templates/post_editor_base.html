@@ -38,10 +38,7 @@
           {% if status > 0 %}
           <label style="font-size:12px; padding-top:15px">
             <input type="checkbox" style="margin-left:15px;"
-                   id="author_can_publish" {{ 'checked' if status > 1 }}
-                   {% if username in author %}
-                      disabled=true
-                   {% endif %}>
+                   id="author_can_publish" {{ 'checked' if status > 1 }}>
               Allow author to publish?
             </input>
           </label>
@@ -378,10 +375,9 @@ $("#submission_close").on("click", function(){
       }
     }
   })
-
 })
 
-if ( status == 2 || status == 3 ) {
+if ( status > 0 ) {
   $("#btn_publish").on("click", function(){
     var publish_button_text = this.textContent.trim();
     var url = '';
@@ -564,7 +560,7 @@ function parseDate(ds, error_name){
   });
 </script>
 <script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js">
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
 </script>
 
 {% endblock %}

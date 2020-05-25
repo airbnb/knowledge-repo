@@ -8,10 +8,13 @@ import itertools
 import signal
 import re
 import threading
-import webbrowser
 import shutil
 import argparse
 import subprocess
+
+import git
+import gitdb
+import webbrowser
 from tabulate import tabulate
 
 # Register handler for SIGTERM, so we can run cleanup code if we are terminated
@@ -85,29 +88,55 @@ if args.repo is None:
     raise ValueError("No repository specified. Please set the --repo flag, "
                      "or the KNOWLEDGE_REPO environment variable.")
 
+# Load repository for use in subsequent commands. It may not be possible to load
+# the repository for various reasons, such as it not existing. At this point,
+# that is okay. Later on the requirement that te repository be correctly
+# initialised will be enforced.
+try:
+    repo = knowledge_repo.KnowledgeRepository.for_uri(args.repo)
+except (ValueError, git.GitError, gitdb.exc.ODBError):  # TODO: Generalise error to cater for all KnowledgeRepository instances.
+    repo = None
+
+
 # Update repository so that we can ensure git repository configuration is up to date
 # We wrap this in a try/except block because failing to update a repository can
 # happen for all sorts of reasons that should not inhibit other actions
 # For example: if the repository does not exist and the action will be 'init'
-if args.update:
-    try:
-        kr = knowledge_repo.KnowledgeRepository.for_uri(args.repo)
-        if isinstance(kr, GitKnowledgeRepository):
-            kr.update(branch=args.knowledge_branch)
-    except:
-        pass
+if repo is not None and args.update:
+    if isinstance(repo, GitKnowledgeRepository):
+        repo.update(branch=args.knowledge_branch)
+    else:
+        repo.update()
 
-# If not running in dev mode, and the specified repo exists, along with a knowledge_repo
+
+# If not running in dev mode, and the current knowledge repository requests that
+# a specific tooling version be used, this script checks whether it is suitable
+# for running the .. the specified repo exists, along with a knowledge_repo
 # script in the .resources/scripts folder, pass execution to this script in the
 # knowledge data repo. If this *is* that script, do nothing. This still allows the `init`
 # action to be run by this script in any case. Instances of this script in a data repo
 # are assumed to be in the: '.resources/scripts/knowledge_repo', and be part of a checked
 # out instance of the complete "knowledge-repo" repository.
-if (isinstance(args.repo, str) and not args.dev
-        and os.path.exists(os.path.join(args.repo, '.resources', 'scripts', 'knowledge_repo'))
-        and os.path.abspath(args.repo) != os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))):
-    cmdline_args = ['--noupdate'] + [arg.replace(' ', '\ ') if ' ' in arg else arg for arg in sys.argv[1:]]
-    sys.exit(subprocess.call('{} {}'.format(os.path.join(os.path.abspath(args.repo), '.resources/scripts/knowledge_repo'), ' '.join(cmdline_args)), shell=True))
+if repo is not None and not args.dev and repo.config.required_tooling_version:
+    required_version = repo.config.required_tooling_version
+    if required_version.startswith('!'):  # Specific revision requested
+        from knowledge_repo.utils.git import clone_kr_to_directory, CheckedOutRevision
+        clone_kr_to_directory('~/.knowledge_repo/git')
+        cmdline_args = ['--noupdate'] + [arg.replace(' ', '\ ') if ' ' in arg else arg for arg in sys.argv[1:]]
+        with CheckedOutRevision('~/.knowledge_repo/git', required_version[1:]) as script_path:
+            sys.exit(
+                subprocess.call(
+                    '{} {}'.format(os.path.join(script_path, 'scripts/knowledge_repo'), ' '.join(cmdline_args)
+                ), shell=True)
+            )
+    else:
+        from knowledge_repo.utils.dependencies import check_dependencies
+        check_dependencies([
+            'knowledge_repo{}{}'.format(
+                '==' if required_version[0] not in ['<', '=', '>'] else '',
+                required_version
+            )
+        ])
 
 # ---------------------------------------------------------------------------------------
 # Everything below this line pertains to actual actions to be performed on the repository
@@ -118,14 +147,12 @@ if (isinstance(args.repo, str) and not args.dev
 # Add the action parsers
 subparsers = parser.add_subparsers(help='sub-commands')
 
-init = subparsers.add_parser('init', help='Initialise a new git knowledge repository.')
+init = subparsers.add_parser('init', help='Initialise a new knowledge repository for the specified repository.')
 init.set_defaults(action='init')
-init.add_argument('--tooling-embed', action='store_true', help='Embed a reference version knowledge_repo tooling in the repository.')
-init.add_argument('--tooling-repo', help='The repository to use (if not the default).')
-init.add_argument('--tooling-branch', help='The branch to use when embedding the tools as a submodule (default is "master").')
 
 create = subparsers.add_parser('create', help='Start a new knowledge post based on a template.')
 create.set_defaults(action='create')
+create.add_argument('--template', default=None, help='The template to use when creating the knowledge post.')
 create.add_argument('format', choices=['ipynb', 'Rmd', 'md'], help='The format of the knowledge post to be created.')
 create.add_argument('filename', help='Where this file should be created.')
 #
@@ -184,6 +211,12 @@ db_upgrade.add_argument('-c', '--config', default=None, help="The config file fr
 db_upgrade.add_argument('-m', '--message', help="The message to use for the database revision.")
 db_upgrade.add_argument('--autogenerate', action='store_true', help="Whether alembic should automatically populate the migration script.")
 
+db_downgrade = subparsers.add_parser('db_downgrade', help='Downgrade the database to the schema identified by a revision number.')
+db_downgrade.set_defaults(action='db_downgrade')
+db_downgrade.add_argument('revision', help="The target database revision. Use '-1' for the previous version.")
+db_downgrade.add_argument('-db', '--dburi', help='The SQLAlchemy database uri.')
+db_downgrade.add_argument('-c', '--config', default=None, help="The config file from which to read server configuration.")
+
 reindex = subparsers.add_parser('reindex', help='Update the index, updating all posts even if they exist in the database already; but will not lose post views and other usage metadata.')
 reindex.set_defaults(action='reindex')
 reindex.add_argument('-db', '--dburi', help='The SQLAlchemy database uri.')
@@ -191,7 +224,7 @@ reindex.add_argument('-c', '--config', default=None, help="The config file from 
 
 # Show version and exit
 if args.version:
-    print('Embedded/active version: {}'.format(knowledge_repo.__version__))
+    print('Active version: {}'.format(knowledge_repo.__version__))
     sys.exit(0)
 
 # Only show db_migrate option if running in development mode, and in a git repository.
@@ -210,26 +243,26 @@ if not hasattr(args, 'action'):
 
 # If init, use this code to create a new repository.
 if args.action == 'init':
-    if args.tooling_embed:
-        embed_tooling = {}
-        if args.tooling_repo is not None:
-            embed_tooling['repository'] = args.tooling_repo
-        if args.tooling_branch is not None:
-            embed_tooling['branch'] = args.tooling_branch
+    assert not isinstance(args.repo, dict), "Only one repository can be initialised at a time."
+    repo = knowledge_repo.KnowledgeRepository.create_for_uri(args.repo)
+    if repo is not None:
+        print("Knowledge repository successfully initialized for uri `{}`.".format(repo.uri))
     else:
-        embed_tooling = False
-    kr = knowledge_repo.KnowledgeRepository.create_for_uri(args.repo, embed_tooling=embed_tooling)
-    if kr is not None:
-        print("Knowledge repository created for uri `{}`.".format(kr.uri))
+        print("Something weird happened while creating repository for uri `{}`. Please report!".format(repo.uri))
     sys.exit(0)
 
-# All subsequent actions perform an action on the repository, and so we instantiate
-# a KnowledgeRepository object here.
-repo = knowledge_repo.KnowledgeRepository.for_uri(args.repo)
+# All subsequent actions perform an action on the repository, and so we verify
+# enforce that `repo` is not None.
+if repo is None:
+    raise RuntimeError("Could not initialise knowledge repository for uri `{}`. Please check the uri, and try again.".format(args.repo))
 
 # Create a new knowledge post from a template
 if args.action == 'create':
     src = os.path.join(os.path.dirname(knowledge_repo.__file__), 'templates', 'knowledge_template.{}'.format(args.format))
+    if args.template:
+        src = args.template
+    if not os.path.exists(src):
+        raise ValueError("Template not found at {}. Please choose a different template and try again.".format(src))
     if os.path.exists(args.filename):
         raise ValueError("File already exists at '{}'. Please choose a different filename and try again.".format(args.filename))
     shutil.copy(src, args.filename)
@@ -271,7 +304,7 @@ if args.action in ['preview', 'runserver']:
                                   debug=args.debug,
                                   db_uri=args.dburi,
                                   config=args.config,
-                                  REPOSITORY_INDEXING_ENABLED=(args.action == 'runserver'))
+                                  INDEXING_ENABLED=(args.action == 'runserver'))
 
     if args.action == 'preview':
         kp_path = repo._kp_path(args.path)
@@ -306,10 +339,14 @@ elif args.action == 'db_upgrade':
     app = repo.get_app(db_uri=args.dburi, debug=args.debug, config=args.config)
     app.db_upgrade()
 
+elif args.action == 'db_downgrade':
+    app = repo.get_app(db_uri=args.dburi, debug=args.debug, config=args.config)
+    app.db_downgrade(revision=args.revision)
+
 elif args.action == 'db_migrate':
     app = repo.get_app(debug=args.debug, db_uri=args.dburi)
     app.db_migrate(args.message, autogenerate=args.autogenerate)
 
 elif args.action == 'reindex':
     app = repo.get_app(db_uri=args.dburi, debug=args.debug, config=args.config)
-    app.db_update_index(reindex=True)
+    app.db_update_index(check_timeouts=False, force=True, reindex=True)

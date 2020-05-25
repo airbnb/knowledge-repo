@@ -1,9 +1,10 @@
 import logging
 import os
 from builtins import str
-from flask import request, url_for, redirect, render_template, current_app, Blueprint, g, Response
+from flask import request, url_for, redirect, render_template, current_app, Blueprint, g, Response, abort
 
-from ..proxies import db_session, current_repo
+from .. import permissions
+from ..proxies import db_session, current_repo, current_user
 from ..models import User, Post, PageView
 from ..utils.render import render_post, render_comment, render_post_raw
 
@@ -18,13 +19,14 @@ blueprint = Blueprint('posts', __name__,
 
 @blueprint.route('/post/<path:path>', methods=['GET'])
 @PageView.logged
+@permissions.post_view.require()
 def render(path):
     """
     Render the knowledge post with all the related formatting.
     """
 
     mode = request.args.get('render', 'html')
-    username, user_id = g.user.username, g.user.id
+    username, user_id = current_user.identifier, current_user.id
 
     tmpl = 'markdown-rendered.html'
     if mode == 'raw':
@@ -38,7 +40,7 @@ def render(path):
         # html = create_presentation_text(presentation_post)
         tmpl = "markdown-presentation.html"
 
-    if not current_app.config.get('REPOSITORY_INDEXING_ENABLED', True):
+    if not current_app.config.get('INDEXING_ENABLED', True):
         return _render_preview(path=path, tmpl=tmpl)
 
     post = (db_session.query(Post)
@@ -52,8 +54,8 @@ def render(path):
                               .filter(Post.path == knowledge_aliases[path])
                               .first())
     if not post:
-        raise Exception(u"unable to find post at {}".format(path))
-
+        logger.warning(u"unable to find post at {}".format(path))
+        return abort(404)
     if post.contains_excluded_tag:
         # It's possible that someone gets a direct link to a post that has an excluded tag
         return render_template("error.html")
@@ -68,16 +70,18 @@ def render(path):
 
     comments = post.comments
     for comment in comments:
-        comment.author = db_session.query(User).filter(User.id == comment.user_id).first().username
+        author = db_session.query(User).filter(User.id == comment.user_id).first()
+        if author is not None:
+            comment.author = author.format_name
+        else:
+            comment.author = 'Anonymous'
         if mode != 'raw':
             comment.text = render_comment(comment)
 
-    user_obj = (db_session.query(User)
-                          .filter(User.id == user_id)
-                          .first())
+    user_obj = current_user
 
     tags_list = [str(t.name) for t in post.tags]
-    user_subscriptions = [str(s) for s in user_obj.get_subscriptions]
+    user_subscriptions = [str(s) for s in user_obj.subscriptions]
 
     is_author = user_id in [author.id for author in post.authors]
 
@@ -108,7 +112,8 @@ def render(path):
                                table_id=None,
                                is_private=(post.private == 1),
                                is_author=is_author,
-                               downloads=list(post.kp._dir('orig_src/')))
+                               can_download=permissions.post_download.can(),
+                               downloads=post.kp.src_paths)
     return rendered
 
 
@@ -123,6 +128,7 @@ def render(path):
 
 @blueprint.route('/post/preview/<path:path>', methods=['GET'])
 @PageView.logged
+@permissions.post_view.require()
 def render_preview(path):
     return _render_preview(path, 'markdown-rendered.html')
 
@@ -168,20 +174,15 @@ def _render_preview(path, tmpl):
 # DEPRECATED: Legacy route for the /render endpoint to allow old bookmarks to function
 @blueprint.route('/render', methods=['GET'])
 @PageView.logged
+@permissions.post_view.require()
 def render_legacy():
     path = request.args.get('markdown', '')
     return redirect(url_for('.render', path=path), code=302)
 
 
-@blueprint.route('/about', methods=['GET'])
-@PageView.logged
-def about():
-    """Renders about page. This is the html version of REAMDE.md"""
-    return render_template("about.html")
-
-
 @blueprint.route('/ajax/post/download', methods=['GET'])
 @PageView.logged
+@permissions.post_download.require()
 def download():
     "Downloads resources associated with a post."
 
@@ -198,8 +199,9 @@ def download():
     elif resource_type == 'source':
         path = request.args.get('path', None)
         assert path is not None, "Source path not provided."
+        assert path in post.src_paths, "Provided reference is not a valid source path."
         return Response(
-            post.read_src(path),
+            post._read_ref(path),
             mimetype="application/octet-stream",
             headers={u"Content-disposition": "attachment; filename={}".format(os.path.basename(path))})
     else:

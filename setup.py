@@ -63,7 +63,7 @@ setup(
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,  # See included paths in MANIFEST.in
-    scripts=['scripts/knowledge_repo'],
+    scripts=['scripts/knowledge_repo', 'scripts/kp'],
     install_requires=version_info['__dependencies__'],
     extras_require=version_info['__optional_dependencies__'],
     classifiers=[
@@ -75,7 +75,6 @@ setup(
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],

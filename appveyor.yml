@@ -7,9 +7,9 @@ environment:
       PYTHON_ARCH: "32"
       MINICONDA: C:\Miniconda
 
-    - PYTHON: "C:\\Python34"
-      PYTHON_VERSION: "3.4.1"
-      PYTHON_ARCH: "32"
+    - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6.6"
+      PYTHON_ARCH: "64"
       MINICONDA: C:\Miniconda3
 
 init:
@@ -17,12 +17,10 @@ init:
   - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
 
   - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
   # Replace dep1 dep2 ... with your dependencies
-  - conda install -c r r
-  - conda install -c r r-knitr
+  - conda install -c r r r-knitr
 
 install:
   - "%PYTHON%/Scripts/pip.exe install autopep8 pep8"

@@ -2,7 +2,7 @@
 
 {% macro format_authors(authors) %}
   {% for author in authors %}
-    <a href='/feed?authors={{ author.username|urlencode }}'>
+    <a href='/feed?authors={{ author.identifier|urlencode }}'>
       {{ author.format_name }}
     </a>
     {% if not loop.last %}
@@ -56,7 +56,7 @@
         </a>
         <a href="/cluster" class="btn btn-default btn-cluster no-underline" role="button">
           <i class="glyphicon glyphicon-post-org glyphicon-th-list"></i>
-          <span class="index-view-nane"> Cluster </span>
+          <span class="index-view-name"> Cluster </span>
         </a>
       </div>
     </div>

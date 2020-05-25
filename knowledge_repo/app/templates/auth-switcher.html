@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}
+Knowledge Repo Login
+{% endblock %}
+
+{% block extra_headers %}
+<link rel='stylesheet' href='{{ url_for("static", filename="css/pages/auth-switcher.css") }}'>
+{% endblock %}
+
+{% block navbar %}
+<!-- Top-level navbar -->
+<nav class="navbar navbar-inverse" style='border-radius: 0px;'>
+  <div class="container">
+    <div class="navbar-header" style='float:none'>
+      <!-- Brand name / logo -->
+      <a class="navbar-brand" href="/" class="logo-image">
+        <img src='{{ url_for("static", filename="images/logo-white.svg") }}' />
+      </a>
+    </div>
+  </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+{% if providers %}
+<span class='auth-message'>
+  The content you are attempting to access requires that you are logged in.
+  Please sign in using one of the following login methods to continue.
+</span>
+<ul class='auth-providers'>
+{% for provider in providers %}
+    <li><a href='login/{{ provider['name'] }}?next={{request.args.next}}'><img src='{{ provider['icon_uri'] }}' />{{ provider['link_text'] }}</a></li>
+{% endfor %}
+</ul>
+{% else %}
+<span class='auth-message'>
+  The content you are attempting to access requires that you are logged in.
+  <br><br>
+  Unfortunately, there are no authentication mechanisms configured. Please contact your system administrator to enable authentication.
+</span>
+{% endif %}
+{% endblock %}

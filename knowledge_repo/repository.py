@@ -9,7 +9,8 @@ from abc import abstractmethod, abstractproperty
 import datetime
 from collections import OrderedDict
 from enum import Enum
-import uuid
+
+import six
 
 from . import config_defaults
 from .post import KnowledgePost
@@ -43,19 +44,23 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         if isinstance(uri, dict):
             return cls.for_uris(uri)
         scheme = urlparse(uri).scheme
-        return cls._get_subclass_for(scheme)(uri, *args, **kwargs)
+        return cls._get_subclass_for(scheme).from_uri(uri, *args, **kwargs)
 
     @classmethod
     def for_uris(cls, uri):
         # Import this within this method so as not to cause import resolution problems
         from .repositories.meta import MetaKnowledgeRepository
-        if isinstance(uri, str):
+        if isinstance(uri, six.string_types):
             uris = {'': uri}
         else:
             uris = uri
 
         krs = {name: cls.for_uri(uri) for name, uri in list(uris.items())}
         return MetaKnowledgeRepository(krs)
+
+    @classmethod
+    def from_uri(cls, url, *args, **kwargs):
+        return cls(url, *args, **kwargs)
 
     @classmethod
     def create_for_uri(cls, uri, **kwargs):
@@ -70,7 +75,7 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
 
     def __init__(self, uri, debug=False, **kwargs):
         self.uri = uri
-        self.config = KnowledgeRepositoryConfig()
+        self.config = KnowledgeRepositoryConfig(self)
         self.config.debug = debug
         self.config.update_defaults(config_defaults)
         self.init(**kwargs)
@@ -95,14 +100,14 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         # It assumes that self.uri is either a string or a dictionary mapping
         # of form:
         # {<mountpoint>: <KnowledgeRepositoryInstance>}
-        if isinstance(self.uri, str):
+        if isinstance(self.uri, six.string_types):
             return {'': self.uri}
 
         elif isinstance(self.uri, dict):
             uri_dict = {}
 
             def add_uris(uri_dict, uri, parent=''):
-                if isinstance(uri, str):
+                if isinstance(uri, six.string_types):
                     uri_dict[parent] = uri
                 elif isinstance(uri, dict):
                     for mountpoint, u in uri.items():
@@ -123,14 +128,14 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         # This method provides a mapping from uri to revision for this repository
         # and/or any nested repositories. This is most useful when checking if an
         # update is required server side.
-        if isinstance(self.uri, str):
+        if isinstance(self.uri, six.string_types):
             return {self.uri: self.revision}
 
         elif isinstance(self.uri, dict):
             revision_dict = {}
 
             def add_revisions(revision_dict, uri):
-                if isinstance(uri, str):
+                if isinstance(uri, six.string_types):
                     revision_dict[uri] = KnowledgeRepository.for_uri(uri).revision
                 elif isinstance(uri, dict):
                     for u in uri.values():
@@ -185,13 +190,13 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         return KnowledgePost(path=path, repository=self, revision=revision or self._kp_get_revision(path))
 
     def dir(self, prefix=None, status=None):
-        if prefix is None or isinstance(prefix, str):
+        if prefix is None or isinstance(prefix, six.string_types):
             prefixes = [prefix]
         else:
             prefixes = prefix
-        assert all([prefix is None or isinstance(prefix, str) for prefix in prefixes]), "All path prefixes must be strings."
+        assert all([prefix is None or isinstance(prefix, six.string_types) for prefix in prefixes]), "All path prefixes must be strings."
         prefixes = [prefix if prefix is None else posixpath.relpath(prefix) for prefix in prefixes]
-        if isinstance(status, str):
+        if isinstance(status, six.string_types):
             if status == 'all':
                 status = [self.PostStatus.DRAFT, self.PostStatus.SUBMITTED, self.PostStatus.PUBLISHED, self.PostStatus.UNPUBLISHED]
             else:
@@ -254,8 +259,8 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         if new_authors != authors or kp.headers['updated_at'] < current_datetime:
             kp.update_headers(authors=new_authors, updated_at=current_datetime)
 
-        for postprocessor in self.config.postprocessors:
-            KnowledgePostProcessor._get_subclass_for(postprocessor).process(kp)
+        for postprocessor, postprocessor_kwargs in self.config.postprocessors:
+            KnowledgePostProcessor._get_subclass_for(postprocessor)(**postprocessor_kwargs).process(kp)
 
         cleanup_kwargs = self._add_prepare(kp, path, update, **kwargs)
 

@@ -3,7 +3,7 @@ import posixpath
 # This file is only needed for setting up a dedicated server configuration
 # with support for extracting username information and emailing users.
 
-SERVER_NAME = 'localhost'
+SERVER_NAME = 'localhost.localdomain'
 
 # ---------------------------------------------------
 # Database configuration
@@ -43,23 +43,14 @@ DB_AUTO_UPGRADE = False
 def prepare_repo(repo):
     return repo
 
+
 # ---------------------------------------------------
 # Authentication Headers
 # ---------------------------------------------------
 # the username request header should allow you to get
 # a person's username - this is used for pageview tracking,
 # likes, favorites, etc. As a fallback, DEFAULT_USER is used.
-AUTH_USERNAME_REQUEST_HEADER = 'test_user_request_header'
-AUTH_USERNAME_DEFAULT = 'knowledge_default'
-
-# the group request header should allow you to get a
-# user's name. This is then used below, where we can
-# map specific users to specific projects for the
-# webeditor posts
-AUTH_GROUP_REQUEST_HEADER = 'test_group_request_header'
-AUTH_GROUP_DEFAULT = ''
-
-USER_GROUP_TO_PROJECT = {}  # TODO: Deprecate?
+AUTH_USER_IDENTIFIER_REQUEST_HEADER = 'test_user_request_header'
 
 # ---------------------------------------------------
 # Flask Mail Configuration

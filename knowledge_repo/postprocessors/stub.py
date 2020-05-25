@@ -7,6 +7,5 @@ class StubPostprocessor(KnowledgePostProcessor):
     '''
     _registry_keys = None
 
-    @classmethod
-    def process(cls, kp):
+    def process(self, kp):
         pass

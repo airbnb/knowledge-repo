@@ -3,9 +3,9 @@ import subprocess
 
 __all__ = ['__author__', '__author_email__', '__version__', '__git_uri__', '__dependencies__', '__optional_dependencies__']
 
-__author__ = "Nikki Ray (maintainer), Robert Chang, Dan Frank,  Chetan Sharma,  Matthew Wardrop"
-__author_email__ = "nikki.ray@airbnb.com, robert.chang@airbnb.com, dan.frank@airbnb.com, chetan.sharma@airbnb.com, matthew.wardrop@airbnb.com"
-__version__ = "0.7.6"
+__author__ = "Erik Ritter (maintainer), Serena Jiang, John Bodley, Bill Ulammandakh, Robert Chang, Dan Frank,  Chetan Sharma,  Matthew Wardrop"
+__author_email__ = "erik.ritter@airbnb.com, serena.jiang@airbnb.com, john.bodley@airbnb.com, bill.ulammandakh@airbnb.com, robert.chang@airbnb.com, dan.frank@airbnb.com, chetan.sharma@airbnb.com, mpwardrop@gmail.com"
+__version__ = "0.8.9"
 try:
     with open(os.devnull, 'w') as devnull:
         __version__ += '_' + subprocess.check_output(['git', 'rev-parse', 'HEAD'], shell=False, stderr=devnull).decode('utf-8').replace('\n', '')
@@ -25,22 +25,28 @@ __dependencies__ = [
     'pygments',  # Code highlighting support in markdown
     'gitpython',  # Git abstraction
     'tabulate',  # Rendering information prettily in knowledge_repo script
+    'pyyaml',  # Used to configure knowledge repositories
+    'cooked_input',  # Used for interactive input from user in CLI tooling
+    'requests',  # Used for downloading images
 
     # Flask App Dependencies
     'flask',  # Main flask framework
+    'flask_login',  # User management framework
+    'flask_principal',  # Permissions management framework
     'flask_mail',  # Mail client and utilities
     'Flask-Migrate',  # Database migration utilities
     'sqlalchemy',  # Database abstractions
     'jinja2>=2.7',  # Templating engine
-    'werkzeug',  # Development webserver
+    'werkzeug>=1.0',  # Development webserver
     'gunicorn',  # Deployed webserver
     'inflection',  # String transformation library
+    'pillow',  # Image thumbnailing
 ]
 
 __optional_dependencies__ = {
     # ipynb notebook conversion suport
     'ipynb': [
-        'nbformat',
+        'nbformat<5.0.0',
         'nbconvert[execute]',
         'traitlets'
     ],
@@ -51,8 +57,14 @@ __optional_dependencies__ = {
         'wand',  # imagemagick integration for image uploading
     ],
 
+    # Optional OAuth library for external authentication support
+    'oauth': [
+        'requests_oauthlib'
+    ],
+
     # Testing dependencies
     'dev': [
+        'pycodestyle',  # PEP8 conformance
         'nose',  # Testing framework
         'beautifulsoup4',  # HTML/XML parser
         'coverage'  # Documentation coverage tester

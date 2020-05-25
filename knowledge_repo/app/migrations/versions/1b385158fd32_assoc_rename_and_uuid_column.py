@@ -17,22 +17,30 @@ import sqlalchemy as sa
 def upgrade():
     op.rename_table('knowledge_post_author', 'assoc_post_author')
     op.rename_table('knowledge_post_tags', 'assoc_post_tag')
-    op.add_column('assoc_post_author', sa.Column('order', sa.Integer(), nullable=True))
 
-    op.add_column('posts', sa.Column('uuid', sa.String(length=100), nullable=True))
-    op.create_unique_constraint(None, 'posts', ['uuid'])
+    with op.batch_alter_table('assoc_post_author') as batch_op:
+        batch_op.add_column(sa.Column('order', sa.Integer(), nullable=True))
 
-    op.add_column('pageviews', sa.Column('object_action', sa.String(length=100), nullable=True))
-    op.add_column('pageviews', sa.Column('version', sa.String(length=100), nullable=True))
+    with op.batch_alter_table('posts') as batch_op:
+        batch_op.add_column(sa.Column('uuid', sa.String(length=100), nullable=True))
+        batch_op.create_unique_constraint('uq_uuid', ['uuid'])
+
+    with op.batch_alter_table('pageviews') as batch_op:
+        batch_op.add_column(sa.Column('object_action', sa.String(length=100), nullable=True))
+        batch_op.add_column(sa.Column('version', sa.String(length=100), nullable=True))
 
 
 def downgrade():
-    op.drop_column('assoc_post_author', 'order')
+    with op.batch_alter_table('assoc_post_author') as batch_op:
+        batch_op.drop_column('order')
+
     op.rename_table('assoc_post_author', 'knowledge_post_author')
     op.rename_table('assoc_post_tag', 'knowledge_post_tags')
 
-    op.drop_constraint(None, 'posts', type_='unique')
-    op.drop_column('posts', 'uuid')
+    with op.batch_alter_table('posts') as batch_op:
+        batch_op.drop_constraint('uq_uuid', type_='unique')
+        batch_op.drop_column('uuid')
 
-    op.drop_column('pageviews', 'object_action')
-    op.drop_column('pageviews', 'version')
+    with op.batch_alter_table('pageviews') as batch_op:
+        batch_op.drop_column('pageviews', 'object_action')
+        batch_op.drop_column('pageviews', 'version')
