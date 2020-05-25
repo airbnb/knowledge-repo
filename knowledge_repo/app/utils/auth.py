@@ -75,6 +75,7 @@ def populate_identity_roles(identity, user=None):
         identity.provides.add(roles.post_comment)
         identity.provides.add(roles.post_download)
         identity.provides.add(roles.stats_view)
+        identity.provides.add(roles.tags_view)
 
         # TODO: Populate group permissions, and port existing group admin
         # code to roles.
