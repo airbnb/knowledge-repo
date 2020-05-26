@@ -6,7 +6,6 @@ import textwrap
 from abc import abstractmethod
 from future.utils import with_metaclass
 
-import six
 import knowledge_repo
 from knowledge_repo.utils.registry import SubclassRegisteringABCMeta
 
@@ -29,7 +28,7 @@ class KnowledgeDeployer(with_metaclass(SubclassRegisteringABCMeta, object)):
                  port=7000,
                  workers=4,
                  timeout=60):
-        assert isinstance(knowledge_builder, six.string_types + (types.FunctionType, )), \
+        assert isinstance(knowledge_builder, str + (types.FunctionType, )), \
             u"Unknown builder type {}".format(type(knowledge_builder))
         self.knowledge_builder = knowledge_builder
         self.host = host
@@ -57,7 +56,7 @@ class KnowledgeDeployer(with_metaclass(SubclassRegisteringABCMeta, object)):
         if isinstance(self.knowledge_builder, types.FunctionType):
             out = []
             for nl, cell in zip(self.knowledge_builder.__code__.co_freevars, self.knowledge_builder.__closure__):
-                if isinstance(cell.cell_contents, six.string_types):
+                if isinstance(cell.cell_contents, str):
                     out.append(u'{} = "{}"'.format(nl, cell.cell_contents.replace('"', '\\"')))
                 else:
                     out.append(u'{} = {}'.format(nl, cell.cell_contents))
@@ -67,7 +66,7 @@ class KnowledgeDeployer(with_metaclass(SubclassRegisteringABCMeta, object)):
 
     @property
     def builder_func(self):
-        if isinstance(self.knowledge_builder, six.string_types):
+        if isinstance(self.knowledge_builder, str):
             knowledge_builder = 'def get_app():\n\t' + self.knowledge_builder.replace('\n', '\t') + '\n\treturn app'
             namespace = {}
             exec(knowledge_builder, namespace)
@@ -95,7 +94,7 @@ class KnowledgeDeployer(with_metaclass(SubclassRegisteringABCMeta, object)):
         out.append('import knowledge_repo')
 
         out.append(self.builder_str)
-        if not isinstance(self.knowledge_builder, six.string_types):
+        if not isinstance(self.knowledge_builder, str):
             out.append('app = %s()' % self.knowledge_builder.__name__)
         out.append('app.start_indexing()')
 

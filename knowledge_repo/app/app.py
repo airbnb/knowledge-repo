@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import os
 import imp
 import logging
@@ -8,7 +6,6 @@ import math
 import uuid
 import mimetypes
 
-import six
 from flask import Flask, current_app, render_template, request, session
 from flask_login import LoginManager, user_loaded_from_request
 from flask_mail import Mail
@@ -52,7 +49,7 @@ class KnowledgeFlask(Flask):
 
         # Load configuration from file or provided object
         if config:
-            if isinstance(config, six.string_types):
+            if isinstance(config, str):
                 config = imp.load_source('knowledge_server_config', os.path.abspath(config))
             self.config.from_object(config)
 

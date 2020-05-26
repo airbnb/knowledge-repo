@@ -1,4 +1,3 @@
-from builtins import object
 
 import os
 from functools import wraps

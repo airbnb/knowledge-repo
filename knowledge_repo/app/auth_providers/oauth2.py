@@ -1,9 +1,8 @@
 import posixpath
 import json
 
-import six
 from flask import request, redirect
-from six.moves.urllib.parse import urljoin
+from urllib.parse import urljoin
 
 from ..models import User
 from ..auth_provider import KnowledgeAuthProvider
@@ -158,7 +157,7 @@ class OAuth2Provider(KnowledgeAuthProvider):
                     key = key[0]
                 else:
                     return extract_from_dict(d[key[0]], key[1:])
-            if isinstance(key, six.string_types):
+            if isinstance(key, str):
                 return d[key]
             raise RuntimeError("Invalid key type: {}.".format(key))
 

@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from builtins import object
 
 from flask_principal import identity_changed, Identity
 from flask_login import login_user

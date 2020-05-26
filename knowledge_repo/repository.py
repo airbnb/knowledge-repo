@@ -1,7 +1,3 @@
-from __future__ import absolute_import
-from __future__ import print_function
-
-from builtins import object
 import sys
 import os
 import posixpath
@@ -9,8 +5,6 @@ from abc import abstractmethod, abstractproperty
 import datetime
 from collections import OrderedDict
 from enum import Enum
-
-import six
 
 from . import config_defaults
 from .post import KnowledgePost
@@ -50,7 +44,7 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
     def for_uris(cls, uri):
         # Import this within this method so as not to cause import resolution problems
         from .repositories.meta import MetaKnowledgeRepository
-        if isinstance(uri, six.string_types):
+        if isinstance(uri, str):
             uris = {'': uri}
         else:
             uris = uri
@@ -100,14 +94,14 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         # It assumes that self.uri is either a string or a dictionary mapping
         # of form:
         # {<mountpoint>: <KnowledgeRepositoryInstance>}
-        if isinstance(self.uri, six.string_types):
+        if isinstance(self.uri, str):
             return {'': self.uri}
 
         elif isinstance(self.uri, dict):
             uri_dict = {}
 
             def add_uris(uri_dict, uri, parent=''):
-                if isinstance(uri, six.string_types):
+                if isinstance(uri, str):
                     uri_dict[parent] = uri
                 elif isinstance(uri, dict):
                     for mountpoint, u in uri.items():
@@ -128,14 +122,14 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         # This method provides a mapping from uri to revision for this repository
         # and/or any nested repositories. This is most useful when checking if an
         # update is required server side.
-        if isinstance(self.uri, six.string_types):
+        if isinstance(self.uri, str):
             return {self.uri: self.revision}
 
         elif isinstance(self.uri, dict):
             revision_dict = {}
 
             def add_revisions(revision_dict, uri):
-                if isinstance(uri, six.string_types):
+                if isinstance(uri, str):
                     revision_dict[uri] = KnowledgeRepository.for_uri(uri).revision
                 elif isinstance(uri, dict):
                     for u in uri.values():
@@ -190,13 +184,13 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         return KnowledgePost(path=path, repository=self, revision=revision or self._kp_get_revision(path))
 
     def dir(self, prefix=None, status=None):
-        if prefix is None or isinstance(prefix, six.string_types):
+        if prefix is None or isinstance(prefix, str):
             prefixes = [prefix]
         else:
             prefixes = prefix
-        assert all([prefix is None or isinstance(prefix, six.string_types) for prefix in prefixes]), "All path prefixes must be strings."
+        assert all([prefix is None or isinstance(prefix, str) for prefix in prefixes]), "All path prefixes must be strings."
         prefixes = [prefix if prefix is None else posixpath.relpath(prefix) for prefix in prefixes]
-        if isinstance(status, six.string_types):
+        if isinstance(status, str):
             if status == 'all':
                 status = [self.PostStatus.DRAFT, self.PostStatus.SUBMITTED, self.PostStatus.PUBLISHED, self.PostStatus.UNPUBLISHED]
             else:

@@ -1,6 +1,5 @@
 import logging
 import os
-from builtins import str
 from flask import request, url_for, redirect, render_template, current_app, Blueprint, g, Response, abort
 
 from .. import permissions

@@ -3,7 +3,6 @@ import sys
 import datetime
 import logging
 import traceback
-from builtins import str
 from future.utils import raise_with_traceback
 from flask import current_app, request
 from flask_login import UserMixin

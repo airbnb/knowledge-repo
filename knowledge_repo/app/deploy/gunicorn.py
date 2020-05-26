@@ -5,8 +5,6 @@
     Adapted from example in http://docs.gunicorn.org/en/stable/custom.html.
 """
 
-from __future__ import absolute_import
-
 from gunicorn.app.base import BaseApplication
 
 from .common import KnowledgeDeployer

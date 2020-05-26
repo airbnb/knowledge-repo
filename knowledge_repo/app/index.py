@@ -1,10 +1,7 @@
-from __future__ import absolute_import
-
 import logging
 import multiprocessing
 import os
 import time
-from builtins import str
 
 from .proxies import db_session, current_repo, current_app
 from .models import ErrorLog, Post, IndexMetadata
