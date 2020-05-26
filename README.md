@@ -22,6 +22,12 @@ For more information about the motivation and inspiration behind this project, w
 
 ## Screenshots
 
-![Main Feed](https://user-images.githubusercontent.com/124910/37555895-d6ad133a-2a42-11e8-9bb5-1b7ee8d60ef9.png)
+![feed](https://user-images.githubusercontent.com/8813413/82880798-c0604e80-9ef3-11ea-9c6f-2dd061bda7b0.png)
 
-![Example Post](https://user-images.githubusercontent.com/124910/37555894-d662eb5c-2a42-11e8-9547-78bef7835521.png)
+![post](https://user-images.githubusercontent.com/8813413/82880796-c0604e80-9ef3-11ea-9b3a-6d8a416117c1.png)
+
+![new_post](https://user-images.githubusercontent.com/8813413/82880791-bfc7b800-9ef3-11ea-8ecf-286e754719f8.png)
+
+![post_form](https://user-images.githubusercontent.com/8813413/82880787-be968b00-9ef3-11ea-8a62-4345a3b69393.png)
+
+![stats](https://user-images.githubusercontent.com/8813413/82880783-bd655e00-9ef3-11ea-92c3-84e8faa77a01.png)
