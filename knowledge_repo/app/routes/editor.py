@@ -3,6 +3,8 @@ import logging
 import sys
 import os
 from datetime import datetime
+from urllib.parse import unquote
+
 from flask import request, render_template, Blueprint, current_app, url_for, send_from_directory, g
 from sqlalchemy import or_
 from werkzeug.utils import secure_filename
@@ -16,10 +18,6 @@ from ..utils.image import pdf_page_to_png, is_pdf, is_allowed_image_format
 
 from ..index import update_index
 
-if sys.version_info.major > 2:
-    from urllib.parse import unquote as urlunquote
-else:
-    from urllib import unquote as urlunquote
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -158,7 +156,7 @@ def save_post():
     if 'proxy' in data:
         headers['proxy'] = data['proxy']
 
-    kp.write(urlunquote(data['markdown']), headers=headers)
+    kp.write(unquote(data['markdown']), headers=headers)
     # add to repo
     current_repo.add(kp, update=True, message=headers['title'])  # THIS IS DANGEROUS
 

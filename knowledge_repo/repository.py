@@ -5,17 +5,13 @@ from abc import abstractmethod, abstractproperty
 import datetime
 from collections import OrderedDict
 from enum import Enum
+from urllib.parse import urlparse
 
 from . import config_defaults
 from .post import KnowledgePost
 from .config import KnowledgeRepositoryConfig
 from .postprocessor import KnowledgePostProcessor
 from .utils.registry import SubclassRegisteringABCMeta
-
-if sys.version_info.major > 2:
-    from urllib.parse import urlparse
-else:
-    from urlparse import urlparse
 
 
 class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
