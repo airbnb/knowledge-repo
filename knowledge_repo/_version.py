@@ -18,7 +18,6 @@ __git_uri__ = "https://github.com/airbnb/knowledge-repo.git"
 # should be defined elsewhere.
 __dependencies__ = [
     # Knowledge Repository Dependencies
-    'enum34',  # Python 3.4+ enum object used for Post status
     'pyyaml',  # Yaml parser and utilities
     'markdown',  # Markdown conversion utilities
     'pygments',  # Code highlighting support in markdown
