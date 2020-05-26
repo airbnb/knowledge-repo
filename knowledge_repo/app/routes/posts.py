@@ -197,6 +197,12 @@ def download():
             post.to_string(format=resource_type),
             mimetype="application/zip",
             headers={u"Content-disposition": "attachment; filename={}".format(filename)})
+    elif resource_type == 'pdf':
+        filename = os.path.basename(post.path)[:-3] + '.pdf'
+        return Response(
+            post.to_string(format=resource_type),
+            mimetype="application/pdf",
+            headers={u"Content-disposition": "attachment; filename={}".format(filename)})
     elif resource_type == 'source':
         path = request.args.get('path', None)
         assert path is not None, "Source path not provided."

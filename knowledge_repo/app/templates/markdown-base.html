@@ -19,9 +19,11 @@
 {% endblock %}
 
 {% block panel_right %}
+
 {% if can_download %}
   <span class='section'>Downloads</span>
   <a href="{{url_for('posts.download')}}?type=kp&post={{post_path|urlencode}}" class="btn btn-primary btn-download" style='display: block;'>Portable Knowledge Post</a>
+  <a href="{{url_for('posts.download')}}?type=pdf&post={{post_path|urlencode}}" class="btn btn-primary btn-download" style='display: block;'>PDF</a>
   <a href="{{url_for('posts.download')}}?type=zip&post={{post_path|urlencode}}" class="btn btn-primary btn-download" style='display: block;'>ZIP Archive</a>
   {% if downloads %}
     <span class='subsection'>Source Files</span>

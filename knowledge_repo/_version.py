@@ -41,6 +41,7 @@ __dependencies__ = [
     'gunicorn',  # Deployed webserver
     'inflection',  # String transformation library
     'pillow',  # Image thumbnailing
+    'weasyprint<=0.42.3',  # Post PDF download option. Pinned to maintain compatibility with Python 2
 ]
 
 __optional_dependencies__ = {
