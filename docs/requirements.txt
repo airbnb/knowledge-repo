@@ -1,4 +1,3 @@
-future
 enum34
 pyyaml
 markdown

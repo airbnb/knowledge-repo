@@ -1,6 +1,6 @@
 import datetime
 
-from future.moves.urllib.parse import urlparse, urlencode, urljoin
+from urllib.parse import urlparse, urlencode, urljoin
 
 from flask import request, url_for
 from flask_login import AnonymousUserMixin, login_user

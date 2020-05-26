@@ -2,14 +2,13 @@ from abc import abstractmethod
 
 from flask_principal import identity_changed, Identity
 from flask_login import login_user
-from future.utils import with_metaclass
 from flask import redirect, current_app, Blueprint, url_for, session
 
 from .utils.auth import prepare_user
 from ..utils.registry import SubclassRegisteringABCMeta
 
 
-class KnowledgeAuthProvider(with_metaclass(SubclassRegisteringABCMeta, object)):
+class KnowledgeAuthProvider(object, metaclass=SubclassRegisteringABCMeta):
     _registry_keys = None
 
     @classmethod

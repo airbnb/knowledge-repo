@@ -2,7 +2,6 @@ import os
 import sys
 import logging
 
-from future.utils import raise_with_traceback
 
 __all__ = ['encode', 'decode']
 
@@ -29,7 +28,7 @@ def encode(data, encoding='utf-8'):
             data = data.encode(encoding)
         except Exception as e:
             if os.environ.get('DEBUG'):
-                raise_with_traceback(e)
+                raise e.with_traceback()
             logger.warning("An encoding error has occurred... continuing anyway. To capture these errors, rerun the current command prefixed with `DEBUG=1 `.")
             data = data.encode(encoding, errors='ignore')
     return data
@@ -42,7 +41,7 @@ def decode(data, encoding='utf-8'):
             data = data.decode(encoding)
         except Exception as e:
             if os.environ.get('DEBUG'):
-                raise_with_traceback(e)
+                raise e.with_traceback()
             logger.warning("An decoding error has occurred... continuing anyway. To capture these errors, rerun the current command prefixed with `DEBUG=1 `.")
             data = data.decode(encoding, errors='ignore')
     return data

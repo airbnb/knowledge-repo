@@ -4,7 +4,6 @@ import inspect
 import sys
 import textwrap
 from abc import abstractmethod
-from future.utils import with_metaclass
 
 import knowledge_repo
 from knowledge_repo.utils.registry import SubclassRegisteringABCMeta
@@ -20,7 +19,7 @@ def get_app_builder(uris, debug, db_uri, config, **kwargs):
     return get_app
 
 
-class KnowledgeDeployer(with_metaclass(SubclassRegisteringABCMeta, object)):
+class KnowledgeDeployer(object, metaclass=SubclassRegisteringABCMeta):
 
     def __init__(self,
                  knowledge_builder,

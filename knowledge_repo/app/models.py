@@ -3,7 +3,6 @@ import sys
 import datetime
 import logging
 import traceback
-from future.utils import raise_with_traceback
 from flask import current_app, request
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
@@ -137,7 +136,7 @@ class ErrorLog(db.Model):
                 db_session.rollback()
                 db_session.add(ErrorLog.from_exception(e))
                 db_session.commit()
-                raise_with_traceback(e)
+                raise e.with_traceback()
         return wrapped
 
 

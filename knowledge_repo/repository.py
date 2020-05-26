@@ -11,7 +11,6 @@ from .post import KnowledgePost
 from .config import KnowledgeRepositoryConfig
 from .postprocessor import KnowledgePostProcessor
 from .utils.registry import SubclassRegisteringABCMeta
-from future.utils import with_metaclass
 
 if sys.version_info.major > 2:
     from urllib.parse import urlparse
@@ -19,7 +18,7 @@ else:
     from urlparse import urlparse
 
 
-class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
+class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
     _registry_keys = None
 
     class PostStatus(Enum):
