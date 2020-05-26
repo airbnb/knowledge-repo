@@ -30,4 +30,4 @@ For more information about the motivation and inspiration behind this project, w
 
 ![post_form](https://user-images.githubusercontent.com/8813413/82880787-be968b00-9ef3-11ea-8a62-4345a3b69393.png)
 
-![stats](https://user-images.githubusercontent.com/8813413/82880783-bd655e00-9ef3-11ea-92c3-84e8faa77a01.png)
+![stats](https://user-images.githubusercontent.com/8813413/82883790-c821f200-9ef7-11ea-9f9c-b1964a62f580.png)
