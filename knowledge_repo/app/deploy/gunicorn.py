@@ -28,7 +28,7 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
 
         # Update the configuration with the options specified via KnowledgeDeployer
         options = {
-            'bind': u'{}:{}'.format(self.host, self.port),
+            'bind': '{}:{}'.format(self.host, self.port),
             'workers': self.workers,
             'timeout': self.timeout,
         }

@@ -10,18 +10,12 @@ logger = logging.getLogger(__name__)
 
 def encode(data, encoding='utf-8'):
     assert encoding == 'utf-8', "Only UTF-8 encoding is currently supported."
-    # Check if data is alreqdy encoded (for the purposes of unicode only
+    # Check if data is already encoded (for the purposes of unicode only
     # If not, convert to a string if necessary, and then encode as utf-8 bytes
-    if sys.version_info.major == 2:
-        if not isinstance(data, basestring):
-            data = unicode(data)
-        elif not isinstance(data, unicode):
-            return data  # UTF-8 data is already encoded
-    else:
-        if isinstance(data, bytes):
-            return data  # UTF-8 data is already encoded
-        elif not isinstance(data, str):
-            data = str(data)
+    if isinstance(data, bytes):
+        return data  # UTF-8 data is already encoded
+    elif not isinstance(data, str):
+        data = str(data)
     # Encode UTF-8 data
     if encoding is not None:
         try:

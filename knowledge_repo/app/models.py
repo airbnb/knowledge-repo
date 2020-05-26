@@ -122,9 +122,9 @@ class ErrorLog(db.Model):
         filename = os.path.relpath(filename, os.path.join(os.path.dirname(__file__), '..'))
         return ErrorLog(
             function=function,
-            location=u'{}:{}'.format(filename, linenumber),
-            message=u'{}: {}'.format(e.__class__.__name__, u"; ".join(str(a) for a in e.args)),
-            traceback=u"\n".join(traceback.format_tb(tb))
+            location='{}:{}'.format(filename, linenumber),
+            message='{}: {}'.format(e.__class__.__name__, "; ".join(str(a) for a in e.args)),
+            traceback="\n".join(traceback.format_tb(tb))
         )
 
     @classmethod
@@ -338,7 +338,7 @@ class Tag(db.Model):
     def description(self):
         if self._description:
             return self._description
-        return u"All posts with tag '{}'.".format(self.name)
+        return "All posts with tag '{}'.".format(self.name)
 
     @description.expression
     def description(self):
@@ -405,7 +405,7 @@ class Post(db.Model):
 
     @hybrid_property
     def authors_string(self):
-        return u', '.join([author.format_name for author in self.authors])
+        return ', '.join([author.format_name for author in self.authors])
 
     @authors_string.expression
     def authors_string(self):

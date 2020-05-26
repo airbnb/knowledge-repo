@@ -72,7 +72,7 @@ class KnowledgeFlask(Flask):
         # Configure database
         if db_uri:
             self.config['SQLALCHEMY_DATABASE_URI'] = db_uri
-        logger.debug(u"Using database: {}".format(self.config['SQLALCHEMY_DATABASE_URI']))
+        logger.debug("Using database: {}".format(self.config['SQLALCHEMY_DATABASE_URI']))
 
         # Register database schema with flask app
         sqlalchemy_db.init_app(self)
@@ -232,7 +232,7 @@ class KnowledgeFlask(Flask):
             for key, value in new_values.items():
                 args[key] = value
 
-            return u'{}?{}'.format(request.path, url_encode(args))
+            return '{}?{}'.format(request.path, url_encode(args))
 
         @self.template_global()
         def pagination_pages(current_page, page_count, max_pages=5, extremes=True):

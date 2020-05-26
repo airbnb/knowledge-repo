@@ -9,7 +9,6 @@ import git
 import yaml
 
 from ..repository import KnowledgeRepository
-from ..utils.types import str_types
 from ..utils.encoding import encode
 
 logger = logging.getLogger(__name__)
@@ -196,7 +195,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
                 break
         if not ref.endswith('.kp'):
             return None
-        return u'/'.join(refs[:i + 1])
+        return '/'.join(refs[:i + 1])
 
     def git_local_posts(self, branches=None, as_dict=False):
         if branches is None:
@@ -255,7 +254,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         if branch is None:
             return self.git.active_branch
 
-        if not isinstance(branch, str_types):
+        if not isinstance(branch, str):
             raise ValueError("'{}' of type `{}` is not a valid branch descriptor.".format(branch, type(branch)))
 
         try:
