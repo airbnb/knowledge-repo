@@ -46,7 +46,7 @@ HEADERS_ALL = {
 # Headers to prompt for if missing when in interactive mode
 HEADERS_INTERACTIVE = ['title', 'subtitle', 'authors', 'tldr', 'created_at', 'tags']
 
-HEADER_PATTERN = r'^---(\n|\r)[\\s\\S]+?---(\n|\r)'
+HEADER_PATTERN = '^---(\n|\r)[\\s\\S]+?---(\n|\r)'
 
 HEADER_SAMPLE = """
 ---
