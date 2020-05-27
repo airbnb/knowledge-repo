@@ -34,8 +34,8 @@ before_install:
   - source activate testenv
   # Pin R to 3.6.3 for now
   - conda install -c conda-forge r-base=3.6.3 r-knitr
-  # Install regex through conda to ensure Mac wheels available
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+  # Install regex through conda to avoid issues with Linux 2.7 and Mac wheels
+  - if [[ "$TRAVIS_OS_NAME" == "osx" || "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
       conda install -c conda-forge regex;
     fi
 install:
