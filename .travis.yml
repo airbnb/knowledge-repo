@@ -15,6 +15,9 @@ jobs:
       python: 3.8
       osx_image: xcode11.4
 
+# Cache isn't working yet because problems with expiration header. Disable for now because it's breaking builds.
+# cache: pip
+
 before_install:
   # We do this conditionally because it saves us some downloading if the
   # version is the same.
@@ -38,9 +41,6 @@ before_install:
 install:
   - pip install pycodestyle
   - pip install .[all]
-
-# Cache isn't working yet because problems with expiration header. Disable for now because it's breaking builds.
-# cache: pip
 
 script:
   - bash run_tests.sh
