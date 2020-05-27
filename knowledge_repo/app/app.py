@@ -1,5 +1,6 @@
 import os
-import imp
+import importlib
+import sys
 import logging
 import traceback
 import math
@@ -50,7 +51,11 @@ class KnowledgeFlask(Flask):
         # Load configuration from file or provided object
         if config:
             if isinstance(config, str):
-                config = imp.load_source('knowledge_server_config', os.path.abspath(config))
+                module_name = 'knowledge_server_config'
+                spec = importlib.util.spec_from_file_location(module_name, os.path.abspath(config))
+                config = importlib.util.module_from_spec(spec)
+                sys.modules[module_name] = config
+                spec.loader.exec_module(config)
             self.config.from_object(config)
 
         # Add configuration passed in as keyword arguments

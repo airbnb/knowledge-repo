@@ -1,5 +1,6 @@
 import functools
-import imp
+import importlib
+import sys
 import logging
 import os
 import time
@@ -86,7 +87,11 @@ class KnowledgeRepositoryConfig(dict):
 
     def __set_from_file(self, d, filename, force=False):
         if filename.endswith('.py'):
-            config = imp.load_source('knowledge_repo.config_{}'.format(str(time.time()).replace('.', '')), filename)
+            module_name = 'knowledge_repo.config_{}'.format(str(time.time()).replace('.', ''))
+            spec = importlib.util.spec_from_file_location(module_name, filename)
+            config = importlib.util.module_from_spec(spec)
+            sys.modules[module_name] = module
+            spec.loader.exec_module(module)
             self.__set_from_module(d, config, force)
         elif filename.endswith('.yml'):
             with open(filename) as f:
