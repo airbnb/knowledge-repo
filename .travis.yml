@@ -34,7 +34,7 @@ before_install:
   # Replace dep1 dep2 ... with your dependencies
   - conda create -n testenv python=$TRAVIS_PYTHON_VERSION
   - source activate testenv
-  - conda install -c r r r-knitr
+  - conda install -c r r-base r-knitr
 install:
   - pip install pycodestyle
   - pip install .[all]
