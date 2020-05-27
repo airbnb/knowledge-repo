@@ -37,7 +37,8 @@ before_install:
   # Replace dep1 dep2 ... with your dependencies
   - conda create -n testenv python=$TRAVIS_PYTHON_VERSION
   - source activate testenv
-  - conda install -c conda-forge regex r-base r-knitr
+  # Install regex through conda to ensure Mac wheels available
+  - conda install -c conda-forge regex r-base=3.6.3 r-knitr
 install:
   - pip install pycodestyle
   - pip install .[all]
