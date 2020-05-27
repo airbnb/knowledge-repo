@@ -1,8 +1,8 @@
 import posixpath
 import json
+from urllib.parse import urljoin
 
 from flask import request, redirect
-from urllib.parse import urljoin
 
 from ..models import User
 from ..auth_provider import KnowledgeAuthProvider
