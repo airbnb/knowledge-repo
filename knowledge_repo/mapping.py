@@ -1,4 +1,3 @@
-from builtins import object
 import re
 
 
@@ -29,7 +28,7 @@ class SubstitutionMapper(object):
             else:
                 output.append(replacement)
         output.append(text[last_offset:])
-        return u''.join(output)
+        return ''.join(output)
 
     def find_matches(self, text, reverse=False):
         matches = []

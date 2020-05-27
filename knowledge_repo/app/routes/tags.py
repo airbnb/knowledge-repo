@@ -15,7 +15,6 @@ from flask import current_app, request, render_template, Blueprint, g
 from sqlalchemy import and_
 import logging
 import math
-from builtins import str
 
 from .. import permissions
 from ..proxies import db_session

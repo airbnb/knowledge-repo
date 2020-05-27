@@ -5,7 +5,6 @@ Functions include:
     - get_all_post_stats
 """
 import math
-from builtins import str
 from flask import current_app
 from sqlalchemy import func, distinct, or_
 

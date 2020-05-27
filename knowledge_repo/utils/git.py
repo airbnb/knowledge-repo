@@ -5,7 +5,7 @@ import tempfile
 
 import git
 
-from knowledge_repo._version import __git_uri__
+from .._version import __git_uri__
 
 
 def clone_kr_to_directory(dir):

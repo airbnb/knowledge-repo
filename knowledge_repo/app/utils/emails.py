@@ -89,7 +89,7 @@ def send_subscription_email(post, tag):
         return
 
     default_recipients = ['knowledge_consumer@notreal.com']
-    subject = u"New knowledge post: {}".format(post.title)
+    subject = "New knowledge post: {}".format(post.title)
     post_authors = [p.format_name for p in post.authors]
     post_tags = [t.name for t in post.tags]
     msg = Message(subject=subject, recipients=default_recipients, bcc=recipients_bcc)

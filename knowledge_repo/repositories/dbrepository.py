@@ -1,4 +1,3 @@
-from builtins import object
 
 import logging
 import posixpath
@@ -6,8 +5,8 @@ import posixpath
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session, mapper
 from sqlalchemy.sql import func
-
 from sqlalchemy import Table, Column, Integer, String, DateTime, LargeBinary, MetaData
+
 from ..repository import KnowledgeRepository
 
 logger = logging.getLogger(__name__)
@@ -32,7 +31,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
 
         # TODO handle if user does not pass in table sqlite://path.db
         uri_splt = self.uri.split(":")
-        engine_uri = u":".join(uri_splt[:-1])
+        engine_uri = ":".join(uri_splt[:-1])
         table_name = uri_splt[-1]
 
         metadata = MetaData()

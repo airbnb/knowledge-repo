@@ -5,8 +5,6 @@
     Adapted from example in http://docs.gunicorn.org/en/stable/custom.html.
 """
 
-from __future__ import absolute_import
-
 from gunicorn.app.base import BaseApplication
 
 from .common import KnowledgeDeployer
@@ -30,7 +28,7 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
 
         # Update the configuration with the options specified via KnowledgeDeployer
         options = {
-            'bind': u'{}:{}'.format(self.host, self.port),
+            'bind': '{}:{}'.format(self.host, self.port),
             'workers': self.workers,
             'timeout': self.timeout,
         }

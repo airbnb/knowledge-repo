@@ -1,6 +1,3 @@
-from __future__ import print_function
-from builtins import input
-
 import os
 import shutil
 import logging
@@ -9,11 +6,9 @@ import socket
 from io import open
 
 import git
-import six
 import yaml
 
 from ..repository import KnowledgeRepository
-from ..utils.types import str_types
 from ..utils.encoding import encode
 
 logger = logging.getLogger(__name__)
@@ -81,7 +76,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         if config.startswith('git:///'):
             assert config.endswith('.yml'), "In-repository configuration must be a YAML file."
             try:
-                self.config.update(yaml.load(self.git_read(config.replace('git:///', ''))))
+                self.config.update(yaml.safe_load(self.git_read(config.replace('git:///', ''))))
             except KeyError:
                 logger.warning("Repository missing configuration file: {}".format(config))
         else:
@@ -93,7 +88,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
     @path.setter
     def path(self, path):
-        assert isinstance(path, six.string_types), "The path specified must be a string."
+        assert isinstance(path, str), "The path specified must be a string."
         path = os.path.abspath(os.path.expanduser(path))
         if not os.path.exists(path):
             path = os.path.abspath(path)
@@ -200,7 +195,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
                 break
         if not ref.endswith('.kp'):
             return None
-        return u'/'.join(refs[:i + 1])
+        return '/'.join(refs[:i + 1])
 
     def git_local_posts(self, branches=None, as_dict=False):
         if branches is None:
@@ -259,7 +254,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         if branch is None:
             return self.git.active_branch
 
-        if not isinstance(branch, str_types):
+        if not isinstance(branch, str):
             raise ValueError("'{}' of type `{}` is not a valid branch descriptor.".format(branch, type(branch)))
 
         try:

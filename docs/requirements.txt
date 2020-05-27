@@ -1,5 +1,3 @@
-future
-enum34
 pyyaml
 markdown
 pygments
@@ -18,4 +16,4 @@ werkzeug>=1.0
 gunicorn
 inflection
 pillow
-weasyprint<=0.42.3
+weasyprint
