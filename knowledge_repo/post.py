@@ -46,6 +46,7 @@ HEADERS_ALL = {
 # Headers to prompt for if missing when in interactive mode
 HEADERS_INTERACTIVE = ['title', 'subtitle', 'authors', 'tldr', 'created_at', 'tags']
 
+HEADER_PATTERN = r'^---(\n|\r)[\\s\\S]+?---(\n|\r)'
 
 HEADER_SAMPLE = """
 ---
@@ -243,11 +244,11 @@ class KnowledgePost(object):
             md = ''
         else:
             md = decode(self._read_ref('knowledge.md'))
-            mtch = re.match('^---(\n|\r)[\\s\\S]+?---(\n|\r)', md)
+            mtch = re.match(HEADER_PATTERN, md)
             if not mtch:
                 raise ValueError("YAML header is missing. Please ensure that the top of your post has a header of the following form:\n" + HEADER_SAMPLE)
             if not headers:
-                md = re.sub('^---(\n|\r)[\\s\\S]+?---(\n|\r)', '', md, count=1)
+                md = re.sub(HEADER_PATTERN, '', md, count=1)
             if not body:
                 md = mtch.group(0)
         if images:
@@ -287,13 +288,13 @@ class KnowledgePost(object):
         md = md.strip()
 
         if not headers:
-            mtch = re.match('^---\n[\\s\\S]+?---\n', md)
+            mtch = re.match(HEADER_PATTERN, md)
             if not mtch:
                 raise ValueError("YAML header is missing. Please ensure that the top of your post has a header of the following form:\n" + HEADER_SAMPLE)
             md_head = mtch.group(0)
             headers = self._get_headers_from_yaml(md_head)
 
-        md = re.sub(r'^---(\n|\r)[\s\S]+?---(\n|\r)', '', md, count=1)
+        md = re.sub(HEADER_PATTERN, '', md, count=1)
 
         headers = self._verify_headers(headers, interactive=interactive)
 
