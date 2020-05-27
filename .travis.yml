@@ -15,12 +15,9 @@ jobs:
       python: 3.6
       osx_image: xcode11.4
 
-# Cache isn't working yet because problems with expiration header. Disable for now because it's breaking builds.
 cache: pip
 
 before_install:
-  # We do this conditionally because it saves us some downloading if the
-  # version is the same.
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
     else
@@ -35,8 +32,12 @@ before_install:
   # Replace dep1 dep2 ... with your dependencies
   - conda create -n testenv python=$TRAVIS_PYTHON_VERSION
   - source activate testenv
+  # Pin R to 3.6.3 for now
+  - conda install -c conda-forge r-base=3.6.3 r-knitr
   # Install regex through conda to ensure Mac wheels available
-  - conda install -c conda-forge regex r-base=3.6.3 r-knitr
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      conda install -c conda-forge regex;
+    fi
 install:
   - pip install pycodestyle
   - pip install .[all]
@@ -54,4 +55,4 @@ deploy:
     tags: true
     distributions: sdist bdist_wheel
     repo: airbnb/knowledge-repo
-    condition: $TRAVIS_PYTHON_VERSION = "3.5"
+    condition: $TRAVIS_PYTHON_VERSION = "3.6"
