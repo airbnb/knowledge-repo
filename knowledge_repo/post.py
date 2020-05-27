@@ -327,7 +327,7 @@ class KnowledgePost(object):
         try:
             if not yaml_str.strip().startswith('---'):
                 raise StopIteration()
-            return next(yaml.load_all(yaml_str))
+            return next(yaml.safe_load_all(yaml_str))
         except yaml.YAMLError as e:
             logger.info(
                 "YAML header is incorrectly formatted or missing. The following "

@@ -76,7 +76,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         if config.startswith('git:///'):
             assert config.endswith('.yml'), "In-repository configuration must be a YAML file."
             try:
-                self.config.update(yaml.load(self.git_read(config.replace('git:///', ''))))
+                self.config.update(yaml.safe_load(self.git_read(config.replace('git:///', ''))))
             except KeyError:
                 logger.warning("Repository missing configuration file: {}".format(config))
         else:
