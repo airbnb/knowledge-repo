@@ -1,10 +1,11 @@
 import zipfile
 import io
+import os
 
 from ..converter import KnowledgePostConverter
 
 
-class IpynbFormat(KnowledgePostConverter):
+class PkpConverter(KnowledgePostConverter):
     _registry_keys = ['kp', 'zip']
 
     def to_file(self, filename):
@@ -27,6 +28,8 @@ class IpynbFormat(KnowledgePostConverter):
         return data.read()
 
     def from_file(self, filename):
+        # Note: header checks are not applied here, since it should not be
+        # possible to create portable knowledge post with incorrect headers.
         zf = zipfile.ZipFile(filename, 'r')
 
         for ref in zf.namelist():

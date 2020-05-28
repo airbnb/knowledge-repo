@@ -5,11 +5,7 @@ import string
 import logging
 import time
 import tempfile
-
-try:
-    from urllib.parse import urljoin
-except ImportError:  # Python 2
-    from urlparse import urljoin
+from urllib.parse import urljoin
 
 from .extract_images import ExtractImages
 

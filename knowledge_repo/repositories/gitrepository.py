@@ -1,6 +1,3 @@
-from __future__ import print_function
-from builtins import input
-
 import os
 import shutil
 import logging
@@ -11,17 +8,14 @@ from io import open
 import git
 import yaml
 
-from knowledge_repo._version import __git_uri__
 from ..repository import KnowledgeRepository
-from ..utils.exec_code import get_module_for_source
-from ..utils.types import str_types
 from ..utils.encoding import encode
 
 logger = logging.getLogger(__name__)
 
 
 class GitKnowledgeRepository(KnowledgeRepository):
-    _registry_keys = ['', 'git']
+    _registry_keys = ['git']
 
     TEMPLATES = {
         'README.md': os.path.abspath(os.path.join(os.path.dirname(__file__), '../templates', 'repository_readme.md')),
@@ -82,7 +76,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         if config.startswith('git:///'):
             assert config.endswith('.yml'), "In-repository configuration must be a YAML file."
             try:
-                self.config.update(yaml.load(self.git_read(config.replace('git:///', ''))))
+                self.config.update(yaml.safe_load(self.git_read(config.replace('git:///', ''))))
             except KeyError:
                 logger.warning("Repository missing configuration file: {}".format(config))
         else:
@@ -147,7 +141,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         logger.info("Fetching updates to the knowledge repository...")
         self.git_remote.fetch()
         current_branch = self.git.active_branch
-        self.git.branches.master.checkout()
+        self.git.branches[branch].checkout()
         self.git_remote.pull(branch)
         current_branch.checkout()
 
@@ -201,7 +195,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
                 break
         if not ref.endswith('.kp'):
             return None
-        return u'/'.join(refs[:i + 1])
+        return '/'.join(refs[:i + 1])
 
     def git_local_posts(self, branches=None, as_dict=False):
         if branches is None:
@@ -260,7 +254,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         if branch is None:
             return self.git.active_branch
 
-        if not isinstance(branch, str_types):
+        if not isinstance(branch, str):
             raise ValueError("'{}' of type `{}` is not a valid branch descriptor.".format(branch, type(branch)))
 
         try:

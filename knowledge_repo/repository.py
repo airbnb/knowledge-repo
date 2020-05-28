@@ -1,7 +1,3 @@
-from __future__ import absolute_import
-from __future__ import print_function
-
-from builtins import object
 import sys
 import os
 import posixpath
@@ -9,22 +5,16 @@ from abc import abstractmethod, abstractproperty
 import datetime
 from collections import OrderedDict
 from enum import Enum
-import uuid
+from urllib.parse import urlparse
 
 from . import config_defaults
 from .post import KnowledgePost
 from .config import KnowledgeRepositoryConfig
 from .postprocessor import KnowledgePostProcessor
 from .utils.registry import SubclassRegisteringABCMeta
-from future.utils import with_metaclass
-
-if sys.version_info.major > 2:
-    from urllib.parse import urlparse
-else:
-    from urlparse import urlparse
 
 
-class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
+class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
     _registry_keys = None
 
     class PostStatus(Enum):
@@ -43,7 +33,7 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
         if isinstance(uri, dict):
             return cls.for_uris(uri)
         scheme = urlparse(uri).scheme
-        return cls._get_subclass_for(scheme)(uri, *args, **kwargs)
+        return cls._get_subclass_for(scheme).from_uri(uri, *args, **kwargs)
 
     @classmethod
     def for_uris(cls, uri):
@@ -56,6 +46,10 @@ class KnowledgeRepository(with_metaclass(SubclassRegisteringABCMeta, object)):
 
         krs = {name: cls.for_uri(uri) for name, uri in list(uris.items())}
         return MetaKnowledgeRepository(krs)
+
+    @classmethod
+    def from_uri(cls, url, *args, **kwargs):
+        return cls(url, *args, **kwargs)
 
     @classmethod
     def create_for_uri(cls, uri, **kwargs):

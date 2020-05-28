@@ -15,7 +15,6 @@ from flask import current_app, request, render_template, Blueprint, g
 from sqlalchemy import and_
 import logging
 import math
-from builtins import str
 
 from .. import permissions
 from ..proxies import db_session
@@ -116,7 +115,7 @@ def delete_tags_from_posts():
 
 @blueprint.route('/tag_pages')
 @PageView.logged
-@permissions.post_comment.require()
+@permissions.tags_view.require()
 def render_tag_pages():
     feed_params = from_request_get_feed_params(request)
     start = feed_params['start']
@@ -136,7 +135,7 @@ def render_tag_pages():
     tag_description = tag_obj.description
 
     # Get subscription status
-    subscribed = tag in feed_params["subscriptions"]
+    subscribed = tag in feed_params.get("subscriptions", [])
 
     # get all files with given tag
     tag_posts = tag_obj.posts

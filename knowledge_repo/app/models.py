@@ -3,17 +3,16 @@ import sys
 import datetime
 import logging
 import traceback
-from builtins import str
-from future.utils import raise_with_traceback
 from flask import current_app, request
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from collections import defaultdict
 
-from sqlalchemy import func, distinct, and_, select, UniqueConstraint
+from sqlalchemy import func, distinct, and_, select, Index, UniqueConstraint
 
 from knowledge_repo._version import __version__
 from knowledge_repo.repository import KnowledgeRepository
+from knowledge_repo.utils.types import MediumText
 from .proxies import current_user, current_repo, db_session
 from .utils.models import unique_constructor
 from .utils.search import get_keywords
@@ -28,9 +27,6 @@ db = SQLAlchemy()
 
 class IndexMetadata(db.Model):
     __tablename__ = 'index_metadata'
-    __table_args__ = (
-        UniqueConstraint('type', 'name', name='_uc_type_name'),
-    )
 
     id = db.Column(db.Integer, nullable=False, primary_key=True)
     type = db.Column(db.String(255), nullable=False)
@@ -126,9 +122,9 @@ class ErrorLog(db.Model):
         filename = os.path.relpath(filename, os.path.join(os.path.dirname(__file__), '..'))
         return ErrorLog(
             function=function,
-            location=u'{}:{}'.format(filename, linenumber),
-            message=u'{}: {}'.format(e.__class__.__name__, u"; ".join(str(a) for a in e.args)),
-            traceback=u"\n".join(traceback.format_tb(tb))
+            location='{}:{}'.format(filename, linenumber),
+            message='{}: {}'.format(e.__class__.__name__, "; ".join(str(a) for a in e.args)),
+            traceback="\n".join(traceback.format_tb(tb))
         )
 
     @classmethod
@@ -140,7 +136,7 @@ class ErrorLog(db.Model):
                 db_session.rollback()
                 db_session.add(ErrorLog.from_exception(e))
                 db_session.commit()
-                raise_with_traceback(e)
+                raise e.with_traceback()
         return wrapped
 
 
@@ -158,6 +154,8 @@ class PageView(db.Model):
     ip_address = db.Column(db.String(64))
     created_at = db.Column(db.DateTime, default=func.now())
     version = db.Column(db.String(100), default=__version__)
+
+    __table_args__ = (Index("object_id_type_action_index", object_id, object_type, object_action),)
 
     class logged(object):
 
@@ -340,7 +338,7 @@ class Tag(db.Model):
     def description(self):
         if self._description:
             return self._description
-        return u"All posts with tag '{}'.".format(self.name)
+        return "All posts with tag '{}'.".format(self.name)
 
     @description.expression
     def description(self):
@@ -362,12 +360,13 @@ class Post(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(db.String(100), unique=True)
-    path = db.Column(db.String(512), unique=True)
+    path = db.Column(db.String(512))
     project = db.Column(db.String(512), nullable=True)  # DEPRECATED
     repository = db.Column(db.String(512))
     revision = db.Column(db.Integer())
 
     title = db.Column(db.Text())
+    subtitle = db.Column(db.Text())
     tldr = db.Column(db.Text)
     keywords = db.Column(db.Text)
     thumbnail = db.Column(db.Text())
@@ -406,7 +405,7 @@ class Post(db.Model):
 
     @hybrid_property
     def authors_string(self):
-        return u', '.join([author.format_name for author in self.authors])
+        return ', '.join([author.format_name for author in self.authors])
 
     @authors_string.expression
     def authors_string(self):
@@ -600,6 +599,7 @@ class Post(db.Model):
         self.repository = kp.repository_uri
         self.revision = kp.revision
         self.title = headers['title']
+        self.subtitle = headers.get('subtitle')
         self.tldr = headers['tldr']
         self.authors = headers.get('authors', [])
         self.tags = headers.get('tags', [])
@@ -632,7 +632,7 @@ class Email(db.Model):
     object_type = db.Column(db.String(100))
     sent_at = db.Column(db.DateTime, default=func.now())
     subject = db.Column(db.Text)
-    text = db.Column(db.Text)
+    text = db.Column(MediumText())
 
 
 @unique_constructor(

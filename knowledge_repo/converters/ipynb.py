@@ -68,7 +68,7 @@ class IpynbFormat(KnowledgePostConverter):
                                        dl], template_file='full.tpl')
         (body, resources) = md_exporter.from_notebook_node(nb)
 
-        self.kp.write(body, images={name.split(
+        self.kp_write(body, images={name.split(
             'images/')[1]: data for name, data in resources.get('outputs', {}).items()})
 
         # Add cleaned ipynb file

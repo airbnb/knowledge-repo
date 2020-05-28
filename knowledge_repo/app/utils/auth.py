@@ -1,6 +1,6 @@
 import datetime
 
-from future.moves.urllib.parse import urlparse, urlencode, urljoin
+from urllib.parse import urlparse, urlencode, urljoin
 
 from flask import request, url_for
 from flask_login import AnonymousUserMixin, login_user
@@ -62,6 +62,8 @@ def populate_identity_roles(identity, user=None):
             identity.provides.add(roles.post_view)
         if current_app.config['POLICY_ANONYMOUS_VIEW_STATS']:
             identity.provides.add(roles.stats_view)
+        if current_app.config['POLICY_ANONYMOUS_VIEW_TAGS']:
+            identity.provides.add(roles.tags_view)
         if current_app.config['POLICY_ANONYMOUS_DOWNLOADS']:
             identity.provides.add(roles.post_download)
 
@@ -73,6 +75,7 @@ def populate_identity_roles(identity, user=None):
         identity.provides.add(roles.post_comment)
         identity.provides.add(roles.post_download)
         identity.provides.add(roles.stats_view)
+        identity.provides.add(roles.tags_view)
 
         # TODO: Populate group permissions, and port existing group admin
         # code to roles.

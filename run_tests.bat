@@ -24,7 +24,7 @@ IF EXIST "%test_repo_path%" (
   RMDIR /Q /S %test_repo_path%
 )
 
-%PYTHON%\\python.exe scripts/knowledge_repo --repo="${test_repo_path}" init
+%PYTHON%\\python.exe scripts/knowledge_repo --repo="git://${test_repo_path}" init
 COPY tests\config_repo.yml %test_repo_path%\.knowledge_repo_config.yml
 
 PUSHD %test_repo_path%
@@ -35,9 +35,9 @@ PUSHD %test_repo_path%
 POPD
 
 # Add some knowledge_posts
-%PYTHON%\\python.exe scripts/knowledge_repo --repo="%test_repo_path%" --dev add knowledge_repo/templates/knowledge_template.ipynb -p projects/test/ipynb_test -m "Test commit" --branch master
-%PYTHON%\\python.exe scripts/knowledge_repo --repo="%test_repo_path%" --dev add knowledge_repo/templates/knowledge_template.Rmd -p projects/test/Rmd_test -m "Test commit" --branch master
-%PYTHON%\\python.exe scripts/knowledge_repo --repo="%test_repo_path%" --dev add knowledge_repo/templates/knowledge_template.md -p projects/test/md_test -m "Test commit" --branch master
+%PYTHON%\\python.exe scripts/knowledge_repo --repo="git://%test_repo_path%" --dev add knowledge_repo/templates/knowledge_template.ipynb -p projects/test/ipynb_test -m "Test commit" --branch master
+%PYTHON%\\python.exe scripts/knowledge_repo --repo="git://%test_repo_path%" --dev add knowledge_repo/templates/knowledge_template.Rmd -p projects/test/Rmd_test -m "Test commit" --branch master
+%PYTHON%\\python.exe scripts/knowledge_repo --repo="git://%test_repo_path%" --dev add knowledge_repo/templates/knowledge_template.md -p projects/test/md_test -m "Test commit" --branch master
 
 REM "Running regression test suite"
 %PYTHON%\\python.exe -m nose --with-coverage --cover-package=knowledge_repo --verbosity=1

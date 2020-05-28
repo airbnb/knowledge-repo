@@ -37,9 +37,17 @@ The following command will create a new repository at `<repo_path>`:
 
   $ knowledge_repo --repo <repo_path> init
 
-The result is a git repository at `<repo_path>` with a `.knowledge_repo_config`
-copied from the defaults found `in the repository source code <repo_config_>`__.
-If a git repository was already found at `<repo_path>` it will upgrade it to be
+The result is a knowledge repository at `<repo_path>` with a `.knowledge_repo_config`
+copied from the defaults found `in the repository source code <repo_config_>`__. By
+default, `init` treats the specified directory as a folder and not as a git repository. 
+In case you wish to create a git repository when initializing the knowledge repo, make
+sure to prefix :code:`git:///`:
+
+.. code-block:: shell
+
+  $ knowledge_repo --repo git:///<repo_path> init
+
+Otherwise, if a git repository was already found at `<repo_path>` it will upgrade it to be
 a knowledge data repository. This is useful if you are starting a repository on
 a remote service like GitHub, as this allows you to clone the remote repository
 as per normal; run this script; and then push the initialization back into the
@@ -55,6 +63,32 @@ whichever service you plan to use) and then running:
 
 Users can then clone this repository, and point their local `knowledge_repo`
 script at it using :code:`--repo <path_of_cloned_repository>`.
+
+When serving the posts from this repository using the Knowledge Repo web application,
+it will attempt to periodically fetch upstream changes to the repository. This can
+be disabled in the server configuration by setting :code:`INDEXING_UPDATES_REPOSITORIES=False`,
+in which case you will have to create your own external process for updating the repository
+in order for the Knowledge Repo to see new posts.
+
+If the git repository is served on a remote host that requires authentication, the
+integrated fetching routines will fail unless you have properly set up your environment
+with the appropriate authentication.
+
+It's possible to use SSH to authenticate. Taking GitHub as an example, to set this up:
+
+ - Create a new SSH key and add it to your repository as a *read-only* deployment key per `GitHub documentation <https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys>`_
+ - Where the server is deployed, clone the git repo with a :code:`git:` URI (not :code:`https:`): :code:`git@github.com:<org>/<repo>.git`
+ - Add the deployment private key to the server (for example, in :code:`~/.ssh/`)
+ - Tell SSH to use the key for :code:`github.com` by adding this to :code:`~/.ssh/config`:
+
+   .. code-block:: shell
+
+      Host github.com
+        HostName github.com
+        IdentityFile ~/.ssh/<your private deployment key file>
+
+Note that anyone with access to this machine can easily extract this key and gain
+read-only access to the repository.
 
 Database Knowledge Repositories
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -118,9 +152,10 @@ by running:
 
 which starts a web application instance on `http://127.0.0.1:7000` with the
 default (insecure) options. The command line also supports some high-level
-options, such as `--port` and `--dburi` which respectively change the local
-port on which the server is running, and the sqlalchemy uri where the database
-can be found and/or initiated.
+options, such as :code:`--port` and :code:`--dburi` which respectively change the local
+port on which the server is running, and the SQLAlchemy URI of the database to use
+and/or initialize for the post index (which is distinct from the database, if any,
+used to store knowledge posts).
 
 For shared deployments, however, you will probably need to create a server
 configuration file. A complete server configuration template can be found
@@ -137,11 +172,12 @@ provided in the template, deploying the web application is as simple as:
 
   $ knowledge_repo --repo <repo_path> deploy --config <config_file>
 
-Supported options are `--port`, `--dburi`,`--workers`, `--timeout` and
-`--config`. The `--config` option allows you to specify a python config file
-from which to load the extended configuration. A template config file is
-provided in `knowledge_repo/app/config_defaults.py`. The `--port` and `--dburi`
-options are as before, with the `--workers` and `--timeout` options specifying
+Supported options are :code:`--port`, :code:`--dburi`, :code:`--workers`,
+:code:`--timeout` and :code:`--config`. The :code:`--config` option allows you
+to specify a python config file from which to load the extended configuration.
+A template config file is provided in `knowledge_repo/app/config_defaults.py`.
+The :code:`--port` and :code:`--dburi` options are as before, with the
+:code:`--workers` and :code:`--timeout` options specifying
 the number of threads to use when serving through gunicorn, and the timeout
 after which the threads are presumed to have died, and will be restarted.
 
@@ -152,9 +188,13 @@ No matter which knowledge repository backends are used, the web application
 itself requires a database backend in order to store its cache of the post
 index and user permissions. The database to be used can be specified via the
 CLI using the :code:`--dburi` option or via the config file passed in using
-:code:`--config`. Most datatabase backends supported by SQLAlchemy should work.
+:code:`--config`. Most database backends supported by SQLAlchemy should work.
 Database URIs will look something like:
-:code:`mysql://username:password@hostname/database:table_name`.
+:code:`mysql://username:password@hostname/database`.
+
+Note that it's also possible to use a SQLite database backed by a local
+file, or development or simple deployments. Use a URI like
+:code:`sqlite:///my-database.db` or :code:`sqlite:////path/to/my-database.db`.
 
 If the database does not exist, it is created (if that is possible) and
 initialised. When updates to the Knowledge Repo require changes to the database

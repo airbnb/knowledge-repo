@@ -24,7 +24,7 @@ echo "Creating a test repository in ${test_repo_path}..."
 # Remove the repository if it exists
 rm -rf ${test_repo_path} &> /dev/null
 
-`dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" init
+`dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" init
 mkdir -p ${test_repo_path} &> /dev/null
 cp `dirname $0`/tests/config_repo.yml ${test_repo_path}/.knowledge_repo_config.yml &> /dev/null
 
@@ -36,19 +36,19 @@ git commit -m "Update repository config." &> /dev/null
 popd &> /dev/null
 
 # Add some knowledge_posts
-`dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add `dirname $0`/knowledge_repo/templates/knowledge_template.ipynb -p projects/test/ipynb_test -m "Test commit" --branch master
-`dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add `dirname $0`/knowledge_repo/templates/knowledge_template.Rmd -p projects/test/Rmd_test -m "Test commit" --branch master
-`dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add `dirname $0`/knowledge_repo/templates/knowledge_template.md -p projects/test/md_test -m "Test commit" --branch master
+`dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add `dirname $0`/knowledge_repo/templates/knowledge_template.ipynb -p projects/test/ipynb_test -m "Test commit" --branch master
+`dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add `dirname $0`/knowledge_repo/templates/knowledge_template.Rmd -p projects/test/Rmd_test -m "Test commit" --branch master
+`dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add `dirname $0`/knowledge_repo/templates/knowledge_template.md -p projects/test/md_test -m "Test commit" --branch master
 
 for post in $(ls `dirname $0`/tests/test_posts); do
     if [[ "${post}" == *.ipynb ]]; then
-        `dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add `dirname $0`/tests/test_posts/${post} -p projects/${post} -m "Test commit" --branch master;
+        `dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add `dirname $0`/tests/test_posts/${post} -p projects/${post} -m "Test commit" --branch master;
     fi;
     if [[ "${post}" == *.Rmd ]]; then
-        `dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add `dirname $0`/tests/test_posts/${post} -p projects/${post} -m "Test commit" --branch master;
+        `dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add `dirname $0`/tests/test_posts/${post} -p projects/${post} -m "Test commit" --branch master;
     fi;
     if [[ "${post}" == *.md ]]; then
-        `dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add `dirname $0`/tests/test_posts/${post} -p projects/${post} -m "Test commit" --branch master;
+        `dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add `dirname $0`/tests/test_posts/${post} -p projects/${post} -m "Test commit" --branch master;
     fi;
 done
 
@@ -56,7 +56,7 @@ echo
 echo "Synchronising database index"
 echo "-----------------------------"
 echo
-`dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" reindex --config `dirname $0`/tests/config_server.py
+`dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" reindex --config `dirname $0`/tests/config_server.py
 
 echo
 echo "Running regression test suite"

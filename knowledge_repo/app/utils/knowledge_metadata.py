@@ -1,7 +1,3 @@
-
-
-from __future__ import absolute_import
-from __future__ import unicode_literals
 from markdown import Extension
 from markdown.preprocessors import Preprocessor
 
@@ -9,7 +5,7 @@ from markdown.preprocessors import Preprocessor
 class KnowledgeMetaExtension(Extension):
     """ Meta-Data extension for Python-Markdown. """
 
-    def extendMarkdown(self, md, md_globals):
+    def extendMarkdown(self, md, md_globals=None):
         """ Add MetaPreprocessor to Markdown instance. """
         md.preprocessors.add("knowledge_meta",
                              KnowledgeMetaPreprocessor(md),

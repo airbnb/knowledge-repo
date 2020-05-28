@@ -25,11 +25,15 @@ def upgrade():
         sa.Column('created_at', sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint('id')
     )
-    op.add_column('pageviews', sa.Column('id_errorlog', sa.Integer(), nullable=True))
-    op.drop_column('pageviews', 'error_message')
+
+    with op.batch_alter_table('pageviews') as batch_op:
+        batch_op.add_column(sa.Column('id_errorlog', sa.Integer(), nullable=True))
+        batch_op.drop_column('error_message')
 
 
 def downgrade():
-    op.add_column('pageviews', sa.Column('error_message', sa.Text(), nullable=True))
-    op.drop_column('pageviews', 'id_errorlog')
+    with op.batch_alter_table('pageviews') as batch_op:
+        batch_op.add_column(sa.Column('error_message', sa.Text(), nullable=True))
+        batch_op.drop_column('id_errorlog')
+
     op.drop_table('errorlog')

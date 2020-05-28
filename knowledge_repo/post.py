@@ -1,4 +1,6 @@
-from __future__ import absolute_import
+from collections import namedtuple
+import io
+import itertools
 import os
 import posixpath
 import re
@@ -6,19 +8,46 @@ import collections
 import logging
 import datetime
 import yaml
-import mimetypes
 import base64
 import uuid
 
-import six
-from builtins import next, object
+import cooked_input as ci
+import PIL.Image
 
 from .utils.encoding import encode, decode
 
 logger = logging.getLogger(__name__)
 
+# Define available headers, their types, and runtime input specification
+Header = namedtuple('Header', ('name', 'type', 'input'))
 
-SAMPLE_HEADER = """
+HEADER_REQUIRED_FIELD_TYPES = [
+    Header('title', str, ci.GetInput(prompt='title')),
+    Header('authors', list, ci.GetInput(prompt='authors (comma separated)', convertor=ci.ListConvertor())),
+    Header('tldr', str, ci.GetInput(prompt='tldr')),
+    Header('created_at', datetime.datetime, ci.GetInput(prompt='created_at', convertor=ci.DateConvertor(), default=datetime.date.today())),
+]
+
+HEADER_OPTIONAL_FIELD_TYPES = [
+    Header('subtitle', str, ci.GetInput(prompt='subtitle', required=False)),
+    Header('tags', list, ci.GetInput(prompt='tags (comma separated)', convertor=ci.ListConvertor(), required=False)),
+    Header('path', str, ci.GetInput(prompt='path', required=False)),
+    Header('updated_at', datetime.datetime, ci.GetInput(prompt='updated_at', convertor=ci.DateConvertor(), default=datetime.datetime.now())),
+    Header('private', bool, ci.GetInput(prompt='private', convertor=ci.BooleanConvertor(), required=False)),   # If true, this post starts out private
+    Header('allowed_groups', list, ci.GetInput(prompt='allowed_groups (comma separated)', convertor=ci.ListConvertor(), required=False)),
+    Header('thumbnail', (int, str), ci.GetInput(prompt='thumbnail', required=False)),
+]
+
+HEADERS_ALL = {
+    header.name: header
+    for header in itertools.chain(HEADER_REQUIRED_FIELD_TYPES, HEADER_OPTIONAL_FIELD_TYPES)
+}
+
+# Headers to prompt for if missing when in interactive mode
+HEADERS_INTERACTIVE = ['title', 'subtitle', 'authors', 'tldr', 'created_at', 'tags']
+
+
+HEADER_SAMPLE = """
 ---
 title: "This is a Knowledge Post title, quoted so we can use special characters like ':'"
 authors:
@@ -216,7 +245,7 @@ class KnowledgePost(object):
             md = decode(self._read_ref('knowledge.md'))
             mtch = re.match('^---\n[\\s\\S]+?---\n', md)
             if not mtch:
-                raise ValueError("YAML header is missing. Please ensure that the top of your post has a header of the following form:\n" + SAMPLE_HEADER)
+                raise ValueError("YAML header is missing. Please ensure that the top of your post has a header of the following form:\n" + HEADER_SAMPLE)
             if not headers:
                 md = re.sub('^---\n[\\s\\S]+?---\n', '', md, count=1)
             if not body:
@@ -254,13 +283,22 @@ class KnowledgePost(object):
                 return self._read_ref('orig_src/' + ref)
             raise e
 
-    def write(self, md, headers=None, images={}):
+    def write(self, md, headers=None, images={}, interactive=False):
         md = md.strip()
-        if headers is not None:
-            md = re.sub('^---\n[\\s\\S]+?---\n', '', md, count=1)
-            md = '---\n' + \
-                yaml.safe_dump(headers, default_flow_style=False) + '---\n' + md
-        md += '\n'
+
+        if not headers:
+            headers = self._get_headers_from_yaml(md)
+
+        md = re.sub(r'^---\n[\s\S]+?---\n', '', md, count=1)
+
+        headers = self._verify_headers(headers, interactive=interactive)
+
+        md = (  # Format with unicode seems to have issue in Python 2, so we explicitly concatenate
+            '---\n' +
+            yaml.safe_dump(headers, default_flow_style=False) +
+            '---\n\n' +
+            md
+        )
 
         self._write_ref('knowledge.md', encode(md))
 
@@ -285,20 +323,75 @@ class KnowledgePost(object):
 
     # ------------- Knowledge Post Format ----------------------------------
 
+    def _get_headers_from_yaml(self, yaml_str):
+        try:
+            if not yaml_str.strip().startswith('---'):
+                raise StopIteration()
+            return next(yaml.safe_load_all(yaml_str))
+        except yaml.YAMLError as e:
+            logger.info(
+                "YAML header is incorrectly formatted or missing. The following "
+                "information may be useful:\n{}\nIf you continue to have "
+                "difficulties, try pasting your YAML header into an online parser "
+                "such as http://yaml-online-parser.appspot.com/.".format(str(e))
+            )
+        except StopIteration as e:
+            logger.info('YAML header is missing!')
+        return {}
+
+    def _verify_headers(self, headers, interactive=False):
+        if not isinstance(headers, dict):
+            raise RuntimeError()
+        missing_required_headers = (
+            set(h.name for h in HEADER_REQUIRED_FIELD_TYPES).difference(headers)
+        )
+
+        if interactive:
+            missing_suggested_headers = (
+                set(HEADERS_INTERACTIVE).difference(headers).difference(missing_required_headers)
+            )
+
+            if missing_required_headers:
+                print("This post is missing the following required headers: {}".format(missing_required_headers))
+            if missing_suggested_headers:
+                print("This post is missing the following suggested headers: {}".format(missing_suggested_headers))
+            if missing_required_headers or missing_suggested_headers:
+                print(
+                    "You will now be prompted for each missing header. If you wish "
+                    "to abort the knowledge post creation, press Ctrl+C."
+                    .format(missing_required_headers)
+                )
+
+                for header in HEADERS_INTERACTIVE:
+                    if header not in headers:
+                        headers[header] = HEADERS_ALL[header].input.get_input()
+        elif missing_required_headers:
+            raise RuntimeError(
+                "Knowledge post is missing required headers {}. Please rerun this "
+                "operation in interactive mode, or add headers manually to the "
+                "post source file.".format(missing_required_headers)
+            )
+
+        for key, value in list(headers.items()):
+            if value is None:
+                del headers[key]
+
+        if 'tags' not in headers or not headers['tags']:
+            headers['tags'] = []
+        headers['updated_at'] = datetime.datetime.now()
+
+        return headers
+
     @property
     def headers(self):
-        try:
-            headers = next(yaml.load_all(self.read(body=False)))
-        except StopIteration as e:
-            raise ValueError("YAML header is missing. Please ensure that the top of your post has a header of the following form:\n" + SAMPLE_HEADER)
-        except yaml.YAMLError as e:
-            raise ValueError(
-                "YAML header is incorrectly formatted or missing. The following information may be useful:\n{}\nIf you continue to have difficulties, try pasting your YAML header into an online parser such as http://yaml-online-parser.appspot.com/.".format(str(e)))
+        headers = self._get_headers_from_yaml(self.read(body=False))
+        if not headers:
+            raise ValueError("YAML header is missing. Please ensure that the top of your post has a header of the following form:\n" + HEADER_SAMPLE)
         for key, value in headers.copy().items():
             if isinstance(value, datetime.date):
                 headers[key] = datetime.datetime.combine(value, datetime.time(0))
             if key == 'tags' and isinstance(value, list):
-                headers[key] = [str(v) if six.PY3 else unicode(v) for v in value]
+                headers[key] = [str(v) for v in value]
         return headers
 
     @headers.setter
@@ -325,11 +418,37 @@ class KnowledgePost(object):
         if ':' not in thumbnail:  # if thumbnail points to a local reference
             if not self._has_ref(thumbnail):
                 return None
-            data = base64.b64encode(self._read_ref(thumbnail))
-            image_mimetype = mimetypes.guess_type(thumbnail)[0]
-            if image_mimetype is not None:
-                return 'data:{};base64,'.format(image_mimetype) + data.decode('utf-8')
-            return None
+
+            data_in = io.BytesIO(self._read_ref(thumbnail))
+            data_out = io.BytesIO()
+
+            try:  # Attempt to generate 125x125 png thumbnail from resource
+                im = PIL.Image.open(data_in)
+
+                # 125x125 is approximately the maximum size we can guarantee
+                # will fit in the thumbnail uri data field, with max characters
+                # of 65535 for a PNG with 32 bits per pixel
+                im.thumbnail((125, 125))
+
+                data_out = io.BytesIO()
+                im.save(data_out, 'png')
+                data_out.seek(0)
+                thumbnail_data = data_out.read()
+
+                data = base64.b64encode(thumbnail_data)
+                thumbnail = (
+                    'data:{};base64,'.format('image/png') +
+                    data.decode('utf-8')
+                )
+            except Exception as e:
+                logger.warning(
+                    "Thumbnail generation failed for {}: {}."
+                    .format(self.path, e)
+                )
+                return None
+            finally:
+                data_in.close()
+                data_out.close()
 
         return thumbnail
 
@@ -362,26 +481,26 @@ class KnowledgePost(object):
 
     # Conversion/Import/Export methods
     @classmethod
-    def from_file(cls, filename, src_paths=[], format=None, postprocessors=None, **opts):
-        kp = KnowledgePostConverter.for_file(cls(), filename, format=format, postprocessors=postprocessors).from_file(filename, **opts)
+    def from_file(cls, filename, src_paths=[], format=None, postprocessors=None, interactive=False, **opts):
+        kp = KnowledgePostConverter.for_file(cls(), filename, format=format, postprocessors=postprocessors, interactive=interactive).from_file(filename, **opts)
         if src_paths:
             for src_path in src_paths:
                 kp.add_srcfile(src_path)
         return kp
 
     @classmethod
-    def from_string(cls, string, src_strings={}, format=None, postprocessors=None, **opts):
-        kp = KnowledgePostConverter.for_format(cls(), format=format, postprocessors=postprocessors).from_string(string, ** opts)
+    def from_string(cls, string, src_strings={}, format=None, postprocessors=None, interactive=False, **opts):
+        kp = KnowledgePostConverter.for_format(cls(), format=format, postprocessors=postprocessors, interactive=interactive).from_string(string, ** opts)
         if src_strings:
             for src_name, data in list(src_strings.items()):
                 kp.write_src(src_name, data)
         return kp
 
-    def to_file(self, filename, format=None, **opts):
-        return KnowledgePostConverter.for_file(self, filename, format=format).to_file(filename, **opts)
+    def to_file(self, filename, format=None, interactive=False, **opts):
+        return KnowledgePostConverter.for_file(self, filename, format=format, interactive=interactive).to_file(filename, **opts)
 
-    def to_string(self, format, **opts):
-        return KnowledgePostConverter.for_format(self, format).to_string(**opts)
+    def to_string(self, format, interactive=False, **opts):
+        return KnowledgePostConverter.for_format(self, format, interactive=interactive).to_string(**opts)
 
 
 from .converter import KnowledgePostConverter  # noqa

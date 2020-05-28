@@ -14,4 +14,4 @@ def check_dependencies(dependencies, message=None):
                "\t{install_command}\n\n"
                "Note: Depending on your system's installation of Python, you may "
                "need to use `pip2` or `pip3` instead of `pip`.").format(install_command='pip install --upgrade ' + ' '.join(missing_deps))
-        raise RuntimeError(u'\n\n'.join([message, fix]))
+        raise RuntimeError('\n\n'.join([message, fix]))

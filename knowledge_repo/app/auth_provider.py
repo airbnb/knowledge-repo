@@ -1,16 +1,14 @@
 from abc import abstractmethod
-from builtins import object
 
 from flask_principal import identity_changed, Identity
 from flask_login import login_user
-from future.utils import with_metaclass
-from flask import redirect, current_app, Blueprint, url_for
+from flask import redirect, current_app, Blueprint, url_for, session
 
 from .utils.auth import prepare_user
 from ..utils.registry import SubclassRegisteringABCMeta
 
 
-class KnowledgeAuthProvider(with_metaclass(SubclassRegisteringABCMeta, object)):
+class KnowledgeAuthProvider(object, metaclass=SubclassRegisteringABCMeta):
     _registry_keys = None
 
     @classmethod
@@ -51,7 +49,7 @@ class KnowledgeAuthProvider(with_metaclass(SubclassRegisteringABCMeta, object)):
             raise RuntimeError("No such user or invalid credentials")
         assert self.validate(user)
         self._perform_login(user)
-        return redirect(url_for('index.render_feed'))
+        return redirect(session.get('requested_url') or url_for('index.render_feed'))
 
     def validate(self, user):
         return True

@@ -1,7 +1,6 @@
 import logging
 import os
-from builtins import str
-from flask import request, url_for, redirect, render_template, current_app, Blueprint, g, Response
+from flask import request, url_for, redirect, render_template, current_app, Blueprint, g, Response, abort
 
 from .. import permissions
 from ..proxies import db_session, current_repo, current_user
@@ -54,8 +53,8 @@ def render(path):
                               .filter(Post.path == knowledge_aliases[path])
                               .first())
     if not post:
-        raise Exception(u"unable to find post at {}".format(path))
-
+        logger.warning("unable to find post at {}".format(path))
+        return abort(404)
     if post.contains_excluded_tag:
         # It's possible that someone gets a direct link to a post that has an excluded tag
         return render_template("error.html")
@@ -146,7 +145,7 @@ def _render_preview(path, tmpl):
             post = current_repo.post(knowledge_aliases[path])
 
     if not post:
-        raise Exception(u"unable to find post at {}".format(path))
+        raise Exception("unable to find post at {}".format(path))
 
     rendered = render_post(post, with_toc=True)
     raw_post = render_post_raw(post) if (mode == 'raw') else None
@@ -159,7 +158,7 @@ def _render_preview(path, tmpl):
                            raw_post=raw_post,
                            comments=[],
                            username=None,
-                           post_author=u', '.join(post.headers['authors']),
+                           post_author=', '.join(post.headers['authors']),
                            title=post.headers['title'],
                            page_views=0,
                            unique_views=0,
@@ -196,7 +195,13 @@ def download():
         return Response(
             post.to_string(format=resource_type),
             mimetype="application/zip",
-            headers={u"Content-disposition": "attachment; filename={}".format(filename)})
+            headers={"Content-disposition": "attachment; filename={}".format(filename)})
+    elif resource_type == 'pdf':
+        filename = os.path.basename(post.path)[:-3] + '.pdf'
+        return Response(
+            post.to_string(format=resource_type),
+            mimetype="application/pdf",
+            headers={"Content-disposition": "attachment; filename={}".format(filename)})
     elif resource_type == 'source':
         path = request.args.get('path', None)
         assert path is not None, "Source path not provided."
@@ -204,6 +209,6 @@ def download():
         return Response(
             post._read_ref(path),
             mimetype="application/octet-stream",
-            headers={u"Content-disposition": "attachment; filename={}".format(os.path.basename(path))})
+            headers={"Content-disposition": "attachment; filename={}".format(os.path.basename(path))})
     else:
-        raise RuntimeError(u"Invalid resource_type: {}".format(resource_type))
+        raise RuntimeError("Invalid resource_type: {}".format(resource_type))

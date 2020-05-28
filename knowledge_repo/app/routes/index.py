@@ -7,9 +7,8 @@ This includes:
   - /favorites
 """
 import os
-import posixpath
 import json
-from builtins import str
+from collections import namedtuple
 from flask import request, render_template, redirect, Blueprint, current_app, make_response
 from flask_login import login_required
 from sqlalchemy import case, desc
@@ -42,7 +41,7 @@ def site_map():
         # url = url_for(rule.endpoint, **(rule.defaults or {}))
         links.append((str(rule), rule.endpoint))
     # links is now a list of url, endpoint tuples
-    return u'<br />'.join(str(link) for link in links)
+    return '<br />'.join(str(link) for link in links)
 
 
 @blueprint.route('/')
@@ -133,16 +132,28 @@ def render_cluster():
             elem_regexp = "%," + elem + ",%"
             post_query = post_query.filter(Post.keywords.like(elem_regexp))
 
+    ClusterPost = namedtuple(
+        'ClusterPost',
+        ['name', 'is_post', 'children_count', 'content']
+    )
+
     if group_by == "author":
         author_to_posts = {}
         authors = (db_session.query(User).all())
         for author in authors:
-            author_posts = [post for
-                            post in author.posts
-                            if post.is_published and not post.contains_excluded_tag]
+            author_posts = [
+                ClusterPost(name=post.title, is_post=True,
+                            children_count=0, content=post)
+                for post in author.posts
+                if post.is_published and not post.contains_excluded_tag
+            ]
             if author_posts:
                 author_to_posts[author.format_name] = author_posts
-        tuples = [(k, v) for (k, v) in author_to_posts.items()]
+        grouped_data = [
+            ClusterPost(name=k, is_post=False,
+                        children_count=len(v), content=v)
+            for (k, v) in author_to_posts.items()
+        ]
 
     elif group_by == "tags":
         tags_to_posts = {}
@@ -151,35 +162,91 @@ def render_cluster():
                               .all())
 
         for tag in all_tags:
-            tag_posts = [post for
-                         post in tag.posts
-                         if post.is_published and not post.contains_excluded_tag]
+            tag_posts = [
+                ClusterPost(name=post.title, is_post=True,
+                            children_count=0, content=post)
+                for post in tag.posts
+                if post.is_published and not post.contains_excluded_tag
+            ]
             if tag_posts:
                 tags_to_posts[tag.name] = tag_posts
-        tuples = [(k, v) for (k, v) in tags_to_posts.items()]
+        grouped_data = [
+            ClusterPost(name=k, is_post=False,
+                        children_count=len(v), content=v)
+            for (k, v) in tags_to_posts.items()
+        ]
 
     elif group_by == "folder":
         posts = post_query.all()
+
         # group by folder
         folder_to_posts = {}
 
         for post in posts:
-            folder = posixpath.dirname(post.path)
-            if folder in folder_to_posts:
-                folder_to_posts[folder].append(post)
+            folder_hierarchy = post.path.split('/')
+            cursor = folder_to_posts
+
+            for folder in folder_hierarchy[:-1]:
+                if folder not in cursor:
+                    cursor[folder] = {}
+                cursor = cursor[folder]
+
+            cursor[folder_hierarchy[-1]] = post
+
+        def unpack(d):
+            """
+            Recusively unpack folder_to_posts
+            """
+            children = []
+            count = 0
+            for k, v in d.items():
+                if isinstance(v, dict):
+                    l, contents = unpack(v)
+                    count += l
+                    children.append(
+                        ClusterPost(name=k, is_post=False,
+                                    children_count=l, content=contents)
+                    )
+                else:
+                    count += 1
+                    children.append(
+                        ClusterPost(name=k, is_post=True,
+                                    children_count=0, content=v)
+                    )
+            return count, children
+
+        _, grouped_data = unpack(folder_to_posts)
+
+    else:
+        raise ValueError("Group by `{}` not understood.".format(group_by))
+
+    def rec_sort(content, sort_by):
+        sorted_content = []
+        for c in content:
+            if c.is_post:
+                sorted_content.append(c)
             else:
-                folder_to_posts[folder] = [post]
+                sorted_content.append(ClusterPost(
+                    name=c.name,
+                    is_post=c.is_post,
+                    children_count=c.children_count,
+                    content=rec_sort(c.content, sort_by)
+                ))
+        # put folders above posts
+        clusters = [c for c in sorted_content if not c.is_post]
+        posts = [c for c in sorted_content if c.is_post]
+        if sort_by == "alpha":
+            return (
+                sorted(clusters, key=lambda x: x.name) +
+                sorted(posts, key=lambda x: x.name)
+            )
+        else:
+            return (
+                sorted(clusters, key=lambda x: x.children_count, reverse=sort_desc) +
+                sorted(posts, key=lambda x: x.children_count, reverse=sort_desc)
+            )
 
-        tuples = [(k, v) for (k, v) in folder_to_posts.items()]
-
-    else:
-        raise ValueError(u"Group by `{}` not understood.".format(group_by))
-
-    if sort_by == 'alpha':
-        grouped_data = sorted(tuples, key=lambda x: x[0])
-    else:
-        grouped_data = sorted(
-            tuples, key=lambda x: len(x[1]), reverse=sort_desc)
+    grouped_data = rec_sort(grouped_data, sort_by)
 
     return render_template("index-cluster.html",
                            grouped_data=grouped_data,
@@ -261,5 +328,5 @@ def generate_projects_typeahead():
     if not permissions.index_view.can():
         return '[]'
     # return path stubs for all repositories
-    stubs = [u'/'.join(p.split('/')[:-1]) for p in current_repo.dir()]
+    stubs = ['/'.join(p.split('/')[:-1]) for p in current_repo.dir()]
     return json.dumps(list(set(stubs)))
