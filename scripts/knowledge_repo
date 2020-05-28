@@ -286,6 +286,7 @@ if args.action == 'create':
     
     # Replace the current timestamp
     with open(src) as f:
+        print(f'current user is {get_login()}')
         result = jinja2.Template(f.read()).render(current_date='{:%Y-%m-%d}'.format(datetime.datetime.now()), author=get_login())
         #result = jinja2.Template(f.read()).render(current_date='{:%Y-%m-%d}'.format(datetime.datetime.now()), author='krepo')
         with open(args.filename, "w") as out:
