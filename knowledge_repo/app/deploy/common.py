@@ -27,7 +27,7 @@ class KnowledgeDeployer(object, metaclass=SubclassRegisteringABCMeta):
                  port=7000,
                  workers=4,
                  timeout=60):
-        assert isinstance(knowledge_builder, str + (types.FunctionType, )), \
+        assert isinstance(knowledge_builder, (str, types.FunctionType, )), \
             "Unknown builder type {}".format(type(knowledge_builder))
         self.knowledge_builder = knowledge_builder
         self.host = host
