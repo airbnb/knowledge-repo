@@ -128,7 +128,8 @@
       </form>
     </div>
     {% block render_block %} {% endblock %}
-    <div class="row row-space-4"></div>
+    <!-- Disabling the post reviewer commenting feature in the web UI for now because it's broken. To debug and enable later. -->
+    <!-- <div class="row row-space-4"></div>
     {% if status == 1 %}
     <div class="row row-space-12">
       <div class="col-md-12">
@@ -172,7 +173,7 @@
       </div>
     </div>
     {% endif %}
-  </div>
+  </div> -->
 {% endblock %}
 
 {% block scripts %}
