@@ -177,7 +177,7 @@ $(document).on('ready', function(){
   $maindiv = $('.renderedMarkdown');
   $maindiv.prepend("<div class=\"codetoggleall\">Collapse All Code</div>");
 
-  $('.codetoggleall').click(function() {
+  var toggleCode = function() {
     var label = $(this).html();
     if (label.indexOf("Expand All Code") >= 0) {
       $(this).html(label.replace("Expand All Code", "Collapse All Code"));
@@ -198,7 +198,13 @@ $(document).on('ready', function(){
 		  $(this).html(label.replace("Collapse", "Expand"));
 	  });
     }
-  });
+  };
+
+  $('.codetoggleall').click(toggleCode);
+
+  {% if collapse_code %}
+    $('.codetoggleall').trigger( "click" )
+  {% endif %}
 })
 
 //Turn all the headers to be links
