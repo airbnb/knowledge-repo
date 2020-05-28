@@ -189,6 +189,11 @@
 
 .modal-content {
   max-width: 1024px;
+  border-radius: 21px;
+}
+
+.modal-title {
+    padding-top: 20px;
 }
 
 .twitter-typeahead {
@@ -821,6 +826,10 @@ border-color: #11b6aa;
   background-color: #00a699;
   border: 1px solid #00a699;
   color: white;
+}
+
+#btn_publish {
+  border-radius: 0 21px 21px 0;
 }
 
 #btn_save:active,
