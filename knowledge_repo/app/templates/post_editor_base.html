@@ -14,7 +14,7 @@
       <h3> {{ path if path else 'New Knowledge Post' }}
         <div class="btn-group pull-right" style='margin-right: 15px'>
           <button class="btn btn-large btn-default btn-webeditor" id="btn_save">
-            Save as Draft
+            Save & Preview
           </button>
           <button
             class="btn btn-large {{'btn-primary' if (status == 1 or status == 2) else 'btn-default'}} btn-webeditor" id="btn_in_review"
@@ -34,12 +34,15 @@
             {% endif %}
           </button>
           {% if status > 0 %}
-          <label style="font-size:12px; padding-top:15px">
+          <br>
+          <p align="right">
+          <label style="font-size:15px; padding-top:15px">
             <input type="checkbox" style="margin-left:15px;"
               id="author_can_publish" {{ 'checked' if status > 1 }}>
-              Allow author to publish?
+              Approve for posting
             </input>
           </label>
+          </p>
           {% endif %}
         </div>
       </h3>
@@ -52,11 +55,11 @@
           {% block metadata_fields %}
 
           {% if not path %}
-          <label for="post_path"> Post Save Folder </label>
+          <label for="post_path"> Post Save Path </label>
           <input id="post_path"
           class="form-control typeahead"
           type="text"
-          placeholder="projects/my_team/my_post_name" 
+          placeholder="webposts/my_team/my_post_name" 
           value=""></input>
           <br>
           {% endif %}
