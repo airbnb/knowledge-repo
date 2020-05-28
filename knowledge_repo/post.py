@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from builtins import next
-from builtins import object
 from collections import namedtuple
 import io
 import itertools
@@ -16,7 +13,6 @@ import uuid
 
 import cooked_input as ci
 import PIL.Image
-import six
 
 from .utils.encoding import encode, decode
 
@@ -26,20 +22,20 @@ logger = logging.getLogger(__name__)
 Header = namedtuple('Header', ('name', 'type', 'input'))
 
 HEADER_REQUIRED_FIELD_TYPES = [
-    Header('title', six.string_types, ci.GetInput(prompt='title')),
+    Header('title', str, ci.GetInput(prompt='title')),
     Header('authors', list, ci.GetInput(prompt='authors (comma separated)', convertor=ci.ListConvertor())),
-    Header('tldr', six.string_types, ci.GetInput(prompt='tldr')),
+    Header('tldr', str, ci.GetInput(prompt='tldr')),
     Header('created_at', datetime.datetime, ci.GetInput(prompt='created_at', convertor=ci.DateConvertor(), default=datetime.date.today())),
 ]
 
 HEADER_OPTIONAL_FIELD_TYPES = [
-    Header('subtitle', six.string_types, ci.GetInput(prompt='subtitle', required=False)),
+    Header('subtitle', str, ci.GetInput(prompt='subtitle', required=False)),
     Header('tags', list, ci.GetInput(prompt='tags (comma separated)', convertor=ci.ListConvertor(), required=False)),
-    Header('path', six.string_types, ci.GetInput(prompt='path', required=False)),
+    Header('path', str, ci.GetInput(prompt='path', required=False)),
     Header('updated_at', datetime.datetime, ci.GetInput(prompt='updated_at', convertor=ci.DateConvertor(), default=datetime.datetime.now())),
     Header('private', bool, ci.GetInput(prompt='private', convertor=ci.BooleanConvertor(), required=False)),   # If true, this post starts out private
     Header('allowed_groups', list, ci.GetInput(prompt='allowed_groups (comma separated)', convertor=ci.ListConvertor(), required=False)),
-    Header('thumbnail', (int, ) + six.string_types, ci.GetInput(prompt='thumbnail', required=False)),
+    Header('thumbnail', (int, str), ci.GetInput(prompt='thumbnail', required=False)),
 ]
 
 HEADERS_ALL = {
@@ -331,7 +327,7 @@ class KnowledgePost(object):
         try:
             if not yaml_str.strip().startswith('---'):
                 raise StopIteration()
-            return next(yaml.load_all(yaml_str))
+            return next(yaml.safe_load_all(yaml_str))
         except yaml.YAMLError as e:
             logger.info(
                 "YAML header is incorrectly formatted or missing. The following "
@@ -395,7 +391,7 @@ class KnowledgePost(object):
             if isinstance(value, datetime.date):
                 headers[key] = datetime.datetime.combine(value, datetime.time(0))
             if key == 'tags' and isinstance(value, list):
-                headers[key] = [str(v) if six.PY3 else unicode(v) for v in value]
+                headers[key] = [str(v) for v in value]
         return headers
 
     @headers.setter
@@ -416,7 +412,7 @@ class KnowledgePost(object):
     def thumbnail_uri(self):
         thumbnail = self.headers.get('thumbnail')
 
-        if not thumbnail or not isinstance(thumbnail, six.string_types):
+        if not thumbnail or not isinstance(thumbnail, str):
             return None
 
         if ':' not in thumbnail:  # if thumbnail points to a local reference

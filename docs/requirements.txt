@@ -1,10 +1,10 @@
-future
-enum34
 pyyaml
 markdown
 pygments
 gitpython
 tabulate
+cooked_input
+requests
 flask
 flask_login
 flask_principal
@@ -12,6 +12,8 @@ flask_mail
 Flask-Migrate
 sqlalchemy
 jinja2>=2.7
-werkzeug
+werkzeug>=1.0
 gunicorn
 inflection
+pillow
+weasyprint

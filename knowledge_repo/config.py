@@ -1,12 +1,11 @@
 import functools
-import imp
+import importlib
+import sys
 import logging
 import os
 import time
 import types
 import yaml
-
-import six
 
 logger = logging.getLogger(__name__)
 
@@ -45,16 +44,16 @@ class KnowledgeRepositoryConfig(dict):
                 dict.update(self, value)
             elif isinstance(value, types.ModuleType):
                 self.__update_from_module(value)
-            elif isinstance(value, six.string_types):
+            elif isinstance(value, str):
                 if os.path.exists(value):
                     self.__update_from_file(value)
                 else:
                     logger.warning(
-                        u"Configuration file {} does not exist.".format(value))
+                        "Configuration file {} does not exist.".format(value))
             elif isinstance(value, type(None)):
                 pass
             else:
-                raise ValueError(u"Cannot interpret {}".format(value))
+                raise ValueError("Cannot interpret {}".format(value))
         dict.update(self, kwargs)
 
     def update_defaults(self, *values, **kwargs):
@@ -63,15 +62,15 @@ class KnowledgeRepositoryConfig(dict):
                 self.DEFAULT_CONFIGURATION.update(value)
             elif isinstance(value, types.ModuleType):
                 self.__defaults_from_module(value)
-            elif isinstance(value, six.string_types):
+            elif isinstance(value, str):
                 if os.path.exists(value):
                     self.__defaults_from_file(value)
                 else:
-                    logger.warning(u"Configuration file {} does not exist.".format(value))
+                    logger.warning("Configuration file {} does not exist.".format(value))
             elif isinstance(value, type(None)):
                 pass
             else:
-                raise ValueError(u"Cannot interpret {}".format(value))
+                raise ValueError("Cannot interpret {}".format(value))
         self.DEFAULT_CONFIGURATION.update(kwargs)
 
     def __defaults_from_file(self, filename):
@@ -88,7 +87,11 @@ class KnowledgeRepositoryConfig(dict):
 
     def __set_from_file(self, d, filename, force=False):
         if filename.endswith('.py'):
-            config = imp.load_source(u'knowledge_repo.config_{}'.format(str(time.time()).replace('.', '')), filename)
+            module_name = 'knowledge_repo.config_{}'.format(str(time.time()).replace('.', ''))
+            spec = importlib.util.spec_from_file_location(module_name, filename)
+            config = importlib.util.module_from_spec(spec)
+            sys.modules[module_name] = module
+            spec.loader.exec_module(module)
             self.__set_from_module(d, config, force)
         elif filename.endswith('.yml'):
             with open(filename) as f:

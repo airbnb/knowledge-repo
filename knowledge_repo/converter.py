@@ -1,4 +1,3 @@
-from builtins import object
 
 import os
 from functools import wraps
@@ -6,7 +5,6 @@ from functools import wraps
 from .postprocessor import KnowledgePostProcessor
 from .utils.registry import SubclassRegisteringABCMeta
 from .utils.dependencies import check_dependencies
-from future.utils import with_metaclass
 
 
 def get_format(filename, format=None):
@@ -24,7 +22,7 @@ def get_format(filename, format=None):
     return format
 
 
-class KnowledgePostConverter(with_metaclass(SubclassRegisteringABCMeta, object)):
+class KnowledgePostConverter(object, metaclass=SubclassRegisteringABCMeta):
     _registry_keys = None  # File extensions
 
     def __init__(self, kp, format=None, postprocessors=None, interactive=False, **kwargs):

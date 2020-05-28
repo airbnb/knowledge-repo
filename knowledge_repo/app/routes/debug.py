@@ -2,6 +2,8 @@ import sys
 import platform
 import types
 import logging
+from urllib.parse import unquote
+
 import tabulate
 import knowledge_repo
 
@@ -68,7 +70,6 @@ def force_reindex():
 
 @blueprint.route('/debug/views')
 def show_views():
-    import urllib
     output = []
     for rule in current_app.url_map.iter_rules():
         options = {}
@@ -77,7 +78,7 @@ def show_views():
 
         methods = ','.join(rule.methods)
         url = url_for(rule.endpoint, **options)
-        line = urllib.unquote("{:50s} {:20s} {}".format(rule.endpoint, methods, url))
+        line = unquote("{:50s} {:20s} {}".format(rule.endpoint, methods, url))
         output.append(line)
 
     return "<br />".join(sorted(output))

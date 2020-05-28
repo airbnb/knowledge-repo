@@ -34,7 +34,7 @@ def render_post_tldr(post):
 
 def render_post_header(post):
 
-    header_template = Template(u"""
+    header_template = Template("""
     <div class='metadata'>
     <span class='title'>{{title}}</span>
     {% if subtitle %}<span class='subtitle'>{{subtitle}}</span>{% endif %}
@@ -47,8 +47,8 @@ def render_post_header(post):
     """)
 
     def get_authors(usernames, authors):
-        authors = [u"<a href='{}'>{}</a>".format(url_for('index.render_feed', authors=username), author) for username, author in zip(usernames, authors)]
-        return u' and '.join(u', '.join(authors).rsplit(', ', 1))
+        authors = ["<a href='{}'>{}</a>".format(url_for('index.render_feed', authors=username), author) for username, author in zip(usernames, authors)]
+        return ' and '.join(', '.join(authors).rsplit(', ', 1))
 
     if isinstance(post, KnowledgePost):
         return header_template.render(title=post.headers['title'],

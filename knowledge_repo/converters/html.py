@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-from __future__ import unicode_literals
 import markdown
 from markdown import Extension
 from markdown.blockprocessors import BlockProcessor
@@ -117,7 +115,7 @@ class IndentsAsCellOutputProcessor(BlockProcessor):
 
             block_is_html = block_is_html and not isinstance(sibling.text, AtomicString)
 
-            block = u'\n'.join([sibling.text, block])
+            block = '\n'.join([sibling.text, block])
             output = sibling
         else:
             # This is a new codeblock. Create the elements and insert text.

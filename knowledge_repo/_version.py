@@ -18,8 +18,6 @@ __git_uri__ = "https://github.com/airbnb/knowledge-repo.git"
 # should be defined elsewhere.
 __dependencies__ = [
     # Knowledge Repository Dependencies
-    'future',  # Python 2/3 support
-    'enum34',  # Python 3.4+ enum object used for Post status
     'pyyaml',  # Yaml parser and utilities
     'markdown',  # Markdown conversion utilities
     'pygments',  # Code highlighting support in markdown
@@ -41,13 +39,13 @@ __dependencies__ = [
     'gunicorn',  # Deployed webserver
     'inflection',  # String transformation library
     'pillow',  # Image thumbnailing
-    'weasyprint<=0.42.3',  # Post PDF download option. Pinned to maintain compatibility with Python 2
+    'weasyprint',  # Post PDF download option
 ]
 
 __optional_dependencies__ = {
     # ipynb notebook conversion suport
     'ipynb': [
-        'nbformat<5.0.0',
+        'nbformat',
         'nbconvert[execute]',
         'traitlets'
     ],

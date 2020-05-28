@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import cooked_input as ci
 import logging
 import os

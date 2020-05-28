@@ -8,7 +8,6 @@ This includes:
 """
 import os
 import json
-from builtins import str
 from collections import namedtuple
 from flask import request, render_template, redirect, Blueprint, current_app, make_response
 from flask_login import login_required
@@ -42,7 +41,7 @@ def site_map():
         # url = url_for(rule.endpoint, **(rule.defaults or {}))
         links.append((str(rule), rule.endpoint))
     # links is now a list of url, endpoint tuples
-    return u'<br />'.join(str(link) for link in links)
+    return '<br />'.join(str(link) for link in links)
 
 
 @blueprint.route('/')
@@ -219,7 +218,7 @@ def render_cluster():
         _, grouped_data = unpack(folder_to_posts)
 
     else:
-        raise ValueError(u"Group by `{}` not understood.".format(group_by))
+        raise ValueError("Group by `{}` not understood.".format(group_by))
 
     def rec_sort(content, sort_by):
         sorted_content = []
@@ -329,5 +328,5 @@ def generate_projects_typeahead():
     if not permissions.index_view.can():
         return '[]'
     # return path stubs for all repositories
-    stubs = [u'/'.join(p.split('/')[:-1]) for p in current_repo.dir()]
+    stubs = ['/'.join(p.split('/')[:-1]) for p in current_repo.dir()]
     return json.dumps(list(set(stubs)))

@@ -4,9 +4,7 @@ import inspect
 import sys
 import textwrap
 from abc import abstractmethod
-from future.utils import with_metaclass
 
-import six
 import knowledge_repo
 from knowledge_repo.utils.registry import SubclassRegisteringABCMeta
 
@@ -21,7 +19,7 @@ def get_app_builder(uris, debug, db_uri, config, **kwargs):
     return get_app
 
 
-class KnowledgeDeployer(with_metaclass(SubclassRegisteringABCMeta, object)):
+class KnowledgeDeployer(object, metaclass=SubclassRegisteringABCMeta):
 
     def __init__(self,
                  knowledge_builder,
@@ -29,8 +27,8 @@ class KnowledgeDeployer(with_metaclass(SubclassRegisteringABCMeta, object)):
                  port=7000,
                  workers=4,
                  timeout=60):
-        assert isinstance(knowledge_builder, six.string_types + (types.FunctionType, )), \
-            u"Unknown builder type {}".format(type(knowledge_builder))
+        assert isinstance(knowledge_builder, str + (types.FunctionType, )), \
+            "Unknown builder type {}".format(type(knowledge_builder))
         self.knowledge_builder = knowledge_builder
         self.host = host
         self.port = port
@@ -57,17 +55,17 @@ class KnowledgeDeployer(with_metaclass(SubclassRegisteringABCMeta, object)):
         if isinstance(self.knowledge_builder, types.FunctionType):
             out = []
             for nl, cell in zip(self.knowledge_builder.__code__.co_freevars, self.knowledge_builder.__closure__):
-                if isinstance(cell.cell_contents, six.string_types):
-                    out.append(u'{} = "{}"'.format(nl, cell.cell_contents.replace('"', '\\"')))
+                if isinstance(cell.cell_contents, str):
+                    out.append('{} = "{}"'.format(nl, cell.cell_contents.replace('"', '\\"')))
                 else:
-                    out.append(u'{} = {}'.format(nl, cell.cell_contents))
+                    out.append('{} = {}'.format(nl, cell.cell_contents))
             out.append(textwrap.dedent(inspect.getsource(self.knowledge_builder)))
-            return u'\n'.join(out)
+            return '\n'.join(out)
         return self.knowledge_builder
 
     @property
     def builder_func(self):
-        if isinstance(self.knowledge_builder, six.string_types):
+        if isinstance(self.knowledge_builder, str):
             knowledge_builder = 'def get_app():\n\t' + self.knowledge_builder.replace('\n', '\t') + '\n\treturn app'
             namespace = {}
             exec(knowledge_builder, namespace)
@@ -91,16 +89,16 @@ class KnowledgeDeployer(with_metaclass(SubclassRegisteringABCMeta, object)):
 
         out = []
         out.append('import sys')
-        out.append(u'sys.path.insert(0, "{}")'.format(kr_path))
+        out.append('sys.path.insert(0, "{}")'.format(kr_path))
         out.append('import knowledge_repo')
 
         out.append(self.builder_str)
-        if not isinstance(self.knowledge_builder, six.string_types):
+        if not isinstance(self.knowledge_builder, str):
             out.append('app = %s()' % self.knowledge_builder.__name__)
         out.append('app.start_indexing()')
 
         with open(tmp_path, 'w') as f:
-            f.write(u'\n'.join(out))
+            f.write('\n'.join(out))
 
         return tmp_dir
 

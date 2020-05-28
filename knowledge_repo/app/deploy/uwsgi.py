@@ -12,7 +12,7 @@ class uWSGIDeployer(KnowledgeDeployer):
 
     _registry_keys = ['uwsgi']
 
-    COMMAND = u"uwsgi {protocol} --plugin python --wsgi-file {{path}} --callable app --master --processes {{processes}} --threads {{threads}}"
+    COMMAND = "uwsgi {protocol} --plugin python --wsgi-file {{path}} --callable app --master --processes {{processes}} --threads {{threads}}"
 
     def run(self):
         if not self.app.check_thread_support():
@@ -21,7 +21,7 @@ class uWSGIDeployer(KnowledgeDeployer):
         tmp_dir = self.write_temp_files()
 
         options = {
-            'socket': u'{}:{}'.format(self.host, self.port),
+            'socket': '{}:{}'.format(self.host, self.port),
             'processes': self.workers,
             'threads': 2,
             'timeout': self.timeout,
@@ -36,8 +36,8 @@ class uWSGIDeployer(KnowledgeDeployer):
             self.COMMAND = self.COMMAND.format(protocol="--http {socket}")
 
         try:
-            cmd = u"cd {};".format(tmp_dir) + self.COMMAND.format(**options)
-            logger.info("Starting server with command: %s", u" ".join(cmd))
+            cmd = "cd {};".format(tmp_dir) + self.COMMAND.format(**options)
+            logger.info("Starting server with command: %s", " ".join(cmd))
             subprocess.check_output(cmd, shell=True)
         finally:
             shutil.rmtree(tmp_dir)

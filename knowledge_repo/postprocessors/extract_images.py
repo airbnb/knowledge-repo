@@ -1,7 +1,6 @@
 import os
 import posixpath
 import re
-import six
 import logging
 
 from ..postprocessor import KnowledgePostProcessor
@@ -22,7 +21,7 @@ class ExtractImages(KnowledgePostProcessor):
         thumbnail = kp.headers.get('thumbnail', 0)
 
         # if thumbnail is a number, select the nth image in this post as the thumbnail
-        if isinstance(thumbnail, six.string_types) and thumbnail.isdigit():
+        if isinstance(thumbnail, str) and thumbnail.isdigit():
             thumbnail = int(thumbnail)
         if isinstance(thumbnail, int):
             if len(images) > 0:

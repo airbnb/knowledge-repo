@@ -1,14 +1,12 @@
-from __future__ import absolute_import
-
 import os
-import imp
+import importlib
+import sys
 import logging
 import traceback
 import math
 import uuid
 import mimetypes
 
-import six
 from flask import Flask, current_app, render_template, request, session
 from flask_login import LoginManager, user_loaded_from_request
 from flask_mail import Mail
@@ -52,8 +50,12 @@ class KnowledgeFlask(Flask):
 
         # Load configuration from file or provided object
         if config:
-            if isinstance(config, six.string_types):
-                config = imp.load_source('knowledge_server_config', os.path.abspath(config))
+            if isinstance(config, str):
+                module_name = 'knowledge_server_config'
+                spec = importlib.util.spec_from_file_location(module_name, os.path.abspath(config))
+                config = importlib.util.module_from_spec(spec)
+                sys.modules[module_name] = config
+                spec.loader.exec_module(config)
             self.config.from_object(config)
 
         # Add configuration passed in as keyword arguments
@@ -75,7 +77,7 @@ class KnowledgeFlask(Flask):
         # Configure database
         if db_uri:
             self.config['SQLALCHEMY_DATABASE_URI'] = db_uri
-        logger.debug(u"Using database: {}".format(self.config['SQLALCHEMY_DATABASE_URI']))
+        logger.debug("Using database: {}".format(self.config['SQLALCHEMY_DATABASE_URI']))
 
         # Register database schema with flask app
         sqlalchemy_db.init_app(self)
@@ -235,7 +237,7 @@ class KnowledgeFlask(Flask):
             for key, value in new_values.items():
                 args[key] = value
 
-            return u'{}?{}'.format(request.path, url_encode(args))
+            return '{}?{}'.format(request.path, url_encode(args))
 
         @self.template_global()
         def pagination_pages(current_page, page_count, max_pages=5, extremes=True):
