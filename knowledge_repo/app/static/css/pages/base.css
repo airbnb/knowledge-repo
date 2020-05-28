@@ -42,7 +42,7 @@
 /* Nav bar search form design */
 .form-control {
   border-radius: 21px;
-  box-shadow: 0 0px 0px rgba(0,0,0,0);
+  box-shadow: unset;
   border: 1px solid #e2ddddcf;
   padding: 8px 14px;
 }
@@ -81,7 +81,6 @@
     background: #ececec;
 }
 #navbar .navbar-form .btn-default {
-    border-color: whitesmoke;
     background-color: #ececec;
     border-color: #ececec;
 }
@@ -412,23 +411,21 @@ img {
 
 .label-primary,
 .label-default,
-.label-subscribed {
-  font-size: 14px;
-  border: 1px solid;
-  border-radius: 15px;
-  border-color: #00A699;
-  font-weight: normal;
-  display: inline-block;
-  margin-bottom: 4px;
-}
-
-.label-primary,
-.label-default,
 .label-unsubscribed {
   font-size: 14px;
   border: 1px solid;
   border-radius: 15px;
   border-color: #9CA299;
+  font-weight: normal;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+
+.label-subscribed {
+  font-size: 14px;
+  border: 1px solid;
+  border-radius: 15px;
+  border-color: #00A699;
   font-weight: normal;
   display: inline-block;
   margin-bottom: 4px;
