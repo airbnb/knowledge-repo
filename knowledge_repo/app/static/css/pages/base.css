@@ -70,7 +70,7 @@
     width: 100%;
     background: #ececec;
     color: black;
-    opacity: 1.0;
+    opacity: 1;
     border: none;
     transition: background 0.2s;
 }
@@ -416,7 +416,7 @@ img {
   font-size: 14px;
   border: 1px solid;
   border-radius: 15px;
-  border-color: ##00A699;
+  border-color: #00A699;
   font-weight: normal;
   display: inline-block;
   margin-bottom: 4px;
@@ -556,7 +556,7 @@ a.label:focus, a.label:hover {
   color:white;
   background-color: #06c6b6;
   border-color: #06c6b6;
-  opacity: 1.0;
+  opacity: 1;
 }
 
 .label-default[href]:focus,
