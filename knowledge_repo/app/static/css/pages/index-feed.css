@@ -18,7 +18,7 @@
     background-color: white;
 }
 .feed-post:hover {
-    background: #fff;
+    background: white;
     border: 1px solid #00a699;
     transition: background 0.4s, border 0.4s;
 }
@@ -33,10 +33,7 @@
     width: 200px;
     position: relative;
     vertical-align: center;
-    /*background: #fff;*/
-    /*border: 1px solid #bbb;*/
     border-radius: 5px;
-    /*box-shadow: 0px 1px 3px rgba(0,0,0,0.2);*/
     margin: 0px;
     transition: border 0.4s, box-shadow 0.4s;
 }
