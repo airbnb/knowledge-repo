@@ -22,12 +22,13 @@ For more information about the motivation and inspiration behind this project, w
 
 ## Screenshots
 
-![feed](https://user-images.githubusercontent.com/8813413/82880798-c0604e80-9ef3-11ea-9c6f-2dd061bda7b0.png)
+![feed](https://user-images.githubusercontent.com/8813413/82959342-55069300-9f6c-11ea-9c73-6764994e6379.png)
 
-![post](https://user-images.githubusercontent.com/8813413/82880796-c0604e80-9ef3-11ea-9b3a-6d8a416117c1.png)
+![post](https://user-images.githubusercontent.com/8813413/82959354-589a1a00-9f6c-11ea-98bf-8725edf639a9.png)
 
-![new_post](https://user-images.githubusercontent.com/8813413/82880791-bfc7b800-9ef3-11ea-8ecf-286e754719f8.png)
+![new_post](https://user-images.githubusercontent.com/8813413/82959348-5768ed00-9f6c-11ea-8eaf-14eae4c8d274.png)
 
-![post_form](https://user-images.githubusercontent.com/8813413/82880787-be968b00-9ef3-11ea-8a62-4345a3b69393.png)
+![post_form](https://user-images.githubusercontent.com/8813413/82959352-58018380-9f6c-11ea-9aee-f07407981796.png)
 
-![stats](https://user-images.githubusercontent.com/8813413/82883790-c821f200-9ef7-11ea-9f9c-b1964a62f580.png)
+![stats](https://user-images.githubusercontent.com/8813413/82959356-5932b080-9f6c-11ea-9962-ffd65f36f765.png)
+
