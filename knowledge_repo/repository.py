@@ -56,6 +56,8 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
         if isinstance(uri, dict):
             return cls.for_uris(uri)
         scheme = urlparse(uri).scheme
+        print(scheme, uri)
+        print(cls._get_subclass_for(scheme))
         return cls._get_subclass_for(scheme).create(uri, **kwargs)
 
     @classmethod

@@ -3,6 +3,7 @@ import logging
 import posixpath
 
 from sqlalchemy import create_engine
+from sqlalchemy.engine.url import make_url
 from sqlalchemy.orm import sessionmaker, scoped_session, mapper
 from sqlalchemy.sql import func
 from sqlalchemy import Table, Column, Integer, String, DateTime, LargeBinary, MetaData
@@ -30,9 +31,18 @@ class DbKnowledgeRepository(KnowledgeRepository):
     def init(self, auto_create=True):
 
         # TODO handle if user does not pass in table sqlite://path.db
-        uri_splt = self.uri.split(":")
-        engine_uri = ":".join(uri_splt[:-1])
-        table_name = uri_splt[-1]
+        engine_uri = make_url(self.uri)
+        if ':' in engine_uri.database:
+            uri_splt = self.uri.split(":")
+            engine_uri = make_url(':'.join(uri_splt[:-1]))
+            table_name = uri_splt[-1].replace('/', '')
+        else:
+            table_name = 'knowledge'
+        print(table_name)
+
+        # uri_splt = self.uri.split(":")
+        # engine_uri = ":".join(uri_splt[:-1])
+        # table_name = uri_splt[-1].replace('/', '')
 
         metadata = MetaData()
         postref_table = Table(table_name, metadata,
@@ -45,10 +55,13 @@ class DbKnowledgeRepository(KnowledgeRepository):
                               Column('status', Integer, default=self.PostStatus.DRAFT.value),
                               Column('ref', String(512)),
                               Column('data', LargeBinary))
+        print(engine_uri)
+        print(self.uri)
         self.engine = create_engine(engine_uri, pool_recycle=3600)
         self.session = scoped_session(sessionmaker(bind=self.engine))
         if auto_create:
             postref_table.create(self.engine, checkfirst=True)
+        print('created table')
 
         class PostRef(object):
             pass
