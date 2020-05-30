@@ -18,7 +18,7 @@ import tempfile
 
 import jinja2
 from tabulate import tabulate
-import pwd
+
 
 def get_login():
     """
@@ -27,7 +27,11 @@ def get_login():
     try:
         user_login = os.getlogin()
     except OSError:
+        import pwd
         user_login = pwd.getpwuid(os.geteuid()).pw_name
+    except ImportError:
+        import getpass
+        user_login = getpass.getuser()
     return user_login
 
 # Register handler for SIGTERM, so we can run cleanup code if we are terminated
