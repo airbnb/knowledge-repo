@@ -7,14 +7,14 @@
 
 .feed-post {
     padding: 20px;
-    border-radius: 21px;
+    border-radius: 12px;
     cursor: pointer;
-    border: 1px solid #dcdada61;
+    border: 1px solid #dcdada00;
     transition: background 0.6s, border 0.6s;
     display: flex;
     margin-top: 1.5em;
     margin-bottom: 1.5em;
-    box-shadow: 0.5px 1px 2px 0px #00000029;
+    box-shadow: 0px 1px 2px #00000029;
     background-color: white;
 }
 .feed-post:hover {
@@ -43,11 +43,10 @@
     right: 0;
     bottom: 0;
     left: 0;
-    max-width:150px;
-    max-height: 150px;
-    height:auto;
-    width:auto;
+    max-height:200px;
+    width:200px;
     margin: auto;
+    border-radius: 8px;
 }
 .feed-post:hover .feed-thumbnail {
     border: transparent;
@@ -58,7 +57,7 @@
 .feed-post .feed-metadata {
     position:relative;
     margin: 0px;
-    margin-left: 1em;
+    margin-left: 1.4em;
     width: 100%;
 }
 .feed-post .feed-metadata span {
@@ -133,15 +132,15 @@
     .feed-post .feed-thumbnail {
         align-self: center;
         margin-bottom: 1em;
-        width: 150px;
-        height: 150px;
+        width: 200px;
+        height: 200px;
     }
 
     .feed-post .feed-thumbnail img {
         align-self: center;
         margin-bottom: 1em;
-        max-width: 125px;
-        max-height: 125px;
+        max-width: 200px;
+        max-height: 200px;
     }
 
     .feed-post .feed-metadata {

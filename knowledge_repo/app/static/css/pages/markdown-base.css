@@ -1,12 +1,12 @@
 .renderedMarkdown {
-    border: 1px solid #e2ddddcf;
+    border: 1px solid #e2dddd00;
     border-radius: 12px;
     padding: 2.2em;
     background: #fff;
     color: #232323;
     margin-bottom: 2em;
     position: relative;
-    box-shadow: 0px 2px 3px rgba(0,0,0,0.1);
+    box-shadow: 0px 1px 2px #00000029;
     font-size: 12pt;
 }
 
@@ -230,7 +230,7 @@
 .codetoggleall {
   width: 140px;
   border-top-right-radius: 0px;
-  border-radius: 21px;
+  border-radius: 8px;
   top: -35px;
   z-index: 3;
 }
