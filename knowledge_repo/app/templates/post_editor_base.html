@@ -386,10 +386,10 @@ if ( status > 0 ) {
     var url = '';
     if (publish_button_text == "Unpublish"){
       url = '/ajax/editor/unpublish?path={{ path }}';
-      alert_text = 'Your post has been unpublished!';
+      alert_text = 'Your post has been unpublished! It will be hidden from the feed upon the next reindex.';
     } else {
       url = '/ajax/editor/publish?path={{ path }}';
-      alert_text = "Your post has been published!";
+      alert_text = "Your post has been published! It will appear on the feed upon the next reindex.";
     }
 
     $.ajax({
@@ -553,7 +553,7 @@ function parseDate(ds, error_name){
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     extensions: ["tex2jax.js"],
-    jax: ["input/TeX", "output/CommonHTML", "output/HTML-CSS"],
+    jax: ["input/TeX", "output/HTML-CSS"],
     tex2jax: {
       inlineMath: [ ['$','$'], ["\\(","\\)"] ],
       displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
@@ -563,7 +563,7 @@ function parseDate(ds, error_name){
   });
 </script>
 <script type="text/javascript"
-  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.8/MathJax.js">
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
 </script>
 
 {% endblock %}
