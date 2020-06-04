@@ -13,16 +13,17 @@
         </div>
 
         <div class="modal-body">
-          Comma-separate the emails, and the reviewers will get a post saying your post is ready to review!
+          Enter your reviewers below. The reviewers will get an email saying your post is ready to review!
           <br><br>
           <form style="padding-left:12px">
-            <text class="text-left" for="form-vert-text">
-            Emails of the Reviewers:
-            </text>
-          <input id="post_reviewers" type="text" value="...@emailext.com"
-                style="width:75%; display:inline-block">
+            <b><text class="text-left" for="form-vert-text">
+            Comma separated list of emails:
+            </text></b>
+          <input id="post_reviewers" type="text" placeholder="sally.smarts@email.com"
+                style="width:75%; display:inline-block; padding: 5px; margin: 10px 0 0 0;">
         </form>
-        <p>
+        <br>
+        <p align="center">
         <button class="btn btn-primary btn-email-reviewers"
                 data-behavior='modal-close'
                 id='submission_close'>

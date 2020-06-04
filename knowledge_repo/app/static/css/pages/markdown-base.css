@@ -1,18 +1,18 @@
 .renderedMarkdown {
-    border: 1px solid #aaa;
-    border-radius: 3px;
-    padding: 1.5em;
+    border: 1px solid #e2dddd00;
+    border-radius: 12px;
+    padding: 2.2em;
     background: #fff;
-    color: #484848;
+    color: #232323;
     margin-bottom: 2em;
     position: relative;
-    box-shadow: 0px 2px 3px rgba(0,0,0,0.1);
+    box-shadow: 0px 1px 2px #00000029;
     font-size: 12pt;
 }
 
 @media (max-width: 992px) {
     .renderedMarkdown {
-        border-radius: 0px;
+        border-radius: 21px;
         border-left: none;
         border-right: none;
         margin-left: -25px;
@@ -230,7 +230,7 @@
 .codetoggleall {
   width: 140px;
   border-top-right-radius: 0px;
-  border-radius: 3px;
+  border-radius: 8px;
   top: -35px;
   z-index: 3;
 }
@@ -269,6 +269,11 @@
     border-left: solid #00a699 10px;
     margin: 0px;
     border-radius: 0px;
+}
+
+.renderedMarkdown .stats .style {
+  right: 4px;
+  padding: 9px;
 }
 
 .renderedMarkdown .codehilite .codetoggle {
@@ -312,6 +317,10 @@
     transition: background-color 0.3s;
     margin: 5px;
     overflow: hidden;
+}
+
+.btn-default:hover {
+  order-color: #d8d8d8;
 }
 
 .side-panel .btn-download:hover {
