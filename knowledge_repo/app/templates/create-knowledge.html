@@ -7,15 +7,26 @@
 {% block content %}
 <center>
   <br>
-  <h3> Select format to download a knowledge stub. </h3>
+  <h3> Select an option below to add a new post </h3>
+</center>
+  <div style="margin: 0 auto; display: table;">
+    <ul>
+      <li> Download a knowledge post template notebook file (Jupyter, RMarkdown or Markdown)</li> 
+      {% if web_editor_enabled %}
+      <li> Write a post in Markdown directly in the Markdown web editor.</li> 
+      <li> Link a post from elsewhere (e.g. Google Docs)</li> 
+      {% endif %}
+    </ul>
+  </div>
   <br>
+<center>
   <div class="create-btn-group" role="group">
     <a class="btn btn-primary" href="create/ipynb" role="button"> Jupyter Notebook </a>
     <a class="btn btn-primary" href="create/Rmd" role="button"> R-Markdown </a>
     <a class="btn btn-primary" href="create/md" role="button"> Markdown </a>
     {% if web_editor_enabled %}
     <a class="btn btn-primary" href="{{ url_for('editor.editor') }}" role="button"> Web Editor </a>
-    <a class="btn btn-primary" href="{{ url_for('editor.editor', proxy='true') }}" role="button"> Web Proxy </a>
+    <a class="btn btn-primary" href="{{ url_for('editor.editor', proxy='true') }}" role="button"> Linked Post </a>
     {% endif %}
 </div>
 </center>

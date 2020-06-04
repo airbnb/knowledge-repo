@@ -6,7 +6,7 @@ This includes:
   - /delete_comment
 """
 import logging
-from flask import request, Blueprint, g
+from flask import request, Blueprint, g, escape
 
 from .. import permissions
 from ..proxies import db_session, current_user
@@ -43,8 +43,7 @@ def post_comment():
                              .first())
     else:
         comment = Comment(post_id=post.id)
-
-    comment.text = data['text']
+    comment.text = escape(data['text'])
     comment.user_id = current_user.id
     db_session.add(comment)
     db_session.commit()

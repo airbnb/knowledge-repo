@@ -10,7 +10,7 @@
     {{ super() }}
 
     <div class="renderedMarkdown">
-        <span class='stats' style='position: absolute; right: 0px; padding: 5px; color: #aaa; top: 0px;'>
+        <span class='stats' style='position: absolute; right: 4px; padding: 9px; color: #aaa; top: 0px;'>
             {% if page_views >= 0 %}
               <i class="glyphicon glyphicon-eye-open" id="pageview_stats" style='color: #9CA299'></i>
               <div id="pageview_stats" style="display: inline-block">
@@ -98,7 +98,7 @@
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     extensions: ["tex2jax.js"],
-    jax: ["input/TeX", "output/HTML-CSS"],
+    jax: ["input/TeX", "output/CommonHTML", "output/HTML-CSS"],
     tex2jax: {
       inlineMath: [ ['$','$'], ["\\(","\\)"] ],
       displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
@@ -108,7 +108,7 @@
   });
 </script>
 <script type="text/javascript"
-  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.8/MathJax.js">
 </script>
 
 <script>
@@ -177,7 +177,7 @@ $(document).on('ready', function(){
   $maindiv = $('.renderedMarkdown');
   $maindiv.prepend("<div class=\"codetoggleall\">Collapse All Code</div>");
 
-  $('.codetoggleall').click(function() {
+  var toggleCode = function() {
     var label = $(this).html();
     if (label.indexOf("Expand All Code") >= 0) {
       $(this).html(label.replace("Expand All Code", "Collapse All Code"));
@@ -198,7 +198,13 @@ $(document).on('ready', function(){
 		  $(this).html(label.replace("Collapse", "Expand"));
 	  });
     }
-  });
+  };
+
+  $('.codetoggleall').click(toggleCode);
+
+  {% if collapse_code %}
+    $('.codetoggleall').trigger( "click" )
+  {% endif %}
 })
 
 //Turn all the headers to be links
