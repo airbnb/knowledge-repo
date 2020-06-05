@@ -34,11 +34,7 @@ class LdapAuthProvider(KnowledgeAuthProvider):
         password = request.form['password']
 
         conn = Connection(self.server, user=userdn, password=password)
-        try:
-            conn.bind()
-        except LDAPSocketOpenError:
-            return False
-        return True
+        return conn.bind()
 
     def get_user(self):
         return User(identifier=request.form['username'])
