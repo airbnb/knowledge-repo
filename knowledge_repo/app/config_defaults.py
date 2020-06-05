@@ -64,7 +64,7 @@ DB_AUTO_UPGRADE = False
 # `KnowledgeAuthProvider` and add either the instance or identifier
 # used for that class below.
 # By default, the knowledge repo offers:
-# ['debug', 'oauth2', 'bitbucket', 'github', 'google']
+# ['debug', 'oauth2', 'bitbucket', 'github', 'google', 'ldap']
 AUTH_PROVIDERS = []
 
 # If you are going to use a OAuth provider, you will need to specify client ids
@@ -206,7 +206,7 @@ REMEMBER_COOKIE_DURATION = datetime.timedelta(days=365)
 # organization.
 
 # Currently the port and protocol must both be included in the server address
-# LDAP_SERVER = 'ldaps://127.0.0.1:389'
+LDAP_SERVER = 'ldap://127.0.0.1:389'
 # When entering this, note the "{0}" which denotes where the user_id is inserted.
 LDAP_USERDN_SCHEMA = 'cn={user_id},ou=people,dc=planetexpress,dc=com'
 
