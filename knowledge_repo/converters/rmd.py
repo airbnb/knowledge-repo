@@ -58,7 +58,6 @@ class RmdConverter(KnowledgePostConverter):
                 runcmd = runcmd.replace("\\", "\\\\")
 
             subprocess.check_output(runcmd, shell=True)
-<<<<<<< HEAD
             rmd_filename = tmp_path + ".md"
 
         # Split file header from footer
