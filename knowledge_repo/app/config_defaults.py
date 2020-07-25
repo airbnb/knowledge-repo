@@ -41,6 +41,8 @@ DEBUG = False
 # Database configuration
 # ---------------------------------------------------
 SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+# But if you use mysql as database, you must specify the URI as demonstrated below.
+# SQLALCHEMY_DATABASE_URI = 'mysql://username:password@hostname/database'
 SQLALCHEMY_ECHO = False
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
