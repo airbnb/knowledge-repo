@@ -1,0 +1,82 @@
+---
+title: "Testing Plotly in Rmarkdown"
+authors: [plotly_dude]
+tags:
+- knowledge
+- example
+created_at: 2016-06-29
+updated_at: 2016-06-30
+tldr: This is an example of using plotly
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Scatterplot
+
+Here we'll be testing a simple scatterplot of the diamonds dataset.
+
+```{r, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(plotly)
+data(diamonds)
+
+data <- diamonds %>% sample_n(1000)
+
+p <- plot_ly(data,
+  x = ~carat, y = ~price,
+  color = ~carat, size = ~carat
+)
+
+p
+```
+
+## Testing more advanced plots
+
+Let's take a look at the 3D plotting functionality here, to also see how performance holds up.
+
+```{r message=FALSE, warning=FALSE}
+library(plotly)
+
+# custom grid style
+axx <- list(
+  gridcolor='rgb(255, 255, 255)',
+  zerolinecolor='rgb(255, 255, 255)',
+  showbackground=TRUE,
+  backgroundcolor='rgb(230, 230,230)'
+)
+
+# individual plots
+fig1 <- plot_ly(z = ~volcano, scene='scene1') 
+fig1 <- fig1 %>% add_surface(showscale=FALSE)
+
+fig2 <- plot_ly(z = ~volcano, scene='scene2') 
+fig2 <- fig2 %>% add_surface(showscale=FALSE)
+
+fig3 <- plot_ly(z = ~volcano, scene='scene3') 
+fig3 <- fig3 %>% add_surface(showscale=FALSE)
+
+fig4 <- plot_ly(z = ~volcano, scene='scene4') 
+fig4 <- fig4 %>% add_surface(showscale=FALSE)
+
+# subplot and define scene
+fig <- subplot(fig1, fig2, fig3, fig4) 
+fig <- fig %>% layout(title = "3D Subplots",
+         scene = list(domain=list(x=c(0,0.5),y=c(0.5,1)),
+                      xaxis=axx, yaxis=axx, zaxis=axx,
+                      aspectmode='cube'),
+         scene2 = list(domain=list(x=c(0.5,1),y=c(0.5,1)),
+                       xaxis=axx, yaxis=axx, zaxis=axx,
+                       aspectmode='cube'),
+         scene3 = list(domain=list(x=c(0,0.5),y=c(0,0.5)),
+                       xaxis=axx, yaxis=axx, zaxis=axx,
+                       aspectmode='cube'),
+         scene4 = list(domain=list(x=c(0.5,1),y=c(0,0.5)),
+                       xaxis=axx, yaxis=axx, zaxis=axx,
+                       aspectmode='cube'))
+
+fig
+```
+
