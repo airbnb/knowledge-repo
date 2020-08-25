@@ -58,6 +58,7 @@ class RmdConverter(KnowledgePostConverter):
             rmd_filename = tmp_path + ".md"
 
         # Split file header from footer
+        # We do this since plotly.js lib needs to be added after header
         with open(rmd_filename) as f:
             header = body = ""
             delim_num = 0
