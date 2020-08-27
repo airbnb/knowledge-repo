@@ -1,0 +1,176 @@
+---
+title: "Testing Plotly in Rmarkdown"
+authors: [plotly_dude]
+tags:
+- knowledge
+- example
+created_at: 2016-06-29
+updated_at: 2016-06-30
+tldr: This is an example of using plotly
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Scatterplot
+
+Here we'll be testing a simple scatterplot of the diamonds dataset.
+
+```{r, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(plotly)
+data(diamonds)
+
+data <- diamonds %>% sample_n(1000)
+
+p <- plot_ly(data,
+  x = ~carat, y = ~price,
+  color = ~carat, size = ~carat
+)
+
+p
+```
+
+## Testing more advanced plots
+
+Let's take a look at some more advanced plotly functionality. First we'll try out the 3D plotting functionality here, to also see how performance holds up.
+
+The code for these plots is quite verbose, so we'll hide the code by default here.
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+library(plotly)
+
+# custom grid style
+axx <- list(
+  gridcolor='rgb(255, 255, 255)',
+  zerolinecolor='rgb(255, 255, 255)',
+  showbackground=TRUE,
+  backgroundcolor='rgb(230, 230,230)'
+)
+
+# individual plots
+fig1 <- plot_ly(z = ~volcano, scene='scene1') 
+fig1 <- fig1 %>% add_surface(showscale=FALSE)
+
+fig2 <- plot_ly(z = ~volcano, scene='scene2') 
+fig2 <- fig2 %>% add_surface(showscale=FALSE)
+
+fig3 <- plot_ly(z = ~volcano, scene='scene3') 
+fig3 <- fig3 %>% add_surface(showscale=FALSE)
+
+fig4 <- plot_ly(z = ~volcano, scene='scene4') 
+fig4 <- fig4 %>% add_surface(showscale=FALSE)
+
+# subplot and define scene
+fig <- subplot(fig1, fig2, fig3, fig4) 
+fig <- fig %>% layout(title = "3D Subplots",
+         scene = list(domain=list(x=c(0,0.5),y=c(0.5,1)),
+                      xaxis=axx, yaxis=axx, zaxis=axx,
+                      aspectmode='cube'),
+         scene2 = list(domain=list(x=c(0.5,1),y=c(0.5,1)),
+                       xaxis=axx, yaxis=axx, zaxis=axx,
+                       aspectmode='cube'),
+         scene3 = list(domain=list(x=c(0,0.5),y=c(0,0.5)),
+                       xaxis=axx, yaxis=axx, zaxis=axx,
+                       aspectmode='cube'),
+         scene4 = list(domain=list(x=c(0.5,1),y=c(0,0.5)),
+                       xaxis=axx, yaxis=axx, zaxis=axx,
+                       aspectmode='cube'))
+
+fig
+```
+
+Next up is a grouped violin plot. Here the code block is also hidden to keep things short.
+
+```{r echo=FALSE, warning=FALSE, echo=FALSE}
+library(plotly)
+
+df <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/violin_data.csv")
+
+pointposMale <- c(-0.9,-1.1,-0.6,-0.3)
+pointposFemale <- c(0.45,0.55,1,0.4)
+showLegend <- c(T,F,F,F)
+
+fig <- plot_ly(type = 'violin')
+
+i = 0
+for (i in 1:length(unique(df$day))) {
+ fig <- add_trace(
+    fig,
+    x = df$day[df$sex == 'Male' & df$day == unique(df$day)[i]],
+    y = df$total_bill[df$sex == 'Male' & df$day == unique(df$day)[i]],
+    hoveron = "points+kde",
+    legendgroup = 'M',
+    scalegroup = 'M',
+    name = 'M',
+    side = 'negative',
+    box = list(
+      visible = T
+    ),
+    points = 'all',
+    pointpos = pointposMale[i],
+    jitter = 0,
+    scalemode = 'count',
+    meanline = list(
+      visible = T
+    ),
+    color = I("#8dd3c7"),
+    marker = list(
+      line = list(
+        width = 2,
+        color = "#8dd3c7"
+      ),
+      symbol = 'line-ns'
+    ),
+    showlegend = showLegend[i]
+    )
+
+fig <- fig %>%
+    add_trace(
+      x = df$day[df$sex == 'Female' & df$day == unique(df$day)[i]],
+      y = df$total_bill[df$sex == 'Female' & df$day == unique(df$day)[i]],
+      hoveron = "points+kde",
+      legendgroup = 'F',
+      scalegroup = 'F',
+      name = 'F',
+      side = 'positive',
+      box = list(
+        visible = T
+      ),
+      points = 'all',
+      pointpos = pointposFemale[i],
+      jitter = 0,
+      scalemode = 'count',
+      meanline = list(
+        visible = T
+      ),
+      color = I("#bebada"),
+      marker = list(
+        line = list(
+          width = 2,
+          color = "#bebada"
+        ),
+        symbol = 'line-ns'
+      ),
+      showlegend = showLegend[i]
+  )
+}
+
+fig <- layout(
+  fig,
+  title = "Total bill distribution<br><i>scaled by number of bills per gender",
+  yaxis = list(
+    zeroline = F
+  ),
+  violingap = 0,
+  violingroupgap = 0,
+  violinmode = 'overlay',
+  legend = list(
+    tracegroupgap = 0
+  )
+)
+
+fig
+```
