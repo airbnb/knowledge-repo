@@ -46,7 +46,7 @@ __optional_dependencies__ = {
     # ipynb notebook conversion suport
     'ipynb': [
         'nbformat',
-        'nbconvert<6.0.0[execute]',
+        'nbconvert[execute]<6.0.0',
         'traitlets'
     ],
 
