@@ -5,7 +5,7 @@ __all__ = ['__author__', '__author_email__', '__version__', '__git_uri__', '__de
 
 __author__ = "Erik Ritter (maintainer), Serena Jiang, John Bodley, Bill Ulammandakh, Robert Chang, Dan Frank,  Chetan Sharma,  Matthew Wardrop"
 __author_email__ = "erik.ritter@airbnb.com, serena.jiang@airbnb.com, john.bodley@airbnb.com, bill.ulammandakh@airbnb.com, robert.chang@airbnb.com, dan.frank@airbnb.com, chetan.sharma@airbnb.com, mpwardrop@gmail.com"
-__version__ = "0.8.9"
+__version__ = "0.8.10"
 try:
     with open(os.devnull, 'w') as devnull:
         __version__ += '_' + subprocess.check_output(['git', 'rev-parse', 'HEAD'], shell=False, stderr=devnull).decode('utf-8').replace('\n', '')
