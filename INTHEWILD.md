@@ -9,6 +9,7 @@ Organizations
  - [Faculty](https://faculty.ai/)
  - [Postmates](https://github.com/postmates)
  - [Recursion Pharmaceuticals](http://recursionpharma.com)
+ - [YouGov](https://yougov.com)
 
 Projects
 ----------
