@@ -9,6 +9,13 @@ from gunicorn.app.base import BaseApplication
 
 from .common import KnowledgeDeployer
 
+import importlib.machinery
+import importlib.util
+import os
+import sys
+import traceback
+import warnings
+
 
 class GunicornDeployer(BaseApplication, KnowledgeDeployer):
 
@@ -20,6 +27,9 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
 
     def load_config(self):
         env_args = self.cfg.parser().parse_args(self.cfg.get_cmd_args_from_env())
+
+        if env_args.config:
+            self.load_config_from_filename(env_args.config)
 
         # Load up environment configuration.
         for key, value in vars(env_args).items():
@@ -42,3 +52,47 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
         if not self.app.check_thread_support():
             raise RuntimeError("Database configuration is not suitable for deployment (not thread-safe).")
         return self.app.start_indexing()
+
+    def load_config_from_filename(self, filename):
+        """
+        Loads the configuration file: the file is a python file, otherwise raise an RuntimeError
+        Exception or stop the process if the configuration file contains a syntax error.
+        """
+
+        if not os.path.exists(filename):
+            raise RuntimeError("%r doesn't exist" % filename)
+
+        ext = os.path.splitext(filename)[1]
+
+        try:
+            module_name = '__config__'
+            if ext in [".py", ".pyc"]:
+                spec = importlib.util.spec_from_file_location(module_name, filename)
+            else:
+                msg = "configuration file should have a valid Python extension.\n"
+                warnings.warn(msg)
+                loader_ = importlib.machinery.SourceFileLoader(module_name, filename)
+                spec = importlib.util.spec_from_file_location(module_name, filename, loader=loader_)
+            mod = importlib.util.module_from_spec(spec)
+            sys.modules[module_name] = mod
+            spec.loader.exec_module(mod)
+        except Exception:
+            print("Failed to read config file: %s" % filename, file=sys.stderr)
+            traceback.print_exc()
+            sys.stderr.flush()
+            sys.exit(1)
+
+        cfg = vars(mod)
+
+        for k, v in cfg.items():
+            # Ignore unknown names
+            if k not in self.cfg.settings:
+                continue
+            try:
+                self.cfg.set(k.lower(), v)
+            except Exception:
+                print("Invalid value for %s: %s\n" % (k, v), file=sys.stderr)
+                sys.stderr.flush()
+                raise
+
+        return cfg
