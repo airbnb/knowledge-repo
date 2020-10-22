@@ -43,15 +43,9 @@ def set_up_indexing_timers(app):
                 sync_lock.acquire()
                 try:
                     with app.app_context():
-                        print('*'*80)
-                        print(f'Thread {os.getpid()} (locked) calling update_index')
-                        print('*'*80)
 
                         update_index(check_timeouts=False)
                 finally:
-                   print('*'*80)
-                   print(f'Process {os.getpid()} releasing lock')
-                   print('*'*80)
                    sync_lock.release()
 
         app.index_watchdog = multiprocessing.Process(target=index_watchdog, args=(app,))
