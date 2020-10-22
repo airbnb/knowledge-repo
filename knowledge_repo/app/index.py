@@ -17,6 +17,7 @@ UNLOCKED = '0'
 
 sync_lock = multiprocessing.Lock()
 
+
 def set_up_indexing_timers(app):
     if not app.config['INDEXING_ENABLED']:
         return False
@@ -43,10 +44,9 @@ def set_up_indexing_timers(app):
                 sync_lock.acquire()
                 try:
                     with app.app_context():
-
                         update_index(check_timeouts=False)
                 finally:
-                   sync_lock.release()
+                    sync_lock.release()
 
         app.index_watchdog = multiprocessing.Process(target=index_watchdog, args=(app,))
         app.index_watchdog.start()
