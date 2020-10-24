@@ -153,7 +153,7 @@ def update_index(check_timeouts=True, force=False, reindex=False):
         posts = db_session.query(Post).all()
 
         for post in posts:
-            if isinstance(post.uuid, str) and post.uuid.starswith('\\x'):
+            if isinstance(post.uuid, str) and post.uuid.startswith('\\x'):
                 decoded_post_uuid = bytes.fromhex(post.uuid.replace('\\x', ''))
             elif isinstance(post.uuid, str):
                 decoded_post_uuid = bytes(post.uuid)
