@@ -189,7 +189,7 @@ class PageView(db.Model):
                 errorlog = ErrorLog.from_exception(e)
                 db_session.add(errorlog)
                 db_session.commit()
-                raise_with_traceback(e)
+                raise e.with_traceback()
             finally:
                 # Extract object id and type after response generated (if requested) to ensure
                 # most recent data is collected
