@@ -134,12 +134,15 @@ class GitKnowledgeRepository(KnowledgeRepository):
         branch = branch or self.config.published_branch
         if not self.git_has_remote:
             return
-        if not self.__remote_available:
-            logger.warning("Cannot connect to remote repository hosted on {}. Continuing locally with potentially outdated code.".format(
+
+        logger.info("Fetching updates to the knowledge repository...")
+        try:
+            self.git_remote.fetch()
+        except git.exc.GitCommandError:
+            logger.warning("Cannot fetch from remote repository hosted on {}. Continuing locally with potentially outdated code.".format(
                 self.__remote_host))
             return
-        logger.info("Fetching updates to the knowledge repository...")
-        self.git_remote.fetch()
+
         current_branch = self.git.active_branch
         self.git.branches[branch].checkout()
         self.git_remote.pull(branch)
@@ -370,10 +373,13 @@ class GitKnowledgeRepository(KnowledgeRepository):
         if branch is None:
             raise ValueError("It does not appear that you have any drafts in progress for '{}'.".format(path))
 
-        if not self.__remote_available:
-            raise RuntimeError("Cannot connect to remote repository {} ({}). Please check your connection, and then try again.".format(self.config.remote_name, self.git_remote.url))
+        try:
+            self.git_remote.push(branch, force=force)
+        except git.exc.GitCommandError as e:
+            raise RuntimeError(
+                "Failed to push to remote repository {} ({}). Please check the following error, and then try again:\n\n{}".format(
+                    self.config.remote_name, self.git_remote.url, e.stderr.strip()))
 
-        self.git_remote.push(branch, force=force)
         logger.info("Pushed local branch `{}` to upstream branch `{}`. Please consider starting a pull request, or otherwise merging into master.".format(branch, branch))
 
     def _publish(self, path):  # Publish a post for general perusal
@@ -503,21 +509,3 @@ class GitKnowledgeRepository(KnowledgeRepository):
                 if m.group(3):
                     port = m.group(3)
         return int(port)
-
-    @property
-    def __remote_available(self):
-        # TODO: support more types of hosts
-        host = self.__remote_host
-        port = self.__remote_port
-
-        if host:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(0.5)
-            try:
-                s.connect((socket.gethostbyname(host), port))
-                return True
-            except:
-                return False
-            finally:
-                s.close()
-        return True
