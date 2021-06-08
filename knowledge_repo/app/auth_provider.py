@@ -23,7 +23,7 @@ class KnowledgeAuthProvider(object, metaclass=SubclassRegisteringABCMeta):
     def __init__(self, name, app=None, **kwargs):
         self.name = name
         self.app = app
-        self.blueprint = Blueprint('auth_provider.' + self.name, __name__, template_folder='../templates')
+        self.blueprint = Blueprint('auth_provider_' + self.name, __name__, template_folder='../templates')
         self.prepare_blueprint(self.blueprint)
         self.init(**kwargs)
 
