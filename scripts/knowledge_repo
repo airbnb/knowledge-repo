@@ -282,11 +282,9 @@ if args.action == 'create':
         raise ValueError("Template not found at {}. Please choose a different template and try again.".format(src))
     if os.path.exists(args.filename):
         raise ValueError("File already exists at '{}'. Please choose a different filename and try again.".format(args.filename))
-<<<<<<< HEAD
     shutil.copy(src, args.filename)
     print("Created a {format} knowledge post template at '{filename}'.".format(format=args.format, filename=args.filename))
     sys.exit(0)
-=======
     
     # Replace the current timestamp
     with open(src) as f:
@@ -298,7 +296,6 @@ if args.action == 'create':
 
     #shutil.copy(src, args.filename)
     print("Created a {format} knowledge post template at {filename}.".format(format=args.format, filename=args.filename))
->>>>>>> 71fb125 (Create current timestamp in the template on the fly)
 
 # # Check which branches have local work
 if args.action == 'drafts':
