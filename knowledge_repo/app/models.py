@@ -136,8 +136,7 @@ class ErrorLog(db.Model):
                 db_session.rollback()
                 db_session.add(ErrorLog.from_exception(e))
                 db_session.commit()
-                tb = sys.exc_info()[2]
-                raise e.with_traceback(tb=sys.exc_info()[2])
+                raise e.with_traceback(sys.exc_info()[2])
         return wrapped
 
 
@@ -190,8 +189,7 @@ class PageView(db.Model):
                 errorlog = ErrorLog.from_exception(e)
                 db_session.add(errorlog)
                 db_session.commit()
-                tb = sys.exc_info()[2]
-                raise e.with_traceback(tb=sys.exc_info()[2])
+                raise e.with_traceback(sys.exc_info()[2])
             finally:
                 # Extract object id and type after response generated (if requested) to ensure
                 # most recent data is collected
