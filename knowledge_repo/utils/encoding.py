@@ -22,8 +22,7 @@ def encode(data, encoding='utf-8'):
             data = data.encode(encoding)
         except Exception as e:
             if os.environ.get('DEBUG'):
-                tb = sys.exc_info()[2]
-                raise e.with_traceback(tb=sys.exc_info()[2])
+                raise e.with_traceback(sys.exc_info()[2])
             logger.warning("An encoding error has occurred... continuing anyway. To capture these errors, rerun the current command prefixed with `DEBUG=1 `.")
             data = data.encode(encoding, errors='ignore')
     return data
@@ -36,8 +35,7 @@ def decode(data, encoding='utf-8'):
             data = data.decode(encoding)
         except Exception as e:
             if os.environ.get('DEBUG'):
-                tb = sys.exc_info()[2]
-                raise e.with_traceback(tb=sys.exc_info()[2])
+                raise e.with_traceback(sys.exc_info()[2])
             logger.warning("An decoding error has occurred... continuing anyway. To capture these errors, rerun the current command prefixed with `DEBUG=1 `.")
             data = data.decode(encoding, errors='ignore')
     return data
