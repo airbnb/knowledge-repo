@@ -13,7 +13,7 @@ jobs:
     - os: osx
       language: generic
       python: 3.8
-      osx_image: xcode11.4
+      osx_image: xcode12.5
 
 cache: pip
 
