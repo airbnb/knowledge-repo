@@ -3,8 +3,6 @@ language: python
 jobs:
   include:
     - os: linux
-      python: 3.6
-    - os: linux
       python: 3.7
     - os: linux
       python: 3.8
@@ -54,4 +52,4 @@ deploy:
     tags: true
     distributions: sdist bdist_wheel
     repo: airbnb/knowledge-repo
-    condition: $TRAVIS_PYTHON_VERSION = "3.6"
+    condition: $TRAVIS_PYTHON_VERSION = "3.8"
