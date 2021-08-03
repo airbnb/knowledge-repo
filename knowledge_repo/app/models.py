@@ -136,8 +136,7 @@ class ErrorLog(db.Model):
                 db_session.rollback()
                 db_session.add(ErrorLog.from_exception(e))
                 db_session.commit()
-                tb = sys.exc_info()[2]
-                raise e.with_traceback(tb=sys.exc_info()[2])
+                raise e.with_traceback(sys.exc_info()[2])
         return wrapped
 
 
@@ -190,8 +189,7 @@ class PageView(db.Model):
                 errorlog = ErrorLog.from_exception(e)
                 db_session.add(errorlog)
                 db_session.commit()
-                tb = sys.exc_info()[2]
-                raise e.with_traceback(tb=sys.exc_info()[2])
+                raise e.with_traceback(sys.exc_info()[2])
             finally:
                 # Extract object id and type after response generated (if requested) to ensure
                 # most recent data is collected
@@ -399,8 +397,7 @@ class Post(db.Model):
 
         for author in authors:
             if not isinstance(author, User):
-                author = author.strip()
-                author = User(identifier=author)
+                author = User(identifier=author.strip())
             user_objs.append(author)
 
         self._authors = user_objs
@@ -615,10 +612,10 @@ class Post(db.Model):
 
         self.status = kp.status
 
-        self.private = 0
+        self.private = False
         # we do this check so that no header (None) and False are treated the same
-        if headers.get('private', ''):
-            self.private = 1
+        if headers.get('private', False):
+            self.private = True
             self.groups = headers.get('allowed_groups', [])
 
 
@@ -651,10 +648,26 @@ class Group(db.Model):
     _users = db.relationship("User", secondary=assoc_group_user, backref='users',
                              lazy='subquery')
 
+    def _prepare_users(self, users):
+        user_objs = []
+
+        for user in users:
+            if not isinstance(user, User):
+                user = User(username=user.strip())
+            user_objs.append(user)
+
+        return user_objs
+
     @hybrid_property
     def users(self):
         return self._users
 
     @users.setter
-    def users(self, user_objs):
-        self._users = self._users + user_objs
+    def users(self, users):
+        self._users = self._prepare_users(users)
+
+    def users_add(self, users):
+        self._users += self._prepare_users(users)
+
+    def users_remove(self, users):
+        self._users = list(set(self._users).difference(self._prepare_users(users)))

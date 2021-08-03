@@ -14,7 +14,7 @@
         data-toggle="popover"
         data-placement="bottom"
         data-html="true"
-    {% if tag in feed_params['subscriptions'] %}
+    {% if tag in feed_params.get('subscriptions', []) %}
         class="label label-tag label-subscribed pop"
         data-content="<div class='content'>
             <button class='btn btn-small btn-primary btn-unsubscribe'
