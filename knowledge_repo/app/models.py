@@ -612,10 +612,10 @@ class Post(db.Model):
 
         self.status = kp.status
 
-        self.private = True
+        self.private = False
         # we do this check so that no header (None) and False are treated the same
         if headers.get('private', False):
-            self.private = False
+            self.private = True
             self.groups = headers.get('allowed_groups', [])
 
 
