@@ -16,8 +16,10 @@ from sqlalchemy import and_
 import logging
 import math
 
-from ..app import db_session
+from .. import permissions
+from ..proxies import db_session
 from ..models import PageView, Post, assoc_post_tag, Subscription, Tag
+from ..proxies import current_user
 from ..utils.requests import from_request_get_feed_params
 from ..utils.emails import send_subscription_email
 
@@ -84,6 +86,7 @@ def render_batch_tags():
 
 @blueprint.route('/delete_tag_post', methods=['GET', 'POST'])
 @PageView.logged
+@permissions.post_comment.require()
 def delete_tags_from_posts():
     """ Delete a tag from all the posts associated with it """
     tag_id = int(request.args.get('tag_id'))
@@ -112,6 +115,7 @@ def delete_tags_from_posts():
 
 @blueprint.route('/tag_pages')
 @PageView.logged
+@permissions.tags_view.require()
 def render_tag_pages():
     feed_params = from_request_get_feed_params(request)
     start = feed_params['start']
@@ -131,7 +135,7 @@ def render_tag_pages():
     tag_description = tag_obj.description
 
     # Get subscription status
-    subscribed = tag in feed_params["subscriptions"]
+    subscribed = tag in feed_params.get("subscriptions", [])
 
     # get all files with given tag
     tag_posts = tag_obj.posts
@@ -188,6 +192,7 @@ def render_tag_pages():
 
 @blueprint.route('/edit_tag_description', methods=['POST'])
 @PageView.logged
+@permissions.post_comment.require()
 def edit_tag_desc():
     """ Edit the description of a tag. This is used in the tag_page """
     data = request.get_json()
@@ -238,13 +243,13 @@ def toggle_tag_subscription():
         if tag_obj:
             subscription = db_session.query(Subscription).filter(
                 and_(Subscription.object_type == 'tag',
-                     Subscription.user_id == g.user.id,
+                     Subscription.user_id == current_user.id,
                      Subscription.object_id == tag_obj.id)).first()
         if subscription and subscribe_action == 'unsubscribe':
             db_session.delete(subscription)
         elif not subscription and subscribe_action == 'subscribe':
             # otherwise, create new subscription
-            subscription = Subscription(user_id=g.user.id, object_type='tag',
+            subscription = Subscription(user_id=current_user.id, object_type='tag',
                                         object_id=tag_obj.id)
             db_session.add(subscription)
         else:
@@ -262,7 +267,7 @@ def toggle_tag_subscription():
     tag_obj = Tag(name=request.args.get('tag_name', ''))
     subscription = db_session.query(Subscription).filter(
         and_(Subscription.object_type == 'tag',
-             Subscription.user_id == g.user.id,
+             Subscription.user_id == current_user.id,
              Subscription.object_id == tag_obj.id)
     ).first()
     return {
@@ -274,6 +279,7 @@ def toggle_tag_subscription():
 
 @blueprint.route('/rename_tag', methods=['POST'])
 @PageView.logged
+@permissions.post_comment.require()
 def rename_tags_and_posts():
     """ Rename a tag
         This requires deleteing all the post-tag associations for the old tag
@@ -320,6 +326,7 @@ def rename_tags_and_posts():
 
 @blueprint.route('/remove_posts_tags', methods=['POST'])
 @PageView.logged
+@permissions.post_comment.require()
 def remove_posts_tags():
     """ Delete a tag from certain posts """
     data = request.get_json()
@@ -348,6 +355,7 @@ def remove_posts_tags():
 
 @blueprint.route('/tag_list', methods=['POST'])
 @PageView.logged
+@permissions.post_comment.require()
 def change_tags():
     """ Change the tags associated with a given post.
         This is called when someone clicks on the a knowledge post

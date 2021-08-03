@@ -1,4 +1,3 @@
-from builtins import object
 
 import logging
 import posixpath
@@ -6,8 +5,8 @@ import posixpath
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session, mapper
 from sqlalchemy.sql import func
-
 from sqlalchemy import Table, Column, Integer, String, DateTime, LargeBinary, MetaData
+
 from ..repository import KnowledgeRepository
 
 logger = logging.getLogger(__name__)

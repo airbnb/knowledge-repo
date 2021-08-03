@@ -1,23 +1,11 @@
 var indexClusterJx = (function(){
 
   function addFoldingToGroups() {
-    var clusterList = $("#cluster_list").children();
-    $.each(clusterList, function(i, child) {
-      var tagName = child.tagName;
-      if (tagName === "LI") {
-        // this is the sublist toggle thing
-        var id = child.children[0].id;
-        var key_id = "#" + id.replace(/[^a-z0-9\s_]/gi, '');
-        var sublist = $(key_id + "-content");
-        var knowledgePosts = sublist.find("li");
-        if (id !== "" && knowledgePosts.length > 0) {
-          $(key_id).on("click", function() {
-            var icon = $(this).find("h6 > i");
-            $(icon).toggleClass("glyphicon-chevron-right glyphicon-chevron-down");
-            $(sublist).toggle("fold");
-          });
-        }
-      }
+    $('.cluster_dir').click(function(e) {
+      e.stopPropagation();
+      var icon = $(this).find("#" + this.id + "-glyph");
+      $(icon).toggleClass("glyphicon-chevron-right glyphicon-chevron-down");
+      $(this).siblings("#" + this.id + "-content").toggle("fold");
     });
   }
 

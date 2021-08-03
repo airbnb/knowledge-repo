@@ -1,8 +1,8 @@
 import sys
 
-__all__ = ['str_types']
+from sqlalchemy import Text
+from sqlalchemy.dialects.mysql import MEDIUMTEXT
 
-if sys.version_info.major > 2:
-    str_types = (str,)
-else:
-    str_types = (str, unicode)
+
+def MediumText():
+    return Text().with_variant(MEDIUMTEXT(), 'mysql')

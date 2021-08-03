@@ -2,7 +2,7 @@ import unittest
 from bs4 import BeautifulSoup
 
 from knowledge_repo import KnowledgeRepository
-from knowledge_repo.app.app import db_session
+from knowledge_repo.app.proxies import db_session
 from knowledge_repo.app.models import PageView, Comment, Vote
 from sqlalchemy import func
 
@@ -134,6 +134,7 @@ class FeedTest(unittest.TestCase):
         soup = BeautifulSoup(data, 'html.parser')
         all_posts = soup.findAll('div', {'class': 'row feed-post'})
         assert len(all_posts) == 3, "Expected 3 posts, found {}".format(len(all_posts))
+
 
 if __name__ == '__main__':
     unittest.main()

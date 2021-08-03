@@ -2,14 +2,17 @@ build: false
 
 environment:
   matrix:
-    - PYTHON: "C:\\Python27"
-      PYTHON_VERSION: "2.7.8"
-      PYTHON_ARCH: "32"
-      MINICONDA: C:\Miniconda
-
-    - PYTHON: "C:\\Python34"
-      PYTHON_VERSION: "3.4.1"
-      PYTHON_ARCH: "32"
+    - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6.10"
+      PYTHON_ARCH: "64"
+      MINICONDA: C:\Miniconda3
+    - PYTHON: "C:\\Python37-x64"
+      PYTHON_VERSION: "3.7.7"
+      PYTHON_ARCH: "64"
+      MINICONDA: C:\Miniconda3
+    - PYTHON: "C:\\Python38-x64"
+      PYTHON_VERSION: "3.8.3"
+      PYTHON_ARCH: "64"
       MINICONDA: C:\Miniconda3
 
 init:
@@ -17,12 +20,11 @@ init:
   - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
 
   - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
   # Replace dep1 dep2 ... with your dependencies
-  - conda install -c r r
-  - conda install -c r r-knitr
+  - conda install -c r r r-rmarkdown r-ggplot2 r-plotly
+  - conda install -c conda-forge pandoc
 
 install:
   - "%PYTHON%/Scripts/pip.exe install autopep8 pep8"

@@ -16,14 +16,12 @@ blueprint = Blueprint('groups', __name__,
 
 @blueprint.route('/post_groups', methods=['GET'])
 @PageView.logged
-def groups_for_posts():
+def groups_for_post():
     """Given a post_id, return a page where you see a list of groups,
        and can view the group members and add people to groups
     """
-    post_id = request.args.get('post_id', 0)
-    post = (db_session.query(Post)
-                      .filter(Post.id == post_id)
-                      .first())
+    post_id = int(request.args.get('post_id', -1))
+    post = Post.query.get(post_id)
     return render_template('post_groups.html',
                            groups=post.groups)
 
@@ -32,10 +30,8 @@ def groups_for_posts():
 @PageView.logged
 def view_group_users():
     """Given a group_id, return a page with a list of group members"""
-    group_id = request.args.get('group_id', 0)
-    group = (db_session.query(Group)
-                       .filter(Group.id == group_id)
-                       .first())
+    group_id = int(request.args.get('group_id', -1))
+    group = Group.query.get(group_id)
     return render_template('view_group_users.html',
                            group=group)
 
@@ -44,10 +40,8 @@ def view_group_users():
 @PageView.logged
 def add_group_users():
     """Given a group_id, show a page where users can be added"""
-    group_id = request.args.get('group_id', 0)
-    group = (db_session.query(Group)
-                       .filter(Group.id == group_id)
-                       .first())
+    group_id = int(request.args.get('group_id', -1))
+    group = Group.query.get(group_id)
     return render_template('add_group_users.html',
                            group=group)
 
@@ -55,23 +49,12 @@ def add_group_users():
 @blueprint.route('/add_users_to_group', methods=['POST', 'GET'])
 @PageView.logged
 def add_users_to_group():
-    group_id = request.args.get('group_id', 0)
+    group_id = int(request.args.get('group_id', -1))
     users = request.get_json()
-    user_objs = []
-    for user in users:
-        username = user.strip()
-        user_obj = (db_session.query(User)
-                              .filter(User.username == username)
-                              .first())
-        if not user_obj:
-            user_obj = User(username=username)
-            db_session.add(user_obj)
-        user_objs.append(user_obj)
 
-    group_obj = (db_session.query(Group)
-                           .filter(Group.id == group_id)
-                           .first())
-    group_obj.users = user_objs
+    group_obj = Group.query.get(group_id)
+    group_obj.users_add([user.strip() for user in users])
+
     db_session.commit()
     return ""
 
@@ -79,15 +62,11 @@ def add_users_to_group():
 @blueprint.route('/delete_user_from_group', methods=['POST', 'GET'])
 @PageView.logged
 def delete_user_from_group():
-    group_id = request.args.get('group_id', 0)
-    user_id = request.get_json()
-    user_obj = (db_session.query(User)
-                          .filter(User.id == user_id)
-                          .first())
-    delete_query = (assoc_group_user.delete()
-                                    .where(and_(assoc_group_user.c.group_id == group_id,
-                                                assoc_group_user.c.user_id == user_obj.id)))
-    db_session.execute(delete_query)
+    group_id = int(request.args.get('group_id', 0))
+    user_id = int(request.get_json())
+
+    group_obj = Group.query.get(group_id)
+    group_obj.users_remove([User.query.get(user_id)])
     db_session.commit()
     return ""
 
@@ -105,6 +84,5 @@ def add_groups():
     groups = request.get_json()
     for group_name in groups:
         group = Group(name=group_name)
-        db_session.add(group)
     db_session.commit()
     return ""

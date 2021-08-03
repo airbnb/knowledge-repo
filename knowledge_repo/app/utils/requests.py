@@ -8,8 +8,9 @@ Functions include:
 import inflection
 from flask import g
 
-from ..app import db_session
+from ..proxies import db_session
 from ..models import User
+from ..proxies import current_user
 
 
 def from_request_get_feed_params(request):
@@ -30,7 +31,7 @@ def from_request_get_feed_params(request):
     feed_params["sort_by"] = inflection.underscore(
         request.args.get('sort_by', 'updated_at'))
     feed_params["sort_desc"] = not bool(request.args.get('sort_asc', ''))
-    username, user_id = g.user.username, g.user.id
+    username, user_id = current_user.identifier, current_user.id
     feed_params["username"] = username
     feed_params["user_id"] = user_id
 
@@ -39,5 +40,5 @@ def from_request_get_feed_params(request):
                           .first())
 
     if user_obj:
-        feed_params["subscriptions"] = user_obj.get_subscriptions
+        feed_params["subscriptions"] = user_obj.subscriptions
     return feed_params
