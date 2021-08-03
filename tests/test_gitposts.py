@@ -42,12 +42,11 @@ class PostTest(unittest.TestCase):
         # we'll check the post_stats of the post by computing them
         # and ensuring that the upper-right-hand text is correct
         icon = soup.findAll("div", {"id": "pageview_stats"})
+        print(icon)
         pageviews_str = icon[0].text.strip()
 
         with self.app.app_context():
-            post = (db_session.query(Post)
-                              .filter(Post.id == self.post_id)
-                              .first())
+            post = Post.query.get(self.post_id)
             distinct_viewers = post.view_user_count
             pageviews = post.view_count
 
