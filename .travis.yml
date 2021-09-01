@@ -43,11 +43,11 @@ script:
   - bash run_tests.sh
 
 # Deploy to pypi automatically from tagged releases on the stable branch
+# Remove password & token from Travis config
+# todo: re-add these, otherwise uploads to the KR will fail.
 deploy:
   provider: pypi
   user: __token__
-  password:
-   secure: t0faW2l8NlvdSXZrlo4ymdY4nDA0JMB2GrN+XmXbTyv9bnNZZ5b3iK+sg1D17DACOgD8adxPAPs8WQgwxc5tIXm7Q0aqgC07qTK0YRs4k8wJVPOh24MXYXKZxEq0UQ+s9ITpwJGITXL/89iSKSTiJ3fG3ANKjbNVHWHO8zNTEJ21bpB/gKP8omgtD8oTOX2EJmddkWSq6aSUtlb+lRqjKG86Xpub5gYW5tFIv+L1HYJnqCWycLz3knSM3CzDzJdKVi+2JpCchbkJqgaFvEDqBzva6iCdcwwkXK5KuSEX1jJM1uTsf74tugq8weDdX/EI+RmbOnd2j7ZFJw6/lz+5BjBTwEg3zCS4Eyxdb2uB16OKwBRouXjeP4f5O8Wea/PVt56OvBT4zfrpPaTWls28DghOPVLJDwbQalWLeH7Rk5eSaUzZnhxSObqYg2en9qgAlPM7eCDd8ay8lPPX6vPADe5eUpHHs+28uQ0ecwblH/XfI8mizIgRUIfcqAc2XPJnoYw2itA0ds9Rzk/yJbXDIrWgP+0tYh2dyH9aGRbW1/kGFdSK5N5paoSmcRYcYa7bfINcWw+VoOpk7GzbE8UnM4xFoubheuXA7gVP/XU12gkJBBKFAuydSRRz2nRwIz6YiFYrRBpzcnZlZ0cabGv79HpD/gDSOj7S0cx/jdwzHLU=
   on:
     tags: true
     distributions: sdist bdist_wheel
