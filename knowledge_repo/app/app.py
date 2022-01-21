@@ -100,6 +100,7 @@ class KnowledgeFlask(Flask):
         @self.before_first_request
         def start_indexing():
             if self.config['INDEXING_ENABLED']:
+                current_app.db.engine.dispose()
                 self.start_indexing()
 
         # Initialise login manager to keep track of user sessions
