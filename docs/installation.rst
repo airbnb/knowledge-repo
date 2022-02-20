@@ -40,11 +40,11 @@ Knowledge Repo installation, please refer to :doc:`deployment`.
 Installation with a Virtual Environment
 ============
 
-To avoid unnecessary changes to your local operations systems, you may choose to install the knowledge repository tooling to a Python virtual environment, with the following commands (assuming your Python 3 executable is `python3`):
+To avoid unnecessary changes to your local operations systems, you may install the knowledge repository tooling to a Python virtual environment, with the following commands (assuming your Python 3 executable is `python3`):
 
 .. code-block:: shell
 
-  $ $ python3 -m venv venv
+  $ python3 -m venv venv
   $ . venv/bin/activate
   $ pip install --upgrade "knowledge-repo[all]"
   $ knowledge_repo --repo test_repo init 
