@@ -33,8 +33,6 @@ but this is expected. If your shell environment cannot find the `knowledge_repo`
 executable, you may need to check your `$PATH` and ensure that your Python's
 executable "bin" folder is on it.
 
-
-
 If you are a user expecting to interact with an existing Knowledge Repo, please
 refer to :doc:`quickstart`. Otherwise, if you are looking to create a new
 Knowledge Repo installation, please refer to :doc:`deployment`.
