@@ -21,7 +21,7 @@ __dependencies__ = [
     'pyyaml',  # Yaml parser and utilities
     'markdown',  # Markdown conversion utilities
     'pygments',  # Code highlighting support in markdown
-    'gitpython',  # Git abstraction
+    'gitpython==3.1.18',  # Git abstraction
     'tabulate',  # Rendering information prettily in knowledge_repo script
     'cooked_input',  # Used for interactive input from user in CLI tooling
     'requests',  # Used for downloading images
