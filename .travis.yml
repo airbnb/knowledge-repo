@@ -30,8 +30,8 @@ before_install:
   # Replace dep1 dep2 ... with your dependencies
   - conda create -n testenv python=$TRAVIS_PYTHON_VERSION
   - source activate testenv
-  - conda update --all --yes
-  - conda install -c conda-forge r-xfun r-base r-rmarkdown r-ggplot2 r-plotly pandoc
+  - conda install -c conda-forge r-base r-rmarkdown r-ggplot2 r-plotly pandoc
+  - conda update r-xfun
   # Install regex through conda to avoid issues with Mac wheels
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       conda install -c conda-forge regex;
