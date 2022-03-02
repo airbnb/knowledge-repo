@@ -27,7 +27,6 @@ before_install:
   - conda config --set always_yes yes --set changeps1 no
   # Useful for debugging any issues with conda
   - conda info -a
-  - conda update --all --yes
   # Replace dep1 dep2 ... with your dependencies
   - conda create -n testenv python=$TRAVIS_PYTHON_VERSION
   - source activate testenv
@@ -36,6 +35,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       conda install -c conda-forge regex;
     fi
+  - conda update --all --yes
 install:
   - pip install pycodestyle
   - pip install .[all]
