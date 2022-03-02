@@ -31,11 +31,12 @@ before_install:
   - conda create -n testenv python=$TRAVIS_PYTHON_VERSION
   - source activate testenv
   - conda install -c conda-forge r-base r-rmarkdown r-ggplot2 r-plotly pandoc
+  - conda update --all --yes
   # Install regex through conda to avoid issues with Mac wheels
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       conda install -c conda-forge regex;
     fi
-  - conda update --all --yes
+
 install:
   - pip install pycodestyle
   - pip install .[all]
