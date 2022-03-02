@@ -28,10 +28,11 @@ before_install:
   # Useful for debugging any issues with conda
   - conda info -a
   # Replace dep1 dep2 ... with your dependencies
+  - conda update --all --yes
   - conda create -n testenv python=$TRAVIS_PYTHON_VERSION
   - source activate testenv
   - conda install -c conda-forge r-base r-rmarkdown r-ggplot2 r-plotly pandoc
-  - conda update r-xfun
+  - conda install -c conda-forge r-xfun
   # Install regex through conda to avoid issues with Mac wheels
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       conda install -c conda-forge regex;
