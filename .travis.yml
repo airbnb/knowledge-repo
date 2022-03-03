@@ -10,8 +10,8 @@ jobs:
       python: 3.8
     - os: osx
       language: generic
-      python: 3.8
-      osx_image: xcode12.5
+      python: 3.6
+      osx_image: xcode13.1
 
 cache: pip
 
@@ -52,4 +52,4 @@ deploy:
     tags: true
     distributions: sdist bdist_wheel
     repo: airbnb/knowledge-repo
-    condition: $TRAVIS_PYTHON_VERSION = "3.8"
+    condition: $TRAVIS_PYTHON_VERSION = "3.6"
