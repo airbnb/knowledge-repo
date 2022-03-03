@@ -30,9 +30,9 @@ before_install:
   # Replace dep1 dep2 ... with your dependencies
   - conda update --all --yes
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      conda create -n testenv python=3.9.6
+      conda create -n testenv python=3.9.6;
     else
-      conda create -n testenv python=$TRAVIS_PYTHON_VERSION
+      conda create -n testenv python=$TRAVIS_PYTHON_VERSION;
     fi
   - source activate testenv
   - conda install -c conda-forge r-xfun=0.27
