@@ -36,3 +36,18 @@ executable "bin" folder is on it.
 If you are a user expecting to interact with an existing Knowledge Repo, please
 refer to :doc:`quickstart`. Otherwise, if you are looking to create a new
 Knowledge Repo installation, please refer to :doc:`deployment`.
+
+Installation with a Python Virtual Environment
+============
+
+To avoid unnecessary changes to your local operations systems, you may install the knowledge repository tooling to a Python virtual environment, with the following commands (assuming your Python 3 executable is `python3`):
+
+.. code-block:: shell
+
+  $ python3 -m venv venv
+  $ . venv/bin/activate
+  $ pip install --upgrade "knowledge-repo[all]"
+  $ knowledge_repo --repo test_repo init 
+  $ knowledge_repo --repo test_repo runserver
+  
+If there are no errors, the application is accessible through the local URL: http://172.20.10.12:7000/
