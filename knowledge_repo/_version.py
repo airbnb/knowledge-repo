@@ -19,10 +19,10 @@ __git_uri__ = "https://github.com/airbnb/knowledge-repo.git"
 __dependencies__ = [
     # Knowledge Repository Dependencies
     'pyyaml',  # Yaml parser and utilities
-    'markdown',  # Markdown conversion utilities
-    'pygments',  # Code highlighting support in markdown
-    'gitpython',  # Git abstraction
-    'tabulate',  # Rendering information prettily in knowledge_repo script
+    'markdown==3.3.4',  # Markdown conversion utilities
+    'pygments==2.10.0',  # Code highlighting support in markdown
+    'gitpython==3.1.18',  # Git abstraction
+    'tabulate==0.8.9',  # Rendering information prettily in knowledge_repo script
     'cooked_input',  # Used for interactive input from user in CLI tooling
     'requests',  # Used for downloading images
 
