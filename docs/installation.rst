@@ -40,7 +40,7 @@ Knowledge Repo installation, please refer to :doc:`deployment`.
 Installation with a Python Virtual Environment
 ============
 
-To avoid unnecessary changes to your local operations systems, you may install the knowledge repository tooling to a Python virtual environment, with the following commands (assuming your Python 3 executable is `python3`):
+To avoid unnecessary changes to your local operations systems, you may install the knowledge repository tooling to a Python virtual environment, with the following commands (assuming your Python 3 executable is "python3"):
 
 .. code-block:: shell
 
@@ -50,4 +50,8 @@ To avoid unnecessary changes to your local operations systems, you may install t
   $ knowledge_repo --repo test_repo init 
   $ knowledge_repo --repo test_repo runserver
   
-If there are no errors, the application is accessible through the local URL: http://172.20.10.12:7000/
+If there are no errors, the application should be accessible through the local URL: http://localhost:7000/. To stop the server, just use the keyboard shortcut `Ctrl+C`.
+
+For the latest Mac OS, port 7000 could have been used by default. Please go to "System Preferences..." then "Sharing", and uncheck the "AirPlay Receiver" setting to release this port number.
+
+
