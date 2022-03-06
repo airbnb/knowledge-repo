@@ -28,6 +28,7 @@ jobs:
       - run: conda info -a
       - run: conda update --all --yes
       - run: conda create -n testenv python='${{ matrix.python-version }}'
+      - run: source ~/anaconda3/etc/profile.d/conda.sh
       - run: conda activate testenv
       - run: conda install -c conda-forge r-xfun=0.27
       - run: conda install -c conda-forge r-base r-rmarkdown r-ggplot2 r-plotly pandoc
