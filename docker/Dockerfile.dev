@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:18.04
 
 MAINTAINER perryism
  
@@ -6,8 +6,12 @@ RUN apt-get update && \
     apt-get -y install \
 	wget \
 	zip \
-	python-pip \
+	python3-pip \
+	python3-dev \
 	git \
+    && cd /usr/local/bin \
+    && ln -s /usr/bin/python3 python \
+    && pip3 install --upgrade pip \
     && rm -rf /var/lib/apt/lists/* 
 
 ARG VERSION=0.9.0
@@ -19,12 +23,12 @@ WORKDIR /app/knowledge-repo-$VERSION
 
 COPY . /app/knowledge-repo-$VERSION
 
-RUN pip install -r requirements.txt
+RUN pip3 install -r docker/requirements.txt
 
-COPY entrypoint.sh /app/knowledge-repo-$VERSION
+COPY docker/entrypoint.sh /app/knowledge-repo-$VERSION
 
 VOLUME /data
 
 EXPOSE 7000
 
-CMD ["./entrypoint.sh"]
+CMD ["bash", "./entrypoint.sh"]
