@@ -5,8 +5,8 @@ gitdb
 gitpython
 tabulate
 pyyaml 
-markdown 
-pygments 
+markdown==3.3.4
+pygments==2.10.0
 pyyaml 
 flask_login 
 flask_principal 
@@ -17,3 +17,6 @@ pillow
 nbformat 
 nbconvert[execute] 
 traitlets
+ldap3
+requests
+weasyprint
