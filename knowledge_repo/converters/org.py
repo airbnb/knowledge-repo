@@ -4,18 +4,15 @@ from ..converter import KnowledgePostConverter
 
 
 def dict_to_yaml(x):
-    yaml = ''
+    yaml = []
     for key, value in x.items():
         if type(value) == list:
-            lines = "{key}:\n".format(key=key)
+            yaml += "{key}:".format(key=key)
             for v in value:
-                lines += "- {v}\n".format(v=v)
+                yaml += "- {v}".format(v=v)
         else:
-            lines = "{key}: {value}\n".format(key=key, value=value)
-
-        yaml += lines
-
-    return yaml
+            yaml += "{key}: {value}".format(key=key, value=value)
+    return "\n".join(yaml)
 
 
 class OrgConverter(KnowledgePostConverter):
