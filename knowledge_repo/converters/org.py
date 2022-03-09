@@ -125,7 +125,7 @@ class OrgConverter(KnowledgePostConverter):
             clean_line = line.lower().strip()
             if clean_line.startswith("#+begin_"):
                 in_chunk = True
-                line_type = re.search("#\+begin_(\w+)", clean_line).group(1)
+                line_type = re.search(r"#\+begin_(\w+)", clean_line).group(1)
             elif clean_line.strip().startswith("#+end_"):
                 in_chunk = False
             # Special case for chunk start and end for results block
@@ -159,10 +159,10 @@ class OrgConverter(KnowledgePostConverter):
         new_line = line
 
         # Headers (Org: *Header)
-        header_match = re.match("^(\*+)", new_line)
+        header_match = re.match(r"^(\*+)", new_line)
         if header_match:
             n_asts = len(header_match.group(1))
-            new_line = re.sub("^(\*+)", "#" * n_asts, new_line)
+            new_line = re.sub(r"^(\*+)", "#" * n_asts, new_line)
 
         # Find and replace
         replacer_regex = [
@@ -178,12 +178,12 @@ class OrgConverter(KnowledgePostConverter):
             },
             # Hyperlinks ([[link][desc]])
             {
-                "regex": re.compile("\[\[(?P<link>[^\[\]]+)\]\[(?P<desc>[^\[\]]+)\]\]"),
+                "regex": re.compile(r"\[\[(?P<link>[^\[\]]+)\]\[(?P<desc>[^\[\]]+)\]\]"),
                 "replace_fmt": "[{desc}]({link})"
             },
             # Images ([[imgpath]])
             {
-                "regex": re.compile("\[\[(?P<imgpath>[^\[\]]+)\]\]"),
+                "regex": re.compile(r"\[\[(?P<imgpath>[^\[\]]+)\]\]"),
                 "replace_fmt": "![]({imgpath})"
             },
             # Code/verbatim (~verbatim~  or =verbatim=)
