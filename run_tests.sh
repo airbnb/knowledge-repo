@@ -36,9 +36,21 @@ git commit -m "Update repository config." &> /dev/null
 popd &> /dev/null
 
 # Add some knowledge_posts
-`dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add `dirname $0`/knowledge_repo/templates/knowledge_template.ipynb -p projects/test/ipynb_test -m "Test commit" --branch master
-`dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add `dirname $0`/knowledge_repo/templates/knowledge_template.Rmd -p projects/test/Rmd_test -m "Test commit" --branch master
-`dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add `dirname $0`/knowledge_repo/templates/knowledge_template.md -p projects/test/md_test -m "Test commit" --branch master
+ipynb_file=$(mktemp).ipynb
+`dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev create ipynb $ipynb_file
+rmd_file=$(mktemp).Rmd
+`dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev create Rmd $rmd_file
+md_file=$(mktemp).md
+`dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev create md $md_file
+cat $md_file
+
+`dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add $ipynb_file -p projects/test/create_ipynb_test -m "Test create ipynb" --branch master
+`dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add $rmd_file -p projects/test/create_Rmd_test -m "Test create rmd" --branch master
+`dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add $md_file -p projects/test/create_md_test -m "Test create md" --branch master
+
+# `dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add `dirname $0`/knowledge_repo/templates/knowledge_template.ipynb -p projects/test/ipynb_test -m "Test commit" --branch master
+# `dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add `dirname $0`/knowledge_repo/templates/knowledge_template.Rmd -p projects/test/Rmd_test -m "Test commit" --branch master
+# `dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add `dirname $0`/knowledge_repo/templates/knowledge_template.md -p projects/test/md_test -m "Test commit" --branch master
 
 for post in $(ls `dirname $0`/tests/test_posts); do
     if [[ "${post}" == *.ipynb ]]; then
@@ -60,6 +72,16 @@ echo "Synchronising database index"
 echo "-----------------------------"
 echo
 `dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" reindex --config `dirname $0`/tests/config_server.py
+ipynb_file=$(mktemp).ipynb
+`dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev create ipynb $ipynb_file
+rmd_file=$(mktemp).Rmd
+`dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev create Rmd $rmd_file
+md_file=$(mktemp).md
+`dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev create md $md_file
+
+`dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add $ipynb_file -p projects/test/ipynb_test -m "Test commit" --branch master
+`dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add $rmd_file -p projects/test/Rmd_test -m "Test commit" --branch master
+`dirname $0`/scripts/knowledge_repo --repo="${test_repo_path}" --dev add $md_file -p projects/test/md_test -m "Test commit" --branch master
 
 echo
 echo "Running regression test suite"

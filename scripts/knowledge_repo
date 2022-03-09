@@ -9,11 +9,30 @@ import threading
 import shutil
 import argparse
 import subprocess
+import datetime
 
 import git
 import gitdb
 import webbrowser
+import tempfile
+
+import jinja2
 from tabulate import tabulate
+
+
+def get_login():
+    """
+    Try to retrieve the user login to in a
+    """
+    try:
+        user_login = os.getlogin()
+    except OSError:
+        import pwd
+        user_login = pwd.getpwuid(os.geteuid()).pw_name
+    except ImportError:
+        import getpass
+        user_login = getpass.getuser()
+    return user_login
 
 # Register handler for SIGTERM, so we can run cleanup code if we are terminated
 signal.signal(signal.SIGTERM, lambda signum, frame: sys.exit(0))
@@ -266,6 +285,17 @@ if args.action == 'create':
     shutil.copy(src, args.filename)
     print("Created a {format} knowledge post template at '{filename}'.".format(format=args.format, filename=args.filename))
     sys.exit(0)
+    
+    # Replace the current timestamp
+    with open(src) as f:
+        print(f'current user is {get_login()}')
+        result = jinja2.Template(f.read()).render(current_date='{:%Y-%m-%d}'.format(datetime.datetime.now()), author=get_login())
+        #result = jinja2.Template(f.read()).render(current_date='{:%Y-%m-%d}'.format(datetime.datetime.now()), author='krepo')
+        with open(args.filename, "w") as out:
+            out.write(result)
+
+    #shutil.copy(src, args.filename)
+    print("Created a {format} knowledge post template at {filename}.".format(format=args.format, filename=args.filename))
 
 # # Check which branches have local work
 if args.action == 'drafts':
