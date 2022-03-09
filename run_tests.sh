@@ -50,6 +50,9 @@ for post in $(ls `dirname $0`/tests/test_posts); do
     if [[ "${post}" == *.md ]]; then
         `dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add `dirname $0`/tests/test_posts/${post} -p projects/${post} -m "Test commit" --branch master;
     fi;
+    if [[ "${post}" == *.org ]] ; then
+        `dirname $0`/scripts/knowledge_repo --repo="git://${test_repo_path}" --dev add `dirname $0`/tests/test_posts/${post} -p projects/${post} -m "Test commit" --branch master;
+    fi;
 done
 
 echo

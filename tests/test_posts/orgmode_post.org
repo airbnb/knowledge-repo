@@ -1,0 +1,52 @@
+#+TITLE: This is an orgmode document
+#+AUTHOR: arinarmo
+#+DATE: 2017-05-19
+#+DESCRIPTION: The TL;DR goes here
+#+KEYWORDS: test, knowledge
+#+KNOWLEDGE_REPO: :updated_at 2017-05-17
+
+* Header 1
+You can *bold* and /italicize/ stuff, you can also _underscore_ (No underscore in markdown though :( ) and +strikethrough+.
+** SubHeader 1
+   You can also run some code with babel!
+#+BEGIN_SRC python :session :results output :exports both
+x = 3
+y = 5
+print("Time for a sum!")
+print(x + y + 1)
+#+END_SRC
+
+#+RESULTS:
+: Time for a sum!
+: 9
+  
+Depending on the output, results look different 
+#+BEGIN_SRC python :session :results output :exports both
+import pandas
+df = pandas.DataFrame({"x": [1,2,3], "y": [4,5,6]})
+print(df.describe())
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+         x    y
+count  3.0  3.0
+mean   2.0  5.0
+std    1.0  1.0
+min    1.0  4.0
+25%    1.5  4.5
+50%    2.0  5.0
+75%    2.5  5.5
+max    3.0  6.0
+#+end_example
+
+You can also quote "code" (verbatim) like so: ~x + y~ 
+** SubHeader 2
+   + Lists 
+   + Work
+   + Fine
+
+Images work too!
+[[https://random.dog/8617-11546-19302.jpg]]
