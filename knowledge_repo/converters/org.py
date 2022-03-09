@@ -7,12 +7,12 @@ def dict_to_yaml(x):
     yaml = []
     for key, value in x.items():
         if type(value) == list:
-            yaml += "{key}:".format(key=key)
+            yaml += "{key}:\n".format(key=key)
             for v in value:
-                yaml += "- {v}".format(v=v)
+                yaml += "- {v}\n".format(v=v)
         else:
-            yaml += "{key}: {value}".format(key=key, value=value)
-    return "\n".join(yaml)
+            yaml += "{key}: {value}\n".format(key=key, value=value)
+    return ''.join(yaml)
 
 
 class OrgConverter(KnowledgePostConverter):
