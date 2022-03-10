@@ -1,6 +1,6 @@
 from . import config_defaults
-from .post import KnowledgePost
 from .config import KnowledgeRepositoryConfig
+from .post import KnowledgePost
 from .postprocessor import KnowledgePostProcessor
 from .utils.registry import SubclassRegisteringABCMeta
 from abc import abstractmethod, abstractproperty
