@@ -1,20 +1,19 @@
+from .utils.encoding import decode, encode
 from collections import namedtuple
+import base64
+import collections
+import cooked_input as ci
+import datetime
 import io
 import itertools
+import logging
 import os
 import posixpath
 import re
-import collections
-import logging
-import datetime
-import yaml
-import base64
 import uuid
-
-import cooked_input as ci
+import yaml
 import PIL.Image
 
-from .utils.encoding import encode, decode
 
 logger = logging.getLogger(__name__)
 
