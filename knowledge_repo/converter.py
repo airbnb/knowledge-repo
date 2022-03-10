@@ -1,10 +1,8 @@
-
-import os
-from functools import wraps
-
 from .postprocessor import KnowledgePostProcessor
-from .utils.registry import SubclassRegisteringABCMeta
 from .utils.dependencies import check_dependencies
+from .utils.registry import SubclassRegisteringABCMeta
+from functools import wraps
+import os
 
 
 def get_format(filename, format=None):
