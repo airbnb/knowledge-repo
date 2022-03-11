@@ -1,15 +1,12 @@
-import os
-import shutil
-import logging
-import re
-import socket
-from io import open
-
-import git
-import yaml
-
 from ..repository import KnowledgeRepository
 from ..utils.encoding import encode
+from io import open
+import git
+import logging
+import os
+import re
+import shutil
+import yaml
 
 logger = logging.getLogger(__name__)
 

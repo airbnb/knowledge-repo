@@ -1,6 +1,5 @@
-import posixpath
-
 from ..repository import KnowledgeRepository
+import posixpath
 
 
 class MetaKnowledgeRepository(KnowledgeRepository):

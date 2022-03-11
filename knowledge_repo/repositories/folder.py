@@ -1,12 +1,11 @@
-import os
-import shutil
-import logging
-import time
-from io import open
-
 from ..post import KnowledgePost
 from ..repository import KnowledgeRepository
 from ..utils.encoding import encode
+from io import open
+import logging
+import os
+import shutil
+import time
 
 logger = logging.getLogger(__name__)
 
