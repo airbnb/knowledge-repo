@@ -1,11 +1,15 @@
-import flask
-from flask import request, render_template, flash, redirect, url_for
-from flask_login import login_user
-
+from ..auth_provider import KnowledgeAuthProvider
 from ..models import User
 from ..utils.auth import is_safe_url
-
-from ..auth_provider import KnowledgeAuthProvider
+import flask
+from flask import (
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask_login import login_user
 
 
 class DebugAuthProvider(KnowledgeAuthProvider):
