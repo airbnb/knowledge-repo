@@ -1,12 +1,11 @@
-import os
-import types
+from abc import abstractmethod
+from knowledge_repo.utils.registry import SubclassRegisteringABCMeta
+import knowledge_repo
 import inspect
+import os
 import sys
 import textwrap
-from abc import abstractmethod
-
-import knowledge_repo
-from knowledge_repo.utils.registry import SubclassRegisteringABCMeta
+import types
 
 
 def get_app_builder(uris, debug, db_uri, config, **kwargs):
