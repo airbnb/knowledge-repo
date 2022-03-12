@@ -1,27 +1,21 @@
+from .. import permissions
+from ..index import update_index
+from ..models import Comment, PageView, Post, PostAuthorAssoc
+from ..proxies import current_repo, current_user, db_session
+from ..utils.emails import send_review_email, send_reviewer_request_email
+from ..utils.image import is_allowed_image_format, is_pdf, pdf_page_to_png
+from datetime import datetime
+from flask import current_app, render_template, request, send_from_directory, url_for, Blueprint
+from knowledge_repo.post import KnowledgePost
+from sqlalchemy import or_
+from urllib.parse import unquote
+from werkzeug.utils import secure_filename
 import json
 import logging
-import sys
 import os
-from datetime import datetime
-from urllib.parse import unquote
-
-from flask import request, render_template, Blueprint, current_app, url_for, send_from_directory, g
-from sqlalchemy import or_
-from werkzeug.utils import secure_filename
-
-from knowledge_repo.post import KnowledgePost
-from .. import permissions
-from ..proxies import db_session, current_repo, current_user
-from ..models import Post, PostAuthorAssoc, Tag, Comment, User, PageView
-from ..utils.emails import send_review_email, send_reviewer_request_email
-from ..utils.image import pdf_page_to_png, is_pdf, is_allowed_image_format
-
-from ..index import update_index
-
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
 
 blueprint = Blueprint('editor', __name__,
                       template_folder='../templates', static_folder='../static')

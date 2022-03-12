@@ -11,17 +11,15 @@ This includes:
   - /toggle_tag_subscription
   - /tag_list
 """
-from flask import current_app, request, render_template, Blueprint, g
+from .. import permissions
+from ..models import assoc_post_tag, PageView, Post, Subscription, Tag
+from ..proxies import current_user, db_session
+from ..utils.emails import send_subscription_email
+from ..utils.requests import from_request_get_feed_params
+from flask import current_app, render_template, request, Blueprint
 from sqlalchemy import and_
 import logging
 import math
-
-from .. import permissions
-from ..proxies import db_session
-from ..models import PageView, Post, assoc_post_tag, Subscription, Tag
-from ..proxies import current_user
-from ..utils.requests import from_request_get_feed_params
-from ..utils.emails import send_subscription_email
 
 blueprint = Blueprint('tag', __name__,
                       template_folder='../templates', static_folder='../static')

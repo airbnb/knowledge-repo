@@ -5,13 +5,12 @@ This includes:
   - /comments
   - /delete_comment
 """
-import logging
-from flask import request, Blueprint, g, escape
-
 from .. import permissions
-from ..proxies import db_session, current_user
-from ..models import Comment, Post, PageView
+from ..models import Comment, PageView, Post
+from ..proxies import current_user, db_session
 from ..utils.emails import send_comment_email
+from flask import escape, request, Blueprint
+import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
