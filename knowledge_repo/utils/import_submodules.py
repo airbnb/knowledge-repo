@@ -1,6 +1,6 @@
-import sys
 import importlib
 import pkgutil
+import sys
 
 
 def import_submodules(package_name):

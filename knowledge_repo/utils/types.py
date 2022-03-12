@@ -1,5 +1,3 @@
-import sys
-
 from sqlalchemy import Text
 from sqlalchemy.dialects.mysql import MEDIUMTEXT
 

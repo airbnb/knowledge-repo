@@ -25,6 +25,7 @@ __dependencies__ = [
     'tabulate==0.8.9',  # Rendering information prettily in knowledge_repo script
     'cooked_input',  # Used for interactive input from user in CLI tooling
     'requests',  # Used for downloading images
+    'ipython_genutils',  # Used by Markdown conversion utilities
 
     # Flask App Dependencies
     'flask',  # Main flask framework
