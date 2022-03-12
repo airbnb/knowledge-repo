@@ -1,11 +1,9 @@
-import posixpath
-import json
-from urllib.parse import urljoin
-
-from flask import request, redirect
-
-from ..models import User
 from ..auth_provider import KnowledgeAuthProvider
+from ..models import User
+from flask import request, redirect
+from urllib.parse import urljoin
+import json
+import posixpath
 
 
 PRESETS = {

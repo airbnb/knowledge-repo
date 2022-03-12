@@ -1,9 +1,12 @@
-from flask import request, render_template, redirect, url_for
-from ldap3 import Server, Connection, ALL
-from ldap3.core.exceptions import LDAPSocketOpenError
-
-from ..models import User
 from ..auth_provider import KnowledgeAuthProvider
+from ..models import User
+from flask import (
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from ldap3 import Server, Connection, ALL
 
 
 class LdapAuthProvider(KnowledgeAuthProvider):
