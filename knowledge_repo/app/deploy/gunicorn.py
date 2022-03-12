@@ -5,10 +5,8 @@
     Adapted from example in http://docs.gunicorn.org/en/stable/custom.html.
 """
 
-from gunicorn.app.base import BaseApplication
-
 from .common import KnowledgeDeployer
-
+from gunicorn.app.base import BaseApplication
 import importlib.machinery
 import importlib.util
 import os
