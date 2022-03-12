@@ -1,14 +1,13 @@
+from .. import permissions
+from ..models import PageView, Post
+from ..proxies import db_session
+from ..utils.posts import get_posts
+from ..utils.requests import from_request_get_feed_params
+from flask import render_template, request, Blueprint
+from sqlalchemy import func
+import collections
 import datetime
 import json
-import collections
-from flask import Blueprint, request, render_template
-from sqlalchemy import func
-
-from .. import permissions
-from ..proxies import db_session
-from ..models import PageView, Post
-from ..utils.requests import from_request_get_feed_params
-from ..utils.posts import get_posts
 
 blueprint = Blueprint('stats', __name__,
                       template_folder='../templates', static_folder='../static')

@@ -4,15 +4,12 @@ This includes:
   - /like
   - /unlike
 """
+from ..models import PageView, Vote
+from ..proxies import current_user, db_session
 import logging
-from flask import request, Blueprint, g
+from flask import request, Blueprint
 from flask_login import login_required
 from sqlalchemy import and_
-
-from ..proxies import db_session
-from ..models import Post, Vote, PageView
-from ..proxies import current_user
-
 
 blueprint = Blueprint(
     'vote', __name__, template_folder='../templates', static_folder='../static')

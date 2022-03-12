@@ -6,19 +6,18 @@ This includes:
   - /table
   - /favorites
 """
-import os
-import json
+from .. import permissions
+from ..models import PageView, Post, Tag, User
+from ..proxies import current_repo, db_session
+from ..utils.posts import get_posts
+from ..utils.render import render_post_tldr
+from ..utils.requests import from_request_get_feed_params
 from collections import namedtuple
-from flask import request, render_template, redirect, Blueprint, current_app, make_response
+from flask import current_app, make_response, redirect, render_template, request, Blueprint
 from flask_login import login_required
 from sqlalchemy import case, desc
-
-from .. import permissions
-from ..proxies import db_session, current_repo
-from ..utils.posts import get_posts
-from ..models import Post, Tag, User, PageView
-from ..utils.requests import from_request_get_feed_params
-from ..utils.render import render_post_tldr
+import os
+import json
 
 blueprint = Blueprint(
     'index', __name__, template_folder='../templates', static_folder='../static')

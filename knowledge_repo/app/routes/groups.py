@@ -1,14 +1,11 @@
-import logging
-
+from ..models import Group, Post, PageView, User
+from ..proxies import db_session
 from flask import request, render_template, Blueprint
 from sqlalchemy import and_
-
-from ..proxies import db_session
-from ..models import Group, Post, PageView, User, assoc_group_user
+import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
 
 blueprint = Blueprint('groups', __name__,
                       template_folder='../templates', static_folder='../static')

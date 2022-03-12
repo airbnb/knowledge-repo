@@ -1,12 +1,10 @@
+from .. import permissions
+from ..proxies import current_repo, current_user, db_session
+from ..models import PageView, Post, User
+from ..utils.render import render_comment, render_post, render_post_raw
+from flask import abort, current_app, redirect, render_template, request, url_for, Blueprint, Response
 import logging
 import os
-from flask import request, url_for, redirect, render_template, current_app, Blueprint, g, Response, abort
-
-from .. import permissions
-from ..proxies import db_session, current_repo, current_user
-from ..models import User, Post, PageView
-from ..utils.render import render_post, render_comment, render_post_raw
-
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
