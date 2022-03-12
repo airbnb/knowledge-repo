@@ -1,9 +1,8 @@
-import os
-import subprocess
-import logging
-import shutil
-
 from .common import KnowledgeDeployer
+import logging
+import os
+import shutil
+import subprocess
 
 logger = logging.getLogger()
 

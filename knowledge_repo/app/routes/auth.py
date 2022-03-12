@@ -1,10 +1,9 @@
-from flask import flash, redirect, render_template, request, current_app, Blueprint, url_for
-from flask_login import login_user, logout_user, login_required
-from flask_principal import identity_changed, AnonymousIdentity, PermissionDenied
-
 from ..models import User
 from ..proxies import current_app
 from ..utils.auth import is_safe_url
+from flask import flash, redirect, render_template, request, current_app, Blueprint, url_for
+from flask_login import login_user, logout_user, login_required
+from flask_principal import identity_changed, AnonymousIdentity, PermissionDenied
 
 blueprint = Blueprint('auth', __name__,
                       template_folder='../templates', static_folder='../static')
