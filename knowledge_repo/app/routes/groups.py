@@ -1,7 +1,6 @@
-from ..models import Group, Post, PageView, User
+from ..models import Group, PageView, Post, User
 from ..proxies import db_session
-from flask import request, render_template, Blueprint
-from sqlalchemy import and_
+from flask import render_template, request, Blueprint
 import logging
 
 logging.basicConfig(level=logging.INFO)
