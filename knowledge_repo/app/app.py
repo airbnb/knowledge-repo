@@ -1,29 +1,27 @@
-import os
-import importlib
-import sys
-import logging
-import traceback
-import math
-import uuid
-import mimetypes
-
-from flask import Flask, current_app, render_template, request, session
-from flask_login import LoginManager, user_loaded_from_request
-from flask_mail import Mail
-from flask_migrate import Migrate
-from flask_principal import Principal, identity_loaded, Identity, AnonymousIdentity, PermissionDenied
+from . import routes
+from .auth_provider import KnowledgeAuthProvider
+from .index import set_up_indexing_timers, time_since_index, time_since_index_check, update_index
+from .models import db as sqlalchemy_db, Tag, User
+from .proxies import current_repo, current_user, db_session
+from .utils.auth import populate_identity_roles, prepare_user, AnonymousKnowledgeUser
 from alembic import command
 from alembic.migration import MigrationContext
 from datetime import datetime
+from flask import current_app, render_template, request, session, Flask
+from flask_login import user_loaded_from_request, LoginManager
+from flask_mail import Mail
+from flask_migrate import Migrate
+from flask_principal import identity_loaded, AnonymousIdentity, Identity, PermissionDenied, Principal
 from werkzeug.urls import url_encode
-
+import logging
+import os
+import importlib
 import knowledge_repo
-from . import routes
-from .auth_provider import KnowledgeAuthProvider
-from .proxies import db_session, current_repo, current_user
-from .index import update_index, set_up_indexing_timers, time_since_index, time_since_index_check
-from .models import db as sqlalchemy_db, User, Tag
-from .utils.auth import AnonymousKnowledgeUser, populate_identity_roles, prepare_user
+import math
+import mimetypes
+import sys
+import traceback
+import uuid
 
 # Needed to serve svg with correct mime type over https
 mimetypes.add_type('image/svg+xml', '.svg')
