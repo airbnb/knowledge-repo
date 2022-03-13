@@ -1,6 +1,5 @@
-import re
-
 from ..converter import KnowledgePostConverter
+import re
 
 
 class ProxyConverter(KnowledgePostConverter):

@@ -1,6 +1,5 @@
-import re
-
 from ..converter import KnowledgePostConverter
+import re
 
 
 def dict_to_yaml(x):

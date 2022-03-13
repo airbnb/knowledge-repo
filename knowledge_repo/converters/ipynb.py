@@ -1,7 +1,6 @@
-import os
-
 from ..converter import KnowledgePostConverter
 from .._version import __optional_dependencies__
+import os
 
 TEMPLATE = '''
 {%- extends 'markdown.tpl' -%}

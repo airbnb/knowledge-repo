@@ -1,19 +1,15 @@
-from __future__ import absolute_import
-from __future__ import unicode_literals
-import markdown
-from markdown import Extension
-from markdown.blockprocessors import BlockProcessor
-from markdown.preprocessors import Preprocessor
-from markdown.util import AtomicString, etree
-from markdown.extensions import codehilite, toc
-from markdown.inlinepatterns import Pattern
-
-import re
-import base64
-import mimetypes
-
+from __future__ import absolute_import, unicode_literals
 from ..converter import KnowledgePostConverter
 from ..mapping import SubstitutionMapper
+from markdown import Extension
+from markdown.blockprocessors import BlockProcessor
+from markdown.extensions import codehilite, toc
+from markdown.inlinepatterns import Pattern
+from markdown.preprocessors import Preprocessor
+from markdown.util import AtomicString, etree
+import base64
+import markdown
+import mimetypes
 
 MARKDOWN_EXTENSIONS = ['extra',
                        'abbr',
