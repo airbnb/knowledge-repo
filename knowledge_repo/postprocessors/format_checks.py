@@ -1,5 +1,3 @@
-import datetime
-
 from ..post import HEADER_OPTIONAL_FIELD_TYPES, HEADER_REQUIRED_FIELD_TYPES
 from ..postprocessor import KnowledgePostProcessor
 

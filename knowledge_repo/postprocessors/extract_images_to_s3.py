@@ -1,13 +1,11 @@
+from .extract_images import ExtractImages
+import logging
 import os
 import posixpath
 import random
 import string
-import logging
 import tempfile
 import time
-
-from .extract_images import ExtractImages
-
 
 logger = logging.getLogger(__name__)
 

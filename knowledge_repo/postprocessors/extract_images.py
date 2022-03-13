@@ -1,9 +1,8 @@
+from ..postprocessor import KnowledgePostProcessor
+import logging
 import os
 import posixpath
 import re
-import logging
-
-from ..postprocessor import KnowledgePostProcessor
 
 logger = logging.getLogger(__name__)
 
