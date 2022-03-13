@@ -44,7 +44,7 @@ class IndexMetadata(db.Model):
         m = db_session.query(IndexMetadata).filter(IndexMetadata.type == type).filter(IndexMetadata.name == name).first()
         if m is not None:
             m.value = value
-            m.updated_at = datetime..utcnow()
+            m.updated_at = datetime.utcnow()
         else:
             m = IndexMetadata(type=type, name=name, value=value, updated_at=datetime.utcnow())
             db_session.add(m)
