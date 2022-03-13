@@ -2,6 +2,7 @@ from .proxies import current_user, current_repo, db_session
 from .utils.models import unique_constructor
 from .utils.search import get_keywords
 from collections import defaultdict
+from datetime import datetime
 from flask import current_app, request
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
@@ -14,7 +15,6 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.orderinglist import ordering_list
 import os
 import sys
-import datetime
 import logging
 import traceback
 
@@ -30,7 +30,7 @@ class IndexMetadata(db.Model):
     type = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(512), nullable=False)
     value = db.Column(db.String(512), nullable=True)
-    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     @classmethod
     def get(cls, type, name, default=None):
@@ -44,9 +44,9 @@ class IndexMetadata(db.Model):
         m = db_session.query(IndexMetadata).filter(IndexMetadata.type == type).filter(IndexMetadata.name == name).first()
         if m is not None:
             m.value = value
-            m.updated_at = datetime.datetime.utcnow()
+            m.updated_at = datetime..utcnow()
         else:
-            m = IndexMetadata(type=type, name=name, value=value, updated_at=datetime.datetime.utcnow())
+            m = IndexMetadata(type=type, name=name, value=value, updated_at=datetime.utcnow())
             db_session.add(m)
 
     @classmethod

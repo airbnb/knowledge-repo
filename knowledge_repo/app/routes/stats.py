@@ -3,10 +3,10 @@ from ..models import PageView, Post
 from ..proxies import db_session
 from ..utils.posts import get_posts
 from ..utils.requests import from_request_get_feed_params
+from datetime import timedelta
 from flask import render_template, request, Blueprint
 from sqlalchemy import func
 import collections
-import datetime
 import json
 
 blueprint = Blueprint('stats', __name__,
@@ -15,7 +15,7 @@ blueprint = Blueprint('stats', __name__,
 
 def _round_date(d):
     """Round date to the previous Monday"""
-    return d - datetime.timedelta(d.weekday())
+    return d - timedelta(d.weekday())
 
 
 @blueprint.route('/post_stats', methods=['GET'])

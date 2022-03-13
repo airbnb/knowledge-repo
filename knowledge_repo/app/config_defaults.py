@@ -1,4 +1,4 @@
-import datetime
+from datetime import timedelta
 # ---------------------------------------------------
 # Host configuration
 # ---------------------------------------------------
@@ -198,7 +198,7 @@ AUTH_USER_ATTRIBUTE_CACHE_LIFETIME = 24 * 60 * 60  # 1 day
 # This is managed by `flask_login`, but is copied here for convenience.
 # For other options regarding sessions, please refer to:
 # https://flask-login.readthedocs.io/en/latest/#cookie-settings
-REMEMBER_COOKIE_DURATION = datetime.timedelta(days=365)
+REMEMBER_COOKIE_DURATION = timedelta(days=365)
 
 # ---------------------------------------------------
 # LDAP configuration
