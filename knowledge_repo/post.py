@@ -1,9 +1,9 @@
 from .utils.encoding import decode, encode
 from collections import namedtuple
+from datetime import date, datetime, time
 import base64
 import collections
 import cooked_input as ci
-import datetime
 import io
 import itertools
 import logging
@@ -24,14 +24,14 @@ HEADER_REQUIRED_FIELD_TYPES = [
     Header('title', str, ci.GetInput(prompt='title')),
     Header('authors', list, ci.GetInput(prompt='authors (comma separated)', convertor=ci.ListConvertor())),
     Header('tldr', str, ci.GetInput(prompt='tldr')),
-    Header('created_at', datetime.datetime, ci.GetInput(prompt='created_at', convertor=ci.DateConvertor(), default=datetime.date.today())),
+    Header('created_at', datetime, ci.GetInput(prompt='created_at', convertor=ci.DateConvertor(), default=date.today())),
 ]
 
 HEADER_OPTIONAL_FIELD_TYPES = [
     Header('subtitle', str, ci.GetInput(prompt='subtitle', required=False)),
     Header('tags', list, ci.GetInput(prompt='tags (comma separated)', convertor=ci.ListConvertor(), required=False)),
     Header('path', str, ci.GetInput(prompt='path', required=False)),
-    Header('updated_at', datetime.datetime, ci.GetInput(prompt='updated_at', convertor=ci.DateConvertor(), default=datetime.datetime.now())),
+    Header('updated_at', datetime, ci.GetInput(prompt='updated_at', convertor=ci.DateConvertor(), default=datetime.now())),
     Header('private', bool, ci.GetInput(prompt='private', convertor=ci.BooleanConvertor(), required=False)),   # If true, this post starts out private
     Header('allowed_groups', list, ci.GetInput(prompt='allowed_groups (comma separated)', convertor=ci.ListConvertor(), required=False)),
     Header('thumbnail', (int, str), ci.GetInput(prompt='thumbnail', required=False)),
@@ -382,7 +382,7 @@ class KnowledgePost(object):
 
         if 'tags' not in headers or not headers['tags']:
             headers['tags'] = []
-        headers['updated_at'] = datetime.datetime.now()
+        headers['updated_at'] = datetime.now()
 
         return headers
 
@@ -392,8 +392,8 @@ class KnowledgePost(object):
         if not headers:
             raise ValueError("YAML header is missing. Please ensure that the top of your post has a header of the following form:\n" + HEADER_SAMPLE)
         for key, value in headers.copy().items():
-            if isinstance(value, datetime.date):
-                headers[key] = datetime.datetime.combine(value, datetime.time(0))
+            if isinstance(value, date):
+                headers[key] = datetime.combine(value, time(0))
             if key == 'tags' and isinstance(value, list):
                 headers[key] = [str(v) for v in value]
         return headers
