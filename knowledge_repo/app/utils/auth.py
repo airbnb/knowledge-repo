@@ -1,13 +1,10 @@
-import datetime
-
-from urllib.parse import urlparse, urlencode, urljoin
-
-from flask import request, url_for
-from flask_login import AnonymousUserMixin, login_user
-from flask_principal import Identity, identity_changed, UserNeed
-
 from .. import roles
 from ..proxies import current_app, db_session
+from datetime import datetime, timedelta
+from flask import request
+from flask_login import AnonymousUserMixin
+from flask_principal import UserNeed
+from urllib.parse import urlparse, urlencode, urljoin
 
 
 def prepare_user(user, session_start=True):
@@ -17,14 +14,14 @@ def prepare_user(user, session_start=True):
         (
             session_start or
             user.last_login_at is None or
-            user.last_login_at < datetime.datetime.now() - datetime.timedelta(seconds=cache_lifetime)
+            user.last_login_at < datetime.now() - timedelta(seconds=cache_lifetime)
         )
     ):
         session_start = True
         user = current_app.config['AUTH_USER_ATTRIBUTE_SETTER'](user)
 
     if session_start or user.id is None:
-        user.last_login_at = datetime.datetime.now()
+        user.last_login_at = datetime.now()
         db_session.add(user)
         db_session.commit()
 

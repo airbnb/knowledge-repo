@@ -1,24 +1,22 @@
+from .proxies import current_user, current_repo, db_session
+from .utils.models import unique_constructor
+from .utils.search import get_keywords
+from collections import defaultdict
+from flask import current_app, request
+from flask_login import UserMixin
+from flask_sqlalchemy import SQLAlchemy
+from knowledge_repo._version import __version__
+from knowledge_repo.repository import KnowledgeRepository
+from knowledge_repo.utils.types import MediumText
+from sqlalchemy import and_, distinct, func, select, Index
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.orderinglist import ordering_list
 import os
 import sys
 import datetime
 import logging
 import traceback
-from flask import current_app, request
-from flask_login import UserMixin
-from flask_sqlalchemy import SQLAlchemy
-from collections import defaultdict
-
-from sqlalchemy import func, distinct, and_, select, Index, UniqueConstraint
-
-from knowledge_repo._version import __version__
-from knowledge_repo.repository import KnowledgeRepository
-from knowledge_repo.utils.types import MediumText
-from .proxies import current_user, current_repo, db_session
-from .utils.models import unique_constructor
-from .utils.search import get_keywords
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.ext.orderinglist import ordering_list
-from sqlalchemy.ext.associationproxy import association_proxy
 
 logger = logging.getLogger(__name__)
 

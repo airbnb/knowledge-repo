@@ -1,12 +1,9 @@
-import sys
-
-import markdown
-from markdown.extensions import toc
-
-import pygments
 from flask import url_for
 from jinja2 import Template
 from knowledge_repo.post import KnowledgePost
+from markdown.extensions import toc
+import markdown
+import pygments
 
 MARKDOWN_EXTENSIONS = ['extra',
                        'abbr',

@@ -5,12 +5,9 @@ Functions include:
     - from_request_get_user_info
     - from_request_get_feed_params
 """
-import inflection
-from flask import g
-
-from ..proxies import db_session
 from ..models import User
-from ..proxies import current_user
+from ..proxies import current_user, db_session
+import inflection
 
 
 def from_request_get_feed_params(request):

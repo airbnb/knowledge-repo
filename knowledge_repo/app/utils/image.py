@@ -1,9 +1,8 @@
+from knowledge_repo._version import __optional_dependencies__
+from knowledge_repo.utils.dependencies import check_dependencies
 import imghdr
 import io
 import os
-
-from knowledge_repo.utils.dependencies import check_dependencies
-from knowledge_repo._version import __optional_dependencies__
 
 ALLOWED_IMAGE_TYPES = ('png', 'jpeg', 'gif')
 

@@ -1,6 +1,5 @@
-from flask_principal import Permission
-
 from . import roles
+from flask_principal import Permission
 
 # Site roles and permissions
 admin = Permission(roles.admin)

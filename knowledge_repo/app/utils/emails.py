@@ -1,17 +1,15 @@
 """
 This file deals with all of the email functions.
 """
+from ..models import Email, Subscription, User
+from ..proxies import db_session
+from ..proxies import current_repo
+from flask import render_template, current_app, url_for
+from flask_mail import Message
 import base64
 import logging
 import re
-
 import requests
-from flask import render_template, current_app, url_for
-from flask_mail import Message
-
-from ..proxies import db_session
-from ..proxies import current_repo
-from ..models import Email, Subscription, User
 
 logger = logging.getLogger(__name__)
 

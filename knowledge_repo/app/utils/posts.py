@@ -4,13 +4,11 @@ Functions include:
     - get_posts
     - get_all_post_stats
 """
-import math
+from ..proxies import db_session
+from ..models import Comment, PageView, Post, Tag, User, Vote
 from flask import current_app
 from sqlalchemy import func, distinct, or_
-
-from ..proxies import db_session
-from ..models import (Comment, PageView, Post,
-                      Tag, Vote, User)
+import math
 
 
 def get_query_param_set(params):

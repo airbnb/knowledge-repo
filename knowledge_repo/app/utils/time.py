@@ -1,11 +1,11 @@
-import datetime
+from datetime import datetime
 
 
 def time_since(dt, human_readable=False, default=None):
     if dt is None:
         return default
-    assert isinstance(dt, datetime.datetime)
-    delta = (datetime.datetime.utcnow() - dt).total_seconds()
+    assert isinstance(dt, datetime)
+    delta = (datetime.utcnow() - dt).total_seconds()
     if human_readable:
         return human_readable_time_delta(delta)
     return delta

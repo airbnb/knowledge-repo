@@ -1,12 +1,11 @@
+from .models import ErrorLog, IndexMetadata, Post
+from .proxies import db_session, current_app, current_repo
+from .utils.emails import send_subscription_emails
+from .utils.time import time_since
 import logging
 import multiprocessing
 import os
 import time
-
-from .proxies import db_session, current_repo, current_app
-from .models import ErrorLog, Post, IndexMetadata
-from .utils.emails import send_subscription_emails
-from .utils.time import time_since
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

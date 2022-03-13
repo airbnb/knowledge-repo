@@ -1,5 +1,5 @@
+from flask_principal import ItemNeed, RoleNeed
 from functools import partial
-from flask_principal import RoleNeed, ItemNeed
 
 # Need types
 GroupNeed = partial(ItemNeed, 'group')
