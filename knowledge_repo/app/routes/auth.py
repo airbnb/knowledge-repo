@@ -1,5 +1,11 @@
 from ..proxies import current_app
-from flask import redirect, render_template, current_app, Blueprint, url_for
+from flask import (
+    current_app,
+    redirect,
+    render_template,
+    url_for,
+    Blueprint,
+)
 from flask_login import logout_user, login_required
 from flask_principal import identity_changed, AnonymousIdentity
 

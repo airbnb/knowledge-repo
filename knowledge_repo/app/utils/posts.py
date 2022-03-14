@@ -5,7 +5,14 @@ Functions include:
     - get_all_post_stats
 """
 from ..proxies import db_session
-from ..models import Comment, PageView, Post, Tag, User, Vote
+from ..models import (
+    Comment,
+    PageView,
+    Post,
+    Tag,
+    User,
+    Vote,
+)
 from flask import current_app
 from sqlalchemy import func, distinct, or_
 import math

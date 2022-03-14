@@ -13,7 +13,14 @@ from ..utils.posts import get_posts
 from ..utils.render import render_post_tldr
 from ..utils.requests import from_request_get_feed_params
 from collections import namedtuple
-from flask import current_app, make_response, redirect, render_template, request, Blueprint
+from flask import (
+    current_app,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    Blueprint,
+)
 from flask_login import login_required
 from sqlalchemy import case, desc
 import os

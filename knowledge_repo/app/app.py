@@ -16,7 +16,13 @@ from .utils.auth import (
 from alembic import command
 from alembic.migration import MigrationContext
 from datetime import datetime
-from flask import current_app, render_template, request, session, Flask
+from flask import (
+    current_app,
+    render_template,
+    request,
+    session,
+    Flask,
+)
 from flask_login import user_loaded_from_request, LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
