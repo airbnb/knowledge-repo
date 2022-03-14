@@ -1,10 +1,8 @@
+from .._version import __git_uri__
+import git
 import os
 import shutil
 import tempfile
-
-import git
-
-from .._version import __git_uri__
 
 
 def clone_kr_to_directory(dir):

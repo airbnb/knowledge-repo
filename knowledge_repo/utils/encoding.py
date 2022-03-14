@@ -2,7 +2,6 @@ import logging
 import os
 import sys
 
-
 __all__ = ['encode', 'decode']
 
 logger = logging.getLogger(__name__)
