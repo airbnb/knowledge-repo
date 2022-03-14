@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from flask import request
 from flask_login import AnonymousUserMixin
 from flask_principal import UserNeed
-from urllib.parse import urlparse, urlencode, urljoin
+from urllib.parse import urljoin, urlparse
 
 
 def prepare_user(user, session_start=True):

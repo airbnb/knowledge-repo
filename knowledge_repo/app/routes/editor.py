@@ -2,8 +2,15 @@ from .. import permissions
 from ..index import update_index
 from ..models import Comment, PageView, Post, PostAuthorAssoc
 from ..proxies import current_repo, current_user, db_session
-from ..utils.emails import send_review_email, send_reviewer_request_email
-from ..utils.image import is_allowed_image_format, is_pdf, pdf_page_to_png
+from ..utils.emails import (
+    send_review_email,
+    send_reviewer_request_email,
+)
+from ..utils.image import (
+    is_allowed_image_format,
+    is_pdf,
+    pdf_page_to_png,
+)
 from datetime import datetime
 from flask import (
     current_app,
