@@ -5,9 +5,9 @@ from .postprocessor import KnowledgePostProcessor
 from .utils.registry import SubclassRegisteringABCMeta
 from abc import abstractmethod, abstractproperty
 from collections import OrderedDict
+from datetime import datetime
 from enum import Enum
 from urllib.parse import urlparse
-import datetime
 import os
 import posixpath
 
@@ -240,7 +240,7 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
         path = self._kp_path(path)
         path = self.config.path_parse(path)
 
-        current_datetime = datetime.datetime.now()
+        current_datetime = datetime.now()
         authors = kp.headers['authors']
         new_authors = [self.config.username_parse(author) for author in authors]
         if new_authors != authors or kp.headers['updated_at'] < current_datetime:

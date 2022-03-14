@@ -1,12 +1,10 @@
+from .docx import DocxConverter
 import cooked_input as ci
 import logging
 import os
 import re
 import time
-
 import webbrowser
-
-from .docx import DocxConverter
 
 logger = logging.getLogger(__name__)
 

@@ -1,14 +1,12 @@
-import os
-import shutil
-import random
-import string
-import logging
-import time
-import tempfile
-from urllib.parse import urljoin
-
 from .extract_images import ExtractImages
-
+import logging
+import os
+import random
+import shutil
+import string
+import tempfile
+import time
+from urllib.parse import urljoin
 
 logger = logging.getLogger(__name__)
 

@@ -1,10 +1,8 @@
+from ..converter import KnowledgePostConverter
 import os
 import logging
 import subprocess
 import tempfile
-
-from ..converter import KnowledgePostConverter
-
 
 logger = logging.getLogger(__name__)
 

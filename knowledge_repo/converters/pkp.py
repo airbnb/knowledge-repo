@@ -1,8 +1,6 @@
-import zipfile
-import io
-import os
-
 from ..converter import KnowledgePostConverter
+import io
+import zipfile
 
 
 class PkpConverter(KnowledgePostConverter):

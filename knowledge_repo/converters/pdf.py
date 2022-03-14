@@ -1,5 +1,4 @@
 from ..converter import KnowledgePostConverter
-
 from .html import HTMLConverter
 
 
