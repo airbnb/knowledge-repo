@@ -17,12 +17,17 @@ from ..models import (
     PageView,
     Post,
     Subscription,
-    Tag
+    Tag,
 )
 from ..proxies import current_user, db_session
 from ..utils.emails import send_subscription_email
 from ..utils.requests import from_request_get_feed_params
-from flask import current_app, render_template, request, Blueprint
+from flask import (
+    current_app,
+    render_template,
+    request,
+    Blueprint,
+)
 from sqlalchemy import and_
 import logging
 import math

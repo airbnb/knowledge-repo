@@ -12,7 +12,7 @@ from flask import (
     request,
     url_for,
     Blueprint,
-    Response
+    Response,
 )
 
 logging.basicConfig(level=logging.INFO)
