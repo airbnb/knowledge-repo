@@ -1,9 +1,10 @@
+from ..constants import FORMAT_CHECKS
 from ..post import HEADER_OPTIONAL_FIELD_TYPES, HEADER_REQUIRED_FIELD_TYPES
 from ..postprocessor import KnowledgePostProcessor
 
 
 class FormatChecks(KnowledgePostProcessor):
-    _registry_keys = ['format_checks']
+    _registry_keys = [FORMAT_CHECKS]
 
     def process(self, kp):
         headers = kp.headers

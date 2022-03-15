@@ -1,3 +1,4 @@
+from ..constants import EXTRACT_IMAGES
 from ..postprocessor import KnowledgePostProcessor
 import logging
 import os
@@ -8,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class ExtractImages(KnowledgePostProcessor):
-    _registry_keys = ['extract_images']
+    _registry_keys = [EXTRACT_IMAGES]
 
     def process(self, kp):
         images = self.find_images(kp.read())

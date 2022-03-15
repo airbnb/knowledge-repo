@@ -1,3 +1,4 @@
+from .constants import EXTRACT_IMAGES, FORMAT_CHECKS
 from .postprocessor import KnowledgePostProcessor
 from .utils.dependencies import check_dependencies
 from .utils.registry import SubclassRegisteringABCMeta
@@ -28,7 +29,7 @@ class KnowledgePostConverter(object, metaclass=SubclassRegisteringABCMeta):
         self.kp = kp
         self.format = format
         if postprocessors is None:
-            postprocessors = [('extract_images', {}), ('format_checks', {})]
+            postprocessors = [(EXTRACT_IMAGES, {}), (FORMAT_CHECKS, {})]
         self.postprocessors = postprocessors
         self.interactive = interactive
         self.init(**kwargs)
