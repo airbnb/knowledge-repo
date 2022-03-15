@@ -1,5 +1,8 @@
 from .constants import (
+    DEV,
     IPYNB,
+    LDAP,
+    OAUTH,
     PDF,
 )
 import os
@@ -61,17 +64,17 @@ __optional_dependencies__ = {
     ],
 
     # Optional OAuth library for external authentication support
-    'oauth': [
+    OAUTH: [
         'requests_oauthlib'
     ],
 
     # Optional ldap library for ldap authentication
-    'ldap': [
+    LDAP: [
         'ldap3'
     ],
 
     # Testing dependencies
-    'dev': [
+    DEV: [
         'pycodestyle',  # PEP8 conformance
         'nose',  # Testing framework
         'beautifulsoup4',  # HTML/XML parser

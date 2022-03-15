@@ -10,6 +10,7 @@ from flask import (
 )
 from flask_login import login_user
 from flask_principal import identity_changed, Identity
+from knowledge_repo.constants import DEBUG, OAUTH
 
 
 class KnowledgeAuthProvider(object, metaclass=SubclassRegisteringABCMeta):
@@ -18,7 +19,7 @@ class KnowledgeAuthProvider(object, metaclass=SubclassRegisteringABCMeta):
     @classmethod
     def register_auth_provider_blueprints(cls, app, prefix='/auth/login'):
         app.auth_providers = []
-        for provider in app.config.get('AUTH_PROVIDERS', ['debug', 'oauth']):
+        for provider in app.config.get('AUTH_PROVIDERS', [DEBUG, OAUTH]):
             if not isinstance(provider, KnowledgeAuthProvider):
                 provider = cls._get_subclass_for(provider.lower())(name=provider, app=app)
             app.register_blueprint(provider.blueprint, url_prefix='/'.join((prefix, provider.name)))

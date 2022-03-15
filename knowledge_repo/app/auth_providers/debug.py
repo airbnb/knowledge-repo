@@ -9,15 +9,16 @@ from flask import (
     url_for,
 )
 from flask_login import login_user
+from knowledge_repo.constants import DEBUG, USERNAME
 import flask
 
 
 class DebugAuthProvider(KnowledgeAuthProvider):
-    _registry_keys = ['debug']
+    _registry_keys = [DEBUG]
 
     def prompt(self):
         if request.method == 'POST':
-            user = request.form['username']
+            user = request.form[USERNAME]
             login_user(User(identifier=user))
 
             flash('Logged in successfully.')
@@ -32,4 +33,4 @@ class DebugAuthProvider(KnowledgeAuthProvider):
         return render_template('auth-login-form.html', skip_password=True)
 
     def get_user(self):
-        return User(identifier=request.form['username'])
+        return User(identifier=request.form[USERNAME])

@@ -8,6 +8,7 @@ from flask import (
     Blueprint,
     Response,
 )
+from knowledge_repo.constants import DEBUG
 import knowledge_repo
 import logging
 import platform
@@ -18,7 +19,7 @@ import types
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-blueprint = Blueprint('debug', __name__,
+blueprint = Blueprint(DEBUG, __name__,
                       template_folder='../templates', static_folder='../static')
 
 
