@@ -1,3 +1,7 @@
+from .constants import (
+    IPYNB,
+    PDF,
+)
 import os
 import subprocess
 
@@ -44,14 +48,14 @@ __dependencies__ = [
 
 __optional_dependencies__ = {
     # ipynb notebook conversion suport
-    'ipynb': [
+    IPYNB: [
         'nbformat',
         'nbconvert[execute]<6.0.0',
         'traitlets'
     ],
 
     # PDF to image conversion used by app
-    'pdf': [
+    PDF: [
         'PyPDF2',  # image for parsing PDFs to images
         'wand',  # imagemagick integration for image uploading
     ],

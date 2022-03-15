@@ -1,3 +1,4 @@
+from ..constants import PDF
 from ..converter import KnowledgePostConverter
 from .html import HTMLConverter
 
@@ -6,7 +7,7 @@ class PDFConverter(KnowledgePostConverter):
     '''
     Use this as a template for new KnowledgePostConverters.
     '''
-    _registry_keys = ['pdf']
+    _registry_keys = [PDF]
 
     @property
     def dependencies(self):

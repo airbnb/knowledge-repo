@@ -1,3 +1,4 @@
+from ..constants import IPYNB
 from ..converter import KnowledgePostConverter
 from .._version import __optional_dependencies__
 import os
@@ -41,11 +42,11 @@ var element = $('#{{ div_id }}');
 
 
 class IpynbFormat(KnowledgePostConverter):
-    _registry_keys = ['ipynb']
+    _registry_keys = [IPYNB]
 
     @property
     def dependencies(self):
-        return __optional_dependencies__['ipynb']
+        return __optional_dependencies__[IPYNB]
 
     def from_file(self, filename):
         import nbformat
