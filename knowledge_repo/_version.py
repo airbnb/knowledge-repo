@@ -1,10 +1,3 @@
-from .constants import (
-    DEV,
-    IPYNB,
-    LDAP,
-    OAUTH,
-    PDF,
-)
 import os
 import subprocess
 
@@ -51,30 +44,30 @@ __dependencies__ = [
 
 __optional_dependencies__ = {
     # ipynb notebook conversion suport
-    IPYNB: [
+    'ipynb': [
         'nbformat',
         'nbconvert[execute]<6.0.0',
         'traitlets'
     ],
 
     # PDF to image conversion used by app
-    PDF: [
+    'pdf': [
         'PyPDF2',  # image for parsing PDFs to images
         'wand',  # imagemagick integration for image uploading
     ],
 
     # Optional OAuth library for external authentication support
-    OAUTH: [
+    'oauth': [
         'requests_oauthlib'
     ],
 
     # Optional ldap library for ldap authentication
-    LDAP: [
+    'ldap': [
         'ldap3'
     ],
 
     # Testing dependencies
-    DEV: [
+    'dev': [
         'pycodestyle',  # PEP8 conformance
         'nose',  # Testing framework
         'beautifulsoup4',  # HTML/XML parser
