@@ -1,7 +1,7 @@
 import os
-from setuptools import setup, find_packages
 from distutils import log
 from distutils.command.install_scripts import install_scripts
+from setuptools import find_packages, setup
 
 # Extract version info from library
 version_info = {}

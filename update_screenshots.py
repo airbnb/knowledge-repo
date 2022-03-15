@@ -1,10 +1,11 @@
 import sys
 sys.path.insert(0, '..')
 
-import threading
-import time
 from selenium.webdriver import Chrome
 import knowledge_repo
+import threading
+import time
+
 
 def take_screenshots():
     driver = Chrome()

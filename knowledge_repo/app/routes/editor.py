@@ -2,10 +2,24 @@ from .. import permissions
 from ..index import update_index
 from ..models import Comment, PageView, Post, PostAuthorAssoc
 from ..proxies import current_repo, current_user, db_session
-from ..utils.emails import send_review_email, send_reviewer_request_email
-from ..utils.image import is_allowed_image_format, is_pdf, pdf_page_to_png
+from ..utils.emails import (
+    send_review_email,
+    send_reviewer_request_email,
+)
+from ..utils.image import (
+    is_allowed_image_format,
+    is_pdf,
+    pdf_page_to_png,
+)
 from datetime import datetime
-from flask import current_app, render_template, request, send_from_directory, url_for, Blueprint
+from flask import (
+    current_app,
+    render_template,
+    request,
+    send_from_directory,
+    url_for,
+    Blueprint,
+)
 from knowledge_repo.post import KnowledgePost
 from sqlalchemy import or_
 from urllib.parse import unquote

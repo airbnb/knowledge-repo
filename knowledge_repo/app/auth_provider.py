@@ -1,7 +1,13 @@
 from ..utils.registry import SubclassRegisteringABCMeta
 from .utils.auth import prepare_user
 from abc import abstractmethod
-from flask import current_app, redirect, session, url_for, Blueprint
+from flask import (
+    current_app,
+    redirect,
+    session,
+    url_for,
+    Blueprint,
+)
 from flask_login import login_user
 from flask_principal import identity_changed, Identity
 

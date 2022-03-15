@@ -1,8 +1,21 @@
 from .. import permissions
 from ..proxies import current_repo, current_user, db_session
 from ..models import PageView, Post, User
-from ..utils.render import render_comment, render_post, render_post_raw
-from flask import abort, current_app, redirect, render_template, request, url_for, Blueprint, Response
+from ..utils.render import (
+    render_comment,
+    render_post,
+    render_post_raw,
+)
+from flask import (
+    abort,
+    current_app,
+    redirect,
+    render_template,
+    request,
+    url_for,
+    Blueprint,
+    Response,
+)
 import logging
 import os
 

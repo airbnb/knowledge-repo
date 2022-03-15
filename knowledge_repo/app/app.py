@@ -1,17 +1,38 @@
 from . import routes
 from .auth_provider import KnowledgeAuthProvider
-from .index import set_up_indexing_timers, time_since_index, time_since_index_check, update_index
+from .index import (
+    set_up_indexing_timers,
+    time_since_index,
+    time_since_index_check,
+    update_index,
+)
 from .models import db as sqlalchemy_db, Tag, User
 from .proxies import current_repo, current_user, db_session
-from .utils.auth import populate_identity_roles, prepare_user, AnonymousKnowledgeUser
+from .utils.auth import (
+    populate_identity_roles,
+    prepare_user,
+    AnonymousKnowledgeUser,
+)
 from alembic import command
 from alembic.migration import MigrationContext
 from datetime import datetime
-from flask import current_app, render_template, request, session, Flask
+from flask import (
+    current_app,
+    render_template,
+    request,
+    session,
+    Flask,
+)
 from flask_login import user_loaded_from_request, LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
-from flask_principal import identity_loaded, AnonymousIdentity, Identity, PermissionDenied, Principal
+from flask_principal import (
+    identity_loaded,
+    AnonymousIdentity,
+    Identity,
+    PermissionDenied,
+    Principal,
+)
 from werkzeug.urls import url_encode
 import logging
 import os

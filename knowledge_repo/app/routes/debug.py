@@ -7,7 +7,13 @@ import platform
 import sys
 import tabulate
 import types
-from flask import current_app, request, url_for, Blueprint, Response
+from flask import (
+    current_app,
+    request,
+    url_for,
+    Blueprint,
+    Response,
+)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
