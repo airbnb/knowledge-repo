@@ -7,10 +7,11 @@ from flask import (
     url_for,
 )
 from ldap3 import Server, Connection, ALL
+from knowledge_repo.constants import LDAP, USERNAME
 
 
 class LdapAuthProvider(KnowledgeAuthProvider):
-    _registry_keys = ['ldap']
+    _registry_keys = [LDAP]
 
     def init(self):
 
@@ -40,4 +41,4 @@ class LdapAuthProvider(KnowledgeAuthProvider):
         return conn.bind()
 
     def get_user(self):
-        return User(identifier=request.form['username'])
+        return User(identifier=request.form[USERNAME])

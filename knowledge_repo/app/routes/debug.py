@@ -1,12 +1,6 @@
 from ..index import get_indexed_revisions, is_indexing
 from ..proxies import current_repo
 from urllib.parse import unquote
-import knowledge_repo
-import logging
-import platform
-import sys
-import tabulate
-import types
 from flask import (
     current_app,
     request,
@@ -14,11 +8,18 @@ from flask import (
     Blueprint,
     Response,
 )
+from knowledge_repo.constants import DEBUG
+import knowledge_repo
+import logging
+import platform
+import sys
+import tabulate
+import types
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-blueprint = Blueprint('debug', __name__,
+blueprint = Blueprint(DEBUG, __name__,
                       template_folder='../templates', static_folder='../static')
 
 

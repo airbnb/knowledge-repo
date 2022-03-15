@@ -1,4 +1,5 @@
 from __future__ import absolute_import, unicode_literals
+from ..constants import PROXY
 from ..converter import KnowledgePostConverter
 from ..mapping import SubstitutionMapper
 from markdown import Extension
@@ -203,7 +204,7 @@ class HTMLConverter(KnowledgePostConverter):
             urlmappers.insert(0, self.base64_encode_image_mapper)
 
         # proxy posts are assumed to be embeddable links
-        if 'proxy' in self.kp.headers:
+        if PROXY in self.kp.headers:
             return None, '<a href="{0}">Linked Post</a>\n<iframe width=100% height=1000 src="{0}"></iframe>'.format(self.kp.headers['proxy'].strip())
 
         html = ''

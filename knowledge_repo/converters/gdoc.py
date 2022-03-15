@@ -1,3 +1,4 @@
+from ..constants import GDOC
 from .docx import DocxConverter
 import cooked_input as ci
 import logging
@@ -10,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class GDocConverter(DocxConverter):
-    _registry_keys = ['gdoc']
+    _registry_keys = [GDOC]
 
     def _find_doc(self, path, after=None, max_attempts=60, delay=1):
         """

@@ -1,3 +1,9 @@
+from .constants import (
+    EXTRACT_IMAGES,
+    FORMAT_CHECKS,
+    GDOC,
+    PROXY,
+)
 from .postprocessor import KnowledgePostProcessor
 from .utils.dependencies import check_dependencies
 from .utils.registry import SubclassRegisteringABCMeta
@@ -8,9 +14,9 @@ import os
 def get_format(filename, format=None):
     if format is None:
         if filename.startswith('https://docs.google.com/document/d/'):
-            format = 'gdoc'
+            format = GDOC
         elif filename.startswith('http://') or filename.startswith('https://'):
-            format = 'proxy'
+            format = PROXY
         elif '.' in filename:
             format = os.path.splitext(filename)[1]
             if format.startswith('.'):
@@ -28,7 +34,7 @@ class KnowledgePostConverter(object, metaclass=SubclassRegisteringABCMeta):
         self.kp = kp
         self.format = format
         if postprocessors is None:
-            postprocessors = [('extract_images', {}), ('format_checks', {})]
+            postprocessors = [(EXTRACT_IMAGES, {}), (FORMAT_CHECKS, {})]
         self.postprocessors = postprocessors
         self.interactive = interactive
         self.init(**kwargs)
