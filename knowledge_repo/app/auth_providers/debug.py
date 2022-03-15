@@ -1,7 +1,6 @@
 from ..auth_provider import KnowledgeAuthProvider
 from ..models import User
 from ..utils.auth import is_safe_url
-import flask
 from flask import (
     flash,
     redirect,
@@ -10,6 +9,7 @@ from flask import (
     url_for,
 )
 from flask_login import login_user
+import flask
 
 
 class DebugAuthProvider(KnowledgeAuthProvider):

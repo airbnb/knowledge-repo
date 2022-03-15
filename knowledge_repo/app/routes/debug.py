@@ -1,12 +1,6 @@
 from ..index import get_indexed_revisions, is_indexing
 from ..proxies import current_repo
 from urllib.parse import unquote
-import knowledge_repo
-import logging
-import platform
-import sys
-import tabulate
-import types
 from flask import (
     current_app,
     request,
@@ -14,6 +8,12 @@ from flask import (
     Blueprint,
     Response,
 )
+import knowledge_repo
+import logging
+import platform
+import sys
+import tabulate
+import types
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
