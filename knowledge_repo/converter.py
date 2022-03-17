@@ -30,7 +30,10 @@ class KnowledgePostConverter(object, metaclass=SubclassRegisteringABCMeta):
     _registry_keys = None  # File extensions
 
     def __init__(self, kp, format=None, postprocessors=None, interactive=False, **kwargs):
-        check_dependencies(self.dependencies, "Whoops! You are missing some dependencies required to use `{}` instances.".format(self.__class__.__name__))
+        check_dependencies(
+            self.dependencies,
+            f'Whoops! You are missing some dependencies required to use `{self.__class__.__name__}` instances.',
+        )
         self.kp = kp
         self.format = format
         if postprocessors is None:
@@ -98,6 +101,8 @@ class KnowledgePostConverter(object, metaclass=SubclassRegisteringABCMeta):
     @classmethod
     def for_format(cls, kp, format, postprocessors=None, interactive=False):
         if format.lower() not in cls._registry:
-            raise ValueError("The knowledge repository does not support files of type '{}'. Supported types are: {}."
-                             .format(format, ','.join(list(cls._registry.keys()))))
+            keys = ','.join(list(cls._registry.keys()))
+            raise ValueError(
+                f"The knowledge repository does not support files of type '{format}'. Supported types are: {keys}."
+            )
         return cls._get_subclass_for(format.lower())(kp, format=format, postprocessors=postprocessors, interactive=interactive)
