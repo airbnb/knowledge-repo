@@ -61,7 +61,7 @@ class KnowledgeFlask(Flask):
         # Add unique identifier for this application isinstance
         self.uuid = str(uuid.uuid4())
         if 'KNOWLEDGE_REPO_MASTER_UUID' not in os.environ:
-            logger.info("Set KNOWLEDGE_REPO_MASTER_UUID to '{}'.".format(self.uuid))
+            logger.info(f"Set KNOWLEDGE_REPO_MASTER_UUID to '{self.uuid}'.")
             os.environ['KNOWLEDGE_REPO_MASTER_UUID'] = self.uuid
 
         # Preload default configuration
@@ -256,7 +256,8 @@ class KnowledgeFlask(Flask):
             for key, value in new_values.items():
                 args[key] = value
 
-            return '{}?{}'.format(request.path, url_encode(args))
+            args_encoded = url_encode(args)
+            return f'{request.path}?{args_encoded}'
 
         @self.template_global()
         def pagination_pages(current_page, page_count, max_pages=5, extremes=True):

@@ -187,7 +187,7 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
             if status == 'all':
                 status = [self.PostStatus.DRAFT, self.PostStatus.SUBMITTED, self.PostStatus.PUBLISHED, self.PostStatus.UNPUBLISHED]
             else:
-                raise ValueError('Status alias `{}` not recognised.'.format(status))
+                raise ValueError(f'Status alias `{status}` not recognised.')
         if status is not None and not isinstance(status, list):
             status = [status]
         elif status is None:
