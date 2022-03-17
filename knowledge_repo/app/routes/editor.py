@@ -48,7 +48,7 @@ def gitless_drafts():
     """
     prefixes = current_app.config.get('WEB_EDITOR_PREFIXES', [])
     if prefixes == []:
-        raise Exception("Web editing is not configured")
+        raise Exception('Web editing is not configured')
 
     query = (db_session.query(Post))
     if prefixes is not None:
@@ -58,7 +58,7 @@ def gitless_drafts():
         query = (query.outerjoin(PostAuthorAssoc, PostAuthorAssoc.post_id == Post.id)
                       .filter(PostAuthorAssoc.user_id == current_user.id))
 
-    return render_template("web_posts.html", posts=query.all())
+    return render_template('web_posts.html', posts=query.all())
 
 
 @blueprint.route('/edit')
@@ -74,7 +74,7 @@ def editor(path=None):
     if prefixes is not None:
         assert (
             path is None or any(path.startswith(prefix) for prefix in prefixes)
-        ), "Editing of this post online is not permitted by server configuration."
+        ), 'Editing of this post online is not permitted by server configuration.'
 
     # set defaults
     data = {'title': None,
@@ -103,7 +103,7 @@ def editor(path=None):
         if post:  # post may have not been indexed yet
             data['comments'] = (db_session.query(Comment)
                                           .filter(Comment.post_id == post.id)
-                                          .filter(Comment.type == "review")
+                                          .filter(Comment.type == 'review')
                                           .all())
 
     if current_user.identifier not in data['authors'] or current_user.identifier in current_repo.config.editors:
@@ -131,11 +131,11 @@ def save_post():
 
     prefixes = current_app.config['WEB_EDITOR_PREFIXES']
     if prefixes == []:
-        raise Exception("Web editing is not configured")
+        raise Exception('Web editing is not configured')
 
     if prefixes is not None:
         if not any([path.startswith(prefix) for prefix in prefixes]):
-            return json.dumps({'msg': ("Your post path must begin with one of {}").format(prefixes),
+            return json.dumps({'msg': (f'Your post path must begin with one of {prefixes}'),
                                'success': False})
 
     # TODO better handling of overwriting
@@ -143,8 +143,8 @@ def save_post():
     if path in current_repo:
         kp = current_repo.post(path)
         if current_user.identifier not in kp.headers['authors'] and current_user.identifier not in current_repo.config.editors:
-            return json.dumps({'msg': ("Post with path {} already exists and you are not an author!"
-                                       "\nPlease try a different path").format(path),
+            return json.dumps({'msg': (f'Post with path {path} already exists and you are not an author!'
+                                       '\nPlease try a different path'),
                                'success': False})
 
     # create the knowledge post
@@ -198,7 +198,7 @@ def publish_post():
     """ Publish the post by changing the status """
     path = request.args.get('path', None)
     if path not in current_repo:
-        return json.dumps({'msg': "Unable to retrieve post with path = {}!".format(path), 'success': False})
+        return json.dumps({'msg': f'Unable to retrieve post with path = {path}!', 'success': False})
     current_repo.publish(path)
 
     update_index(check_timeouts=False)
@@ -212,7 +212,7 @@ def unpublish_post():
     """ Unpublish the post """
     path = request.args.get('path', None)
     if path not in current_repo:
-        return json.dumps({'msg': "Unable to retrieve post with path = {}!".format(path), 'success': False})
+        return json.dumps({'msg': f'Unable to retrieve post with path = {path}!', 'success': False})
     current_repo.unpublish(path)
 
     update_index(check_timeouts=False)
@@ -226,7 +226,7 @@ def accept():
     """ Accept the post """
     path = request.args.get('path', None)
     if path not in current_repo:
-        return json.dumps({'msg': "Unable to retrieve post with path = {}!".format(path), 'success': False})
+        return json.dumps({'msg': f'Unable to retrieve post with path = {path}!', 'success': False})
     current_repo.accept(path)
     update_index()
     return 'OK'
@@ -239,10 +239,10 @@ def delete_post():
     """ Delete a post """
     path = request.args.get('path', None)
     if path not in current_repo:
-        return json.dumps({'msg': "Unable to retrieve post with path = {}!".format(path), 'success': False})
+        return json.dumps({'msg': f'Unable to retrieve post with path = {path}!', 'success': False})
     kp = current_repo.post(path)
     if current_user.identifier not in kp.headers['authors']:
-        return json.dumps({'msg': "You can only delete a post where you are an author!", 'success': False})
+        return json.dumps({'msg': 'You can only delete a post where you are an author!', 'success': False})
     current_repo.remove(path)
 
     update_index(check_timeouts=False)
@@ -265,7 +265,7 @@ def review_comment():
         comment.text = request.get_json()['text']
         comment.user_id = current_user.id
         comment.post_id = post_id
-        comment.type = "review"
+        comment.type = 'review'
         db_session.add(comment)
         db_session.commit()
 
@@ -297,16 +297,16 @@ def file_upload():
 
     if files:
         for img_file in files.values():
-            filename = secure_filename(title + "_" + img_file.filename).lower()
+            filename = secure_filename(title + '_' + img_file.filename).lower()
             dst_folder = os.path.join(current_app.static_folder, upload_folder)
 
             if is_allowed_image_format(img_file):
                 try:
                     img_file.save(os.path.join(dst_folder, filename))
                     send_from_directory(dst_folder, filename)
-                    uploadedFiles += [url_for("static", filename=os.path.join(upload_folder, filename))]
+                    uploadedFiles += [url_for('static', filename=os.path.join(upload_folder, filename))]
                 except Exception as e:
-                    error_msg = "ERROR during image upload: {}".format(str(e))
+                    error_msg = f'ERROR during image upload: {e}'
                     logger.error(error_msg)
                     return json.dumps({'error_msg': error_msg, 'success': False})
 
@@ -318,11 +318,11 @@ def file_upload():
                     num_pages = src_pdf.getNumPages()
                     for page_num in range(num_pages):
                         page_png = pdf_page_to_png(src_pdf, page_num)
-                        page_name = "{filename}_{page_num}.jpg".format(**locals())
+                        page_name = '{filename}_{page_num}.jpg'.format(**locals())
                         page_png.save(filename=os.path.join(dst_folder, page_name))
-                        uploadedFiles += [url_for("static", filename=os.path.join(upload_folder, page_name))]
+                        uploadedFiles += [url_for('static', filename=os.path.join(upload_folder, page_name))]
                 except Exception as e:
-                    error_msg = "ERROR during pdf upload: {}".format(str(e))
+                    error_msg = f'ERROR during pdf upload: {e}'
                     logger.error(error_msg)
                     return json.dumps({'error_msg': error_msg, 'success': False})
 
