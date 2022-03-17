@@ -42,11 +42,11 @@ class KnowledgeAuthProvider(object, metaclass=SubclassRegisteringABCMeta):
 
     @property
     def link_text(self):
-        return "Sign in using {}".format(self.name.capitalize())
+        return f'Sign in using {self.name.capitalize()}'
 
     @property
     def icon_uri(self):
-        return url_for('static', filename='images/auth/{}.png'.format(self.name))
+        return url_for('static', filename=f'images/auth/{self.name}.png')
 
     def authorize(self):
         user = self.get_user()

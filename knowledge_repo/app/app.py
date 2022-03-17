@@ -96,7 +96,9 @@ class KnowledgeFlask(Flask):
         # Configure database
         if db_uri:
             self.config['SQLALCHEMY_DATABASE_URI'] = db_uri
-        logger.debug("Using database: {}".format(self.config['SQLALCHEMY_DATABASE_URI']))
+
+        used_db_uri = self.config['SQLALCHEMY_DATABASE_URI']
+        logger.debug(f'Using database: {used_db_uri}')
 
         # Register database schema with flask app
         sqlalchemy_db.init_app(self)
