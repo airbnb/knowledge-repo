@@ -103,12 +103,12 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
                     for mountpoint, u in uri.uris.items():
                         uri_dict[posixpath.join(parent, mountpoint)] = u
                 else:
-                    raise ValueError("Unrecognised uri: {}".format(uri))
+                    raise ValueError(f'Unrecognised uri: {uri}')
 
             add_uris(uri_dict, self.uri)
             return uri_dict
 
-        raise ValueError("Unrecognised KnowledgeRepository.uri: {}".format(self.uri))
+        raise ValueError(f'Unrecognised KnowledgeRepository.uri: {self.uri}')
 
     @property
     def revisions(self):
@@ -130,12 +130,12 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
                 elif isinstance(uri, KnowledgeRepository):
                     revision_dict.update(uri.revisions)
                 else:
-                    raise ValueError("Unrecognised uri: {}".format(uri))
+                    raise ValueError(f'Unrecognised uri: {uri}')
 
             add_revisions(revision_dict, self.uris)
             return revision_dict
 
-        raise ValueError("Unrecognised KnowledgeRepository.uri: {}".format(self.uri))
+        raise ValueError('Unrecognised KnowledgeRepository.uri: {self.uri}')
 
     # ------------- Repository actions / state ------------------------------------
 
@@ -173,7 +173,7 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
             path = self.config.aliases[path]
             if path in self.config.alias:
                 raise ValueError("Alias cycle detected.")
-        assert self.has_post(path, revision=revision), "{} does not have a post for path '{}'.".format(self.__class__.__name__, path)
+        assert self.has_post(path, revision=revision), f"{self.__class__.__name__} does not have a post for path '{path}'."
         return KnowledgePost(path=path, repository=self, revision=revision or self._kp_get_revision(path))
 
     def dir(self, prefix=None, status=None):
@@ -323,7 +323,7 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
         assert all([not segment.endswith('.kp') for segment in path.split(
             '/')[:-1]]), "The post path may not contain a directory named '*.kp'."
         if path == '.' or path.startswith('..'):
-            raise ValueError("Provided path '{}' is outside of the knowledge repository.".format(path))
+            raise ValueError(f"Provided path '{path}' is outside of the knowledge repository.")
         if not path.endswith('.kp'):
             path += '.kp'
         return path
