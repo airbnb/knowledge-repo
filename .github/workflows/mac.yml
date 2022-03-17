@@ -16,7 +16,7 @@ jobs:
       matrix:
         os:
           - macos-latest
-        python-version: ['3.9']
+        python-version: ['3.8']
     steps:
       - name: 'Set up Python ${{ matrix.python-version }}'
         uses: actions/setup-python@v2
@@ -30,7 +30,7 @@ jobs:
       - run: conda config --set always_yes yes --set changeps1 no
       - run: conda info -a
       - run: conda update --all --yes
-      - run: conda create -n testenv python=3.9.6 && . "$(conda info --base)/etc/profile.d/conda.sh" && conda activate testenv
+      - run: conda create -n testenv python=3.8.12 && . $(conda info --base)/etc/profile.d/conda.sh && conda activate testenv
       - run: conda install -c conda-forge r-xfun=0.27
       - run: conda install -c conda-forge r-base r-rmarkdown r-ggplot2 r-plotly pandoc
       - run: conda install -c conda-forge regex
