@@ -49,11 +49,11 @@ class KnowledgeRepositoryConfig(dict):
                     self.__update_from_file(value)
                 else:
                     logger.warning(
-                        "Configuration file {} does not exist.".format(value))
+                        f'Configuration file {value} does not exist.')
             elif isinstance(value, type(None)):
                 pass
             else:
-                raise ValueError("Cannot interpret {}".format(value))
+                raise ValueError(f'Cannot interpret {value}')
         dict.update(self, kwargs)
 
     def update_defaults(self, *values, **kwargs):
@@ -66,11 +66,11 @@ class KnowledgeRepositoryConfig(dict):
                 if os.path.exists(value):
                     self.__defaults_from_file(value)
                 else:
-                    logger.warning("Configuration file {} does not exist.".format(value))
+                    logger.warning(f'Configuration file {value} does not exist.')
             elif isinstance(value, type(None)):
                 pass
             else:
-                raise ValueError("Cannot interpret {}".format(value))
+                raise ValueError(f'Cannot interpret {value}')
         self.DEFAULT_CONFIGURATION.update(kwargs)
 
     def __defaults_from_file(self, filename):
@@ -87,7 +87,8 @@ class KnowledgeRepositoryConfig(dict):
 
     def __set_from_file(self, d, filename, force=False):
         if filename.endswith('.py'):
-            module_name = 'knowledge_repo.config_{}'.format(str(time.time()).replace('.', ''))
+            time_str = str(time.time()).replace('.', '')
+            module_name = f'knowledge_repo.config_{time_str}'
             spec = importlib.util.spec_from_file_location(module_name, filename)
             config = importlib.util.module_from_spec(spec)
             sys.modules[module_name] = module
@@ -103,6 +104,6 @@ class KnowledgeRepositoryConfig(dict):
             if not key.startswith('_'):
                 if not force and key not in self.DEFAULT_CONFIGURATION:
                     logger.debug(
-                        "Ignoring configuration key `{}` which is not a valid configuration key.".format(key))
+                        f'Ignoring configuration key `{key}` which is not a valid configuration key.')
                 else:
                     d[key] = getattr(module, key)

@@ -79,6 +79,8 @@ tldr: |
 ---
 """
 
+YAML_MESSAGE = 'YAML header is missing. Please ensure that the top of your post has a header of the following form:\n' + HEADER_SAMPLE
+
 
 # Use OrderedDict representations in Yaml, so post headers remain in order
 # Although this sets it for all uses of yaml in this Python instance,
@@ -245,7 +247,7 @@ class KnowledgePost(object):
             md = decode(self._read_ref('knowledge.md'))
             mtch = re.match(HEADER_PATTERN, md)
             if not mtch:
-                raise ValueError("YAML header is missing. Please ensure that the top of your post has a header of the following form:\n" + HEADER_SAMPLE)
+                raise ValueError(YAML_MESSAGE)
             if not headers:
                 md = re.sub(HEADER_PATTERN, '', md, count=1)
             if not body:
@@ -256,7 +258,7 @@ class KnowledgePost(object):
 
     @property
     def image_paths(self):
-        return ['images/{}'.format(image_name) for image_name in self._dir(parent='images')]
+        return [f'images/{image_name}' for image_name in self._dir(parent='images')]
 
     def read_image(self, name):
         return self._read_ref('images/' + name)
@@ -269,8 +271,8 @@ class KnowledgePost(object):
 
     @property
     def src_paths(self):
-        srcs = ['src/{}'.format(src_name) for src_name in self._dir(parent='src')]
-        legacy_srcs = ['orig_src/{}'.format(src_name) for src_name in self._dir(parent='orig_src')]  # TODO: deprecate
+        srcs = [f'src/{src_name}' for src_name in self._dir(parent='src')]
+        legacy_srcs = [f'orig_src/{src_name}' for src_name in self._dir(parent='orig_src')]  # TODO: deprecate
         return srcs + legacy_srcs
 
     def read_src(self, ref):
@@ -289,7 +291,7 @@ class KnowledgePost(object):
         if not headers:
             mtch = re.match(HEADER_PATTERN, md)
             if not mtch:
-                raise ValueError("YAML header is missing. Please ensure that the top of your post has a header of the following form:\n" + HEADER_SAMPLE)
+                raise ValueError(YAML_MESSAGE)
             md_head = mtch.group(0)
             headers = self._get_headers_from_yaml(md_head)
 
@@ -334,10 +336,10 @@ class KnowledgePost(object):
             return next(yaml.full_load_all(yaml_str))
         except yaml.YAMLError as e:
             logger.info(
-                "YAML header is incorrectly formatted or missing. The following "
-                "information may be useful:\n{}\nIf you continue to have "
-                "difficulties, try pasting your YAML header into an online parser "
-                "such as http://yaml-online-parser.appspot.com/.".format(str(e))
+                'YAML header is incorrectly formatted or missing. The following '
+                f'information may be useful:\n{e}\nIf you continue to have '
+                'difficulties, try pasting your YAML header into an online parser '
+                'such as http://yaml-online-parser.appspot.com/.'
             )
         except StopIteration as e:
             logger.info('YAML header is missing!')
@@ -356,14 +358,13 @@ class KnowledgePost(object):
             )
 
             if missing_required_headers:
-                print("This post is missing the following required headers: {}".format(missing_required_headers))
+                print(f'This post is missing the following required headers: {missing_required_headers}')
             if missing_suggested_headers:
-                print("This post is missing the following suggested headers: {}".format(missing_suggested_headers))
+                print(f'This post is missing the following suggested headers: {missing_suggested_headers}')
             if missing_required_headers or missing_suggested_headers:
                 print(
-                    "You will now be prompted for each missing header. If you wish "
-                    "to abort the knowledge post creation, press Ctrl+C."
-                    .format(missing_required_headers)
+                    f'You will now be prompted for each missing header {missing_required_headers}.'
+                    'If you wish to abort the knowledge post creation, press Ctrl+C.'
                 )
 
                 for header in HEADERS_INTERACTIVE:
@@ -371,9 +372,9 @@ class KnowledgePost(object):
                         headers[header] = HEADERS_ALL[header].input.get_input()
         elif missing_required_headers:
             raise RuntimeError(
-                "Knowledge post is missing required headers {}. Please rerun this "
-                "operation in interactive mode, or add headers manually to the "
-                "post source file.".format(missing_required_headers)
+                f'Knowledge post is missing required headers {missing_required_headers}.'
+                'Please rerun this operation in interactive mode, or add headers manually '
+                'to the post source file.'
             )
 
         for key, value in list(headers.items()):
@@ -390,7 +391,7 @@ class KnowledgePost(object):
     def headers(self):
         headers = self._get_headers_from_yaml(self.read(body=False))
         if not headers:
-            raise ValueError("YAML header is missing. Please ensure that the top of your post has a header of the following form:\n" + HEADER_SAMPLE)
+            raise ValueError(YAML_MESSAGE)
         for key, value in headers.copy().items():
             if isinstance(value, date):
                 headers[key] = datetime.combine(value, time(0))
@@ -441,13 +442,12 @@ class KnowledgePost(object):
 
                 data = base64.b64encode(thumbnail_data)
                 thumbnail = (
-                    'data:{};base64,'.format('image/png') +
+                    'data:image/png;base64,' +
                     data.decode('utf-8')
                 )
             except Exception as e:
                 logger.warning(
-                    "Thumbnail generation failed for {}: {}."
-                    .format(self.path, e)
+                    f'Thumbnail generation failed for {self.path}: {e}.'
                 )
                 return None
             finally:

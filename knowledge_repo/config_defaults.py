@@ -17,14 +17,14 @@ def path_parse(repo, path):
             return path
     raise ValueError(
         "Provided path '{path}' does not match any of the following patterns:\n" +
-        '\n'.join("'{}': {}".format(pattern, desc) for pattern, desc in repo.config.path_patterns.items())
+        '\n'.join(f"'{pattern}': {desc}" for pattern, desc in repo.config.path_patterns.items())
     )
 
 
 # The accepted path patterns should be provided as a dictionary mapping regex
 # patterns to descriptions of that pattern.
 path_patterns = {
-    '.*': "Any path is valid."
+    '.*': 'Any path is valid.'
 }
 
 
@@ -53,10 +53,10 @@ editors = []
 # `username_pattern`, which can be provided more readily in a YAML configuration
 # file.
 def username_parse(repo, username):
-    if not re.match(repo.config.username_pattern, username):
+    pattern = repo.config.username_pattern
+    if not re.match(pattern, username):
         raise ValueError(
-            "Username '{}' does not follow the required pattern: '{}'"
-            .format(username, repo.config.username_pattern)
+            f"Username '{username}' does not follow the required pattern: '{pattern}'"
         )
     return username
 
