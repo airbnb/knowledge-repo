@@ -16,7 +16,7 @@ jobs:
       matrix:
         os:
           - macos-latest
-        python-version: ['3.6', '3.7', '3.8', '3.9']
+        python-version: ['3.9']
     steps:
       - name: 'Set up Python ${{ matrix.python-version }}'
         uses: actions/setup-python@v2
@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v2
       - run:  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh
       - run: bash miniconda.sh -b -p $HOME/miniconda
-      - run: 'export PATH="$HOME/miniconda/bin:$PATH"'
+      - run: export PATH="$HOME/miniconda/bin:$PATH"
       - run: hash -r
       - run: conda config --set always_yes yes --set changeps1 no
       - run: conda info -a
