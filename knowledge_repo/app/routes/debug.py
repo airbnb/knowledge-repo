@@ -53,9 +53,9 @@ def show_versions():
     for mountpoint, uri in current_repo.uris.items():
         revisions.append([mountpoint or '&lt;root&gt;', repo_revisions[uri], indexed_revisions.get(uri, 'None')])
 
-    return ("Knowledge Repo Version: {}<br/>\n".format(knowledge_repo.__version__) +
-            "Python Version: {}<br/>\n".format(sys.version) +
-            "Platform: {}<br/>\n".format(platform.version()) +
+    return (f"Knowledge Repo Version: {knowledge_repo.__version__}<br/>\n" +
+            f"Python Version: {sys.version}<br/>\n" +
+            f"Platform: {platform.version()}<br/>\n" +
             "<h2>Repository Revisions</h2>" +
             ("<i>Currently indexing</i><br />\n" if is_indexing() else "") +
             tabulate.tabulate(revisions, tablefmt='html') +

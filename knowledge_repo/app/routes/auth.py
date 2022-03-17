@@ -19,7 +19,8 @@ def login():
     providers = current_app.auth_providers
 
     if len(providers) == 1:
-        return redirect(url_for('auth_provider_{}.prompt'.format(providers[0].name)))
+        provider_name = providers[0].name
+        return redirect(url_for(f'auth_provider_{provider_name}.prompt'))
 
     return render_template(
         'auth-switcher.html',

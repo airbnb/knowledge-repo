@@ -224,7 +224,7 @@ def render_cluster():
         _, grouped_data = unpack(folder_to_posts)
 
     else:
-        raise ValueError("Group by `{}` not understood.".format(group_by))
+        raise ValueError(f'Group by `{group_by}` not understood.')
 
     def rec_sort(content, sort_by):
         sorted_content = []
@@ -273,7 +273,7 @@ def create(knowledge_format=None):
                                web_editor_enabled=current_app.config['WEB_EDITOR_PREFIXES'] != [])
 
     cur_dir = os.path.dirname(os.path.realpath(__file__))
-    knowledge_template = "knowledge_template.{}".format(knowledge_format)
+    knowledge_template = f'knowledge_template.{knowledge_format}'
     filename = os.path.join(cur_dir, '../../templates', knowledge_template)
     response = make_response(open(filename).read())
     response.headers["Content-Disposition"] = "attachment; filename=" + knowledge_template
