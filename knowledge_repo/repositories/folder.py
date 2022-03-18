@@ -32,7 +32,7 @@ class FolderKnowledgeRepository(KnowledgeRepository):
             if not os.path.exists(target):
                 shutil.copy(template, target)
             else:
-                logger.warning("Not overriding existing file '{}'.".format(filename))
+                logger.warning(f"Not overriding existing file '{filename}'.")
         return FolderKnowledgeRepository(path)
 
     @classmethod
@@ -69,7 +69,7 @@ class FolderKnowledgeRepository(KnowledgeRepository):
             if self.auto_create:
                 self.create(path)
             else:
-                raise ValueError("Provided path '{}' does not exist.".format(path))
+                raise ValueError(f"Provided path '{path}' does not exist.")
         self._path = path
 
     # ----------- Repository actions / state ------------------------------------

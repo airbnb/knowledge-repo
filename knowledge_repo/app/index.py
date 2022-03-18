@@ -21,10 +21,10 @@ def set_up_indexing_timers(app):
 
     if app.check_thread_support(check_index=True, check_repositories=app.config['INDEXING_UPDATES_REPOSITORIES']):
         if os.environ['KNOWLEDGE_REPO_MASTER_UUID'] != app.uuid:
-            logger.info("Not spawning index-sync timers for non-master application instance: {}".format(app.uuid))
+            logger.info(f'Not spawning index-sync timers for non-master application instance: {app.uuid}')
             return
 
-        logger.info("Spawning index-sync timers for master application instance: {}".format(app.uuid))
+        logger.info(f'Spawning index-sync timers for master application instance: {app.uuid}')
 
         def index_watchdog(app):
             while True:
@@ -156,12 +156,12 @@ def update_index(check_timeouts=True, force=False, reindex=False):
             # If UUID has changed, check if we can find it elsewhere in the repository, and if so update index path
             if post.uuid and ((post.path not in kr_dir) or (post.uuid != kr_dir[post.path].uuid)):
                 if post.uuid in kr_uuids:
-                    logger.info('Updating location of post: {} -> {}'.format(post.path, kr_uuids[post.uuid].path))
+                    logger.info(f'Updating location of post: {post.path} -> {kr_uuids[post.uuid].path}')
                     post.path = kr_uuids[post.uuid].path
 
             # If path of post no longer in directory, mark as unpublished
             if post.path not in kr_dir:
-                logger.info('Recording unpublished status for post at {}'.format(post.path))
+                logger.info(f'Recording unpublished status for post at {post.path}')
                 post.status = current_repo.PostStatus.UNPUBLISHED
                 continue
 
@@ -173,17 +173,17 @@ def update_index(check_timeouts=True, force=False, reindex=False):
             # Update metadata of post if required
             if reindex or (kp.revision > post.revision or not post.is_published or kp.uuid != post.uuid):
                 if kp.is_valid():
-                    logger.info('Recording update to post at: {}'.format(kp.path))
+                    logger.info(f'Recording update to post at: {kp.path}')
                     post.update_metadata_from_kp(kp)
                 else:
-                    logger.warning('Update to post at "{}" is corrupt.'.format(kp.path))
+                    logger.warning(f'Update to post at "{kp.path}" is corrupt.')
 
         # Add the new posts that remain in kr_dir
         for kp_path, kp in kr_dir.items():
             if not kp.is_valid():
-                logger.warning('New post at "{}" is corrupt.'.format(kp.path))
+                logger.warning(f'New post at "{kp.path}" is corrupt.')
                 continue
-            logger.info('creating new post from path {}'.format(kp_path))
+            logger.info(f'creating new post from path {kp_path}')
             post = Post()
             db_session.add(post)
             db_session.flush()  # (matthew) Fix groups logic so this is not necessary
