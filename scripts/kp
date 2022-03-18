@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 import argparse
-import cooked_input as ci
 import os
 import socket
 import sys
 import threading
 import webbrowser
+
+import cooked_input as ci
 
 # If this script is being run out of a checked out `knowledge-repo` repository,
 # we need to make sure the appropriate knowledge_repo package is being used. To
@@ -21,9 +22,11 @@ from knowledge_repo import KnowledgePost  # nopep8
 
 # Build argparser
 
-parser = argparse.ArgumentParser(add_help=False, description='Tooling to aid with the authoring and submission of knowledge posts.')
+parser = argparse.ArgumentParser(add_help=False,
+                                 description='Tooling to aid with the authoring and submission of knowledge posts.')
 parser.add_argument('--version', dest='version', action='store_true', help='Show version and exit.')
-parser.add_argument('--non-interactive', dest='interactive', action='store_false', help='Run scripts in non-interactive mode.')
+parser.add_argument('--non-interactive', dest='interactive', action='store_false',
+                    help='Run scripts in non-interactive mode.')
 parser.add_argument('-h', '--help', action='store_true', help='Show help and exit.')
 
 args, remaining_args = parser.parse_known_args()
@@ -44,7 +47,8 @@ subparsers = parser.add_subparsers(help='actions')
 from_ = subparsers.add_parser('from', help='Create a knowledge post from an existing document.')
 from_.set_defaults(action='from')
 from_.add_argument('source', help='The path or url of the source file.')
-from_.add_argument('--format', help='The format to assume for the source file (overriding default detection algorithms).')
+from_.add_argument('--format',
+                   help='The format to assume for the source file (overriding default detection algorithms).')
 from_.add_argument('--src', nargs='+', help='Specify additional files to be added as source files.')
 from_.add_argument('--overwrite', action='store_true', help='Overwrite any existing knowledge post.')
 
@@ -70,7 +74,8 @@ submit.add_argument(
 submit.add_argument(
     'path', help="The path of the post within the repository."
 )
-submit.add_argument('--update', action='store_true', help='Whether this post should replace existing posts at the same path.')
+submit.add_argument('--update', action='store_true',
+                    help='Whether this post should replace existing posts at the same path.')
 submit.add_argument('--message', help="A commit message describing this post and/or its changes.")
 
 args = parser.parse_args()
@@ -85,9 +90,11 @@ if not args.post_path.endswith('.kp'):
 if args.action == 'from':
     if not args.overwrite and os.path.exists(args.post_path):
         if args.interactive:
-            args.overwrite = ci.get_boolean(prompt="File already exists at '{}'. Do you want to overwrite it? (y/n)".format(args.post_path))
+            args.overwrite = ci.get_boolean(
+                prompt="File already exists at '{}'. Do you want to overwrite it? (y/n)".format(args.post_path))
         if not args.overwrite:
-            raise RuntimeError("File already exists at '{}', but the `overwrite` flag is not set.".format(args.post_path))
+            raise RuntimeError(
+                "File already exists at '{}', but the `overwrite` flag is not set.".format(args.post_path))
     kp = KnowledgePost.from_file(args.source, format=args.format, src_paths=args.src, interactive=args.interactive)
     kp.to_file(args.post_path, format='kp')
     sys.exit(0)
@@ -107,12 +114,15 @@ if args.action == 'to':
 if args.action == 'preview':
     from knowledge_repo.app.deploy import KnowledgeDeployer, get_app_builder
 
+
     def get_available_port():
         s = socket.socket()
         s.bind(("", 0))
         free_port = s.getsockname()[1]
         s.close()
         return free_port
+
+
     port = get_available_port()
 
     post_path = os.path.abspath(args.post_path)
@@ -134,7 +144,7 @@ if args.action == 'preview':
         "point your browser at the resulting url.\n\n"
         "When you are ready to exit the preview, simply kill this process using "
         "`<Ctrl> + C`.\n"
-        .format(url)
+            .format(url)
     )
     threading.Timer(1.25, lambda: webbrowser.open(url)).start()
 
