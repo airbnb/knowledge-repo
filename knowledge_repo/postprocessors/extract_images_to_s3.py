@@ -56,8 +56,8 @@ class ExtractImagesToS3(ExtractImages):
             fname_s3 = posixpath.join(self.s3_image_root, repo_name, fname_img)
             # Note: The following command may need to be prefixed with a login agent;
             # for example, to handle multi-factor authentication.
-            cmd = "aws s3 cp '{0}' {1}".format(tmp_path, fname_s3)
-            logger.info("Uploading images to S3: {cmd}".format(cmd=cmd))
+            cmd = f"aws s3 cp '{tmp_path}' {fname_s3}"
+            logger.info(f'Uploading images to S3: {cmd}')
             retval = os.system(cmd)
             if retval != 0:
                 raise Exception('Problem uploading images to s3')
