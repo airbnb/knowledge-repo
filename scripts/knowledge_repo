@@ -1,18 +1,17 @@
 #!/usr/bin/env python
 
-import sys
-import os
-import itertools
-import signal
-import re
-import threading
-import shutil
 import argparse
+import os
+import re
+import shutil
+import signal
 import subprocess
+import sys
+import threading
+import webbrowser
 
 import git
 import gitdb
-import webbrowser
 from tabulate import tabulate
 
 # Register handler for SIGTERM, so we can run cleanup code if we are terminated
@@ -31,6 +30,7 @@ from knowledge_repo.repositories.gitrepository import GitKnowledgeRepository  # 
 contrib_dir = os.path.join(os.path.dirname(__file__), os.pardir, 'contrib')
 if os.path.exists(os.path.join(contrib_dir, '__init__.py')):
     sys.path.insert(0, os.path.join(contrib_dir, '..'))
+
 
 # We first check whether this script actually the one we are going to be using,
 # or whether it should delegate tasks to a different script: namely the one hosted
@@ -52,10 +52,13 @@ class ParseRepositories(argparse.Action):
         repo = values
         prefix = self.prefix_pattern.match(repo)
         if not prefix:
-            raise ValueError("Be sure to specify repositories in form {name}uri when specifying more than one repository.")
+            raise ValueError(
+                "Be sure to specify repositories in form {name}uri when specifying more than one repository.")
         name, uri = prefix.groups()
         if name in self._repo_dict:
-            raise ValueError("Multiple repositories with the name ({}) have been specified. Please ensure all referenced repositories have a unique name.".format(name))
+            raise ValueError(
+                "Multiple repositories with the name ({}) have been specified. Please ensure all referenced repositories have a unique name.".format(
+                    name))
 
         self._repo_dict[name] = uri
 
@@ -67,12 +70,19 @@ class ParseRepositories(argparse.Action):
         else:
             setattr(namespace, self.dest, self._repo_dict)
 
-parser = argparse.ArgumentParser(add_help=False, description='Script to simplify management of the knowledge data repo.')
-parser.add_argument('--repo', action=ParseRepositories, help='The repository(ies) to use.', default=os.environ.get('KNOWLEDGE_REPO', None))
-parser.add_argument('--knowledge-branch', dest='knowledge_branch', help='The branch of the repository from which to source the knowledge_repo tools.', default='master')
-parser.add_argument('--dev', action='store_true', help='Whether to skip passing control to version of code checked out in knowledge repository.')
+
+parser = argparse.ArgumentParser(add_help=False,
+                                 description='Script to simplify management of the knowledge data repo.')
+parser.add_argument('--repo', action=ParseRepositories, help='The repository(ies) to use.',
+                    default=os.environ.get('KNOWLEDGE_REPO', None))
+parser.add_argument('--knowledge-branch', dest='knowledge_branch',
+                    help='The branch of the repository from which to source the knowledge_repo tools.',
+                    default='master')
+parser.add_argument('--dev', action='store_true',
+                    help='Whether to skip passing control to version of code checked out in knowledge repository.')
 parser.add_argument('--debug', action='store_true', help='Whether to enable debug mode.')
-parser.add_argument('--noupdate', dest='update', action='store_false', help='Whether script should update the repository before performing actions.')
+parser.add_argument('--noupdate', dest='update', action='store_false',
+                    help='Whether script should update the repository before performing actions.')
 parser.add_argument('--version', dest='version', action='store_true', help='Show version and exit.')
 parser.add_argument('-h', '--help', action='store_true', help='Show help and exit.')
 
@@ -92,9 +102,9 @@ if args.repo is None:
 # initialised will be enforced.
 try:
     repo = knowledge_repo.KnowledgeRepository.for_uri(args.repo)
-except (ValueError, git.exc.GitError, gitdb.exc.ODBError):  # TODO: Generalise error to cater for all KnowledgeRepository instances.
+except (ValueError, git.exc.GitError,
+        gitdb.exc.ODBError):  # TODO: Generalise error to cater for all KnowledgeRepository instances.
     repo = None
-
 
 # Update repository so that we can ensure git repository configuration is up to date
 # We wrap this in a try/except block because failing to update a repository can
@@ -105,7 +115,6 @@ if repo is not None and args.update:
         repo.update(branch=args.knowledge_branch)
     else:
         repo.update()
-
 
 # If not running in dev mode, and the current knowledge repository requests that
 # a specific tooling version be used, this script checks whether it is suitable
@@ -119,16 +128,18 @@ if repo is not None and not args.dev and repo.config.required_tooling_version:
     required_version = repo.config.required_tooling_version
     if required_version.startswith('!'):  # Specific revision requested
         from knowledge_repo.utils.git import clone_kr_to_directory, CheckedOutRevision
+
         clone_kr_to_directory('~/.knowledge_repo/git')
         cmdline_args = ['--noupdate'] + [arg.replace(' ', '\ ') if ' ' in arg else arg for arg in sys.argv[1:]]
         with CheckedOutRevision('~/.knowledge_repo/git', required_version[1:]) as script_path:
             sys.exit(
                 subprocess.call(
                     '{} {}'.format(os.path.join(script_path, 'scripts/knowledge_repo'), ' '.join(cmdline_args)
-                ), shell=True)
+                                   ), shell=True)
             )
     else:
         from knowledge_repo.utils.dependencies import check_dependencies
+
         check_dependencies([
             'knowledge_repo{}{}'.format(
                 '==' if required_version[0] not in ['<', '=', '>'] else '',
@@ -154,19 +165,25 @@ create.add_argument('--template', default=None, help='The template to use when c
 create.add_argument('format', choices=['ipynb', 'Rmd', 'md'], help='The format of the knowledge post to be created.')
 create.add_argument('filename', help='Where this file should be created.')
 #
-drafts = subparsers.add_parser('drafts', help='Show the posts which have local work that has not been published upstream.')
+drafts = subparsers.add_parser('drafts',
+                               help='Show the posts which have local work that has not been published upstream.')
 drafts.set_defaults(action='drafts')
 
-status = subparsers.add_parser('status', help='Provide information on the state of the repository. Useful mainly for debugging.')
+status = subparsers.add_parser('status',
+                               help='Provide information on the state of the repository. Useful mainly for debugging.')
 status.set_defaults(action='status')
 
-add = subparsers.add_parser('add', help='Add a knowledge post to the repository based on the supplied file. Can be a *.ipynb, *.Rmd, or *.md file.')
+add = subparsers.add_parser('add',
+                            help='Add a knowledge post to the repository based on the supplied file. Can be a *.ipynb, *.Rmd, or *.md file.')
 add.set_defaults(action='add')
 add.add_argument('filename', help='The filename to add.')
-add.add_argument('-p', '--path', help='The path of the destination post to be added in the knowledge repo. Required if the knowledge post does not specify "path" in its headers.')
+add.add_argument('-p', '--path',
+                 help='The path of the destination post to be added in the knowledge repo. Required if the knowledge post does not specify "path" in its headers.')
 add.add_argument('--update', action='store_true', help='Whether this should update an existing post of the same name.')
-add.add_argument('--branch', help='The branch to use for this addition, if not the default (which is the path of the knowledge post).')
-add.add_argument('--squash', action='store_true', help='Automatically suppress all previous commits, and replace it with this version.')
+add.add_argument('--branch',
+                 help='The branch to use for this addition, if not the default (which is the path of the knowledge post).')
+add.add_argument('--squash', action='store_true',
+                 help='Automatically suppress all previous commits, and replace it with this version.')
 add.add_argument('--submit', action='store_true', help='Submit newly added post')
 add.add_argument('-m', '--message', help='The commit message to be used when committing into the repo.')
 add.add_argument('--src', nargs='+', help='Specify additional source files to add to <knowledge_post>/orig_src.')
@@ -179,7 +196,8 @@ push = subparsers.add_parser('push', help='DEPRECATED: Use `submit` instead.')
 push.set_defaults(action='push')
 push.add_argument('path', help='The path of the knowledge post to submit for review.')
 
-preview = subparsers.add_parser('preview', help='Run the knowledge repo app, and preview the specified post. It is assumed it is available on the currently checked out branch.')
+preview = subparsers.add_parser('preview',
+                                help='Run the knowledge repo app, and preview the specified post. It is assumed it is available on the currently checked out branch.')
 preview.set_defaults(action='preview')
 preview.add_argument('path', help="The path of the knowledge post to preview.")
 preview.add_argument('--port', default=7000, type=int, help="Specify the port on which to run the web server")
@@ -197,25 +215,32 @@ deploy = subparsers.add_parser('deploy', help='Deploy the knowledge repo app usi
 deploy.set_defaults(action='deploy')
 deploy.add_argument('-p', '--port', default=7000, type=int, help="Specify the port on which to run the web server")
 deploy.add_argument('-w', '--workers', default=4, type=int, help="Number of gunicorn worker threads to spin up.")
-deploy.add_argument('-t', '--timeout', default=60, type=int, help="Specify the timeout (seconds) for the gunicorn web server")
+deploy.add_argument('-t', '--timeout', default=60, type=int,
+                    help="Specify the timeout (seconds) for the gunicorn web server")
 deploy.add_argument('-db', '--dburi', help='The SQLAlchemy database uri.')
 deploy.add_argument('-c', '--config', default=None, help="The config file from which to read server configuration.")
-deploy.add_argument('--engine', default='gunicorn', help='Which server engine to use when deploying; choose from: "flask", "gunicorn" (default) or "uwsgi".')
+deploy.add_argument('--engine', default='gunicorn',
+                    help='Which server engine to use when deploying; choose from: "flask", "gunicorn" (default) or "uwsgi".')
 
-db_upgrade = subparsers.add_parser('db_upgrade', help='Upgrade the database to the latest schema. Only necessary if you have disabled automatic migrations in your deployment.')
+db_upgrade = subparsers.add_parser('db_upgrade',
+                                   help='Upgrade the database to the latest schema. Only necessary if you have disabled automatic migrations in your deployment.')
 db_upgrade.set_defaults(action='db_upgrade')
 db_upgrade.add_argument('-db', '--dburi', help='The SQLAlchemy database uri.')
 db_upgrade.add_argument('-c', '--config', default=None, help="The config file from which to read server configuration.")
 db_upgrade.add_argument('-m', '--message', help="The message to use for the database revision.")
-db_upgrade.add_argument('--autogenerate', action='store_true', help="Whether alembic should automatically populate the migration script.")
+db_upgrade.add_argument('--autogenerate', action='store_true',
+                        help="Whether alembic should automatically populate the migration script.")
 
-db_downgrade = subparsers.add_parser('db_downgrade', help='Downgrade the database to the schema identified by a revision number.')
+db_downgrade = subparsers.add_parser('db_downgrade',
+                                     help='Downgrade the database to the schema identified by a revision number.')
 db_downgrade.set_defaults(action='db_downgrade')
 db_downgrade.add_argument('revision', help="The target database revision. Use '-1' for the previous version.")
 db_downgrade.add_argument('-db', '--dburi', help='The SQLAlchemy database uri.')
-db_downgrade.add_argument('-c', '--config', default=None, help="The config file from which to read server configuration.")
+db_downgrade.add_argument('-c', '--config', default=None,
+                          help="The config file from which to read server configuration.")
 
-reindex = subparsers.add_parser('reindex', help='Update the index, updating all posts even if they exist in the database already; but will not lose post views and other usage metadata.')
+reindex = subparsers.add_parser('reindex',
+                                help='Update the index, updating all posts even if they exist in the database already; but will not lose post views and other usage metadata.')
 reindex.set_defaults(action='reindex')
 reindex.add_argument('-db', '--dburi', help='The SQLAlchemy database uri.')
 reindex.add_argument('-c', '--config', default=None, help="The config file from which to read server configuration.")
@@ -231,7 +256,8 @@ if args.dev and os.path.exists(os.path.join(os.path.dirname(__file__), '..', '.g
     db_migrate.set_defaults(action='db_migrate')
     db_migrate.add_argument('message', help="The message to use for the database revision.")
     db_migrate.add_argument('-db', '--dburi', help='The SQLAlchemy database uri.')
-    db_migrate.add_argument('--autogenerate', action='store_true', help="Whether alembic should automatically populate the migration script.")
+    db_migrate.add_argument('--autogenerate', action='store_true',
+                            help="Whether alembic should automatically populate the migration script.")
 
 args = parser.parse_args()
 
@@ -252,31 +278,39 @@ if args.action == 'init':
 # All subsequent actions perform an action on the repository, and so we verify
 # enforce that `repo` is not None.
 if repo is None:
-    raise RuntimeError("Could not initialise knowledge repository for uri `{}`. Please check the uri, and try again.".format(args.repo))
+    raise RuntimeError(
+        "Could not initialise knowledge repository for uri `{}`. Please check the uri, and try again.".format(
+            args.repo))
 
 # Create a new knowledge post from a template
 if args.action == 'create':
-    src = os.path.join(os.path.dirname(knowledge_repo.__file__), 'templates', 'knowledge_template.{}'.format(args.format))
+    src = os.path.join(os.path.dirname(knowledge_repo.__file__), 'templates',
+                       'knowledge_template.{}'.format(args.format))
     if args.template:
         src = args.template
     if not os.path.exists(src):
         raise ValueError("Template not found at {}. Please choose a different template and try again.".format(src))
     if os.path.exists(args.filename):
-        raise ValueError("File already exists at '{}'. Please choose a different filename and try again.".format(args.filename))
+        raise ValueError(
+            "File already exists at '{}'. Please choose a different filename and try again.".format(args.filename))
     shutil.copy(src, args.filename)
-    print("Created a {format} knowledge post template at '{filename}'.".format(format=args.format, filename=args.filename))
+    print("Created a {format} knowledge post template at '{filename}'.".format(format=args.format,
+                                                                               filename=args.filename))
     sys.exit(0)
 
 # # Check which branches have local work
 if args.action == 'drafts':
-    statuses = repo.post_statuses(repo.dir(status=[repo.PostStatus.DRAFT, repo.PostStatus.SUBMITTED, repo.PostStatus.UNPUBLISHED]), detailed=True)
-    print(tabulate([[path, status.name, details] for path, (status, details) in statuses.items()], ['Post', 'Status', 'Details'], 'fancy_grid'))
+    statuses = repo.post_statuses(
+        repo.dir(status=[repo.PostStatus.DRAFT, repo.PostStatus.SUBMITTED, repo.PostStatus.UNPUBLISHED]), detailed=True)
+    print(tabulate([[path, status.name, details] for path, (status, details) in statuses.items()],
+                   ['Post', 'Status', 'Details'], 'fancy_grid'))
     sys.exit(0)
 
 if args.action == 'status':
     status = repo.status_message
     if isinstance(args.repo, dict):
-        print("\n-----\n".join(['Repository: {name}\n{message}'.format(name=name, message=message) for name, message in status.items()]))
+        print("\n-----\n".join(
+            ['Repository: {name}\n{message}'.format(name=name, message=message) for name, message in status.items()]))
     else:
         print(repo.status_message)
     sys.exit(0)
@@ -290,7 +324,8 @@ if args.action == 'add':
 
 if args.action in ['submit', 'push'] or (args.action == 'add' and args.submit):
     if args.action == 'push':
-        print("WARNING: The `push` action is deprecated, and you are encouraged to use `knowledge_repo submit <path>` instead.")
+        print(
+            "WARNING: The `push` action is deprecated, and you are encouraged to use `knowledge_repo submit <path>` instead.")
     repo.submit(path=args.path)
     sys.exit(0)
 
