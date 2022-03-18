@@ -40,7 +40,7 @@ class ExtractImages(KnowledgePostProcessor):
             elif os.path.exists(orig_path):
                 thumbnail = self.copy_image(kp, orig_path)
             else:
-                logger.warning("Could not find a thumbnail image at: {}".format(thumbnail))
+                logger.warning(f'Could not find a thumbnail image at: {thumbnail}')
 
         # update post headers to point to new thumbnail image
         kp.update_headers(thumbnail=thumbnail)
@@ -78,7 +78,8 @@ class ExtractImages(KnowledgePostProcessor):
             elif os.path.exists(orig_path):
                 new_path = self.copy_image(kp, orig_path)
             else:
-                logger.warning("Could not find an image at: {}".format(image['src']))
+                image_src = image['src']
+                logger.warning(f'Could not find an image at: {image_src}')
             if not new_path:
                 continue
             image_mapping[image['src']] = new_path
