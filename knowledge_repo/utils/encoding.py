@@ -1,3 +1,4 @@
+from .constants import UTF8
 import logging
 import os
 import sys
@@ -7,8 +8,8 @@ __all__ = ['encode', 'decode']
 logger = logging.getLogger(__name__)
 
 
-def encode(data, encoding='utf-8'):
-    assert encoding == 'utf-8', "Only UTF-8 encoding is currently supported."
+def encode(data, encoding=UTF8):
+    assert encoding == UTF8, "Only UTF-8 encoding is currently supported."
     # Check if data is already encoded (for the purposes of unicode only
     # If not, convert to a string if necessary, and then encode as utf-8 bytes
     if isinstance(data, bytes):
@@ -27,8 +28,8 @@ def encode(data, encoding='utf-8'):
     return data
 
 
-def decode(data, encoding='utf-8'):
-    assert encoding == 'utf-8', "Only UTF-8 encoding is currently supported."
+def decode(data, encoding=UTF8):
+    assert encoding == UTF8, "Only UTF-8 encoding is currently supported."
     if encoding is not None:
         try:
             data = data.decode(encoding)

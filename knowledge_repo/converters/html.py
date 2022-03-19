@@ -1,5 +1,5 @@
 from __future__ import absolute_import, unicode_literals
-from ..constants import PROXY
+from ..constants import PROXY, UTF8
 from ..converter import KnowledgePostConverter
 from ..mapping import SubstitutionMapper
 from markdown import Extension
@@ -272,5 +272,5 @@ class HTMLConverter(KnowledgePostConverter):
                 image_data = base64.b64encode(self.kp_images[url])
                 image_mimetype = mimetypes.guess_type(url)[0]
                 if image_mimetype is not None:
-                    return 'data:{};base64, '.format(image_mimetype) + image_data.decode('utf-8')
+                    return 'data:{};base64, '.format(image_mimetype) + image_data.decode(UTF8)
         return None
