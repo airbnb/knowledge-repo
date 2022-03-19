@@ -1,14 +1,14 @@
+from ..constants import DOCX
+from ..converter import KnowledgePostConverter
 import os
 import re
 import shutil
 import tempfile
 
-from ..converter import KnowledgePostConverter
-
 
 class DocxConverter(KnowledgePostConverter):
 
-    _registry_keys = ['docx']
+    _registry_keys = [DOCX]
 
     @property
     def dependencies(self):
@@ -22,7 +22,7 @@ class DocxConverter(KnowledgePostConverter):
         import pypandoc
         pypandoc.convert_file(
             filename,
-            format='docx',
+            format=DOCX,
             to='markdown-grid_tables',
             outputfile=target_file,
             extra_args=[

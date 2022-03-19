@@ -1,10 +1,11 @@
+from ..constants import KP, ZIP
 from ..converter import KnowledgePostConverter
 import io
 import zipfile
 
 
 class PkpConverter(KnowledgePostConverter):
-    _registry_keys = ['kp', 'zip']
+    _registry_keys = [KP, ZIP]
 
     def to_file(self, filename):
         zf = zipfile.ZipFile(filename, 'w')

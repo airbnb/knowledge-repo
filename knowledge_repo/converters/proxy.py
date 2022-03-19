@@ -1,10 +1,11 @@
+from ..constants import PROXY
 from ..converter import KnowledgePostConverter
 import re
 
 
 class ProxyConverter(KnowledgePostConverter):
 
-    _registry_keys = ['proxy']
+    _registry_keys = [PROXY]
 
     def from_file(self, url, **opts):
 

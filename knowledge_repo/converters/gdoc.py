@@ -1,4 +1,4 @@
-from ..constants import GDOC
+from ..constants import DOCX, GDOC
 from .docx import DocxConverter
 import cooked_input as ci
 import logging
@@ -33,7 +33,7 @@ class GDocConverter(DocxConverter):
             if not os.path.exists(path):
                 break
             for filename in os.listdir(path):
-                if filename.endswith('.docx'):
+                if filename.endswith(f'.{DOCX}'):
                     fpath = os.path.join(path, filename)
                     if os.path.getmtime(fpath) > after:
                         return fpath
@@ -43,16 +43,15 @@ class GDocConverter(DocxConverter):
             fpath = ci.get_string(
                 prompt=(
                     "We were unable to find the downloaded Google Doc in the "
-                    "expected path: '{}'. If the document was downloaded "
+                    f"expected path: '{path}'. If the document was downloaded "
                     "elsewhere, please enter the full path of downloaded "
                     "document now (including file name)"
-                    .format(path)
                 ),
                 required=False
             )
             if fpath:
                 return fpath
-        raise RuntimeError("Cannot find 'docx' document in {}.".format(path))
+        raise RuntimeError(f"Cannot find 'docx' document in {path}.")
 
     def from_file(self, url, download_path=None, **opts):
         m = re.match('https://docs.google.com/document/d/(?P<doc_id>[^/]+)/', url)
@@ -61,7 +60,7 @@ class GDocConverter(DocxConverter):
             raise ValueError("Invalid Google Docs url.")
 
         doc_id = m.group('doc_id')
-        download_url = "https://docs.google.com/document/d/{doc_id}/export?format=doc".format(doc_id=doc_id)
+        download_url = f"https://docs.google.com/document/d/{doc_id}/export?format=doc"
 
         time_start = time.time()
         webbrowser.open(download_url)
@@ -69,7 +68,7 @@ class GDocConverter(DocxConverter):
         time.sleep(2)
 
         download_path = download_path or os.path.expanduser('~/Downloads')
-        logger.info("Looking for downloaded Google Docs file in '{}'...".format(download_path))
+        logger.info(f"Looking for downloaded Google Docs file in '{download_path}'...")
         filename = self._find_doc(download_path, after=time_start)
 
         DocxConverter.from_file(self, filename, **opts)

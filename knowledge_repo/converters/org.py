@@ -1,3 +1,4 @@
+from ..constants import ORG
 from ..converter import KnowledgePostConverter
 import re
 
@@ -6,11 +7,11 @@ def dict_to_yaml(x):
     yaml = []
     for key, value in x.items():
         if type(value) == list:
-            yaml += "{key}:\n".format(key=key)
+            yaml += f'{key}:\n'
             for v in value:
-                yaml += "- {v}\n".format(v=v)
+                yaml += f'- {v}\n'
         else:
-            yaml += "{key}: {value}\n".format(key=key, value=value)
+            yaml += f'{key}: {value}\n'
     return ''.join(yaml)
 
 
@@ -39,7 +40,7 @@ class OrgConverter(KnowledgePostConverter):
     #+KR_TAGS: tag1, tag2
     is the correct way to assign many tags to a post/document
     '''
-    _registry_keys = ["org"]
+    _registry_keys = [ORG]
 
     # This dicts will help in converting org metadata (#+TITLE: {}) to yaml metadata (title: {})
     metadata_required_fields = {
@@ -249,7 +250,7 @@ class OrgConverter(KnowledgePostConverter):
         meta = dict()
 
         for field in self.metadata_required_fields:
-            if line.lower().startswith("#+{}:".format(field)):
+            if line.lower().startswith(f'#+{field}:'):
                 field_type = self.metadata_required_fields[field]["type"]
                 field_name = self.metadata_required_fields[field]["converts_to"]
                 if field_type == "list":
