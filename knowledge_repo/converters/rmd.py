@@ -1,3 +1,4 @@
+from ..constants import MD, RMD
 from ..converter import KnowledgePostConverter
 import os
 import logging
@@ -29,7 +30,7 @@ plotly_header = """
 
 
 class RmdConverter(KnowledgePostConverter):
-    _registry_keys = ['rmd']
+    _registry_keys = [RMD]
 
     def from_file(self, filename, rebuild=True):
 
@@ -37,15 +38,12 @@ class RmdConverter(KnowledgePostConverter):
             tmp_fd, tmp_path = tempfile.mkstemp()
             os.close(tmp_fd)
 
+            fname = os.path.abspath(filename)
             runcmd = (
                 "Rscript --no-save --no-restore --slave -e \""
                 "library(rmarkdown);"
-                "render('{fname}', '{target_path}', output_format = html_document(keep_md = T));"
+                f"render('{fname}', '{tmp_path}', output_format = html_document(keep_md = T));"
                 "\""
-                .format(
-                    fname=os.path.abspath(filename),
-                    target_path=tmp_path
-                )
             )
 
             # Replace '\' with '\\' on Windows machines so R happy with filepath
