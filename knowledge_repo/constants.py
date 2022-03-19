@@ -2,6 +2,7 @@
 
 DEBUG = 'debug'
 DEV = 'dev'
+DOCX = 'docx'
 EXTRACT_IMAGES = 'extract_images'
 FORMAT_CHECKS = 'format_checks'
 GDOC = 'gdoc'
