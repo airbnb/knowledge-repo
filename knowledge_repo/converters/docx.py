@@ -1,5 +1,6 @@
 from ..constants import DOCX
 from ..converter import KnowledgePostConverter
+from knowledge_repo.utils.files import read_text
 import os
 import re
 import shutil
@@ -32,8 +33,7 @@ class DocxConverter(KnowledgePostConverter):
             ]
         )
 
-        with open(target_file) as f:
-            md = f.read()
+        md = read_text(target_file)
 
         # Image embeddings exported from docx files have fixed sizes in inches
         # which browsers do not understand. We remove these annotations.
