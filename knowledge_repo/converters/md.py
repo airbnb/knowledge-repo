@@ -2,6 +2,7 @@ from ..constants import MD
 from ..converter import KnowledgePostConverter
 from knowledge_repo.utils.files import read_text
 
+
 class MdConverter(KnowledgePostConverter):
     _registry_keys = [MD]
 
