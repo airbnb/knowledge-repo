@@ -2,7 +2,7 @@ from . import config_defaults
 from .config import KnowledgeRepositoryConfig
 from .post import KnowledgePost
 from .postprocessor import KnowledgePostProcessor
-from .utils.constants import KP_EXTENSION
+from .constants import KP_EXTENSION
 from .utils.registry import SubclassRegisteringABCMeta
 from abc import abstractmethod, abstractproperty
 from collections import OrderedDict
