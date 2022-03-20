@@ -1,10 +1,9 @@
 from ..constants import MD
 from ..converter import KnowledgePostConverter
-
+from knowledge_repo.utils.files import read_text
 
 class MdConverter(KnowledgePostConverter):
     _registry_keys = [MD]
 
     def from_file(self, filename):
-        with open(filename) as f:
-            self.kp_write(f.read())
+        self.kp_write(read_text(filename))

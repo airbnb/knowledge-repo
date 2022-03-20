@@ -1,5 +1,6 @@
 from ..constants import ORG
 from ..converter import KnowledgePostConverter
+from knowledge_repo.utils.files import read_text_lines
 import re
 
 
@@ -90,8 +91,7 @@ class OrgConverter(KnowledgePostConverter):
         return []
 
     def from_file(self, filename, **opts):
-        with open(filename, "r") as f:
-            lines = f.readlines()
+        lines = read_text_lines(filename)
 
         self.kp.add_srcfile(filename)
         self.from_lines(lines, **opts)

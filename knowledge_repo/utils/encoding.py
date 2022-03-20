@@ -1,4 +1,4 @@
-from .constants import UTF8
+from ..constants import UTF8
 import logging
 import os
 import sys
