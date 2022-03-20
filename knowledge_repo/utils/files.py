@@ -3,26 +3,22 @@ import yaml
 
 def read_text(filename):
     with open(filename, 'r') as f:
-        content = f.read()
-        return content
+        return f.read()
 
 
 def read_text_lines(filename):
     with open(filename, 'r') as f:
-        lines = f.readlines()
-        return lines
+        return f.readlines()
 
 
 def read_yaml(filename):
     with open(filename, 'r') as f:
-        content = yaml.safe_load(f)
-        return content
+        return yaml.safe_load(f)
 
 
 def read_binary(filename):
     with open(filename, 'rb') as f:
-        content = f.read()
-        return content
+        return f.read()
 
 
 def write_text(filename, content):
