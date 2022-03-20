@@ -57,9 +57,9 @@ class KnowledgeDeployer(object, metaclass=SubclassRegisteringABCMeta):
             for nl, cell in zip(self.knowledge_builder.__code__.co_freevars, self.knowledge_builder.__closure__):
                 if isinstance(cell.cell_contents, str):
                     cell_contents = cell.cell_contents.replace('"', '\\"')
-                    out.append(f'{nl} = "{cell_contents}"')
                 else:
-                    out.append(f'{nl} = {cell.cell_contents}')
+                    cell_contents = cell.cell_contents
+                out.append(f'{nl} = "{cell_contents}"')
             out.append(textwrap.dedent(inspect.getsource(self.knowledge_builder)))
             return '\n'.join(out)
         return self.knowledge_builder

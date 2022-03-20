@@ -6,7 +6,7 @@ from flask import (
     request,
     url_for,
 )
-from ldap3 import Connection, Server, ALL
+from ldap3 import ALL, Connection, Server
 from knowledge_repo.constants import AUTH_LOGIN_FORM, LDAP, USERNAME
 
 
