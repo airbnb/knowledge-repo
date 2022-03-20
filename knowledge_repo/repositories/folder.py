@@ -1,7 +1,7 @@
 from ..post import KnowledgePost
 from ..repository import KnowledgeRepository
 from ..utils.encoding import encode
-from knowledge_repo.utils.files import write_binary
+from knowledge_repo.utils.files import read_binary, write_binary
 from io import open
 import logging
 import os
@@ -209,8 +209,7 @@ class FolderKnowledgeRepository(KnowledgeRepository):
     def _kp_read_ref(self, path, reference, revision=None):
         path = os.path.join(self.path, path)
         if os.path.isdir(path):
-            with open(os.path.join(self.path, path, reference), 'rb') as f:
-                return f.read()
+            return read_binary(os.path.join(self.path, path, reference))
         else:
             kp = KnowledgePost.from_file(path, format='kp')
             return kp._read_ref(reference)
