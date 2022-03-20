@@ -1,5 +1,6 @@
 # Shared constants
 
+AUTH_LOGIN_FORM = 'auth-login-form.html'
 DEBUG = 'debug'
 DEV = 'dev'
 DOCX = 'docx'
