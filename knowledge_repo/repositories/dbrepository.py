@@ -39,8 +39,8 @@ class DbKnowledgeRepository(KnowledgeRepository):
     def init(self, auto_create=True):
 
         # TODO handle if user does not pass in table sqlite://path.db
-        uri_splt = self.uri.split(":")
-        engine_uri = ":".join(uri_splt[:-1])
+        uri_splt = self.uri.split(':')
+        engine_uri = ':'.join(uri_splt[:-1])
         table_name = uri_splt[-1]
 
         metadata = MetaData()

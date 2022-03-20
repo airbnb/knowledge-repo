@@ -2,7 +2,6 @@ from ..post import KnowledgePost
 from ..repository import KnowledgeRepository
 from ..utils.encoding import encode
 from knowledge_repo.utils.files import read_binary, write_binary
-from io import open
 import logging
 import os
 import shutil
@@ -63,7 +62,7 @@ class FolderKnowledgeRepository(KnowledgeRepository):
 
     @path.setter
     def path(self, path):
-        assert isinstance(path, str), "The path specified must be a string."
+        assert isinstance(path, str), 'The path specified must be a string.'
         path = os.path.abspath(os.path.expanduser(path))
         if not os.path.exists(path):
             path = os.path.abspath(path)
@@ -182,7 +181,7 @@ class FolderKnowledgeRepository(KnowledgeRepository):
                 path = os.path.join(path, parent)
             for dirpath, dirnames, filenames in os.walk(os.path.join(self.path, path)):
                 for filename in filenames:
-                    if dirpath == "" and filename == "REVISION":
+                    if dirpath == '' and filename == 'REVISION':
                         continue
                     yield os.path.relpath(os.path.join(dirpath, filename), os.path.join(self.path, path))
         else:
@@ -202,9 +201,9 @@ class FolderKnowledgeRepository(KnowledgeRepository):
         raise NotImplementedError
 
     def _kp_new_revision(self, path, uuid=None):
-        self._kp_write_ref(path, "REVISION", encode(self._kp_get_revision(path) + 1))
+        self._kp_write_ref(path, 'REVISION', encode(self._kp_get_revision(path) + 1))
         if uuid:
-            self._kp_write_ref(path, "UUID", encode(uuid))
+            self._kp_write_ref(path, 'UUID', encode(uuid))
 
     def _kp_read_ref(self, path, reference, revision=None):
         path = os.path.join(self.path, path)
