@@ -1,5 +1,6 @@
 from ..constants import MD_EXTENSION, RMD
 from ..converter import KnowledgePostConverter
+from knowledge_repo.utils.files import read_text_lines
 import os
 import logging
 import subprocess
@@ -48,26 +49,26 @@ class RmdConverter(KnowledgePostConverter):
 
             # Replace '\' with '\\' on Windows machines so R happy with filepath
             if os.name == 'nt':
-                runcmd = runcmd.replace("\\", "\\\\")
+                runcmd = runcmd.replace('\\', '\\\\')
 
             subprocess.check_output(runcmd, shell=True)
             rmd_filename = tmp_path + MD_EXTENSION
 
         # Split file header from footer
         # We do this since plotly.js lib needs to be added after header
-        with open(rmd_filename) as f:
-            header = body = ""
-            delim_num = 0
-            for line in f.readlines():
-                if delim_num < 2:
-                    header += line
-                else:
-                    body += line
-                if line.strip() == "---":
-                    delim_num += 1
+        lines = read_text_lines(rmd_filename)
+        header = body = ''
+        delim_num = 0
+        for line in lines:
+            if delim_num < 2:
+                header += line
+            else:
+                body += line
+            if line.strip() == '---':
+                delim_num += 1
 
         # If notebook needs plotly, add plotly.js lib
-        if "plotly" in body:
+        if 'plotly' in body:
             body = plotly_header + body
 
         self.kp.write(header + body)
