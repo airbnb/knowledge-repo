@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from knowledge_repo.utils.files import write_file
+from knowledge_repo.utils.files import write_text
 from knowledge_repo.utils.registry import SubclassRegisteringABCMeta
 import knowledge_repo
 import inspect
@@ -97,7 +97,7 @@ class KnowledgeDeployer(object, metaclass=SubclassRegisteringABCMeta):
             out.append('app = %s()' % self.knowledge_builder.__name__)
         out.append('app.start_indexing()')
 
-        write_file(tmp_path, '\n'.join(out))
+        write_text(tmp_path, '\n'.join(out))
         return tmp_dir
 
     @abstractmethod

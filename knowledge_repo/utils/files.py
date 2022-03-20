@@ -25,6 +25,11 @@ def read_binary(filename):
         return content
 
 
-def write_file(filename, content):
+def write_text(filename, content):
     with open(filename, 'w') as f:
+        f.write(content)
+
+
+def write_binary(filename, content):
+    with open(filename, 'wb') as f:
         f.write(content)
