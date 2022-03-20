@@ -124,7 +124,7 @@ class IndentsAsCellOutputProcessor(BlockProcessor):
         if not block_is_html and 'pre' not in output.get('class', 'code-output'):
             output.set('class', ' '.join([output.get('class', ''), 'pre']))
 
-        output.text = "{}\n".format(block) if block_is_html else AtomicString("{}\n".format(block))
+        output.text = f'{block}\n' if block_is_html else AtomicString(f'{block}\n')
 
         if theRest:
             # This block contained unindented line(s) after the first indented
@@ -272,5 +272,5 @@ class HTMLConverter(KnowledgePostConverter):
                 image_data = base64.b64encode(self.kp_images[url])
                 image_mimetype = mimetypes.guess_type(url)[0]
                 if image_mimetype is not None:
-                    return 'data:{};base64, '.format(image_mimetype) + image_data.decode(UTF8)
+                    return f'data:{image_mimetype};base64, ' + image_data.decode(UTF8)
         return None

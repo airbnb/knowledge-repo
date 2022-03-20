@@ -15,4 +15,4 @@ def check_dependencies(dependencies, message=None):
                f"\t{install_command}\n\n"
                "Note: Depending on your system's installation of Python, you may "
                "need to use `pip2` or `pip3` instead of `pip`.")
-        raise RuntimeError('\n\n'.join([message, fix]))
+        raise RuntimeError(f'{message}\n\n{fix}')
