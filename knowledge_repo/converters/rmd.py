@@ -51,7 +51,7 @@ class RmdConverter(KnowledgePostConverter):
                 runcmd = runcmd.replace("\\", "\\\\")
 
             subprocess.check_output(runcmd, shell=True)
-            rmd_filename = tmp_path + ".md"
+            rmd_filename = tmp_path + f".{MD}"
 
         # Split file header from footer
         # We do this since plotly.js lib needs to be added after header

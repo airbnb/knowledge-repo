@@ -6,8 +6,8 @@ from flask import (
     request,
     url_for,
 )
-from ldap3 import Server, Connection, ALL
-from knowledge_repo.constants import LDAP, USERNAME
+from ldap3 import Connection, Server, ALL
+from knowledge_repo.constants import AUTH_LOGIN_FORM, LDAP, USERNAME
 
 
 class LdapAuthProvider(KnowledgeAuthProvider):
@@ -17,19 +17,22 @@ class LdapAuthProvider(KnowledgeAuthProvider):
 
         if not self.app.config.get('LDAP_SERVER'):
             raise RuntimeError(
-                "Use of LDAP authentication requires specification of the LDAP_SERVER configuration variable.")
+                'Use of LDAP authentication requires specification '
+                'of the LDAP_SERVER configuration variable.')
         self.server = Server(self.app.config['LDAP_SERVER'], get_info=ALL)
 
     def prompt(self):
-        return render_template('auth-login-form.html', skip_password=False)
+        return render_template(AUTH_LOGIN_FORM, skip_password=False)
 
     def authorize(self):
         user = self.get_user()
         if user is None:
-            raise RuntimeError("No such user or invalid credentials")
+            raise RuntimeError('No such user or invalid credentials')
         if self.validate(user) is False:
-            return render_template("auth-login-form.html",
-                                   error_message="Uh-oh, it looks like something in your credentials was wrong...")
+            return render_template(
+                AUTH_LOGIN_FORM,
+                error_message='Uh-oh, it looks like something in '
+                              'your credentials was wrong...')
         self._perform_login(user)
         return redirect(url_for('index.render_feed'))
 

@@ -9,7 +9,7 @@ from flask import (
     url_for,
 )
 from flask_login import login_user
-from knowledge_repo.constants import DEBUG, USERNAME
+from knowledge_repo.constants import AUTH_LOGIN_FORM, DEBUG, USERNAME
 import flask
 
 
@@ -30,7 +30,7 @@ class DebugAuthProvider(KnowledgeAuthProvider):
                 return flask.abort(400)
 
             return redirect(next or url_for('index.render_feed'))
-        return render_template('auth-login-form.html', skip_password=True)
+        return render_template(AUTH_LOGIN_FORM, skip_password=True)
 
     def get_user(self):
         return User(identifier=request.form[USERNAME])

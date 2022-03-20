@@ -100,7 +100,8 @@ class MetaKnowledgeRepository(KnowledgeRepository):
 
     def _kp_repository_uri(self, path):
         prefix, repository, repo_path = self.__repo_for_path(path)
-        return '{{{prefix}}}{repository_uri}'.format(prefix=prefix, repository_uri=repository._kp_repository_uri(repo_path))
+        repository_uri = repository._kp_repository_uri(repo_path)
+        return f'{{{prefix}}}{repository_uri}'
 
     def _kp_uuid(self, path):
         return self.__delegate_for_path(path, '_kp_uuid')

@@ -1,6 +1,7 @@
 from ..constants import PDF
 from ..converter import KnowledgePostConverter
 from .html import HTMLConverter
+from knowledge_repo.utils.files import write_binary
 
 
 class PDFConverter(KnowledgePostConverter):
@@ -21,8 +22,7 @@ class PDFConverter(KnowledgePostConverter):
         raise NotImplementedError
 
     def to_file(self, filename, **opts):
-        with open(filename, 'wb') as f:
-            f.write(self.to_string())
+        write_binary(filename, self.to_string())
 
     def to_string(self, **opts):
         from weasyprint import HTML, CSS

@@ -1,5 +1,6 @@
 from ..constants import EXTRACT_IMAGES
 from ..postprocessor import KnowledgePostProcessor
+from knowledge_repo.utils.files import read_binary
 import logging
 import os
 import posixpath
@@ -97,8 +98,7 @@ class ExtractImages(KnowledgePostProcessor):
     def copy_image(self, kp, path, is_ref=False):
         if is_ref:
             return
-        with open(path, 'rb') as f:
-            kp.write_image(os.path.basename(path), f.read())
+        kp.write_image(os.path.basename(path), read_binary(path))
         return posixpath.join('images', os.path.basename(path))
 
     def replace_image_locations(self, md, offset, match, old_path, new_path):

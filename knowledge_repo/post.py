@@ -1,4 +1,5 @@
 from .utils.encoding import decode, encode
+from .utils.files import read_binary
 from collections import namedtuple
 from datetime import date, datetime, time
 import base64
@@ -324,8 +325,7 @@ class KnowledgePost(object):
     def add_srcfile(self, filename, name=None):
         if not name:
             name = os.path.basename(filename)
-        with open(filename, 'rb') as f:
-            self.write_src(name, f.read())
+        self.write_src(name, read_binary(filename))
 
     # ------------- Knowledge Post Format ----------------------------------
 

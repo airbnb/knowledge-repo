@@ -1,7 +1,7 @@
 from ..post import KnowledgePost
 from ..repository import KnowledgeRepository
 from ..utils.encoding import encode
-from io import open
+from knowledge_repo.utils.files import read_binary, write_binary
 import logging
 import os
 import shutil
@@ -62,7 +62,7 @@ class FolderKnowledgeRepository(KnowledgeRepository):
 
     @path.setter
     def path(self, path):
-        assert isinstance(path, str), "The path specified must be a string."
+        assert isinstance(path, str), 'The path specified must be a string.'
         path = os.path.abspath(os.path.expanduser(path))
         if not os.path.exists(path):
             path = os.path.abspath(path)
@@ -172,8 +172,7 @@ class FolderKnowledgeRepository(KnowledgeRepository):
             ref_dir = os.path.dirname(ref_path)
             if not os.path.exists(ref_dir):
                 os.makedirs(ref_dir)
-            with open(ref_path, 'wb') as f:
-                return f.write(data)
+            write_binary(ref_path, data)
 
     def _kp_dir(self, path, parent=None, revision=None):  # TODO: Account for revision
         path = os.path.join(self.path, path)
@@ -182,7 +181,7 @@ class FolderKnowledgeRepository(KnowledgeRepository):
                 path = os.path.join(path, parent)
             for dirpath, dirnames, filenames in os.walk(os.path.join(self.path, path)):
                 for filename in filenames:
-                    if dirpath == "" and filename == "REVISION":
+                    if dirpath == '' and filename == 'REVISION':
                         continue
                     yield os.path.relpath(os.path.join(dirpath, filename), os.path.join(self.path, path))
         else:
@@ -202,15 +201,14 @@ class FolderKnowledgeRepository(KnowledgeRepository):
         raise NotImplementedError
 
     def _kp_new_revision(self, path, uuid=None):
-        self._kp_write_ref(path, "REVISION", encode(self._kp_get_revision(path) + 1))
+        self._kp_write_ref(path, 'REVISION', encode(self._kp_get_revision(path) + 1))
         if uuid:
-            self._kp_write_ref(path, "UUID", encode(uuid))
+            self._kp_write_ref(path, 'UUID', encode(uuid))
 
     def _kp_read_ref(self, path, reference, revision=None):
         path = os.path.join(self.path, path)
         if os.path.isdir(path):
-            with open(os.path.join(self.path, path, reference), 'rb') as f:
-                return f.read()
+            return read_binary(os.path.join(self.path, path, reference))
         else:
             kp = KnowledgePost.from_file(path, format='kp')
             return kp._read_ref(reference)

@@ -60,7 +60,7 @@ class IndexMetadata(db.Model):
 class PostAuthorAssoc(db.Model):
     __tablename__ = 'assoc_post_author'
 
-    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, primary_key=True)
     order = db.Column(db.Integer)
 
@@ -118,11 +118,12 @@ class ErrorLog(db.Model):
         tb = sys.exc_info()[-1]
         filename, linenumber, function, code = traceback.extract_tb(sys.exc_info()[-1])[-1]
         filename = os.path.relpath(filename, os.path.join(os.path.dirname(__file__), '..'))
+        e_args = '; '.join(str(a) for a in e.args)
         return ErrorLog(
             function=function,
-            location='{}:{}'.format(filename, linenumber),
-            message='{}: {}'.format(e.__class__.__name__, "; ".join(str(a) for a in e.args)),
-            traceback="\n".join(traceback.format_tb(tb))
+            location=f'{filename}:{linenumber}',
+            message=f'{e.__class__.__name__}: {e_args}',
+            traceback='\n'.join(traceback.format_tb(tb))
         )
 
     @classmethod
@@ -153,7 +154,7 @@ class PageView(db.Model):
     created_at = db.Column(db.DateTime, default=func.now())
     version = db.Column(db.String(100), default=__version__)
 
-    __table_args__ = (Index("object_id_type_action_index", object_id, object_type, object_action),)
+    __table_args__ = (Index('object_id_type_action_index', object_id, object_type, object_action),)
 
     class logged(object):
 
@@ -209,10 +210,15 @@ class PageView(db.Model):
             try:
                 object_info = self._object_extractor(*args, **kwargs)
             except Exception as e:
-                logger.warning("Error using object extractor: " + str(e))
+                logger.warning(f'Error using object extractor: {e}')
                 object_info = {'id': (-1), 'type': None}
-            assert isinstance(object_info, dict), "Object extractors must return a dictionary."
-            assert len(set(['id', 'type']).difference(object_info.keys())) == 0 and len(set(object_info.keys()).difference(['id', 'type', 'action', 'may_change'])) == 0, "Object extractors must at least include the keys 'id' and 'type', and optionally 'action' and 'may_change'. Was provided with: {}".format(str(list(object_info.keys())))
+            assert isinstance(object_info, dict), 'Object extractors must return a dictionary.'
+            assert (
+                len(set(['id', 'type']).difference(object_info.keys())) == 0 and
+                len(set(object_info.keys()).difference(['id', 'type', 'action', 'may_change'])) == 0,
+                "Object extractors must at least include the keys 'id' and 'type', and "
+                f"optionally 'action' and 'may_change'. Was provided with: {list(object_info.keys())}"
+            )
             object_info = defaultdict(lambda: None, object_info)
             return object_info['id'], object_info['type'], object_info['action'], object_info['may_change'] or False
 
@@ -252,7 +258,7 @@ class User(db.Model, UserMixin):
 
     last_login_at = db.Column(db.DateTime)  # Date of last login
 
-    _posts_assoc = db.relationship("PostAuthorAssoc")
+    _posts_assoc = db.relationship('PostAuthorAssoc')
     posts = association_proxy('_posts_assoc', 'post')  # This property should not directly modified
 
     # Method overrides for the UserMixin class for flask_login
@@ -336,7 +342,7 @@ class Tag(db.Model):
     def description(self):
         if self._description:
             return self._description
-        return "All posts with tag '{}'.".format(self.name)
+        return f"All posts with tag '{self.name}'."
 
     @description.expression
     def description(self):
@@ -374,10 +380,10 @@ class Post(db.Model):
     created_at = db.Column(db.DateTime, default=func.now())
     updated_at = db.Column(db.DateTime, default=func.now())
 
-    _authors_assoc = db.relationship("PostAuthorAssoc",
+    _authors_assoc = db.relationship('PostAuthorAssoc',
                                      order_by='PostAuthorAssoc.order',
                                      collection_class=ordering_list('order'),
-                                     cascade="all, delete-orphan")
+                                     cascade='all, delete-orphan')
     _authors = association_proxy('_authors_assoc', 'author',
                                  creator=lambda author: PostAuthorAssoc(author=author),)
 
@@ -408,7 +414,7 @@ class Post(db.Model):
     def authors_string(self):
         raise NotImplementedError
 
-    _tags = db.relationship("Tag", secondary=assoc_post_tag, backref='posts',
+    _tags = db.relationship('Tag', secondary=assoc_post_tag, backref='posts',
                             lazy='subquery')
 
     @hybrid_property
@@ -426,7 +432,7 @@ class Post(db.Model):
         for tag in tags:
             if not isinstance(tag, Tag):
                 tag = tag.strip()
-                if tag[0] == "#":
+                if tag[0] == '#':
                     tag = tag[1:]
                 tag = Tag(name=tag)
             tag_objs.append(tag)
@@ -438,7 +444,7 @@ class Post(db.Model):
         excluded_tags = current_app.config.get('EXCLUDED_TAGS', [])
         return any([tag.name in excluded_tags for tag in self.tags])
 
-    _groups = db.relationship("Group", secondary=assoc_post_group, backref='posts',
+    _groups = db.relationship('Group', secondary=assoc_post_group, backref='posts',
                               lazy='subquery')
 
     @hybrid_property
@@ -457,7 +463,7 @@ class Post(db.Model):
 
         # create an implicit group, group_post.id, to add
         # single users to
-        group = Group(name=":post_group_" + str(self.id))
+        group = Group(name=f':post_group_{self.id}')
 
         # this created group should have the author associated with it
         # so they can add people to the post
@@ -481,7 +487,10 @@ class Post(db.Model):
         if status is None:
             self._status = None
         else:
-            assert isinstance(status, KnowledgeRepository.PostStatus), "Status must be an instance of KnowledgeRepository.PostStatus.Status or None"
+            assert (
+                isinstance(status, KnowledgeRepository.PostStatus),
+                'Status must be an instance of KnowledgeRepository.PostStatus.Status or None'
+            )
             self._status = status.value
 
     @hybrid_property
@@ -492,7 +501,7 @@ class Post(db.Model):
     def is_published(self):
         return func.coalesce(self._status, 0) == current_repo.PostStatus.PUBLISHED.value
 
-    _views = db.relationship("PageView", lazy='dynamic',
+    _views = db.relationship('PageView', lazy='dynamic',
                              primaryjoin="and_(foreign(PageView.object_id)==Post.id, "
                                          "PageView.object_type=='post',"
                                          "PageView.object_action=='view')")
@@ -510,7 +519,7 @@ class Post(db.Model):
         return (select([func.count(PageView.id)])
                 .where(PageView.object_id == self.id)
                 .where(PageView.object_type == 'post')
-                .label("view_count"))
+                .label('view_count'))
 
     @hybrid_property
     def view_user_count(self):
@@ -524,9 +533,9 @@ class Post(db.Model):
         return (select([func.count(distinct(PageView.user_id))])
                 .where(PageView.object_id == self.id)
                 .where(PageView.object_type == 'post')
-                .label("view_user_count"))
+                .label('view_user_count'))
 
-    _votes = db.relationship("Vote", lazy='dynamic',
+    _votes = db.relationship('Vote', lazy='dynamic',
                              primaryjoin="and_(foreign(Vote.object_id)==Post.id, "
                                          "Vote.object_type=='post')")
 
@@ -544,14 +553,14 @@ class Post(db.Model):
         return (select([func.count(Vote.id)])
                 .where(Vote.object_id == self.id)
                 .where(Vote.object_type == 'post')
-                .label("vote_count"))
+                .label('vote_count'))
 
     def vote_counted_for_user(self, user_id):
         return (db_session.query(Vote)
                           .filter(and_(Vote.object_id == self.id, Vote.object_type == 'post', Vote.user_id == user_id))
                           .first()) is not None
 
-    _comments = db.relationship("Comment", lazy="dynamic",
+    _comments = db.relationship('Comment', lazy='dynamic',
                                 primaryjoin="and_(foreign(Comment.post_id)==Post.id, "
                                             "Comment.type=='post')")
 
@@ -569,7 +578,7 @@ class Post(db.Model):
         return (select([func.count(Comment.id)])
                 .where(Comment.post_id == self.id)
                 .where(Comment.object_type == 'post')
-                .label("comments_count"))
+                .label('comments_count'))
 
     @property
     def kp(self):
@@ -643,7 +652,7 @@ class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), unique=True)
 
-    _users = db.relationship("User", secondary=assoc_group_user, backref='users',
+    _users = db.relationship('User', secondary=assoc_group_user, backref='users',
                              lazy='subquery')
 
     def _prepare_users(self, users):

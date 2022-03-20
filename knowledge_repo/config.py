@@ -1,3 +1,5 @@
+from .constants import PY_EXTENSION, YML_EXTENSION
+from .utils.files import read_yaml
 import functools
 import importlib
 import logging
@@ -5,7 +7,6 @@ import os
 import sys
 import time
 import types
-import yaml
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +87,7 @@ class KnowledgeRepositoryConfig(dict):
         self.__set_from_module(self, module)
 
     def __set_from_file(self, d, filename, force=False):
-        if filename.endswith('.py'):
+        if filename.endswith(PY_EXTENSION):
             time_str = str(time.time()).replace('.', '')
             module_name = f'knowledge_repo.config_{time_str}'
             spec = importlib.util.spec_from_file_location(module_name, filename)
@@ -94,9 +95,8 @@ class KnowledgeRepositoryConfig(dict):
             sys.modules[module_name] = module
             spec.loader.exec_module(module)
             self.__set_from_module(d, config, force)
-        elif filename.endswith('.yml'):
-            with open(filename) as f:
-                config = yaml.safe_load(f)
+        elif filename.endswith(YML_EXTENSION):
+            config = read_yaml(filename)
             self.update(config)
 
     def __set_from_module(self, d, module, force=False):

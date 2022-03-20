@@ -2,6 +2,7 @@ from . import config_defaults
 from .config import KnowledgeRepositoryConfig
 from .post import KnowledgePost
 from .postprocessor import KnowledgePostProcessor
+from .constants import KP_EXTENSION
 from .utils.registry import SubclassRegisteringABCMeta
 from abc import abstractmethod, abstractproperty
 from collections import OrderedDict
@@ -320,12 +321,12 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
         path = os.path.relpath(os.path.abspath(os.path.join(rel, path)), rel)
         if os.name == 'nt':
             path = path.replace(os.path.sep, os.path.altsep)
-        assert all([not segment.endswith('.kp') for segment in path.split(
+        assert all([not segment.endswith(KP_EXTENSION) for segment in path.split(
             '/')[:-1]]), "The post path may not contain a directory named '*.kp'."
         if path == '.' or path.startswith('..'):
             raise ValueError(f"Provided path '{path}' is outside of the knowledge repository.")
-        if not path.endswith('.kp'):
-            path += '.kp'
+        if not path.endswith(KP_EXTENSION):
+            path += KP_EXTENSION
         return path
 
     @abstractmethod
