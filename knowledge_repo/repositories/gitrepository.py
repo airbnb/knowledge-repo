@@ -481,7 +481,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
             self._kp_write_ref(path, "UUID", encode(uuid))
 
     def _kp_read_ref(self, path, reference, revision=None):
-        read_binary(os.path.join(self.path, path, reference))
+        return read_binary(os.path.join(self.path, path, reference))
 
     # ------------- Utility methods --------------------------------------
     def __abspath(self, path):
