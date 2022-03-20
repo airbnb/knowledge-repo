@@ -1,4 +1,6 @@
 from .extract_images import ExtractImages
+from knowledge_repo.utils.files import write_binary
+from urllib.parse import urljoin
 import logging
 import os
 import random
@@ -6,7 +8,6 @@ import shutil
 import string
 import tempfile
 import time
-from urllib.parse import urljoin
 
 logger = logging.getLogger(__name__)
 
@@ -34,8 +35,7 @@ class ExtractImagesToLocalServer(ExtractImages):
         # Copy image data to new file
         if is_ref:
             _, tmp_path = tempfile.mkstemp()
-            with open(tmp_path, 'wb') as f:
-                f.write(kp._read_ref(img_path))
+            write_binary(tmp_path, kp._read_ref(img_path))
         else:
             tmp_path = img_path
 
