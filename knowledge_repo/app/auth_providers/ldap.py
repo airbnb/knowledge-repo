@@ -6,7 +6,7 @@ from flask import (
     request,
     url_for,
 )
-from ldap3 import Server, Connection, ALL
+from ldap3 import Connection, Server, ALL
 from knowledge_repo.constants import AUTH_LOGIN_FORM, LDAP, USERNAME
 
 
@@ -29,7 +29,8 @@ class LdapAuthProvider(KnowledgeAuthProvider):
         if user is None:
             raise RuntimeError('No such user or invalid credentials')
         if self.validate(user) is False:
-            return render_template(AUTH_LOGIN_FORM,
+            return render_template(
+                AUTH_LOGIN_FORM,
                 error_message='Uh-oh, it looks like something in '
                               'your credentials was wrong...')
         self._perform_login(user)
