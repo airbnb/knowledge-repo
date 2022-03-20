@@ -28,7 +28,7 @@ class KnowledgeDeployer(object, metaclass=SubclassRegisteringABCMeta):
                  workers=4,
                  timeout=60):
         assert isinstance(knowledge_builder, (str, types.FunctionType, )), \
-            "Unknown builder type {}".format(type(knowledge_builder))
+            f'Unknown builder type {type(knowledge_builder)}'
         self.knowledge_builder = knowledge_builder
         self.host = host
         self.port = port
@@ -56,9 +56,10 @@ class KnowledgeDeployer(object, metaclass=SubclassRegisteringABCMeta):
             out = []
             for nl, cell in zip(self.knowledge_builder.__code__.co_freevars, self.knowledge_builder.__closure__):
                 if isinstance(cell.cell_contents, str):
-                    out.append('{} = "{}"'.format(nl, cell.cell_contents.replace('"', '\\"')))
+                    cell_contents = cell.cell_contents.replace('"', '\\"')
+                    out.append(f'{nl} = "{cell_contents}"')
                 else:
-                    out.append('{} = {}'.format(nl, cell.cell_contents))
+                    out.append(f'{nl} = {cell.cell_contents}')
             out.append(textwrap.dedent(inspect.getsource(self.knowledge_builder)))
             return '\n'.join(out)
         return self.knowledge_builder
@@ -89,7 +90,7 @@ class KnowledgeDeployer(object, metaclass=SubclassRegisteringABCMeta):
 
         out = []
         out.append('import sys')
-        out.append('sys.path.insert(0, "{}")'.format(kr_path))
+        out.append(f'sys.path.insert(0, "{kr_path}")')
         out.append('import knowledge_repo')
 
         out.append(self.builder_str)
