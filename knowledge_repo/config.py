@@ -1,4 +1,4 @@
-from .constants import PY, YML
+from .constants import PY_EXTENSION, YML_EXTENSION
 from .utils.files import read_yaml
 import functools
 import importlib
@@ -87,7 +87,7 @@ class KnowledgeRepositoryConfig(dict):
         self.__set_from_module(self, module)
 
     def __set_from_file(self, d, filename, force=False):
-        if filename.endswith(f'.{PY}'):
+        if filename.endswith(PY_EXTENSION):
             time_str = str(time.time()).replace('.', '')
             module_name = f'knowledge_repo.config_{time_str}'
             spec = importlib.util.spec_from_file_location(module_name, filename)
@@ -95,7 +95,7 @@ class KnowledgeRepositoryConfig(dict):
             sys.modules[module_name] = module
             spec.loader.exec_module(module)
             self.__set_from_module(d, config, force)
-        elif filename.endswith(f'.{YML}'):
+        elif filename.endswith(YML_EXTENSION):
             config = read_yaml(filename)
             self.update(config)
 

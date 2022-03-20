@@ -1,4 +1,4 @@
-from ..constants import DOCX, GDOC
+from ..constants import DOCX_EXTENSION, GDOC
 from .docx import DocxConverter
 import cooked_input as ci
 import logging
@@ -33,7 +33,7 @@ class GDocConverter(DocxConverter):
             if not os.path.exists(path):
                 break
             for filename in os.listdir(path):
-                if filename.endswith(f'.{DOCX}'):
+                if filename.endswith(DOCX_EXTENSION):
                     fpath = os.path.join(path, filename)
                     if os.path.getmtime(fpath) > after:
                         return fpath
