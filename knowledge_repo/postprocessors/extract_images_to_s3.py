@@ -1,4 +1,5 @@
 from .extract_images import ExtractImages
+from knowledge_repo.utils.files import write_binary
 import logging
 import os
 import posixpath
@@ -35,8 +36,7 @@ class ExtractImagesToS3(ExtractImages):
         # Copy image data to new file
         if is_ref:
             _, tmp_path = tempfile.mkstemp()
-            with open(tmp_path, 'wb') as f:
-                f.write(kp._read_ref(img_path))
+            write_binary(tmp_path, kp._read_ref(img_path))
         else:
             tmp_path = img_path
 

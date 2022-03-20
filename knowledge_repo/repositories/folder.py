@@ -1,6 +1,7 @@
 from ..post import KnowledgePost
 from ..repository import KnowledgeRepository
 from ..utils.encoding import encode
+from knowledge_repo.utils.files import write_binary
 from io import open
 import logging
 import os
@@ -172,8 +173,7 @@ class FolderKnowledgeRepository(KnowledgeRepository):
             ref_dir = os.path.dirname(ref_path)
             if not os.path.exists(ref_dir):
                 os.makedirs(ref_dir)
-            with open(ref_path, 'wb') as f:
-                return f.write(data)
+            write_binary(ref_path, data)
 
     def _kp_dir(self, path, parent=None, revision=None):  # TODO: Account for revision
         path = os.path.join(self.path, path)
