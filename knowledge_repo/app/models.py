@@ -215,8 +215,10 @@ class PageView(db.Model):
             assert isinstance(object_info, dict), 'Object extractors must return a dictionary.'
             assert len(set(['id', 'type']).difference(object_info.keys())) == 0 and \
                 len(set(object_info.keys()).difference(['id', 'type', 'action', 'may_change'])) == 0, \
-                ("Object extractors must at least include the keys 'id' and 'type', and "
-                f"optionally 'action' and 'may_change'. Was provided with: {list(object_info.keys())}")
+                (
+                    "Object extractors must at least include the keys 'id' and 'type', and "
+                    f"optionally 'action' and 'may_change'. Was provided with: {list(object_info.keys())}"
+                )
             object_info = defaultdict(lambda: None, object_info)
             return object_info['id'], object_info['type'], object_info['action'], object_info['may_change'] or False
 
