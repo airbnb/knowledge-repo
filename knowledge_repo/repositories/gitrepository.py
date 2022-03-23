@@ -1,5 +1,6 @@
 from ..repository import KnowledgeRepository
 from ..utils.encoding import encode
+from ..utils.files import get_path
 from io import open
 from knowledge_repo.utils.files import read_binary, write_binary
 import git
@@ -16,8 +17,8 @@ class GitKnowledgeRepository(KnowledgeRepository):
     _registry_keys = ['git']
 
     TEMPLATES = {
-        'README.md': os.path.abspath(os.path.join(os.path.dirname(__file__), '../templates', 'repository_readme.md')),
-        '.knowledge_repo_config.yml': os.path.abspath(os.path.join(os.path.dirname(__file__), '../templates', 'repository_config.yml'))
+        'README.md': get_path(__file__, '../templates', 'repository_readme.md'),
+        '.knowledge_repo_config.yml': get_path(__file__, '../templates', 'repository_config.yml'),
     }
 
     @classmethod
