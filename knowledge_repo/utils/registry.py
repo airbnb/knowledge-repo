@@ -16,7 +16,8 @@ class SubclassRegisteringABCMeta(ABCMeta):
         if registry_keys:
             for key in registry_keys:
                 if key in cls._registry and cls.__name__ != cls._registry[key].__name__:
-                    logger.info("Ignoring attempt by class `{}` to register key '{}', which is already registered for class `{}`.".format(cls.__name__, key, cls._registry[key].__name__))
+                    logger.info(f"Ignoring attempt by class `{cls.__name__}` to register key '{key}', "
+                                f"which is already registered for class `{cls._registry[key].__name__}`.")
                 else:
                     cls._registry[key] = cls
 
