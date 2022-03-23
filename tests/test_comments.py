@@ -1,11 +1,10 @@
-import unittest
 import json
+import unittest
 
 from bs4 import BeautifulSoup
 
 from knowledge_repo import KnowledgeRepository
 from knowledge_repo.app.models import Comment, Post, User
-
 from knowledge_repo.app.proxies import db_session
 
 
@@ -34,11 +33,11 @@ class CommentTest(unittest.TestCase):
         with self.repo_app.app_context():
             # get the number of comments on a given post
             post = (db_session.query(Post)
-                              .filter(Post.is_published)
-                              .first())
+                    .filter(Post.is_published)
+                    .first())
             n_comments = len(db_session.query(Comment)
-                                       .filter(Comment.post_id == post.id)
-                                       .all())
+                             .filter(Comment.post_id == post.id)
+                             .all())
 
             assert post.status == self.repo.PostStatus.PUBLISHED
 
@@ -55,10 +54,10 @@ class CommentTest(unittest.TestCase):
 
             # check that new comment exists in db
             comment_exists = (db_session.query(Comment)
-                                        .filter(Comment.post_id == post.id)
-                                        .filter(Comment.user_id == self.user_id)
-                                        .filter(Comment.text == data['text'])
-                                        .first())
+                              .filter(Comment.post_id == post.id)
+                              .filter(Comment.user_id == self.user_id)
+                              .filter(Comment.text == data['text'])
+                              .first())
             assert comment_exists
 
             assert post.status == self.repo.PostStatus.PUBLISHED
@@ -77,11 +76,10 @@ class CommentTest(unittest.TestCase):
         """
 
         with self.repo_app.app_context():
-
             # get a post
             post = (db_session.query(Post)
-                              .filter(Post.is_published)
-                              .first())
+                    .filter(Post.is_published)
+                    .first())
 
             # create a comment
             data = {'text': 'This is a comment'}
@@ -92,18 +90,18 @@ class CommentTest(unittest.TestCase):
 
             # get comment id
             comment_id = (db_session.query(Comment)
-                                    .filter(Comment.post_id == post.id)
-                                    .filter(Comment.user_id == self.user_id)
-                                    .filter(Comment.text == data['text'])
-                                    .first()).id
+                          .filter(Comment.post_id == post.id)
+                          .filter(Comment.user_id == self.user_id)
+                          .filter(Comment.text == data['text'])
+                          .first()).id
 
             # test deleting a commment
             rv = self.app.get('/delete_comment?comment_id={}'.format(comment_id),
                               headers=self.headers)
             assert rv.status == '200 OK'
             delete_comment = (db_session.query(Comment)
-                                        .filter(Comment.id == comment_id)
-                                        .all())
+                              .filter(Comment.id == comment_id)
+                              .all())
             assert not delete_comment, 'comments found after deletion'
 
 

@@ -1,6 +1,6 @@
 import unittest
+
 from bs4 import BeautifulSoup
-from sqlalchemy import and_
 
 from knowledge_repo import KnowledgeRepository
 from knowledge_repo.app.models import User, Vote, Post

@@ -1,10 +1,11 @@
 import unittest
+
 from bs4 import BeautifulSoup
+from sqlalchemy import func
 
 from knowledge_repo import KnowledgeRepository
-from knowledge_repo.app.proxies import db_session
 from knowledge_repo.app.models import PageView, Comment, Vote
-from sqlalchemy import func
+from knowledge_repo.app.proxies import db_session
 
 
 class FeedTest(unittest.TestCase):
@@ -41,8 +42,8 @@ class FeedTest(unittest.TestCase):
             title_href = title_link['href']
             title_text = title_link.string
 
-            assert(len(title_href))
-            assert(self.app.get(title_href, headers=self.headers).status == "200 OK")
+            assert (len(title_href))
+            assert (self.app.get(title_href, headers=self.headers).status == "200 OK")
 
     def test03_test_post_stats(self):
         """

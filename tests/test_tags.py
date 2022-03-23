@@ -4,8 +4,8 @@ import json
 import unittest
 
 from knowledge_repo import KnowledgeRepository
-from knowledge_repo.app.proxies import db_session
 from knowledge_repo.app.models import Tag, User, Subscription, Post, assoc_post_tag
+from knowledge_repo.app.proxies import db_session
 
 
 class TagsTest(unittest.TestCase):
@@ -139,7 +139,7 @@ class TagsTest(unittest.TestCase):
                                   content_type='application/json',
                                   headers=self.headers)
 
-            assert(rv.status == "200 OK")
+            assert (rv.status == "200 OK")
 
             old_tag_obj = (db_session.query(Tag)
                            .filter(Tag.id == TagsTest.tag_id)

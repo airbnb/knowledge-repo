@@ -9,12 +9,13 @@ class ClusterTest(unittest.TestCase):
         self.repo = KnowledgeRepository.for_uri('tests/test_repo', auto_create=True)
         self.app = self.repo.get_app(config='tests/config_server.py').test_client()
         self.headers = {}
-#         username_request_header = app.config.get("USERNAME_REQUEST_HEADER")
-#         self.knowledge_username = 'clusters_test_user'
-#         self.headers = {
-#             username_request_header: self.knowledge_username
-#         }
-#         engine.echo = False
+
+    #         username_request_header = app.config.get("USERNAME_REQUEST_HEADER")
+    #         self.knowledge_username = 'clusters_test_user'
+    #         self.headers = {
+    #             username_request_header: self.knowledge_username
+    #         }
+    #         engine.echo = False
 
     def test01_test_cluster_folder(self):
         """
