@@ -1,5 +1,3 @@
-from .constants import PY_EXTENSION, YML_EXTENSION
-from .utils.files import read_yaml
 import functools
 import importlib
 import logging
@@ -7,6 +5,9 @@ import os
 import sys
 import time
 import types
+
+from .constants import PY_EXTENSION, YML_EXTENSION
+from .utils.files import read_yaml
 
 logger = logging.getLogger(__name__)
 
