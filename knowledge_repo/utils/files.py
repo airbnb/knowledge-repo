@@ -1,3 +1,4 @@
+import os
 import yaml
 
 
@@ -29,3 +30,8 @@ def write_text(filename, content):
 def write_binary(filename, content):
     with open(filename, 'wb') as f:
         f.write(content)
+
+
+def get_path(__file__, directory, filename):
+    return os.path.abspath(
+        os.path.join(os.path.dirname(__file__), directory, filename))

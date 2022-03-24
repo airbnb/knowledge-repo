@@ -49,7 +49,7 @@ def render(path):
         # presentation_post['tldr'] = post.tldr
         # presentation_post['html'] = html
         # html = create_presentation_text(presentation_post)
-        tmpl = "markdown-presentation.html"
+        tmpl = 'markdown-presentation.html'
 
     if not current_app.config.get('INDEXING_ENABLED', True):
         return _render_preview(path=path, tmpl=tmpl)
@@ -65,16 +65,16 @@ def render(path):
                               .filter(Post.path == knowledge_aliases[path])
                               .first())
     if not post:
-        logger.warning("unable to find post at {}".format(path))
+        logger.warning(f'unable to find post at {path}')
         return abort(404)
     if post.contains_excluded_tag:
         # It's possible that someone gets a direct link to a post that has an excluded tag
-        return render_template("error.html")
+        return render_template('error.html')
 
     if post.private and not (username in post.authors or username in current_repo.config.editors):
         allowed_users = set(user.id for group in post.groups for user in group.users)
         if user_id not in allowed_users:
-            return render_template("permission_ask.html", authors=post.authors_string)
+            return render_template('permission_ask.html', authors=post.authors_string)
 
     rendered = render_post(post, with_toc=True)
     raw_post = render_post_raw(post) if mode == 'raw' else None
@@ -158,7 +158,7 @@ def _render_preview(path, tmpl):
             post = current_repo.post(knowledge_aliases[path])
 
     if not post:
-        raise Exception("unable to find post at {}".format(path))
+        raise Exception(f'unable to find post at {path}')
 
     rendered = render_post(post, with_toc=True)
     raw_post = render_post_raw(post) if (mode == 'raw') else None
@@ -196,7 +196,7 @@ def render_legacy():
 @PageView.logged
 @permissions.post_download.require()
 def download():
-    "Downloads resources associated with a post."
+    'Downloads resources associated with a post.'
 
     post = current_repo.post(request.args.get('post'))  # Note: `post` is expected to be a post path
     resource_type = request.args.get('type', 'source')
@@ -207,21 +207,21 @@ def download():
             filename = filename[:-3] + '.zip'
         return Response(
             post.to_string(format=resource_type),
-            mimetype="application/zip",
-            headers={"Content-disposition": "attachment; filename={}".format(filename)})
+            mimetype='application/zip',
+            headers={'Content-disposition': f'attachment; filename={filename}'})
     elif resource_type == PDF:
         filename = os.path.basename(post.path)[:-3] + '.pdf'
         return Response(
             post.to_string(format=resource_type),
-            mimetype="application/pdf",
-            headers={"Content-disposition": "attachment; filename={}".format(filename)})
+            mimetype='application/pdf',
+            headers={'Content-disposition': f'attachment; filename={filename}'})
     elif resource_type == 'source':
         path = request.args.get('path', None)
-        assert path is not None, "Source path not provided."
-        assert path in post.src_paths, "Provided reference is not a valid source path."
+        assert path is not None, 'Source path not provided.'
+        assert path in post.src_paths, 'Provided reference is not a valid source path.'
         return Response(
             post._read_ref(path),
-            mimetype="application/octet-stream",
-            headers={"Content-disposition": "attachment; filename={}".format(os.path.basename(path))})
+            mimetype='application/octet-stream',
+            headers={'Content-disposition': f'attachment; filename={os.path.basename(path)}'})
     else:
-        raise RuntimeError("Invalid resource_type: {}".format(resource_type))
+        raise RuntimeError(f'Invalid resource_type: {resource_type}')
