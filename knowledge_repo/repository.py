@@ -1,18 +1,16 @@
-import os
-import posixpath
-from abc import abstractmethod, abstractproperty
-from collections import OrderedDict
-from datetime import datetime
-from enum import Enum
-from urllib.parse import urlparse
-
 from . import config_defaults
 from .config import KnowledgeRepositoryConfig
 from .constants import KP_EXTENSION
 from .post import KnowledgePost
 from .postprocessor import KnowledgePostProcessor
 from .utils.registry import SubclassRegisteringABCMeta
-
+from abc import abstractmethod, abstractproperty
+from collections import OrderedDict
+from datetime import datetime
+from enum import Enum
+from urllib.parse import urlparse
+import os
+import posixpath
 
 class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
     _registry_keys = None

@@ -1,12 +1,9 @@
 import unittest
-
 from bs4 import BeautifulSoup
-from sqlalchemy import func
-
 from knowledge_repo import KnowledgeRepository
 from knowledge_repo.app.models import PageView, Comment, Vote
 from knowledge_repo.app.proxies import db_session
-
+from sqlalchemy import func
 
 class FeedTest(unittest.TestCase):
 

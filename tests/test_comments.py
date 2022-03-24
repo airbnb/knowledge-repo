@@ -1,6 +1,5 @@
-import json
 import unittest
-
+import json
 from bs4 import BeautifulSoup
 
 from knowledge_repo import KnowledgeRepository

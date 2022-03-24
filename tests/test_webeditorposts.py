@@ -1,13 +1,10 @@
-import datetime
-import json
-import unittest
-
 from bs4 import BeautifulSoup
-
 from knowledge_repo import KnowledgeRepository, KnowledgePost
 from knowledge_repo.app.models import Post
 from knowledge_repo.app.proxies import db_session
-
+import datetime
+import json
+import unittest
 
 class WebEditorPostTest(unittest.TestCase):
     """The test class for webeditor posts."""

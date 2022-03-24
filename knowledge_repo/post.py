@@ -1,5 +1,10 @@
+from .utils.encoding import decode, encode
+from .utils.files import read_binary
+from collections import namedtuple
+from datetime import date, datetime, time
 import base64
 import collections
+import cooked_input as ci
 import io
 import itertools
 import logging
@@ -7,15 +12,8 @@ import os
 import posixpath
 import re
 import uuid
-from collections import namedtuple
-from datetime import date, datetime, time
-
-import PIL.Image
-import cooked_input as ci
 import yaml
-
-from .utils.encoding import decode, encode
-from .utils.files import read_binary
+import PIL.Image
 
 logger = logging.getLogger(__name__)
 

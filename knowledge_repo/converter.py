@@ -1,6 +1,3 @@
-import os
-from functools import wraps
-
 from .constants import (
     EXTRACT_IMAGES,
     FORMAT_CHECKS,
@@ -10,7 +7,8 @@ from .constants import (
 from .postprocessor import KnowledgePostProcessor
 from .utils.dependencies import check_dependencies
 from .utils.registry import SubclassRegisteringABCMeta
-
+from functools import wraps
+import os
 
 def get_format(filename, format=None):
     if format is None:
