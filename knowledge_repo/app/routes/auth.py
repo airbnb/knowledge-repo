@@ -10,7 +10,8 @@ from flask_login import logout_user, login_required
 from flask_principal import identity_changed, AnonymousIdentity
 
 blueprint = Blueprint('auth', __name__,
-                      template_folder='../templates', static_folder='../static')
+                      template_folder='../templates',
+                      static_folder='../static')
 
 
 @blueprint.route('/auth/login', methods=['GET', 'POST'])
@@ -24,7 +25,10 @@ def login():
 
     return render_template(
         'auth-switcher.html',
-        providers=[{'name': provider.name, 'icon_uri': provider.icon_uri, 'link_text': provider.link_text} for provider in providers]
+        providers=[{
+            'name': provider.name,
+            'icon_uri': provider.icon_uri,
+            'link_text': provider.link_text} for provider in providers]
     )
 
 

@@ -16,7 +16,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 blueprint = Blueprint('comments', __name__,
-                      template_folder='../templates', static_folder='../static')
+                      template_folder='../templates',
+                      static_folder='../static')
 
 
 @blueprint.route('/comment', methods=['POST'])
@@ -78,8 +79,8 @@ def delete_comment():
             if comment.user_id == current_user.id:
                 db_session.delete(comment)
         db_session.commit()
-    except:
-        logging.warning("ERROR processing request")
+    except Exception as e:
+        logging.warning(f'ERROR processing request: {e}')
         pass
 
     return ""
