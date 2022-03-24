@@ -12,6 +12,7 @@ from urllib.parse import urlparse
 import os
 import posixpath
 
+
 class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
     _registry_keys = None
 

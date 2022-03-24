@@ -10,6 +10,7 @@ from .utils.registry import SubclassRegisteringABCMeta
 from functools import wraps
 import os
 
+
 def get_format(filename, format=None):
     if format is None:
         if filename.startswith('https://docs.google.com/document/d/'):

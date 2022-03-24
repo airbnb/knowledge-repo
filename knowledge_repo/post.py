@@ -445,8 +445,7 @@ class KnowledgePost(object):
 
                 data = base64.b64encode(thumbnail_data)
                 thumbnail = (
-                    'data:image/png;base64,'
-                    +
+                    'data:image/png;base64,' +
                     data.decode('utf-8')
                 )
             except Exception as e:

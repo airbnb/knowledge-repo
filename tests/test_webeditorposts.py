@@ -6,6 +6,7 @@ import datetime
 import json
 import unittest
 
+
 class WebEditorPostTest(unittest.TestCase):
     """The test class for webeditor posts."""
 
