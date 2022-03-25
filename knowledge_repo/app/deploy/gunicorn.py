@@ -24,7 +24,8 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
         BaseApplication.__init__(self)
 
     def load_config(self):
-        env_args = self.cfg.parser().parse_args(self.cfg.get_cmd_args_from_env())
+        env_args = self.cfg.parser().parse_args(
+            self.cfg.get_cmd_args_from_env())
 
         if env_args.config:
             self.load_config_from_filename(env_args.config)
@@ -34,7 +35,8 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
             if key != 'args' and value is not None:
                 self.cfg.set(key, value)
 
-        # Update the configuration with the options specified via KnowledgeDeployer
+        # Update the configuration with the options specified
+        # via KnowledgeDeployer
         options = {
             'bind': '{}:{}'.format(self.host, self.port),
             'workers': self.workers,
@@ -48,13 +50,16 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
 
     def load(self):
         if not self.app.check_thread_support():
-            raise RuntimeError("Database configuration is not suitable for deployment (not thread-safe).")
+            raise RuntimeError('Database configuration is not suitable '
+                               'for deployment (not thread-safe).')
         return self.app.start_indexing()
 
     def load_config_from_filename(self, filename):
         """
-        Loads the configuration file: the file is a python file, otherwise raise an RuntimeError
-        Exception or stop the process if the configuration file contains a syntax error.
+        Loads the configuration file: the file is a
+        python file, otherwise raise an RuntimeError
+        Exception or stop the process if the configuration
+        file contains a syntax error.
         """
 
         if not os.path.exists(filename):
@@ -65,12 +70,15 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
         try:
             module_name = '__config__'
             if ext in [".py", ".pyc"]:
-                spec = importlib.util.spec_from_file_location(module_name, filename)
+                spec = importlib.util.spec_from_file_location(
+                    module_name, filename)
             else:
-                msg = "configuration file should have a valid Python extension.\n"
-                warnings.warn(msg)
-                loader_ = importlib.machinery.SourceFileLoader(module_name, filename)
-                spec = importlib.util.spec_from_file_location(module_name, filename, loader=loader_)
+                warnings.warn('configuration file should have '
+                              'a valid Python extension.\n')
+                loader_ = importlib.machinery.SourceFileLoader(
+                    module_name, filename)
+                spec = importlib.util.spec_from_file_location(
+                    module_name, filename, loader=loader_)
             mod = importlib.util.module_from_spec(spec)
             sys.modules[module_name] = mod
             spec.loader.exec_module(mod)
