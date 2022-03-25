@@ -34,7 +34,7 @@ __dependencies__ = [
     'flask_mail',  # Mail client and utilities
     'Flask-Migrate',  # Database migration utilities
     'sqlalchemy',  # Database abstractions
-    'jinja2>=2.7,<=3.0',  # Templating engine
+    'jinja2>=2.7,<=3.0.3',  # Templating engine
     'werkzeug>=1.0',  # Development webserver
     'gunicorn',  # Deployed webserver
     'inflection',  # String transformation library
