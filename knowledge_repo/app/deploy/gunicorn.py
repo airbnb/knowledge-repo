@@ -38,7 +38,7 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
         # Update the configuration with the options specified
         # via KnowledgeDeployer
         options = {
-            'bind': '{}:{}'.format(self.host, self.port),
+            'bind': f'{self.host}:{self.port}',
             'workers': self.workers,
             'timeout': self.timeout,
         }
@@ -63,13 +63,13 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
         """
 
         if not os.path.exists(filename):
-            raise RuntimeError("%r doesn't exist" % filename)
+            raise RuntimeError(f"{filename} doesn't exist")
 
         ext = os.path.splitext(filename)[1]
 
         try:
             module_name = '__config__'
-            if ext in [".py", ".pyc"]:
+            if ext in ['.py', '.pyc']:
                 spec = importlib.util.spec_from_file_location(
                     module_name, filename)
             else:
@@ -83,7 +83,7 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
             sys.modules[module_name] = mod
             spec.loader.exec_module(mod)
         except Exception:
-            print("Failed to read config file: %s" % filename, file=sys.stderr)
+            print(f'Failed to read config file: {filename}', file=sys.stderr)
             traceback.print_exc()
             sys.stderr.flush()
             sys.exit(1)
@@ -97,7 +97,7 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
             try:
                 self.cfg.set(k.lower(), v)
             except Exception:
-                print("Invalid value for %s: %s\n" % (k, v), file=sys.stderr)
+                print(f'Invalid value for {k}: {v}\n', file=sys.stderr)
                 sys.stderr.flush()
                 raise
 
