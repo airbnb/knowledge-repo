@@ -63,7 +63,7 @@ class GunicornDeployer(BaseApplication, KnowledgeDeployer):
         """
 
         if not os.path.exists(filename):
-            raise RuntimeError(f"{filename} doesn't exist")
+            raise RuntimeError("%r doesn't exist" % filename)
 
         ext = os.path.splitext(filename)[1]
 
