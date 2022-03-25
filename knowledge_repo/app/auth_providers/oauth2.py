@@ -118,13 +118,15 @@ class OAuth2Provider(KnowledgeAuthProvider):
         redirect_url = f'{scheme}://{host}'
         redirect_path = f'/auth/login/{self.name}/authorize'
         if self.app.config['APPLICATION_ROOT']:
-            redirect_path = posixpath.join(self.app.config['APPLICATION_ROOT'], redirect_path)
+            redirect_path = posixpath.join(
+                self.app.config['APPLICATION_ROOT'], redirect_path)
         redirect_uri = urljoin(redirect_url, redirect_path)
 
         # Import OAuth deps here so we do not have a hard dependency on them
         from requests_oauthlib import OAuth2Session
         if self.client_id is None or self.client_secret is None:
-            raise ValueError('You must configure a client id and client secret in order to use oauth')
+            raise ValueError('You must configure a client id and client '
+                             'secret in order to use oauth')
         self.oauth_client = OAuth2Session(
             client_id=self.client_id,
             scope=self.scopes,
@@ -133,7 +135,8 @@ class OAuth2Provider(KnowledgeAuthProvider):
         )
 
     def prompt(self):
-        return redirect(self.oauth_client.authorization_url(self.authorization_url)[0])
+        return redirect(self.oauth_client.authorization_url(
+            self.authorization_url)[0])
 
     def get_endpoint_url(self, endpoint):
         return urljoin(self.base_url, endpoint)
@@ -165,19 +168,24 @@ class OAuth2Provider(KnowledgeAuthProvider):
                 return d[key]
             raise RuntimeError(f'Invalid key type: {key}.')
 
-        response = self.oauth_client.get(self.get_endpoint_url(self.user_info_endpoint), verify=self.verify_ssl_certs)
+        response = self.oauth_client.get(self.get_endpoint_url(
+            self.user_info_endpoint), verify=self.verify_ssl_certs)
         try:
             response_dict = json.loads(response.content)
             identifier_mapped = self.user_info_mapping['identifier']
             identifier = extract_from_dict(response_dict, identifier_mapped)
             if identifier is None:
-                raise ValueError(f"identifier '{identifier_mapped}' not found in authentication response")
+                raise ValueError(f"identifier '{identifier_mapped}'"
+                                 " not found in authentication response")
             user = User(identifier=identifier)
             if 'name' in self.user_info_mapping:
-                user.name = extract_from_dict(response_dict, self.user_info_mapping['name'])
+                user.name = extract_from_dict(
+                    response_dict, self.user_info_mapping['name'])
             if 'avatar_uri' in self.user_info_mapping:
-                user.avatar_uri = extract_from_dict(response_dict, self.user_info_mapping['avatar_uri'])
+                user.avatar_uri = extract_from_dict(
+                    response_dict, self.user_info_mapping['avatar_uri'])
         except Exception:
-            raise RuntimeError(f'Failure to extract user information from:\n\n {response.content}')
+            raise RuntimeError('Failure to extract user information '
+                               f'from:\n\n {response.content}')
 
         return user
