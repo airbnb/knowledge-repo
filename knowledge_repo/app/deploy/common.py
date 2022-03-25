@@ -54,20 +54,23 @@ class KnowledgeDeployer(object, metaclass=SubclassRegisteringABCMeta):
     def builder_str(self):
         if isinstance(self.knowledge_builder, types.FunctionType):
             out = []
-            for nl, cell in zip(self.knowledge_builder.__code__.co_freevars, self.knowledge_builder.__closure__):
+            for nl, cell in zip(self.knowledge_builder.__code__.co_freevars,
+                                self.knowledge_builder.__closure__):
                 if isinstance(cell.cell_contents, str):
                     cell_contents = cell.cell_contents.replace('"', '\\"')
                 else:
                     cell_contents = cell.cell_contents
                 out.append(f'{nl} = "{cell_contents}"')
-            out.append(textwrap.dedent(inspect.getsource(self.knowledge_builder)))
+            out.append(
+                textwrap.dedent(inspect.getsource(self.knowledge_builder)))
             return '\n'.join(out)
         return self.knowledge_builder
 
     @property
     def builder_func(self):
         if isinstance(self.knowledge_builder, str):
-            knowledge_builder = 'def get_app():\n\t' + self.knowledge_builder.replace('\n', '\t') + '\n\treturn app'
+            knowledge_builder = 'def get_app():\n\t' + \
+                self.knowledge_builder.replace('\n', '\t') + '\n\treturn app'
             namespace = {}
             exec(knowledge_builder, namespace)
             return namespace['get_app']
@@ -86,7 +89,8 @@ class KnowledgeDeployer(object, metaclass=SubclassRegisteringABCMeta):
         tmp_dir = tempfile.mkdtemp()
         tmp_path = os.path.join(tmp_dir, 'server.py')
 
-        kr_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
+        kr_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), '../../..'))
 
         out = []
         out.append('import sys')
