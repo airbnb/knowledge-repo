@@ -20,7 +20,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 blueprint = Blueprint(DEBUG, __name__,
-                      template_folder='../templates', static_folder='../static')
+                      template_folder='../templates',
+                      static_folder='../static')
 
 
 @blueprint.route('/debug/versions', methods=['GET'])
@@ -38,20 +39,25 @@ def show_versions():
         return 'Unknown'
 
     versions = []
-    for module_name in sorted(set(name.split('.')[0] for name in sys.modules.keys())):
+    for module_name in sorted(set(name.split('.')[0]
+                              for name in sys.modules.keys())):
         if module_name.startswith('_'):
             continue
         module = __import__(module_name)
-        if not hasattr(module, '__file__') or 'site-packages' not in module.__file__:
+        if not hasattr(module, '__file__') or 'site-packages' \
+                not in module.__file__:
             continue
         versions.append([module_name, get_version(__import__(module_name))])
 
-    # Show revision for mountpoint. Don't show actual uri because database passwords will be leaked
+    # Show revision for mountpoint. Don't show actual
+    # uri because database passwords will be leaked
     revisions = []
     repo_revisions = current_repo.revisions
     indexed_revisions = get_indexed_revisions()
     for mountpoint, uri in current_repo.uris.items():
-        revisions.append([mountpoint or '&lt;root&gt;', repo_revisions[uri], indexed_revisions.get(uri, 'None')])
+        revisions.append([mountpoint or '&lt;root&gt;',
+                         repo_revisions[uri],
+                         indexed_revisions.get(uri, 'None')])
 
     return (f"Knowledge Repo Version: {knowledge_repo.__version__}<br/>\n" +
             f"Python Version: {sys.version}<br/>\n" +
@@ -60,13 +66,15 @@ def show_versions():
             ("<i>Currently indexing</i><br />\n" if is_indexing() else "") +
             tabulate.tabulate(revisions, tablefmt='html') +
             "<h2>Loaded Packages</h2>\n" +
-            tabulate.tabulate(versions, tablefmt='html', headers=('Mount Point', 'Revision', 'Indexed Revision')))
+            tabulate.tabulate(versions, tablefmt='html', headers=(
+                'Mount Point', 'Revision', 'Indexed Revision')))
 
 
 @blueprint.route('/debug/force_reindex', methods=['GET'])
 def force_reindex():
     reindex = bool(request.args.get('reindex', ''))
-    current_app.db_update_index(check_timeouts=False, force=True, reindex=reindex)
+    current_app.db_update_index(
+        check_timeouts=False, force=True, reindex=reindex)
     return "Index Updated"
 
 

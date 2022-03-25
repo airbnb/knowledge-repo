@@ -32,13 +32,26 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 blueprint = Blueprint('editor', __name__,
-                      template_folder='../templates', static_folder='../static')
-
-# TODO: These functions have not been fully married to the KnowledgePost API
-# Currently, backended by Post objects but partially implemented on KnowledgePost API
+                      template_folder='../templates',
+                      static_folder='../static')
 
 
-# TODO: Deprecate this route in favour of integrating editing links into primary index pages and user pages
+def get_warning_msg(msg):
+    return json.dumps({'msg': msg, 'success': False})
+
+
+def get_error_msg(msg):
+    return json.dumps({'error_msg': msg, 'success': False})
+
+
+# TODO: These functions have not been fully married
+# to the KnowledgePost API
+# Currently, backended by Post objects but partially
+# implemented on KnowledgePost API
+
+
+# TODO: Deprecate this route in favour of integrating editing
+# links into primary index pages and user pages
 @blueprint.route('/webposts', methods=['GET'])
 @PageView.logged
 @permissions.post_edit.require()
@@ -55,8 +68,9 @@ def gitless_drafts():
         query = query.filter(or_(*[Post.path.like(p + '%') for p in prefixes]))
 
     if current_user.identifier not in current_repo.config.editors:
-        query = (query.outerjoin(PostAuthorAssoc, PostAuthorAssoc.post_id == Post.id)
-                      .filter(PostAuthorAssoc.user_id == current_user.id))
+        query = (query.outerjoin(
+            PostAuthorAssoc, PostAuthorAssoc.post_id == Post.id)
+            .filter(PostAuthorAssoc.user_id == current_user.id))
 
     return render_template('web_posts.html', posts=query.all())
 
@@ -74,7 +88,7 @@ def editor(path=None):
     if prefixes is not None:
         assert (
             path is None or any(path.startswith(prefix) for prefix in prefixes)
-        ), 'Editing of this post online is not permitted by server configuration.'
+        ), 'Editing this post online is not permitted by server configuration.'
 
     # set defaults
     data = {'title': None,
@@ -106,7 +120,8 @@ def editor(path=None):
                                           .filter(Comment.type == 'review')
                                           .all())
 
-    if current_user.identifier not in data['authors'] or current_user.identifier in current_repo.config.editors:
+    if current_user.identifier not in data['authors'] \
+            or current_user.identifier in current_repo.config.editors:
         data['can_approve'] = 1
 
     data['created_at'] = data['created_at']
@@ -135,28 +150,31 @@ def save_post():
 
     if prefixes is not None:
         if not any([path.startswith(prefix) for prefix in prefixes]):
-            return json.dumps({'msg': (f'Your post path must begin with one of {prefixes}'),
-                               'success': False})
+            return get_warning_msg(
+                f'Your post path must begin with one of {prefixes}')
 
     # TODO better handling of overwriting
     kp = None
     if path in current_repo:
         kp = current_repo.post(path)
-        if current_user.identifier not in kp.headers['authors'] and current_user.identifier not in current_repo.config.editors:
-            return json.dumps({'msg': (f'Post with path {path} already exists and you are not an author!'
-                                       '\nPlease try a different path'),
-                               'success': False})
+        if current_user.identifier not in kp.headers['authors'] \
+                and current_user.identifier not in current_repo.config.editors:
+            return get_warning_msg(
+                f'Post with path {path} already exists and you are not '
+                'an author!\nPlease try a different path')
 
     # create the knowledge post
     kp = kp or KnowledgePost(path=path)
 
     headers = {}
-    headers['created_at'] = datetime.strptime(data['created_at'], '%Y-%m-%d').date()
-    headers['updated_at'] = datetime.strptime(data['updated_at'], '%Y-%m-%d').date()
+    headers['created_at'] = datetime.strptime(
+        data['created_at'], '%Y-%m-%d').date()
+    headers['updated_at'] = datetime.strptime(
+        data['updated_at'], '%Y-%m-%d').date()
     headers['title'] = data['title']
     headers['path'] = data['path']
-    # TODO: thumbnail header not working currently, as feed image set with kp
-    # method not based on header
+    # TODO: thumbnail header not working currently, as feed image set
+    # with kp method not based on header
     headers['thumbnail'] = data.get('feed_image', '')
     headers['authors'] = [auth.strip() for auth in data['author']]
     headers['tldr'] = data['tldr']
@@ -166,7 +184,8 @@ def save_post():
 
     kp.write(unquote(data['markdown']), headers=headers)
     # add to repo
-    current_repo.add(kp, update=True, message=headers['title'])  # THIS IS DANGEROUS
+    current_repo.add(
+        kp, update=True, message=headers['title'])  # THIS IS DANGEROUS
 
     update_index()
     return json.dumps({'path': path})
@@ -198,7 +217,7 @@ def publish_post():
     """ Publish the post by changing the status """
     path = request.args.get('path', None)
     if path not in current_repo:
-        return json.dumps({'msg': f'Unable to retrieve post with path = {path}!', 'success': False})
+        return get_warning_msg(f'Unable to retrieve post with path = {path}!')
     current_repo.publish(path)
 
     update_index(check_timeouts=False)
@@ -212,7 +231,7 @@ def unpublish_post():
     """ Unpublish the post """
     path = request.args.get('path', None)
     if path not in current_repo:
-        return json.dumps({'msg': f'Unable to retrieve post with path = {path}!', 'success': False})
+        return get_warning_msg(f'Unable to retrieve post with path = {path}!')
     current_repo.unpublish(path)
 
     update_index(check_timeouts=False)
@@ -226,7 +245,7 @@ def accept():
     """ Accept the post """
     path = request.args.get('path', None)
     if path not in current_repo:
-        return json.dumps({'msg': f'Unable to retrieve post with path = {path}!', 'success': False})
+        return get_warning_msg(f'Unable to retrieve post with path = {path}!')
     current_repo.accept(path)
     update_index()
     return 'OK'
@@ -239,10 +258,11 @@ def delete_post():
     """ Delete a post """
     path = request.args.get('path', None)
     if path not in current_repo:
-        return json.dumps({'msg': f'Unable to retrieve post with path = {path}!', 'success': False})
+        return get_warning_msg(f'Unable to retrieve post with path = {path}!')
     kp = current_repo.post(path)
     if current_user.identifier not in kp.headers['authors']:
-        return json.dumps({'msg': 'You can only delete a post where you are an author!', 'success': False})
+        return get_warning_msg(
+            'You can only delete a post where you are an author!')
     current_repo.remove(path)
 
     update_index(check_timeouts=False)
@@ -254,7 +274,8 @@ def delete_post():
 @permissions.post_edit.require()
 def review_comment():
     """
-    Saves a review and sends an email that the post has been reviewed to the author of the post or deletes a submitted review
+    Saves a review and sends an email that the post has been reviewed to
+    the author of the post or deletes a submitted review
     """
 
     if request.method == 'POST':
@@ -287,8 +308,9 @@ def review_comment():
 @PageView.logged
 @permissions.post_edit.require()
 def file_upload():
-    """ Uploads images dropped on the web editor's markdown box to static/images
-        and notifies editors by email
+    """
+    Uploads images dropped on the web editor's markdown box to
+    static/images and notifies editors by email
     """
     upload_folder = 'images'
     title = request.form['title']
@@ -304,11 +326,12 @@ def file_upload():
                 try:
                     img_file.save(os.path.join(dst_folder, filename))
                     send_from_directory(dst_folder, filename)
-                    uploadedFiles += [url_for('static', filename=os.path.join(upload_folder, filename))]
+                    uploadedFiles += [url_for('static', filename=os.path.join(
+                        upload_folder, filename))]
                 except Exception as e:
                     error_msg = f'ERROR during image upload: {e}'
                     logger.error(error_msg)
-                    return json.dumps({'error_msg': error_msg, 'success': False})
+                    return get_error_msg(error_msg)
 
             elif is_pdf(filename):
                 from PyPDF2 import PdfFileReader
@@ -318,12 +341,16 @@ def file_upload():
                     num_pages = src_pdf.getNumPages()
                     for page_num in range(num_pages):
                         page_png = pdf_page_to_png(src_pdf, page_num)
-                        page_name = '{filename}_{page_num}.jpg'.format(**locals())
-                        page_png.save(filename=os.path.join(dst_folder, page_name))
-                        uploadedFiles += [url_for('static', filename=os.path.join(upload_folder, page_name))]
+                        page_name = '{filename}_{page_num}.jpg'.format(
+                            **locals())
+                        page_png.save(filename=os.path.join(
+                            dst_folder, page_name))
+                        uploadedFiles += [url_for(
+                            'static', filename=os.path.join(
+                                upload_folder, page_name))]
                 except Exception as e:
                     error_msg = f'ERROR during pdf upload: {e}'
                     logger.error(error_msg)
-                    return json.dumps({'error_msg': error_msg, 'success': False})
+                    return get_error_msg(error_msg)
 
     return json.dumps({'links': uploadedFiles, 'success': True})

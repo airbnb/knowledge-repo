@@ -37,7 +37,8 @@ class LdapAuthProvider(KnowledgeAuthProvider):
         return redirect(url_for('index.render_feed'))
 
     def validate(self, user):
-        userdn = self.app.config['LDAP_USERDN_SCHEMA'].format(user_id=user.identifier)
+        userdn = self.app.config['LDAP_USERDN_SCHEMA'].format(
+            user_id=user.identifier)
         password = request.form['password']
 
         conn = Connection(self.server, user=userdn, password=password)
