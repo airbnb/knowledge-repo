@@ -1,4 +1,5 @@
 from alembic import context
+from flask import current_app
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 import logging
@@ -14,8 +15,6 @@ logger = logging.getLogger('alembic.env')
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from flask import current_app
-
 config.set_main_option('sqlalchemy.url',
                        current_app.config.get('SQLALCHEMY_DATABASE_URI'))
 target_metadata = current_app.db.metadata
@@ -38,7 +37,7 @@ def run_migrations_offline():
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = config.get_main_option('sqlalchemy.url')
     context.configure(url=url)
 
     with context.begin_transaction():
@@ -78,6 +77,7 @@ def run_migrations_online():
             context.run_migrations()
     finally:
         connection.close()
+
 
 if context.is_offline_mode():
     run_migrations_offline()
