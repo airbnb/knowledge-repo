@@ -22,18 +22,17 @@ from ..models import (
 from ..proxies import current_user, db_session
 from ..utils.emails import send_subscription_email
 from ..utils.requests import from_request_get_feed_params
+from ..utils.shared import get_blueprint
 from flask import (
     current_app,
     render_template,
     request,
-    Blueprint,
 )
 from sqlalchemy import and_
 import logging
 import math
 
-blueprint = Blueprint('tag', __name__,
-                      template_folder='../templates', static_folder='../static')
+blueprint = get_blueprint('tag', __name__)
 
 
 @blueprint.route('/batch_tags')

@@ -3,14 +3,14 @@ from ..models import PageView, Post
 from ..proxies import db_session
 from ..utils.posts import get_posts
 from ..utils.requests import from_request_get_feed_params
+from ..utils.shared import get_blueprint
 from datetime import timedelta
-from flask import render_template, request, Blueprint
+from flask import render_template, request
 from sqlalchemy import func
 import collections
 import json
 
-blueprint = Blueprint('stats', __name__,
-                      template_folder='../templates', static_folder='../static')
+blueprint = get_blueprint('stats', __name__)
 
 
 def _round_date(d):

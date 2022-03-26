@@ -12,6 +12,7 @@ from ..proxies import current_repo, db_session
 from ..utils.posts import get_posts
 from ..utils.render import render_post_tldr
 from ..utils.requests import from_request_get_feed_params
+from ..utils.shared import get_blueprint
 from collections import namedtuple
 from flask import (
     current_app,
@@ -19,15 +20,13 @@ from flask import (
     redirect,
     render_template,
     request,
-    Blueprint,
 )
 from flask_login import login_required
 from sqlalchemy import case, desc
 import os
 import json
 
-blueprint = Blueprint(
-    'index', __name__, template_folder='../templates', static_folder='../static')
+blueprint = get_blueprint('index', __name__)
 
 
 def has_no_empty_params(rule):

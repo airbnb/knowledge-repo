@@ -6,13 +6,13 @@ This includes:
 """
 from ..models import PageView, Vote
 from ..proxies import current_user, db_session
+from ..utils.shared import get_blueprint
 import logging
-from flask import request, Blueprint
+from flask import request
 from flask_login import login_required
 from sqlalchemy import and_
 
-blueprint = Blueprint(
-    'vote', __name__, template_folder='../templates', static_folder='../static')
+blueprint = get_blueprint('vote', __name__)
 
 
 @blueprint.route('/like')

@@ -1,17 +1,15 @@
 from ..proxies import current_app
+from ..utils.shared import get_blueprint
 from flask import (
     current_app,
     redirect,
     render_template,
     url_for,
-    Blueprint,
 )
 from flask_login import logout_user, login_required
 from flask_principal import identity_changed, AnonymousIdentity
 
-blueprint = Blueprint('auth', __name__,
-                      template_folder='../templates',
-                      static_folder='../static')
+blueprint = get_blueprint('auth', __name__)
 
 
 @blueprint.route('/auth/login', methods=['GET', 'POST'])

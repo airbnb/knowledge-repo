@@ -6,6 +6,7 @@ from ..utils.render import (
     render_post,
     render_post_raw,
 )
+from ..utils.shared import get_blueprint
 from flask import (
     abort,
     current_app,
@@ -13,7 +14,6 @@ from flask import (
     render_template,
     request,
     url_for,
-    Blueprint,
     Response,
 )
 from knowledge_repo.constants import PDF
@@ -24,8 +24,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-blueprint = Blueprint('posts', __name__,
-                      template_folder='../templates', static_folder='../static')
+blueprint = get_blueprint('posts', __name__)
 
 
 @blueprint.route('/post/<path:path>', methods=['GET'])
