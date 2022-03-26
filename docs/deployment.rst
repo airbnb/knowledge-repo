@@ -98,6 +98,7 @@ It's possible to use SSH to authenticate. Taking GitHub as an example, to set th
 
 Note that anyone with access to this machine can easily extract this key and gain
 read-only access to the repository.
+
 Database Knowledge Repositories
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
