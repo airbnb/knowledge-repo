@@ -36,7 +36,8 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
 
     @classmethod
     def for_uris(cls, uri):
-        # Import this within this method so as not to cause import resolution problems
+        # Import this within this method so as not to cause import
+        # resolution problems
         from .repositories.meta import MetaKnowledgeRepository
         if isinstance(uri, str):
             uris = {'': uri}
@@ -77,7 +78,8 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
 
     @config.setter
     def config(self, config):
-        assert isinstance(config, KnowledgeRepositoryConfig), "`config` should be a `KnowledgeRepositoryConfig` instance."
+        assert isinstance(config, KnowledgeRepositoryConfig), \
+            '`config` should be a `KnowledgeRepositoryConfig` instance.'
         self._config = config
 
     @property
@@ -99,7 +101,8 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
                     uri_dict[parent] = uri
                 elif isinstance(uri, dict):
                     for mountpoint, u in uri.items():
-                        add_uris(uri_dict, u, parent=posixpath.join(parent, mountpoint))
+                        add_uris(uri_dict, u, parent=posixpath.join(
+                            parent, mountpoint))
                 elif isinstance(uri, KnowledgeRepository):
                     for mountpoint, u in uri.uris.items():
                         uri_dict[posixpath.join(parent, mountpoint)] = u
@@ -113,9 +116,9 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
 
     @property
     def revisions(self):
-        # This method provides a mapping from uri to revision for this repository
-        # and/or any nested repositories. This is most useful when checking if an
-        # update is required server side.
+        # This method provides a mapping from uri to revision for this
+        # repository and/or any nested repositories. This is most useful
+        # when checking if an update is required server side.
         if isinstance(self.uri, str):
             return {self.uri: self.revision}
 
@@ -124,7 +127,8 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
 
             def add_revisions(revision_dict, uri):
                 if isinstance(uri, str):
-                    revision_dict[uri] = KnowledgeRepository.for_uri(uri).revision
+                    revision_dict[uri] = \
+                        KnowledgeRepository.for_uri(uri).revision
                 elif isinstance(uri, dict):
                     for u in uri.values():
                         add_revisions(revision_dict, u)
@@ -138,7 +142,7 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
 
         raise ValueError(f'Unrecognised KnowledgeRepository.uri: {self.uri}')
 
-    # ------------- Repository actions / state ------------------------------------
+    # ------------- Repository actions / state --------------------------------
 
     def session_begin(self):
         pass
@@ -164,29 +168,37 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
     def set_active_draft(self, path):
         pass
 
-    # -------------- Post retrieval methods --------------------------------------
+    # -------------- Post retrieval methods ----------------------------------
 
     def post(self, path, revision=None):
         if path is None:
             raise ValueError("path is None")
         path = self._kp_path(path)
-        if not self.has_post(path, revision=revision) and path in self.config.aliases:
+        if not self.has_post(path, revision=revision) \
+                and path in self.config.aliases:
             path = self.config.aliases[path]
             if path in self.config.alias:
                 raise ValueError("Alias cycle detected.")
-        assert self.has_post(path, revision=revision), f"{self.__class__.__name__} does not have a post for path '{path}'."
-        return KnowledgePost(path=path, repository=self, revision=revision or self._kp_get_revision(path))
+        assert self.has_post(path, revision=revision), \
+            f"{self.__class__.__name__} does not have a post at '{path}'."
+        return KnowledgePost(
+            path=path, repository=self,
+            revision=revision or self._kp_get_revision(path))
 
     def dir(self, prefix=None, status=None):
         if prefix is None or isinstance(prefix, str):
             prefixes = [prefix]
         else:
             prefixes = prefix
-        assert all([prefix is None or isinstance(prefix, str) for prefix in prefixes]), "All path prefixes must be strings."
-        prefixes = [prefix if prefix is None else posixpath.relpath(prefix) for prefix in prefixes]
+        assert all([prefix is None or isinstance(prefix, str) for prefix
+                    in prefixes]), "All path prefixes must be strings."
+        prefixes = [prefix if prefix is None else posixpath.relpath(prefix)
+                    for prefix in prefixes]
         if isinstance(status, str):
             if status == 'all':
-                status = [self.PostStatus.DRAFT, self.PostStatus.SUBMITTED, self.PostStatus.PUBLISHED, self.PostStatus.UNPUBLISHED]
+                status = \
+                    [self.PostStatus.DRAFT, self.PostStatus.SUBMITTED,
+                     self.PostStatus.PUBLISHED, self.PostStatus.UNPUBLISHED]
             else:
                 raise ValueError(f'Status alias `{status}` not recognised.')
         if status is not None and not isinstance(status, list):
@@ -207,10 +219,12 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
         return self._kp_exists(self._kp_path(path), revision=revision)
 
     def post_status(self, path, revision=None, detailed=False):
-        return self._kp_status(self._kp_path(path), revision=revision, detailed=detailed)
+        return self._kp_status(self._kp_path(path), revision=revision,
+                               detailed=detailed)
 
     def post_statuses(self, paths, detailed=False):
-        return OrderedDict([(path, self.post_status(path, detailed=detailed)) for path in paths])
+        return OrderedDict([(path, self.post_status(path, detailed=detailed))
+                            for path in paths])
 
     def posts(self, status=None, only_valid=False):
         for path in self.dir(status=status):
@@ -233,11 +247,18 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
 
     # -------------- Post submission / addition user flow --------------------
 
-    def add(self, kp, path=None, update=False, **kwargs):  # Create a new knowledge post draft
-        assert isinstance(kp, KnowledgePost), "One can only add KnowledgePost objects to a KnowledgeRepository."
+    # Create a new knowledge post draft
+    def add(self, kp, path=None, update=False, **kwargs):
+        assert isinstance(kp, KnowledgePost), \
+            'One can only add KnowledgePost objects to a KnowledgeRepository.'
         path = path or kp.path
         if not path:
-            raise ValueError("Post path not provided for Knowledge Post, and one is not specified within the knowledge post. Either add the path to post headers using `path: <path>` or specify the project path on the command line adding `-p <path>` to the current command.")
+            raise ValueError(
+                'Post path not provided for Knowledge Post, and one is not '
+                'specified within the knowledge post. Either add the path to '
+                'post headers using `path: <path>` or specify the project '
+                'path on the command line adding `-p <path>` to the current '
+                'command.')
         path = self._kp_path(path)
         path = self.config.path_parse(path)
 
