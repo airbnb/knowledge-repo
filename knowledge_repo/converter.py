@@ -22,7 +22,8 @@ def get_format(filename, format=None):
             if format.startswith('.'):
                 format = format[1:]
         else:
-            raise RuntimeError("Unable to determine a format automatically. Please manually specify the format, and try again.")
+            raise RuntimeError(
+                "Unable to determine a format automatically. Please manually specify the format, and try again.")
     return format
 
 
@@ -69,6 +70,7 @@ class KnowledgePostConverter(object, metaclass=SubclassRegisteringABCMeta):
                 return kp
             finally:
                 self.cleanup()
+
         return wrapped
 
     def __getattribute__(self, attr):
@@ -105,4 +107,5 @@ class KnowledgePostConverter(object, metaclass=SubclassRegisteringABCMeta):
             raise ValueError(
                 f"The knowledge repository does not support files of type '{format}'. Supported types are: {keys}."
             )
-        return cls._get_subclass_for(format.lower())(kp, format=format, postprocessors=postprocessors, interactive=interactive)
+        return cls._get_subclass_for(format.lower())(kp, format=format, postprocessors=postprocessors,
+                                                     interactive=interactive)

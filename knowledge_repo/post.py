@@ -15,7 +15,6 @@ import uuid
 import yaml
 import PIL.Image
 
-
 logger = logging.getLogger(__name__)
 
 # Define available headers, their types, and runtime input specification
@@ -25,16 +24,20 @@ HEADER_REQUIRED_FIELD_TYPES = [
     Header('title', str, ci.GetInput(prompt='title')),
     Header('authors', list, ci.GetInput(prompt='authors (comma separated)', convertor=ci.ListConvertor())),
     Header('tldr', str, ci.GetInput(prompt='tldr')),
-    Header('created_at', datetime, ci.GetInput(prompt='created_at', convertor=ci.DateConvertor(), default=date.today())),
+    Header('created_at', datetime,
+           ci.GetInput(prompt='created_at', convertor=ci.DateConvertor(), default=date.today())),
 ]
 
 HEADER_OPTIONAL_FIELD_TYPES = [
     Header('subtitle', str, ci.GetInput(prompt='subtitle', required=False)),
     Header('tags', list, ci.GetInput(prompt='tags (comma separated)', convertor=ci.ListConvertor(), required=False)),
     Header('path', str, ci.GetInput(prompt='path', required=False)),
-    Header('updated_at', datetime, ci.GetInput(prompt='updated_at', convertor=ci.DateConvertor(), default=datetime.now())),
-    Header('private', bool, ci.GetInput(prompt='private', convertor=ci.BooleanConvertor(), required=False)),   # If true, this post starts out private
-    Header('allowed_groups', list, ci.GetInput(prompt='allowed_groups (comma separated)', convertor=ci.ListConvertor(), required=False)),
+    Header('updated_at', datetime,
+           ci.GetInput(prompt='updated_at', convertor=ci.DateConvertor(), default=datetime.now())),
+    Header('private', bool, ci.GetInput(prompt='private', convertor=ci.BooleanConvertor(), required=False)),
+    # If true, this post starts out private
+    Header('allowed_groups', list,
+           ci.GetInput(prompt='allowed_groups (comma separated)', convertor=ci.ListConvertor(), required=False)),
     Header('thumbnail', (int, str), ci.GetInput(prompt='thumbnail', required=False)),
 ]
 
@@ -301,10 +304,10 @@ class KnowledgePost(object):
         headers = self._verify_headers(headers, interactive=interactive)
 
         md = (  # Format with unicode seems to have issue in Python 2, so we explicitly concatenate
-            '---\n' +
-            yaml.safe_dump(headers, default_flow_style=False) +
-            '---\n\n' +
-            md
+                '---\n' +
+                yaml.safe_dump(headers, default_flow_style=False) +
+                '---\n\n' +
+                md
         )
 
         self._write_ref('knowledge.md', encode(md))
@@ -486,7 +489,8 @@ class KnowledgePost(object):
     # Conversion/Import/Export methods
     @classmethod
     def from_file(cls, filename, src_paths=[], format=None, postprocessors=None, interactive=False, **opts):
-        kp = KnowledgePostConverter.for_file(cls(), filename, format=format, postprocessors=postprocessors, interactive=interactive).from_file(filename, **opts)
+        kp = KnowledgePostConverter.for_file(cls(), filename, format=format, postprocessors=postprocessors,
+                                             interactive=interactive).from_file(filename, **opts)
         if src_paths:
             for src_path in src_paths:
                 kp.add_srcfile(src_path)
@@ -494,14 +498,16 @@ class KnowledgePost(object):
 
     @classmethod
     def from_string(cls, string, src_strings={}, format=None, postprocessors=None, interactive=False, **opts):
-        kp = KnowledgePostConverter.for_format(cls(), format=format, postprocessors=postprocessors, interactive=interactive).from_string(string, ** opts)
+        kp = KnowledgePostConverter.for_format(cls(), format=format, postprocessors=postprocessors,
+                                               interactive=interactive).from_string(string, **opts)
         if src_strings:
             for src_name, data in list(src_strings.items()):
                 kp.write_src(src_name, data)
         return kp
 
     def to_file(self, filename, format=None, interactive=False, **opts):
-        return KnowledgePostConverter.for_file(self, filename, format=format, interactive=interactive).to_file(filename, **opts)
+        return KnowledgePostConverter.for_file(self, filename, format=format, interactive=interactive).to_file(filename,
+                                                                                                               **opts)
 
     def to_string(self, format, interactive=False, **opts):
         return KnowledgePostConverter.for_format(self, format, interactive=interactive).to_string(**opts)

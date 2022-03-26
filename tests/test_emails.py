@@ -1,19 +1,20 @@
 import base64
-import unittest
 import datetime
+import unittest
+
 from sqlalchemy import and_
 
 from knowledge_repo import KnowledgeRepository, KnowledgePost
 from knowledge_repo.app.models import Post, Subscription, Email, User
-from knowledge_repo.app.utils.emails import send_internal_error_email, send_subscription_emails, send_comment_email, send_review_email
 from knowledge_repo.app.proxies import db_session
+from knowledge_repo.app.utils.emails import send_internal_error_email, send_subscription_emails, send_comment_email, \
+    send_review_email
 
 
 class EmailTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-
         self.repo = KnowledgeRepository.for_uri('tests/test_repo', auto_create=True)
         self.app = self.repo.get_app(config='tests/config_server.py')
         self.app.repository.config.editors = ['knowledge_editors']
@@ -132,11 +133,11 @@ class EmailTest(unittest.TestCase):
                     send_subscription_emails(post)
 
             emails_sent = (db_session.query(Email)
-                                     .filter(and_(Email.object_id == post_id,
-                                                  Email.user_id == user_id,
-                                                  Email.trigger_id == tag_id,
-                                                  Email.trigger_type == 'subscription'))
-                                     .all())
+                           .filter(and_(Email.object_id == post_id,
+                                        Email.user_id == user_id,
+                                        Email.trigger_id == tag_id,
+                                        Email.trigger_type == 'subscription'))
+                           .all())
 
             # There should be exactly 1 email sent to the user for the target post
             # Check EmailSent records

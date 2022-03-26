@@ -1,8 +1,8 @@
 from . import config_defaults
 from .config import KnowledgeRepositoryConfig
+from .constants import KP_EXTENSION
 from .post import KnowledgePost
 from .postprocessor import KnowledgePostProcessor
-from .constants import KP_EXTENSION
 from .utils.registry import SubclassRegisteringABCMeta
 from abc import abstractmethod, abstractproperty
 from collections import OrderedDict

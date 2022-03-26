@@ -1,11 +1,10 @@
 import unittest
 
 from bs4 import BeautifulSoup
-from sqlalchemy import and_
 
 from knowledge_repo import KnowledgeRepository
-from knowledge_repo.app.proxies import db_session
 from knowledge_repo.app.models import Post
+from knowledge_repo.app.proxies import db_session
 
 
 class PostTest(unittest.TestCase):
@@ -18,8 +17,8 @@ class PostTest(unittest.TestCase):
         with self.app.app_context():
             # for this test, pick one post
             post = (db_session.query(Post)
-                              .filter(Post.is_published)
-                              .first())
+                    .filter(Post.is_published)
+                    .first())
             self.post_id = post.id
             self.post_rendered_url = '/post/{}'.format(post.path)
 

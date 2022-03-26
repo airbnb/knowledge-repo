@@ -1,4 +1,5 @@
 import unittest
+
 from bs4 import BeautifulSoup
 
 from knowledge_repo import KnowledgeRepository
