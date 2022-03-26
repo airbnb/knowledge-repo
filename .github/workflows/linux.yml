@@ -33,8 +33,8 @@ jobs:
       - run: conda update --all --yes
       - run: conda create -n testenv python='${{ matrix.python-version }}'
       - run: conda activate testenv
-      - run: conda install -c conda-forge r-xfun=0.27
-      - run: conda install -c conda-forge r-base r-rmarkdown r-ggplot2 r-plotly pandoc
+      - run: conda install -c conda-forge r-xfun=0.27 r-rlang=1.0.2
+      - run: conda install -c conda-forge r-base=4.1.1 r-rmarkdown=2.13 r-ggplot2=3.3.5 r-plotly=4.10.0 pandoc=2.17.1.1
       - run: pip install pycodestyle
       - run: pip install .[all]
       - run: bash run_tests.sh
