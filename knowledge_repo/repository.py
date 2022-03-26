@@ -1,16 +1,17 @@
-from . import config_defaults
-from .config import KnowledgeRepositoryConfig
-from .post import KnowledgePost
-from .postprocessor import KnowledgePostProcessor
-from .constants import KP_EXTENSION
-from .utils.registry import SubclassRegisteringABCMeta
+import os
+import posixpath
 from abc import abstractmethod, abstractproperty
 from collections import OrderedDict
 from datetime import datetime
 from enum import Enum
 from urllib.parse import urlparse
-import os
-import posixpath
+
+from . import config_defaults
+from .config import KnowledgeRepositoryConfig
+from .constants import KP_EXTENSION
+from .post import KnowledgePost
+from .postprocessor import KnowledgePostProcessor
+from .utils.registry import SubclassRegisteringABCMeta
 
 
 class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
@@ -179,17 +180,24 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
             path = self.config.aliases[path]
             if path in self.config.alias:
                 raise ValueError("Alias cycle detected.")
+<<<<<<< HEAD
         assert self.has_post(path, revision=revision), \
             f"{self.__class__.__name__} does not have a post at '{path}'."
         return KnowledgePost(
             path=path, repository=self,
             revision=revision or self._kp_get_revision(path))
+=======
+        assert self.has_post(path,
+                             revision=revision), f"{self.__class__.__name__} does not have a post for path '{path}'."
+        return KnowledgePost(path=path, repository=self, revision=revision or self._kp_get_revision(path))
+>>>>>>> 4f268e7 (update repo)
 
     def dir(self, prefix=None, status=None):
         if prefix is None or isinstance(prefix, str):
             prefixes = [prefix]
         else:
             prefixes = prefix
+<<<<<<< HEAD
         assert all([prefix is None or isinstance(prefix, str) for prefix
                     in prefixes]), "All path prefixes must be strings."
         prefixes = [prefix if prefix is None else posixpath.relpath(prefix)
@@ -199,6 +207,15 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
                 status = \
                     [self.PostStatus.DRAFT, self.PostStatus.SUBMITTED,
                      self.PostStatus.PUBLISHED, self.PostStatus.UNPUBLISHED]
+=======
+        assert all(
+            [prefix is None or isinstance(prefix, str) for prefix in prefixes]), "All path prefixes must be strings."
+        prefixes = [prefix if prefix is None else posixpath.relpath(prefix) for prefix in prefixes]
+        if isinstance(status, str):
+            if status == 'all':
+                status = [self.PostStatus.DRAFT, self.PostStatus.SUBMITTED, self.PostStatus.PUBLISHED,
+                          self.PostStatus.UNPUBLISHED]
+>>>>>>> 4f268e7 (update repo)
             else:
                 raise ValueError(f'Status alias `{status}` not recognised.')
         if status is not None and not isinstance(status, list):
@@ -254,11 +271,15 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
         path = path or kp.path
         if not path:
             raise ValueError(
+<<<<<<< HEAD
                 'Post path not provided for Knowledge Post, and one is not '
                 'specified within the knowledge post. Either add the path to '
                 'post headers using `path: <path>` or specify the project '
                 'path on the command line adding `-p <path>` to the current '
                 'command.')
+=======
+                "Post path not provided for Knowledge Post, and one is not specified within the knowledge post. Either add the path to post headers using `path: <path>` or specify the project path on the command line adding `-p <path>` to the current command.")
+>>>>>>> 4f268e7 (update repo)
         path = self._kp_path(path)
         path = self.config.path_parse(path)
 
