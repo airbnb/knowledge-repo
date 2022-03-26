@@ -21,18 +21,20 @@ blueprint = get_blueprint('vote', __name__)
 def like_post():
     """ Like a post """
     try:
-        post_id = int(request.args.get('post_id', '-1'))  # This will prevent old code from adding invalid post_ids
+        # This will prevent old code from adding invalid post_ids
+        post_id = int(request.args.get('post_id', '-1'))
         if post_id < 0:
             return "No Post Found to like!"
         vote = (db_session.query(Vote)
-                .filter(and_(Vote.object_id == post_id, Vote.user_id == current_user.id))
+                .filter(and_(Vote.object_id == post_id,
+                             Vote.user_id == current_user.id))
                 .first())
         if not vote:
             vote = Vote(user_id=current_user.id, object_id=post_id)
             db_session.add(vote)
             db_session.commit()
-    except:
-        logging.warning("ERROR processing request")
+    except Exception as e:
+        logging.warning(f'ERROR processing request {e}')
     return ""
 
 
@@ -42,16 +44,18 @@ def like_post():
 def unlike_post():
     """ Un-like a post """
     try:
-        post_id = int(request.args.get('post_id', '-1'))  # This will prevent old code from adding invalid post_ids
+        # This will prevent old code from adding invalid post_ids
+        post_id = int(request.args.get('post_id', '-1'))
         if post_id < 0:
             return "No Post Found to Unlike!"
         votes = (db_session.query(Vote)
-                 .filter(and_(Vote.object_id == post_id, Vote.user_id == current_user.id))
+                 .filter(and_(Vote.object_id == post_id,
+                              Vote.user_id == current_user.id))
                  .all())
         if votes:
             for vote in votes:
                 db_session.delete(vote)
             db_session.commit()
-    except:
-        logging.warning("ERROR processing request")
+    except Exception as e:
+        logging.warning(f'ERROR processing request {e}')
     return ""

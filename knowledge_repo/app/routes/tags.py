@@ -271,10 +271,9 @@ def toggle_tag_subscription():
             logging.warning("ERROR processing request")
             return ""
         db_session.commit()
-        return ""
     except Exception as e:
         logging.warning(f'ERROR processing request: {e}')
-        return ""
+    return ""
 
 
 @toggle_tag_subscription.object_extractor
