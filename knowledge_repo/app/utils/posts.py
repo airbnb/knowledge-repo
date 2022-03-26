@@ -50,14 +50,17 @@ def get_posts(feed_params):
     if filters and str(filters):
         filter_set = get_query_param_set(filters)
         for elem in filter_set:
-            query = query.filter(or_(func.lower(Post.keywords).like('%' + elem + '%'),
-                                     func.lower(Post.keywords).like('%' + elem),
-                                     func.lower(Post.keywords).like(elem + '%')))
+            query = query.filter(
+                or_(func.lower(Post.keywords).like('%' + elem + '%'),
+                    func.lower(Post.keywords).like('%' + elem),
+                    func.lower(Post.keywords).like(elem + '%')))
 
     author_names = feed_params['authors']
     if author_names:
-        author_names = [author_name.strip() for author_name in author_names.split(",")]
-        query = query.filter(Post.authors.any(User.identifier.in_(author_names)))
+        author_names = [author_name.strip()
+                        for author_name in author_names.split(",")]
+        query = query.filter(
+            Post.authors.any(User.identifier.in_(author_names)))
 
     # sort - TODO clean up
     sort_by = feed_params['sort_by']
@@ -112,19 +115,22 @@ def get_posts(feed_params):
 
     # get the right indexes
     feed_params['posts_count'] = len(posts)
-    feed_params['page_count'] = int(math.ceil(float(len(posts)) / feed_params['results']))
+    feed_params['page_count'] = \
+        int(math.ceil(float(len(posts)) / feed_params['results']))
     posts = posts[feed_params['start']:feed_params[
         'start'] + feed_params['results']]
 
-    # Post.authors is lazy loaded, so we need to make sure it has been loaded before being
-    # passed beyond the scope of this database db_session.
+    # Post.authors is lazy loaded, so we need to make sure
+    # it has been loaded before being passed beyond the scope
+    # of this database db_session.
     for post in posts:
         post.authors
 
-    post_stats = {post.path: {'all_views': post.view_count,
-                              'distinct_views': post.view_user_count,
-                              'total_likes': post.vote_count,
-                              'total_comments': post.comment_count} for post in posts}
+    post_stats = {
+        post.path: {'all_views': post.view_count,
+                    'distinct_views': post.view_user_count,
+                    'total_likes': post.vote_count,
+                    'total_comments': post.comment_count} for post in posts}
 
     db_session.expunge_all()
 
