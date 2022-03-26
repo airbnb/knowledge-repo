@@ -65,8 +65,9 @@ def render_batch_tags():
             db_session.delete(tag)
             db_session.commit()
 
-        tags_to_posts[tag.id] = [(post.path, post.title) for post in posts if
-                                 post.is_published and not post.contains_excluded_tag]
+        tags_to_posts[tag.id] = [
+            (post.path, post.title) for post in posts if post.is_published
+            and not post.contains_excluded_tag]
         nonzero_tags.append(tag)
         # so that we can use the tag in the jinja template
         db_session.expunge(tag)
@@ -103,7 +104,8 @@ def delete_tags_from_posts():
                .filter(Tag.id == tag_id)
                .first())
 
-    delete_query = assoc_post_tag.delete().where(assoc_post_tag.c.tag_id == tag_id)
+    delete_query = assoc_post_tag.delete().where(
+        assoc_post_tag.c.tag_id == tag_id)
     db_session.execute(delete_query)
     db_session.delete(tag_obj)
     db_session.commit()
@@ -113,7 +115,8 @@ def delete_tags_from_posts():
 
 @delete_tags_from_posts.object_extractor
 def delete_tags_from_posts():
-    tag_obj = Tag.query.filter(Tag.name == request.args.get('tag_name', '')).first()
+    tag_obj = Tag.query.filter(
+        Tag.name == request.args.get('tag_name', '')).first()
     return {
         'id': tag_obj.id if tag_obj else None,
         'type': 'tag',
@@ -150,14 +153,16 @@ def render_tag_pages():
     posts = [post for post in tag_posts if post.is_published]
 
     feed_params['posts_count'] = len(posts)
-    feed_params['page_count'] = int(math.ceil(1.0 * len(posts) / feed_params['results']))
+    feed_params['page_count'] = int(math.ceil(
+        1.0 * len(posts) / feed_params['results']))
 
     posts = posts[start:min(start + num_results, len(posts))]
 
-    post_stats = {post.path: {'all_views': post.view_count,
-                              'distinct_views': post.view_user_count,
-                              'total_likes': post.vote_count,
-                              'total_comments': post.comment_count} for post in posts}
+    post_stats = {
+        post.path: {'all_views': post.view_count,
+                    'distinct_views': post.view_user_count,
+                    'total_likes': post.vote_count,
+                    'total_comments': post.comment_count} for post in posts}
 
     author_to_count = {}
     for post in posts:
@@ -257,16 +262,18 @@ def toggle_tag_subscription():
             db_session.delete(subscription)
         elif not subscription and subscribe_action == 'subscribe':
             # otherwise, create new subscription
-            subscription = Subscription(user_id=current_user.id, object_type='tag',
-                                        object_id=tag_obj.id)
+            subscription = Subscription(
+                user_id=current_user.id,
+                object_type='tag',
+                object_id=tag_obj.id)
             db_session.add(subscription)
         else:
             logging.warning("ERROR processing request")
             return ""
         db_session.commit()
         return ""
-    except:
-        logging.warning("ERROR processing request")
+    except Exception as e:
+        logging.warning(f'ERROR processing request: {e}')
         return ""
 
 
@@ -346,7 +353,8 @@ def remove_posts_tags():
     for post in posts:
         post_id = (db_session.query(Post).filter(Post.path == post).first()).id
         delete_query = assoc_post_tag.delete().where(
-            and_(assoc_post_tag.c.tag_id == tag_id, assoc_post_tag.c.post_id == post_id))
+            and_(assoc_post_tag.c.tag_id == tag_id,
+                 assoc_post_tag.c.post_id == post_id))
         db_session.execute(delete_query)
     db_session.commit()
     return ""
@@ -381,7 +389,8 @@ def change_tags():
     tag_set = set(old_tags)
     tags_list = tags_string.split(",")
     post.tags = tags_list
-    # post tag settr might take subset of tags_list to avoid dupes or whatever else
+    # post tag settr might take subset of tags_list
+    # to avoid dupes or whatever else
     new_tags = post.tags
 
     email_tags = [tag for tag in new_tags if tag not in tag_set]
