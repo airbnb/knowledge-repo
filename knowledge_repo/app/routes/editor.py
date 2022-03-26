@@ -11,6 +11,7 @@ from ..utils.image import (
     is_pdf,
     pdf_page_to_png,
 )
+from ..utils.shared import get_blueprint
 from datetime import datetime
 from flask import (
     current_app,
@@ -18,7 +19,6 @@ from flask import (
     request,
     send_from_directory,
     url_for,
-    Blueprint,
 )
 from knowledge_repo.post import KnowledgePost
 from sqlalchemy import or_
@@ -31,9 +31,7 @@ import os
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-blueprint = Blueprint('editor', __name__,
-                      template_folder='../templates',
-                      static_folder='../static')
+blueprint = get_blueprint('editor', __name__)
 
 
 def get_warning_msg(msg):

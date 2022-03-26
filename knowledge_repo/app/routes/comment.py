@@ -9,15 +9,14 @@ from .. import permissions
 from ..models import Comment, PageView, Post
 from ..proxies import current_user, db_session
 from ..utils.emails import send_comment_email
-from flask import escape, request, Blueprint
+from ..utils.shared import get_blueprint
+from flask import escape, request
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-blueprint = Blueprint('comments', __name__,
-                      template_folder='../templates',
-                      static_folder='../static')
+blueprint = get_blueprint('comments', __name__)
 
 
 @blueprint.route('/comment', methods=['POST'])

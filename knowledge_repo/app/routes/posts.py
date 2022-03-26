@@ -6,6 +6,7 @@ from ..utils.render import (
     render_post,
     render_post_raw,
 )
+from ..utils.shared import get_blueprint
 from flask import (
     abort,
     current_app,
@@ -13,7 +14,6 @@ from flask import (
     render_template,
     request,
     url_for,
-    Blueprint,
     Response,
 )
 from knowledge_repo.constants import PDF
@@ -24,8 +24,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-blueprint = Blueprint('posts', __name__,
-                      template_folder='../templates', static_folder='../static')
+blueprint = get_blueprint('posts', __name__)
 
 
 @blueprint.route('/post/<path:path>', methods=['GET'])
@@ -68,20 +67,25 @@ def render(path):
         logger.warning(f'unable to find post at {path}')
         return abort(404)
     if post.contains_excluded_tag:
-        # It's possible that someone gets a direct link to a post that has an excluded tag
+        # It's possible that someone gets a direct link to a post
+        # that has an excluded tag
         return render_template('error.html')
 
-    if post.private and not (username in post.authors or username in current_repo.config.editors):
-        allowed_users = set(user.id for group in post.groups for user in group.users)
+    if post.private and not (username in post.authors or
+                             username in current_repo.config.editors):
+        allowed_users = set(
+            user.id for group in post.groups for user in group.users)
         if user_id not in allowed_users:
-            return render_template('permission_ask.html', authors=post.authors_string)
+            return render_template(
+                'permission_ask.html', authors=post.authors_string)
 
     rendered = render_post(post, with_toc=True)
     raw_post = render_post_raw(post) if mode == 'raw' else None
 
     comments = post.comments
     for comment in comments:
-        author = db_session.query(User).filter(User.id == comment.user_id).first()
+        author = db_session.query(User).filter(
+            User.id == comment.user_id).first()
         if author is not None:
             comment.author = author.format_name
         else:
@@ -99,33 +103,35 @@ def render(path):
     web_editor_prefixes = current_app.config['WEB_EDITOR_PREFIXES']
     is_webpost = False
     if web_editor_prefixes:
-        is_webpost = any(prefix for prefix in web_editor_prefixes if path.startswith(prefix))
+        is_webpost = any(prefix for prefix in web_editor_prefixes
+                         if path.startswith(prefix))
 
-    rendered = render_template(tmpl,
-                               html=rendered['html'],
-                               toc=rendered['toc'],
-                               post_id=post.id,
-                               post_path=path,
-                               raw_post=raw_post,
-                               comments=comments,
-                               username=username,
-                               post_author=post.authors_string,
-                               title=post.title,
-                               page_views=post.view_count,
-                               unique_views=post.view_user_count,
-                               likes=post.vote_counted_for_user(user_id=user_id),
-                               total_likes=post.vote_count,
-                               tags_list=tags_list,
-                               user_subscriptions=user_subscriptions,
-                               show_webeditor_button=is_webpost and is_author,
-                               webeditor_buttons=is_webpost,
-                               web_uri=post.kp.web_uri,
-                               table_id=None,
-                               is_private=(post.private == 1),
-                               is_author=is_author,
-                               can_download=permissions.post_download.can(),
-                               downloads=post.kp.src_paths,
-                               collapse_code=current_app.config['COLLAPSE_CODE_DEFAULT'])
+    rendered = render_template(
+        tmpl,
+        html=rendered['html'],
+        toc=rendered['toc'],
+        post_id=post.id,
+        post_path=path,
+        raw_post=raw_post,
+        comments=comments,
+        username=username,
+        post_author=post.authors_string,
+        title=post.title,
+        page_views=post.view_count,
+        unique_views=post.view_user_count,
+        likes=post.vote_counted_for_user(user_id=user_id),
+        total_likes=post.vote_count,
+        tags_list=tags_list,
+        user_subscriptions=user_subscriptions,
+        show_webeditor_button=is_webpost and is_author,
+        webeditor_buttons=is_webpost,
+        web_uri=post.kp.web_uri,
+        table_id=None,
+        is_private=(post.private == 1),
+        is_author=is_author,
+        can_download=permissions.post_download.can(),
+        downloads=post.kp.src_paths,
+        collapse_code=current_app.config['COLLAPSE_CODE_DEFAULT'])
     return rendered
 
 
@@ -183,7 +189,8 @@ def _render_preview(path, tmpl):
                            table_id=None)
 
 
-# DEPRECATED: Legacy route for the /render endpoint to allow old bookmarks to function
+# DEPRECATED: Legacy route for the /render endpoint
+# to allow old bookmarks to function
 @blueprint.route('/render', methods=['GET'])
 @PageView.logged
 @permissions.post_view.require()
@@ -198,7 +205,8 @@ def render_legacy():
 def download():
     'Downloads resources associated with a post.'
 
-    post = current_repo.post(request.args.get('post'))  # Note: `post` is expected to be a post path
+    # Note: `post` is expected to be a post path
+    post = current_repo.post(request.args.get('post'))
     resource_type = request.args.get('type', 'source')
 
     if resource_type in ('kp', 'zip'):
@@ -208,20 +216,24 @@ def download():
         return Response(
             post.to_string(format=resource_type),
             mimetype='application/zip',
-            headers={'Content-disposition': f'attachment; filename={filename}'})
+            headers={
+                'Content-disposition': f'attachment; filename={filename}'})
     elif resource_type == PDF:
         filename = os.path.basename(post.path)[:-3] + '.pdf'
         return Response(
             post.to_string(format=resource_type),
             mimetype='application/pdf',
-            headers={'Content-disposition': f'attachment; filename={filename}'})
+            headers={
+                'Content-disposition': f'attachment; filename={filename}'})
     elif resource_type == 'source':
         path = request.args.get('path', None)
         assert path is not None, 'Source path not provided.'
-        assert path in post.src_paths, 'Provided reference is not a valid source path.'
+        assert path in post.src_paths, \
+            'Provided reference is not a valid source path.'
         return Response(
             post._read_ref(path),
             mimetype='application/octet-stream',
-            headers={'Content-disposition': f'attachment; filename={os.path.basename(path)}'})
+            headers={'Content-disposition':
+                     f'attachment; filename={os.path.basename(path)}'})
     else:
         raise RuntimeError(f'Invalid resource_type: {resource_type}')

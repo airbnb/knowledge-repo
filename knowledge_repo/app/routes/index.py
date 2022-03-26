@@ -12,6 +12,7 @@ from ..proxies import current_repo, db_session
 from ..utils.posts import get_posts
 from ..utils.render import render_post_tldr
 from ..utils.requests import from_request_get_feed_params
+from ..utils.shared import get_blueprint
 from collections import namedtuple
 from flask import (
     current_app,
@@ -19,15 +20,13 @@ from flask import (
     redirect,
     render_template,
     request,
-    Blueprint,
 )
 from flask_login import login_required
 from sqlalchemy import case, desc
 import os
 import json
 
-blueprint = Blueprint(
-    'index', __name__, template_folder='../templates', static_folder='../static')
+blueprint = get_blueprint('index', __name__)
 
 
 def has_no_empty_params(rule):
@@ -70,10 +69,11 @@ def render_favorites():
             .first())
     posts = user.liked_posts
 
-    post_stats = {post.path: {'all_views': post.view_count,
-                              'distinct_views': post.view_user_count,
-                              'total_likes': post.vote_count,
-                              'total_comments': post.comment_count} for post in posts}
+    post_stats = {
+        post.path: {'all_views': post.view_count,
+                    'distinct_views': post.view_user_count,
+                    'total_likes': post.vote_count,
+                    'total_comments': post.comment_count} for post in posts}
 
     return render_template("index-feed.html",
                            feed_params=feed_params,
@@ -128,9 +128,10 @@ def render_cluster():
     sort_desc = not bool(request.args.get('sort_asc', ''))
 
     excluded_tags = current_app.config.get('EXCLUDED_TAGS', [])
-    post_query = (db_session.query(Post)
-                            .filter(Post.is_published)
-                            .filter(~Post.tags.any(Tag.name.in_(excluded_tags))))
+    post_query = (
+        db_session.query(Post)
+                  .filter(Post.is_published)
+                  .filter(~Post.tags.any(Tag.name.in_(excluded_tags))))
 
     if filters:
         filter_set = filters.split(" ")
@@ -248,8 +249,12 @@ def render_cluster():
             )
         else:
             return (
-                sorted(clusters, key=lambda x: x.children_count, reverse=sort_desc) +
-                sorted(posts, key=lambda x: x.children_count, reverse=sort_desc)
+                sorted(clusters,
+                       key=lambda x: x.children_count,
+                       reverse=sort_desc) +
+                sorted(posts,
+                       key=lambda x: x.children_count,
+                       reverse=sort_desc)
             )
 
     grouped_data = rec_sort(grouped_data, sort_by)
@@ -269,14 +274,16 @@ def render_cluster():
 def create(knowledge_format=None):
     """ Renders the create knowledge view """
     if knowledge_format is None:
-        return render_template("create-knowledge.html",
-                               web_editor_enabled=current_app.config['WEB_EDITOR_PREFIXES'] != [])
+        return render_template(
+            "create-knowledge.html",
+            web_editor_enabled=current_app.config['WEB_EDITOR_PREFIXES'] != [])
 
     cur_dir = os.path.dirname(os.path.realpath(__file__))
     knowledge_template = f'knowledge_template.{knowledge_format}'
     filename = os.path.join(cur_dir, '../../templates', knowledge_template)
     response = make_response(open(filename).read())
-    response.headers["Content-Disposition"] = "attachment; filename=" + knowledge_template
+    response.headers["Content-Disposition"] = \
+        "attachment; filename=" + knowledge_template
     return response
 
 
@@ -290,13 +297,15 @@ def ajax_post_typeahead():
     search_terms = search_terms.split(" ")
     case_statements = []
     for term in search_terms:
-        case_stmt = case([(Post.keywords.ilike('%' + term.strip() + '%'), 1)], else_=0)
+        case_stmt = case([(Post.keywords.ilike('%' + term.strip() + '%'), 1)],
+                         else_=0)
         case_statements += [case_stmt]
 
     match_score = sum(case_statements).label("match_score")
 
     posts = (db_session.query(Post, match_score)
-                       .filter(Post.status == current_repo.PostStatus.PUBLISHED.value)
+                       .filter(Post.status ==
+                               current_repo.PostStatus.PUBLISHED.value)
                        .order_by(desc(match_score))
                        .limit(5)
                        .all())

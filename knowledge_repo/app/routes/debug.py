@@ -1,11 +1,11 @@
 from ..index import get_indexed_revisions, is_indexing
 from ..proxies import current_repo
+from ..utils.shared import get_blueprint
 from urllib.parse import unquote
 from flask import (
     current_app,
     request,
     url_for,
-    Blueprint,
     Response,
 )
 from knowledge_repo.constants import DEBUG
@@ -19,9 +19,7 @@ import types
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-blueprint = Blueprint(DEBUG, __name__,
-                      template_folder='../templates',
-                      static_folder='../static')
+blueprint = get_blueprint(DEBUG, __name__)
 
 
 @blueprint.route('/debug/versions', methods=['GET'])

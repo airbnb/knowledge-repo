@@ -8,13 +8,15 @@ from urllib.parse import urljoin, urlparse
 
 
 def prepare_user(user, session_start=True):
-    cache_lifetime = current_app.config['AUTH_USER_ATTRIBUTE_CACHE_LIFETIME'] or 0
+    cache_lifetime = \
+        current_app.config['AUTH_USER_ATTRIBUTE_CACHE_LIFETIME'] or 0
     if (
         current_app.config['AUTH_USER_ATTRIBUTE_SETTER'] and
         (
             session_start or
             user.last_login_at is None or
-            user.last_login_at < datetime.now() - timedelta(seconds=cache_lifetime)
+            user.last_login_at < datetime.now() - timedelta(
+                seconds=cache_lifetime)
         )
     ):
         session_start = True
@@ -46,7 +48,8 @@ class AnonymousKnowledgeUser(AnonymousUserMixin):
 def is_safe_url(target):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
-    return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
+    return test_url.scheme in ('http', 'https') \
+        and ref_url.netloc == test_url.netloc
 
 
 def populate_identity_roles(identity, user=None):

@@ -5,10 +5,9 @@ This view defines routes that allow us to check
 the health of the server.
 Ultimately, we can do something more complex
 """
-from flask import Blueprint
+from ..utils.shared import get_blueprint
 
-blueprint = Blueprint('health', __name__,
-                      template_folder='../templates', static_folder='../static')
+blueprint = get_blueprint('health', __name__)
 
 
 @blueprint.route('/health')

@@ -30,9 +30,13 @@ def pdf_page_to_png(src_pdf, pagenum=0, resolution=154):
     """
 
     check_dependencies(__optional_dependencies__[PDF])
-    # Import libraries within this function so as to avoid import-time dependence
+    # Import libraries within this function so as to avoid
+    # import-time dependence
     import PyPDF2
-    from wand.image import Image  # TODO: When we start using this again, document which system-level libraries are required.
+
+    # TODO: When we start using this again, document which
+    # system-level libraries are required.
+    from wand.image import Image
 
     dst_pdf = PyPDF2.PdfFileWriter()
     dst_pdf.addPage(src_pdf.getPage(pagenum))

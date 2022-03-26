@@ -1,13 +1,13 @@
 from ..models import Group, PageView, Post, User
 from ..proxies import db_session
-from flask import render_template, request, Blueprint
+from ..utils.shared import get_blueprint
+from flask import render_template, request
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-blueprint = Blueprint('groups', __name__,
-                      template_folder='../templates', static_folder='../static')
+blueprint = get_blueprint('groups', __name__)
 
 
 @blueprint.route('/post_groups', methods=['GET'])

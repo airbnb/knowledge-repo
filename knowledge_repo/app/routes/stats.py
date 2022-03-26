@@ -3,14 +3,14 @@ from ..models import PageView, Post
 from ..proxies import db_session
 from ..utils.posts import get_posts
 from ..utils.requests import from_request_get_feed_params
+from ..utils.shared import get_blueprint
 from datetime import timedelta
-from flask import render_template, request, Blueprint
+from flask import render_template, request
 from sqlalchemy import func
 import collections
 import json
 
-blueprint = Blueprint('stats', __name__,
-                      template_folder='../templates', static_folder='../static')
+blueprint = get_blueprint('stats', __name__)
 
 
 def _round_date(d):
@@ -47,9 +47,10 @@ def stats():
     feed_params = from_request_get_feed_params(request)
 
     # count daily and weekly pageviews
-    datetime_pageviews = (db_session.query(PageView.created_at, func.count(PageView.id))
-                                    .group_by(PageView.created_at)
-                                    .all())
+    datetime_pageviews = (
+        db_session.query(PageView.created_at, func.count(PageView.id))
+                  .group_by(PageView.created_at)
+                  .all())
 
     daily_pageviews = {}
     weekly_pageviews = {}
@@ -63,12 +64,16 @@ def stats():
     posts = (db_session.query(Post)
                        .filter(Post.is_published).all())
 
-    created_at_counts = collections.Counter([_round_date(post.created_at.date()) for post in posts])
-    updated_at_counts = collections.Counter([_round_date(post.updated_at.date()) for post in posts])
+    created_at_counts = collections.Counter(
+        [_round_date(post.created_at.date()) for post in posts])
+    updated_at_counts = collections.Counter(
+        [_round_date(post.updated_at.date()) for post in posts])
 
-    all_week_keys = set(created_at_counts.keys()).union(updated_at_counts.keys())
-    weekly_posts_created_and_updated = dict((k, [created_at_counts.get(k, 0), updated_at_counts.get(k, 0)])
-                                            for k in all_week_keys)
+    all_week_keys = set(
+        created_at_counts.keys()).union(updated_at_counts.keys())
+    weekly_posts_created_and_updated = dict(
+        (k, [created_at_counts.get(k, 0), updated_at_counts.get(k, 0)])
+        for k in all_week_keys)
 
     # cumulative weekly post created
     weekly_cumulative_posts = {}
@@ -79,12 +84,14 @@ def stats():
 
     # count post per author
     posts, _ = get_posts(feed_params)
-    post_per_author_count = collections.Counter([author.format_name for post in posts for author in post.authors])
+    post_per_author_count = collections.Counter(
+        [author.format_name for post in posts for author in post.authors])
 
-    return render_template('stats.html',
-                           feed_params=feed_params,
-                           daily_pageviews=daily_pageviews,
-                           weekly_posts_created_and_updated=weekly_posts_created_and_updated,
-                           weekly_cumulative_posts=weekly_cumulative_posts,
-                           weekly_pageviews=weekly_pageviews,
-                           post_per_author_count=post_per_author_count)
+    return render_template(
+        'stats.html',
+        feed_params=feed_params,
+        daily_pageviews=daily_pageviews,
+        weekly_posts_created_and_updated=weekly_posts_created_and_updated,
+        weekly_cumulative_posts=weekly_cumulative_posts,
+        weekly_pageviews=weekly_pageviews,
+        post_per_author_count=post_per_author_count)
