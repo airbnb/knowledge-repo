@@ -28,6 +28,15 @@ the repository configuration has grown out of sync with upstream changes.
 
 .. _`repo_config`: https://github.com/airbnb/knowledge-repo/blob/master/knowledge_repo/templates/repository_config.yml
 
+Note starting from May 24th, 2021 Github default branch name has been changed from :code:`master` to  :code:`main`.
+Currently Knowledge Repo only support :code:`master` branch right now, for new created Git knowledge repositories
+follow steps below to update default branch.
+
+1. rename local branch from main to master: :code:`git branch -m main master`
+2. push to main: :code:`git push -u origin master`
+3. update default branch to master on GitHub side
+4. delete remote master branch: :code:`git push origin --delete main`
+
 Git Knowledge Repositories
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
