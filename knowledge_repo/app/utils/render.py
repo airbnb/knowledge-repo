@@ -24,9 +24,11 @@ MARKDOWN_EXTENSIONS = ['extra',
 
 def render_post_tldr(post):
     if isinstance(post, KnowledgePost):
-        return markdown.Markdown(extensions=MARKDOWN_EXTENSIONS).convert(post.headers.get('tldr').strip())
+        return markdown.Markdown(extensions=MARKDOWN_EXTENSIONS).convert(
+            post.headers.get('tldr').strip())
     else:
-        return markdown.Markdown(extensions=MARKDOWN_EXTENSIONS).convert(post.tldr.strip())
+        return markdown.Markdown(extensions=MARKDOWN_EXTENSIONS).convert(
+            post.tldr.strip())
 
 
 def render_post_header(post):
@@ -44,16 +46,17 @@ def render_post_header(post):
     """)
 
     def get_authors(usernames, authors):
-        url_authors = url_for('index.render_feed', authors=username)
-        authors = [f"<a href='{url_authors}'>{author}</a>"
-                   for username, author in zip(usernames, authors)]
+        authors = ["<a href='{}'>{}</a>".format(
+            url_for('index.render_feed', authors=username), author)
+            for username, author in zip(usernames, authors)]
         return ' and '.join(', '.join(authors).rsplit(', ', 1))
 
     if isinstance(post, KnowledgePost):
         return header_template.render(
             title=post.headers['title'],
             subtitle=post.headers.get('subtitle'),
-            authors=get_authors(post.headers['authors'], post.headers['authors']),
+            authors=get_authors(
+                post.headers['authors'], post.headers['authors']),
             date_created=post.headers['created_at'].strftime("%B %d, %Y"),
             date_updated=post.headers['updated_at'].strftime("%B %d, %Y"),
             tldr=render_post_tldr(post))
@@ -61,7 +64,9 @@ def render_post_header(post):
         return header_template.render(
             title=post.title,
             subtitle=post.subtitle,
-            authors=get_authors([author.identifier for author in post.authors], [author.format_name for author in post.authors]),
+            authors=get_authors(
+                [author.identifier for author in post.authors],
+                [author.format_name for author in post.authors]),
             date_created=post.created_at.strftime("%B %d, %Y"),
             date_updated=post.updated_at.strftime("%B %d, %Y"),
             tldr=render_post_tldr(post))
@@ -90,10 +95,14 @@ def render_post(post, with_toc=False):
 
     def intra_knowledge_urlmapper(name, url):
         if name == 'a' and url.startswith('knowledge:'):
-            return url_for('posts.render', path=url.split('knowledge:')[1]).replace('%2F', '/')  # Temporary fix before url revamp
+            # Temporary fix before url revamp
+            return url_for('posts.render',
+                           path=url.split('knowledge:')[1]).replace('%2F', '/')
         return None
 
-    md, html = HTMLConverter(post if isinstance(post, KnowledgePost) else post.kp)._render_markdown(skip_headers=True, urlmappers=[intra_knowledge_urlmapper])
+    md, html = HTMLConverter(
+        post if isinstance(post, KnowledgePost) else post.kp)._render_markdown(
+        skip_headers=True, urlmappers=[intra_knowledge_urlmapper])
 
     html = render_post_header(post) + html
 
