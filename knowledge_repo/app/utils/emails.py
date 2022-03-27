@@ -56,7 +56,7 @@ def send_subscription_emails(post):
     # if this post is tagged as private - send no emails
     post_full_tags = [tag.name for tag in post.tags]
     for full_tag in post_full_tags:
-        if full_tag in current_app.config.get("EXCLUDED_TAGS", []):
+        if full_tag in current_app.config.get('EXCLUDED_TAGS', []):
             return
 
     for tag in post.tags:
@@ -87,7 +87,7 @@ def send_subscription_email(post, tag):
         return
 
     default_recipients = ['knowledge_consumer@notreal.com']
-    subject = "New knowledge post: {}".format(post.title)
+    subject = f'New knowledge post: {post.title}'
     post_authors = [p.format_name for p in post.authors]
     post_tags = [t.name for t in post.tags]
     msg = Message(subject=subject, recipients=default_recipients, bcc=recipients_bcc)
@@ -104,36 +104,42 @@ def send_subscription_email(post, tag):
                 response = requests.get(post.thumbnail)
                 if response.ok:
                     thumb_bytes = response.content
-        except:
+        except Exception as e:
+            logger.warning(f'Exception encountered: {e}')
             pass
 
     if not thumb_bytes:
-        with current_app.open_resource('static/images/default_thumbnail.png') as f:
+        with current_app.open_resource(
+                'static/images/default_thumbnail.png') as f:
             thumb_bytes = f.read()
 
-    # Attach thumbnail to the email (base64 embedded images are not supported by many email clients)
-    msg.attach('thumb.png', 'image/png', thumb_bytes, 'inline', headers=[['Content-ID', '<Thumb>']])
+    # Attach thumbnail to the email (base64 embedded images are not
+    # supported by many email clients)
+    msg.attach('thumb.png', 'image/png', thumb_bytes, 'inline',
+               headers=[['Content-ID', '<Thumb>']])
 
     # Plain mail
-    msg.body = render_template("email_templates/subscription_email.txt",
-                               full_tag=tag.name,
-                               page_id=post.path,
-                               post_title=post.title,
-                               post_tldr=post.tldr,
-                               post_authors=post_authors,
-                               post_tags=post_tags,
-                               knowledge_app_base_url=current_app.config['SERVER_NAME'])
+    msg.body = render_template(
+        'email_templates/subscription_email.txt',
+        full_tag=tag.name,
+        page_id=post.path,
+        post_title=post.title,
+        post_tldr=post.tldr,
+        post_authors=post_authors,
+        post_tags=post_tags,
+        knowledge_app_base_url=current_app.config['SERVER_NAME'])
 
     # Rich email
-    msg.html = render_template("email_templates/subscription_email.html",
-                               full_tag=tag.name,
-                               page_id=post.path,
-                               post_title=post.title,
-                               post_tldr=post.tldr,
-                               post_authors=post_authors,
-                               post_tags=post_tags,
-                               post_thumbnail=thumb_bytes,
-                               knowledge_app_base_url=current_app.config['SERVER_NAME'])
+    msg.html = render_template(
+        'email_templates/subscription_email.html',
+        full_tag=tag.name,
+        page_id=post.path,
+        post_title=post.title,
+        post_tldr=post.tldr,
+        post_authors=post_authors,
+        post_tags=post_tags,
+        post_thumbnail=thumb_bytes,
+        knowledge_app_base_url=current_app.config['SERVER_NAME'])
 
     for user in recipient_users:
         # mark email as sent just before you send the email
@@ -141,7 +147,7 @@ def send_subscription_email(post, tag):
                            trigger_id=tag.id,
                            trigger_type='subscription',
                            object_id=post.id,
-                           object_type="post",
+                           object_type='post',
                            subject=subject,
                            text=msg.html)
         db_session.add(email_sent)
@@ -152,55 +158,64 @@ def send_subscription_email(post, tag):
 
 def send_comment_email(path, comment_text, commenter='Someone'):
     if 'mail' not in current_app.config:
-        logger.warning('Mail subsystem is not configured. Silently dropping email.')
+        logger.warning('Mail subsystem is not configured. '
+                       'Silently dropping email.')
         return
 
     kp = current_repo.post(path)
     headers = kp.headers
 
-    msg = Message("Someone commented on your post!", usernames_to_emails(headers['authors']))
-    msg.body = render_template("email_templates/comment_email.txt",
-                               commenter=commenter,
-                               comment_text=comment_text,
-                               post_title=headers['title'],
-                               post_url=url_for('posts.render', path=path, _external=True))
+    msg = Message('Someone commented on your post!',
+                  usernames_to_emails(headers['authors']))
+    msg.body = render_template(
+        'email_templates/comment_email.txt',
+        commenter=commenter,
+        comment_text=comment_text,
+        post_title=headers['title'],
+        post_url=url_for('posts.render', path=path, _external=True))
     current_app.config['mail'].send(msg)
 
 
 def send_internal_error_email(subject_line, **kwargs):
     if 'mail' not in current_app.config:
-        logger.warning('Mail subsystem is not configured. Silently dropping email.')
+        logger.warning('Mail subsystem is not configured. '
+                       'Silently dropping email.')
         return
     recipients = usernames_to_emails(current_repo.config.editors)
     msg = Message(subject_line, recipients)
     msg.body = render_template(
-        "email_templates/internal_error_email.txt", **kwargs)
+        'email_templates/internal_error_email.txt', **kwargs)
     current_app.config['mail'].send(msg)
 
 
 def send_reviewer_request_email(path, reviewer):
     if 'mail' not in current_app.config:
-        logger.warning('Mail subsystem is not configured. Silently dropping email.')
+        logger.warning('Mail subsystem is not configured. '
+                       'Silently dropping email.')
         return
-    subject = "Someone requested a web post review from you!"
+    subject = 'Someone requested a web post review from you!'
     msg = Message(subject, [reviewer])
-    msg.body = render_template("email_templates/reviewer_request_email.txt",
-                               post_url=url_for('editor.editor', path=path, _external=True))
+    msg.body = render_template('email_templates/reviewer_request_email.txt',
+                               post_url=url_for('editor.editor',
+                                                path=path, _external=True))
     current_app.config['mail'].send(msg)
 
 
 def send_review_email(path, comment_text, commenter='Someone'):
     if 'mail' not in current_app.config:
-        logger.warning('Mail subsystem is not configured. Silently dropping email.')
+        logger.warning('Mail subsystem is not configured. '
+                       'Silently dropping email.')
         return
 
     kp = current_repo.post(path)
     headers = kp.headers
 
-    msg = Message("Someone reviewed your post!", usernames_to_emails(headers['authors']))
-    msg.body = render_template("email_templates/review_email.txt",
-                               commenter=commenter,
-                               comment_text=comment_text,
-                               post_title=headers['title'],
-                               post_url=url_for('editor.editor', path=path, _external=True))
+    msg = Message('Someone reviewed your post!',
+                  usernames_to_emails(headers['authors']))
+    msg.body = render_template(
+        'email_templates/review_email.txt',
+        commenter=commenter,
+        comment_text=comment_text,
+        post_title=headers['title'],
+        post_url=url_for('editor.editor', path=path, _external=True))
     current_app.config['mail'].send(msg)
