@@ -1,0 +1,33 @@
+name: main
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  Build:
+    runs-on: '${{ matrix.os }}'
+    strategy:
+      matrix:
+        os: ["macos-latest"]
+        python-version: ['3.6', '3.7', '3.8']
+    steps:
+      - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          installer-url: https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+          activate-environment: test
+          python-version: '${{ matrix.python-version }}'
+      - shell: bash -l {0}
+        run: |
+          conda update --all --yes
+          conda config --set always_yes yes --set changeps1 no
+          conda info -a
+          conda install -c conda-forge r-xfun=0.27 r-rlang=1.0.2
+          conda install -c conda-forge r-base=4.1.1 r-rmarkdown=2.13 r-ggplot2=3.3.5 r-plotly=4.10.0 pandoc=2.17.1.1
+          conda install -c conda-forge regex
+          pip install pycodestyle
+          pip install .[all]
+          bash run_tests.sh
