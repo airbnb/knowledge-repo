@@ -35,7 +35,7 @@ __dependencies__ = [
     'Flask-Migrate',  # Database migration utilities
     'sqlalchemy',  # Database abstractions
     'jinja2>=2.7,<=3.0.3',  # Templating engine
-    'werkzeug>=1.0',  # Development webserver
+    'werkzeug>=1.0,<=2.0.3',  # Development webserver
     'gunicorn',  # Deployed webserver
     'inflection',  # String transformation library
     'pillow',  # Image thumbnailing
