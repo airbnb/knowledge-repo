@@ -84,6 +84,7 @@ Dockerfile
 docker-compose.yml
 
 # virtualenv
+.venv/
 venv/
 ENV/
 
