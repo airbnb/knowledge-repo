@@ -71,7 +71,8 @@ class KnowledgeFlask(Flask):
         if config:
             if isinstance(config, str):
                 module_name = 'knowledge_server_config'
-                spec = importlib.util.spec_from_file_location(module_name, os.path.abspath(config))
+                spec = importlib.util.spec_from_file_location(
+                    module_name, os.path.abspath(config))
                 config = importlib.util.module_from_spec(spec)
                 sys.modules[module_name] = config
                 spec.loader.exec_module(config)
@@ -84,14 +85,18 @@ class KnowledgeFlask(Flask):
         if hasattr(config, 'prepare_repo'):
             repo = config.prepare_repo(repo)
         self.repository = repo
-        assert isinstance(self.repository, knowledge_repo.KnowledgeRepository), "Invalid repository object provided."
+        assert isinstance(
+            self.repository, knowledge_repo.KnowledgeRepository), \
+            "Invalid repository object provided."
 
         # Set debug mode from kwargs or else maintain current setting
         if debug is not None:
             self.config['DEBUG'] = debug
 
-        # Set the secret key for this instance (creating one if one does not exist already)
-        self.config['SECRET_KEY'] = self.config['SECRET_KEY'] or str(uuid.uuid4())
+        # Set the secret key for this instance (creating one if one
+        # does not exist already)
+        self.config['SECRET_KEY'] = self.config['SECRET_KEY'] \
+            or str(uuid.uuid4())
 
         # Configure database
         if db_uri:
@@ -108,7 +113,8 @@ class KnowledgeFlask(Flask):
         Migrate(self, self.db)
 
         # Try to create the database if it does not already exist
-        # Existence is determined by whether there is an existing alembic migration revision
+        # Existence is determined by whether there is an existing
+        # alembic migration revision
         db_auto_create = self.config.get('DB_AUTO_CREATE', True)
         db_auto_upgrade = self.config.get('DB_AUTO_UPGRADE', True)
         if db_auto_create and self.db_revision is None:
@@ -136,24 +142,32 @@ class KnowledgeFlask(Flask):
         if self.config.get('AUTH_USE_REQUEST_HEADERS'):
             @self.login_manager.request_loader
             def load_user_from_request(request):
-                user_attributes = current_app.config.get('AUTH_MAP_REQUEST_HEADERS')(request.headers)
-                if isinstance(user_attributes, dict) and user_attributes.get('identifier', None):
+                user_attributes = current_app.config.get(
+                    'AUTH_MAP_REQUEST_HEADERS')(request.headers)
+                if isinstance(user_attributes, dict) and \
+                        user_attributes.get('identifier', None):
                     user = User(identifier=user_attributes['identifier'])
                     user.can_logout = False
                     for attribute in ['avatar_uri', 'email', 'name']:
                         if user_attributes.get(attribute):
-                            setattr(user, attribute, user_attributes[attribute])
+                            setattr(user, attribute,
+                                    user_attributes[attribute])
                     user = prepare_user(user, session_start=False)
                     return user
         elif self.config.get('AUTH_USER_IDENTIFIER_REQUEST_HEADER'):
-            logger.warning("AUTH_USER_IDENTIFIER* configuration keys are deprecated and will be removed in v0.9.0 .")
+            logger.warning("AUTH_USER_IDENTIFIER* configuration keys "
+                           "are deprecated and will be removed in v0.9.0 .")
 
             @self.login_manager.request_loader
             def load_user_from_request(request):
-                identifier = request.headers.get(current_app.config['AUTH_USER_IDENTIFIER_REQUEST_HEADER'])
+                identifier = request.headers.get(
+                    current_app.config['AUTH_USER_IDENTIFIER_REQUEST_HEADER'])
                 if identifier:
-                    if current_app.config['AUTH_USER_IDENTIFIER_REQUEST_HEADER_MAPPING']:
-                        identifier = current_app.config['AUTH_USER_IDENTIFIER_REQUEST_HEADER_MAPPING'](identifier)
+                    if current_app.config[
+                            'AUTH_USER_IDENTIFIER_REQUEST_HEADER_MAPPING']:
+                        identifier = current_app.config[
+                            'AUTH_USER_IDENTIFIER_REQUEST_HEADER_MAPPING'](
+                                identifier)
                     user = User(identifier=identifier)
                     user.can_logout = False
                     user = prepare_user(user, session_start=False)
@@ -162,8 +176,8 @@ class KnowledgeFlask(Flask):
         # Intialise access policies
         self.principal = Principal(self)
 
-        # Add AnonymousIdentity fallback so that on_identity_loaded is called for
-        # anonymous users too.
+        # Add AnonymousIdentity fallback so that on_identity_loaded is
+        # called for anonymous users too.
         self.principal.identity_loaders.append(lambda: AnonymousIdentity())
 
         # Synchronise user permissions with data model
@@ -207,7 +221,8 @@ class KnowledgeFlask(Flask):
                 otherwise show a nice error template to the users
             """
             if current_app.config.get("DEBUG"):
-                return render_template('traceback.html', info=traceback.format_exc()), 500
+                return render_template(
+                    'traceback.html', info=traceback.format_exc()), 500
             else:
                 return render_template('error.html')
 
@@ -217,7 +232,8 @@ class KnowledgeFlask(Flask):
 
         @self.before_first_request
         def ensure_excluded_tags_exist():
-            # For every tag in the excluded tags, create the tag object if it doesn't exist
+            # For every tag in the excluded tags, create the tag object
+            # if it doesn't exist
             excluded_tags = current_app.config['EXCLUDED_TAGS']
             for tag in excluded_tags:
                 Tag(name=tag)
@@ -246,10 +262,11 @@ class KnowledgeFlask(Flask):
             version_revision = None
             if '_' in knowledge_repo.__version__:
                 version, version_revision = version.split('_')
-            return dict(version=version,
-                        version_revision=version_revision,
-                        last_index=time_since_index(human_readable=True),
-                        last_index_check=time_since_index_check(human_readable=True))
+            return dict(
+                version=version,
+                version_revision=version_revision,
+                last_index=time_since_index(human_readable=True),
+                last_index_check=time_since_index_check(human_readable=True))
 
         @self.template_global()
         def modify_query(**new_values):
@@ -262,9 +279,12 @@ class KnowledgeFlask(Flask):
             return f'{request.path}?{args_encoded}'
 
         @self.template_global()
-        def pagination_pages(current_page, page_count, max_pages=5, extremes=True):
-            page_min = int(max(1, current_page - math.floor(1.0 * max_pages // 2)))
-            page_max = int(min(page_count, current_page + math.floor(1.0 * max_pages / 2)))
+        def pagination_pages(current_page, page_count, max_pages=5,
+                             extremes=True):
+            page_min = int(max(1, current_page - math.floor(
+                1.0 * max_pages // 2)))
+            page_max = int(min(page_count, current_page + math.floor(
+                1.0 * max_pages / 2)))
 
             to_acquire = max_pages - (page_max - page_min + 1)
 
@@ -294,7 +314,8 @@ class KnowledgeFlask(Flask):
             """
             try:
                 return datetime.strftime(date, '%Y-%m-%d')
-            except:
+            except Exception as e:
+                logger.error(f'Exception encountered: {e}')
                 return date
 
     @property
@@ -312,7 +333,8 @@ class KnowledgeFlask(Flask):
     @property
     def _alembic_config(self):
         if not hasattr(self, 'extensions') or 'migrate' not in self.extensions:
-            raise RuntimeError("KnowledgeApp has not yet been configured. Please instantiate it via `get_app_for_repo`.")
+            raise RuntimeError("KnowledgeApp has not yet been configured. "
+                               "Please instantiate it via `get_app_for_repo`.")
         migrations_path = os.path.join(os.path.dirname(__file__), "migrations")
         return self.extensions['migrate'].migrate.get_config(migrations_path)
 
@@ -345,12 +367,14 @@ class KnowledgeFlask(Flask):
 
     def db_migrate(self, message, autogenerate=True):
         with self.app_context():
-            command.revision(self._alembic_config, message=message, autogenerate=autogenerate)
+            command.revision(self._alembic_config, message=message,
+                             autogenerate=autogenerate)
         return self
 
     def db_update_index(self, check_timeouts=True, force=False, reindex=False):
         with self.app_context():
-            update_index(check_timeouts=check_timeouts, force=force, reindex=reindex)
+            update_index(check_timeouts=check_timeouts,
+                         force=force, reindex=reindex)
         return self
 
     def start_indexing(self):
@@ -360,9 +384,11 @@ class KnowledgeFlask(Flask):
         return self
 
     def check_thread_support(self, check_index=True, check_repositories=True):
-        # If index database is an sqlite database, it will lock on any write action, and so breaks on multiple threads
-        # Repository uris will break as above (but less often since they are not often written too), but will also
-        # end up being a separate repository per thread; breaking consistency of presented content.
+        # If index database is an sqlite database, it will lock on any write
+        # action, and so breaks on multiple threads. Repository uris will
+        # break as above (but less often since they are not often written
+        # too), but will also end up being a separate repository per thread; 
+        # breaking consistency of presented content.
 
         if check_index:
             index_db = self.config['SQLALCHEMY_DATABASE_URI']
