@@ -387,7 +387,7 @@ class KnowledgeFlask(Flask):
         # If index database is an sqlite database, it will lock on any write
         # action, and so breaks on multiple threads. Repository uris will
         # break as above (but less often since they are not often written
-        # too), but will also end up being a separate repository per thread; 
+        # too), but will also end up being a separate repository per thread;
         # breaking consistency of presented content.
 
         if check_index:
