@@ -4,8 +4,7 @@
 [![license](https://img.shields.io/github/license/airbnb/knowledge-repo.svg)]()
 [![PyPI version](https://badge.fury.io/py/knowledge-repo.svg)](https://badge.fury.io/py/knowledge-repo)
 [![Python](https://img.shields.io/pypi/pyversions/knowledge-repo.svg?maxAge=2592000)](https://pypi.python.org/pypi/knowledge-repo)
-[![Build Status](https://travis-ci.org/airbnb/knowledge-repo.svg?branch=master)](https://travis-ci.org/airbnb/knowledge-repo)
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/t88a27n099oqnbsw/branch/master?svg=true&pendingText=Windows%20build%20pending...&passingText=Windows%20build%20passing&failingText=Windows%20build%20failing)](https://ci.appveyor.com/project/matthewwardrop/knowledge-repo)
+[![Build Status](https://github.com/airbnb/knowledge-repo/actions/workflows/main.yml/badge.svg)](https://github.com/airbnb/knowledge-repo/actions)
 
 The Knowledge Repo project is focused on facilitating the sharing of
 knowledge between data scientists and other technical roles using data formats
