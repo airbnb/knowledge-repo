@@ -22,38 +22,49 @@ Header = namedtuple('Header', ('name', 'type', 'input'))
 
 HEADER_REQUIRED_FIELD_TYPES = [
     Header('title', str, ci.GetInput(prompt='title')),
-    Header('authors', list, ci.GetInput(prompt='authors (comma separated)', convertor=ci.ListConvertor())),
+    Header('authors', list, ci.GetInput(
+        prompt='authors (comma separated)', convertor=ci.ListConvertor())),
     Header('tldr', str, ci.GetInput(prompt='tldr')),
-    Header('created_at', datetime,
-           ci.GetInput(prompt='created_at', convertor=ci.DateConvertor(), default=date.today())),
+    Header('created_at', datetime, ci.GetInput(
+        prompt='created_at', convertor=ci.DateConvertor(),
+        default=date.today())),
 ]
 
 HEADER_OPTIONAL_FIELD_TYPES = [
     Header('subtitle', str, ci.GetInput(prompt='subtitle', required=False)),
-    Header('tags', list, ci.GetInput(prompt='tags (comma separated)', convertor=ci.ListConvertor(), required=False)),
+    Header('tags', list, ci.GetInput(
+        prompt='tags (comma separated)', convertor=ci.ListConvertor(),
+        required=False)),
     Header('path', str, ci.GetInput(prompt='path', required=False)),
-    Header('updated_at', datetime,
-           ci.GetInput(prompt='updated_at', convertor=ci.DateConvertor(), default=datetime.now())),
-    Header('private', bool, ci.GetInput(prompt='private', convertor=ci.BooleanConvertor(), required=False)),
+    Header('updated_at', datetime, ci.GetInput(
+        prompt='updated_at', convertor=ci.DateConvertor(),
+        default=datetime.now())),
+    Header('private', bool, ci.GetInput(
+        prompt='private', convertor=ci.BooleanConvertor(), required=False)),
     # If true, this post starts out private
-    Header('allowed_groups', list,
-           ci.GetInput(prompt='allowed_groups (comma separated)', convertor=ci.ListConvertor(), required=False)),
-    Header('thumbnail', (int, str), ci.GetInput(prompt='thumbnail', required=False)),
+    Header('allowed_groups', list, ci.GetInput(
+        prompt='allowed_groups (comma separated)',
+        convertor=ci.ListConvertor(), required=False)),
+    Header('thumbnail', (int, str), ci.GetInput(
+        prompt='thumbnail', required=False)),
 ]
 
 HEADERS_ALL = {
     header.name: header
-    for header in itertools.chain(HEADER_REQUIRED_FIELD_TYPES, HEADER_OPTIONAL_FIELD_TYPES)
+    for header in itertools.chain(HEADER_REQUIRED_FIELD_TYPES,
+                                  HEADER_OPTIONAL_FIELD_TYPES)
 }
 
 # Headers to prompt for if missing when in interactive mode
-HEADERS_INTERACTIVE = ['title', 'subtitle', 'authors', 'tldr', 'created_at', 'tags']
+HEADERS_INTERACTIVE = ['title', 'subtitle', 'authors',
+                       'tldr', 'created_at', 'tags']
 
 HEADER_PATTERN = '^---(\n|\r)[\\s\\S]+?---(\n|\r)'
 
 HEADER_SAMPLE = """
 ---
-title: "This is a Knowledge Post title, quoted so we can use special characters like ':'"
+title: "This is a Knowledge Post title, quoted so we can use special
+        characters like ':'"
 authors:
 - sally_smarts
 - wesly_wisdom
@@ -64,7 +75,8 @@ created_at: 2016-06-29
 updated_at: 2016-06-30
 thumbnail: 2
 tldr: |
-    You can write any markdown you want here (the '|' character makes this an escaped section)
+    You can write any markdown you want here (the '|' character makes
+    this an escaped section)
 
     * bullet
     * bullet
@@ -83,7 +95,8 @@ tldr: |
 ---
 """
 
-YAML_MESSAGE = 'YAML header is missing. Please ensure that the top of your post has a header of the following form:\n' + HEADER_SAMPLE
+YAML_MESSAGE = ('YAML header is missing. Please ensure that the top of your '
+                'post has a header of the following form:\n' + HEADER_SAMPLE)
 
 
 # Use OrderedDict representations in Yaml, so post headers remain in order
@@ -149,7 +162,8 @@ class ReferenceCache(object):
     def get(self, key, default=None):
         try:
             return self[key]
-        except:
+        except Exception as e:
+            logger.warning(f'Exception encountered {e}')
             return default
 
     def __contains__(self, key):
@@ -170,7 +184,8 @@ class ReferenceCache(object):
                 cache = cache.get(parent, {})
         for key in cache:
             if isinstance(cache[key], dict):
-                for path in self.dir(parent=posixpath.join(parent or '', key), cache=cache[key]):
+                for path in self.dir(parent=posixpath.join(
+                        parent or '', key), cache=cache[key]):
                     yield posixpath.join(key, path)
             else:
                 yield key
@@ -178,12 +193,13 @@ class ReferenceCache(object):
 
 class KnowledgePost(object):
     '''
-    A "Knowledge Post" is a (virtual) folder in which there is a 'knowledge.md' file,
-    and potentially an 'images' and/or 'src' folder. It is "virtual" in the sense
-    that `KnowledgePost` objects store everything in memory, and use `KnowledgeRepository`
-    object instances to interface with "physical" realisations of them. For example,
-    in a GitKnowledgeRepository, the physical realisation is an actual folder; whereas
-    in a database-backed KnowledgeRepository, on the virtual structure is maintained.
+    A "Knowledge Post" is a (virtual) folder in which there is a 'knowledge.md'
+    file, and potentially an 'images' and/or 'src' folder. It is "virtual" in
+    the sense that `KnowledgePost` objects store everything in memory, and use
+    `KnowledgeRepository` object instances to interface with "physical"
+    realisations of them. For example, in a GitKnowledgeRepository, the
+    physical realisation is an actual folder; whereas in a database-backed
+    KnowledgeRepository, on the virtual structure is maintained.
     '''
 
     def __init__(self, path=None, revision=None, repository=None):
@@ -209,7 +225,8 @@ class KnowledgePost(object):
     def uuid(self):
         if not getattr(self, '_uuid', None):
             if self.repository is not None:
-                self._uuid = self.repository._kp_uuid(self.path)  # Use repository UUID (even if None)
+                # Use repository UUID (even if None)
+                self._uuid = self.repository._kp_uuid(self.path)
             else:
                 self._uuid = str(uuid.uuid4())
         return self._uuid
@@ -218,9 +235,10 @@ class KnowledgePost(object):
     def uuid(self, uuid):
         self._uuid = uuid
 
-    # ------------ Reference cache methods ------------------------------------------
+    # ------------ Reference cache methods ------------------------------------
     def _read_ref(self, ref):
-        if (ref not in self.__cache) and (self.repository is not None) and self.repository._kp_has_ref(self.path, ref):
+        if (ref not in self.__cache) and (self.repository is not None) \
+                and self.repository._kp_has_ref(self.path, ref):
             self.__cache[ref] = self.repository._kp_read_ref(self.path, ref)
         return self.__cache[ref]
 
@@ -231,18 +249,20 @@ class KnowledgePost(object):
         del self.__cache[ref]
 
     def _has_ref(self, ref):
-        return (ref in self.__cache) or (self.repository is not None) and self.repository._kp_has_ref(self.path, ref)
+        return (ref in self.__cache) or (self.repository is not None) \
+            and self.repository._kp_has_ref(self.path, ref)
 
     def _dir(self, parent=None):
         for ref in self.__cache.dir(parent=parent):
             if self.__cache[posixpath.join(parent or '', ref)] is not None:
                 yield ref
         if self.repository is not None:
-            for ref in self.repository._kp_dir(self.path, parent=parent, revision=self.revision):
+            for ref in self.repository._kp_dir(
+                    self.path, parent=parent, revision=self.revision):
                 if ref not in self.__cache:
                     yield ref
 
-    # ---------- Knowledge Post Data Population -----------------------------
+    # ---------- Knowledge Post Data Population -------------------------------
 
     def read(self, images=False, headers=True, body=True):
         if not (body or headers):
@@ -262,7 +282,8 @@ class KnowledgePost(object):
 
     @property
     def image_paths(self):
-        return [f'images/{image_name}' for image_name in self._dir(parent='images')]
+        return [f'images/{image_name}' for image_name
+                in self._dir(parent='images')]
 
     def read_image(self, name):
         return self._read_ref('images/' + name)
@@ -330,7 +351,7 @@ class KnowledgePost(object):
             name = os.path.basename(filename)
         self.write_src(name, read_binary(filename))
 
-    # ------------- Knowledge Post Format ----------------------------------
+    # ------------- Knowledge Post Format -------------------------------------
 
     def _get_headers_from_yaml(self, yaml_str):
         try:
