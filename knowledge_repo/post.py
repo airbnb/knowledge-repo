@@ -297,7 +297,9 @@ class KnowledgePost(object):
     @property
     def src_paths(self):
         srcs = [f'src/{src_name}' for src_name in self._dir(parent='src')]
-        legacy_srcs = [f'orig_src/{src_name}' for src_name in self._dir(parent='orig_src')]  # TODO: deprecate
+        # TODO: deprecate
+        legacy_srcs = [f'orig_src/{src_name}' for src_name
+                       in self._dir(parent='orig_src')]
         return srcs + legacy_srcs
 
     def read_src(self, ref):
@@ -324,7 +326,8 @@ class KnowledgePost(object):
 
         headers = self._verify_headers(headers, interactive=interactive)
 
-        md = (  # Format with unicode seems to have issue in Python 2, so we explicitly concatenate
+        md = (  # Format with unicode seems to have issue in Python 2,
+                # so we explicitly concatenate
                 '---\n' +
                 yaml.safe_dump(headers, default_flow_style=False) +
                 '---\n\n' +
@@ -360,10 +363,10 @@ class KnowledgePost(object):
             return next(yaml.full_load_all(yaml_str))
         except yaml.YAMLError as e:
             logger.info(
-                'YAML header is incorrectly formatted or missing. The following '
-                f'information may be useful:\n{e}\nIf you continue to have '
-                'difficulties, try pasting your YAML header into an online parser '
-                'such as http://yaml-online-parser.appspot.com/.'
+                'YAML header is incorrectly formatted or missing. The '
+                f'following information may be useful:\n{e}\nIf you continue '
+                'to have difficulties, try pasting your YAML header into an '
+                'online parser such as http://yaml-online-parser.appspot.com/.'
             )
         except StopIteration as e:
             logger.info('YAML header is missing!')
@@ -373,32 +376,36 @@ class KnowledgePost(object):
         if not isinstance(headers, dict):
             raise RuntimeError()
         missing_required_headers = (
-            set(h.name for h in HEADER_REQUIRED_FIELD_TYPES).difference(headers)
+            set(h.name for h in
+                HEADER_REQUIRED_FIELD_TYPES).difference(headers)
         )
 
         if interactive:
             missing_suggested_headers = (
-                set(HEADERS_INTERACTIVE).difference(headers).difference(missing_required_headers)
+                set(HEADERS_INTERACTIVE).difference(
+                    headers).difference(missing_required_headers)
             )
 
             if missing_required_headers:
-                print(f'This post is missing the following required headers: {missing_required_headers}')
+                print('This post is missing the following '
+                      f'required headers: {missing_required_headers}')
             if missing_suggested_headers:
-                print(f'This post is missing the following suggested headers: {missing_suggested_headers}')
+                print('This post is missing the following suggested '
+                      f'headers: {missing_suggested_headers}')
             if missing_required_headers or missing_suggested_headers:
-                print(
-                    f'You will now be prompted for each missing header {missing_required_headers}.'
-                    'If you wish to abort the knowledge post creation, press Ctrl+C.'
-                )
+                print('You will now be prompted for each missing header '
+                      f'{missing_required_headers}. If you wish to abort '
+                      'the knowledge post creation, press Ctrl+C.')
 
                 for header in HEADERS_INTERACTIVE:
                     if header not in headers:
                         headers[header] = HEADERS_ALL[header].input.get_input()
         elif missing_required_headers:
             raise RuntimeError(
-                f'Knowledge post is missing required headers {missing_required_headers}.'
-                'Please rerun this operation in interactive mode, or add headers manually '
-                'to the post source file.'
+                'Knowledge post is missing required headers '
+                f'{missing_required_headers}. Please rerun this operation '
+                'in interactive mode, or add headers manually to the post '
+                'source file.'
             )
 
         for key, value in list(headers.items()):
@@ -485,14 +492,16 @@ class KnowledgePost(object):
             return False
         try:
             FormatChecks().process(self)
-        except:
+        except Exception as e:
+            logger.warning(f'Exception encountered {e}')
             return False
         return True
 
     @property
     def status(self):
         if self.repository is not None:
-            return self.repository._kp_status(self.path, revision=self.revision)
+            return self.repository._kp_status(
+                self.path, revision=self.revision)
 
     @property
     def is_published(self):
@@ -500,7 +509,8 @@ class KnowledgePost(object):
 
     @property
     def is_accepted(self):
-        return self.status in [self.repository.PostStatus.UNPUBLISHED, self.repository.PostStatus.PUBLISHED]
+        return self.status in [self.repository.PostStatus.UNPUBLISHED,
+                               self.repository.PostStatus.PUBLISHED]
 
     @property
     def web_uri(self):
@@ -509,29 +519,35 @@ class KnowledgePost(object):
 
     # Conversion/Import/Export methods
     @classmethod
-    def from_file(cls, filename, src_paths=[], format=None, postprocessors=None, interactive=False, **opts):
-        kp = KnowledgePostConverter.for_file(cls(), filename, format=format, postprocessors=postprocessors,
-                                             interactive=interactive).from_file(filename, **opts)
+    def from_file(cls, filename, src_paths=[], format=None,
+                  postprocessors=None, interactive=False, **opts):
+        kp = KnowledgePostConverter.for_file(
+            cls(), filename, format=format, postprocessors=postprocessors,
+            interactive=interactive).from_file(filename, **opts)
         if src_paths:
             for src_path in src_paths:
                 kp.add_srcfile(src_path)
         return kp
 
     @classmethod
-    def from_string(cls, string, src_strings={}, format=None, postprocessors=None, interactive=False, **opts):
-        kp = KnowledgePostConverter.for_format(cls(), format=format, postprocessors=postprocessors,
-                                               interactive=interactive).from_string(string, **opts)
+    def from_string(cls, string, src_strings={}, format=None,
+                    postprocessors=None, interactive=False, **opts):
+        kp = KnowledgePostConverter.for_format(
+            cls(), format=format, postprocessors=postprocessors,
+            interactive=interactive).from_string(string, **opts)
         if src_strings:
             for src_name, data in list(src_strings.items()):
                 kp.write_src(src_name, data)
         return kp
 
     def to_file(self, filename, format=None, interactive=False, **opts):
-        return KnowledgePostConverter.for_file(self, filename, format=format, interactive=interactive).to_file(filename,
-                                                                                                               **opts)
+        return KnowledgePostConverter.for_file(
+            self, filename, format=format,
+            interactive=interactive).to_file(filename, **opts)
 
     def to_string(self, format, interactive=False, **opts):
-        return KnowledgePostConverter.for_format(self, format, interactive=interactive).to_string(**opts)
+        return KnowledgePostConverter.for_format(
+            self, format, interactive=interactive).to_string(**opts)
 
 
 from .converter import KnowledgePostConverter  # noqa
