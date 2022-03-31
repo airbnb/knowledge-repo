@@ -21,7 +21,8 @@ class ExtractImages(KnowledgePostProcessor):
     def update_thumbnail_uri(self, kp, images, image_mapping):
         thumbnail = kp.headers.get('thumbnail', 0)
 
-        # if thumbnail is a number, select the nth image in this post as the thumbnail
+        # if thumbnail is a number, select the nth image in this post
+        # as the thumbnail
         if isinstance(thumbnail, str) and thumbnail.isdigit():
             thumbnail = int(thumbnail)
         if isinstance(thumbnail, int):
@@ -33,15 +34,18 @@ class ExtractImages(KnowledgePostProcessor):
             else:
                 thumbnail = None
 
-        # if thumbnail is a url, copy it locally to the post unless already collected during collection
+        # if thumbnail is a url, copy it locally to the post unless already
+        # collected during collection
         if thumbnail and not self.skip_image(kp, {'src': thumbnail}):
-            orig_path = os.path.join(kp.orig_context, os.path.expanduser(thumbnail))
+            orig_path = os.path.join(
+                kp.orig_context, os.path.expanduser(thumbnail))
             if thumbnail in image_mapping:
                 thumbnail = image_mapping[thumbnail]
             elif os.path.exists(orig_path):
                 thumbnail = self.copy_image(kp, orig_path)
             else:
-                logger.warning(f'Could not find a thumbnail image at: {thumbnail}')
+                logger.warning(
+                    f'Could not find a thumbnail image at: {thumbnail}')
 
         # update post headers to point to new thumbnail image
         kp.update_headers(thumbnail=thumbnail)
@@ -50,11 +54,13 @@ class ExtractImages(KnowledgePostProcessor):
         images = []
         images.extend(self.collect_images_for_pattern(
             md,
-            # Match all <img /> tags with attributes of form <name>(="<value>") with optional quotes (can be single or double)
+            # Match all <img /> tags with attributes of form <name>(="<value>")
+            # with optional quotes (can be single or double)
             # The src attribute is exected to always be surrounded by quotes.
             r'<img\s+(?:\w+(?:=([\'\"])?(?(1)(?:(?!\1).)*?\1|[^>]*?))?\s+?)*src=([\'\"])(?P<src>(?:(?!\2).)*?)\2(?:\s+\w+(?:=([\'\"])?(?(1)(?:(?!\4).)*?\4|[^>]*?))?)*\s*\/?>'
         ))
-        images.extend(self.collect_images_for_pattern(md, r'\!\[[^\]]*?\]\((?P<src>[^\)]*)\)'))
+        images.extend(self.collect_images_for_pattern(
+            md, r'\!\[[^\]]*?\]\((?P<src>[^\)]*)\)'))
         return sorted(images, key=lambda x: x['offset'])
 
     def collect_images_for_pattern(self, md, pattern=None):
@@ -70,7 +76,8 @@ class ExtractImages(KnowledgePostProcessor):
         for image in images:
             if self.skip_image(kp, image):
                 continue
-            orig_path = os.path.join(kp.orig_context, os.path.expanduser(image['src']))
+            orig_path = os.path.join(
+                kp.orig_context, os.path.expanduser(image['src']))
             new_path = None
             if image['src'] in image_mapping:
                 new_path = image_mapping[image['src']]
@@ -84,7 +91,8 @@ class ExtractImages(KnowledgePostProcessor):
             if not new_path:
                 continue
             image_mapping[image['src']] = new_path
-            md = self.replace_image_locations(md, image['offset'], image['tag'], image['src'], new_path)
+            md = self.replace_image_locations(
+                md, image['offset'], image['tag'], image['src'], new_path)
         kp.write(md)
         return image_mapping
 
