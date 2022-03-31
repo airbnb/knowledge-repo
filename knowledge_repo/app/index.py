@@ -66,12 +66,19 @@ def acquire_index_lock():
             IndexMetadata.set('lock', 'master_check', current_app.uuid)
             db_session.commit()
             if (
-                IndexMetadata.get('lock', 'index_master') == current_app.uuid
-                or time_since(IndexMetadata.get_last_update(
-                    'lock', 'index_master'
-                ),
-                    default=current_app.config["INDEXING_TIMEOUT"] + 1)
-                    > current_app.config["INDEXING_TIMEOUT"]
+                IndexMetadata.get(
+                    'lock',
+                    'index_master'
+                ) == current_app.uuid or time_since(
+                    IndexMetadata.get_last_update(
+                        'lock',
+                        'index_master'
+                    ),
+                    default=current_app.config[
+                        "INDEXING_TIMEOUT"
+                    ] + 1) > current_app.config[
+                        "INDEXING_TIMEOUT"
+                ]
             ):
                 # Update/set lock and update timestamp
                 IndexMetadata.set('lock', 'index_master', current_app.uuid)
@@ -87,7 +94,11 @@ def is_indexing():
     # permitted to run again)
     timeout = current_app.config["INDEXING_TIMEOUT"]
     last_update = time_since_index()
-    return IndexMetadata.get('lock', 'index', UNLOCKED) == LOCKED and last_update is not None and (last_update < timeout)
+    return IndexMetadata.get(
+        'lock',
+        'index',
+        UNLOCKED
+    ) == LOCKED and last_update is not None and (last_update < timeout)
 
 
 def time_since_index(human_readable=False):
@@ -125,8 +136,7 @@ def index_due_for_update():
     seconds_check = time_since_index_check()
 
     if (
-        seconds is not None
-        and seconds_check is not None
+        seconds is not None and seconds_check is not None
     ) and (
             seconds < interval or seconds_check < interval
     ):
@@ -180,8 +190,9 @@ def update_index(check_timeouts=True, force=False, reindex=False):
             # If UUID has changed, check if we can find it elsewhere in the
             # repository, and if so update index path
             if post.uuid and (
-                    (post.path not in kr_dir)
-                    or (post.uuid != kr_dir[post.path].uuid)
+                    (post.path not in kr_dir) or (
+                        post.uuid != kr_dir[post.path].uuid
+                    )
             ):
                 if post.uuid in kr_uuids:
                     logger.info(
@@ -204,9 +215,7 @@ def update_index(check_timeouts=True, force=False, reindex=False):
 
             # Update metadata of post if required
             if reindex or (
-                kp.revision > post.revision
-                or not post.is_published
-                or kp.uuid != post.uuid
+                kp.revision > post.revision or not post.is_published or kp.uuid != post.uuid
             ):
                 if kp.is_valid():
                     logger.info(f'Recording update to post at: {kp.path}')

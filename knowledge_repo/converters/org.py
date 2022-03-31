@@ -20,7 +20,7 @@ class OrgConverter(KnowledgePostConverter):
     '''
     Converts .org documents to the markdown syntax needed for a knowledge repo.
 
-    Uses the .org metadata standard syntax to populate the metadata YAML 
+    Uses the .org metadata standard syntax to populate the metadata YAML
     required by the knowledge repo.
     (e.g. #+TITLE: the title becomes - title: the title)
 
@@ -290,7 +290,8 @@ class OrgConverter(KnowledgePostConverter):
 
     def convert_example(self, line):
         '''
-        Translates a single line of an 'example' block in orgmode syntax to markdown syntax
+        Translates a single line of an 'example' block in orgmode syntax
+        to markdown syntax
         '''
         if "#+begin_example" in line.lower() or "#+end_example" in line.lower() or "#+results" in line.lower():
             return None

@@ -62,8 +62,7 @@ class KnowledgeAuthProvider(object, metaclass=SubclassRegisteringABCMeta):
             raise RuntimeError("No such user or invalid credentials")
         assert self.validate(user)
         self._perform_login(user)
-        return redirect(session.get('requested_url')
-                        or url_for('index.render_feed'))
+        return redirect(session.get('requested_url') or url_for('index.render_feed'))
 
     def validate(self, user):
         return True
