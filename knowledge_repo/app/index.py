@@ -20,14 +20,18 @@ def set_up_indexing_timers(app):
         return False
 
     if app.check_thread_support(check_index=True,
-                                check_repositories=app.config['INDEXING_UPDATES_REPOSITORIES']):
+                                check_repositories=app.config[
+                                    'INDEXING_UPDATES_REPOSITORIES'
+                                ]):
         if os.environ['KNOWLEDGE_REPO_MASTER_UUID'] != app.uuid:
             logger.info(
-                f'Not spawning index-sync timers for non-master application instance: {app.uuid}')
+                f'Not spawning index-sync timers for non-master application \
+                instance: {app.uuid}')
             return
 
         logger.info(
-            f'Spawning index-sync timers for master application instance: {app.uuid}')
+            f'Spawning index-sync timers for master application \
+                instance: {app.uuid}')
 
         def index_watchdog(app):
             while True:
@@ -62,9 +66,12 @@ def acquire_index_lock():
             IndexMetadata.set('lock', 'master_check', current_app.uuid)
             db_session.commit()
             if (
-                IndexMetadata.get('lock', 'index_master') == current_app.uuid or
-                time_since(IndexMetadata.get_last_update('lock', 'index_master'),
-                           default=current_app.config["INDEXING_TIMEOUT"] + 1) > current_app.config["INDEXING_TIMEOUT"]
+                IndexMetadata.get('lock', 'index_master') == current_app.uuid
+                or time_since(IndexMetadata.get_last_update(
+                    'lock', 'index_master'
+                ),
+                    default=current_app.config["INDEXING_TIMEOUT"] + 1)
+                    > current_app.config["INDEXING_TIMEOUT"]
             ):
                 # Update/set lock and update timestamp
                 IndexMetadata.set('lock', 'index_master', current_app.uuid)
@@ -76,7 +83,8 @@ def acquire_index_lock():
 
 
 def is_indexing():
-    # Default index timeout to 10 minutes (after which indexing will be permitted to run again)
+    # Default index timeout to 10 minutes (after which indexing will be
+    # permitted to run again)
     timeout = current_app.config["INDEXING_TIMEOUT"]
     last_update = time_since_index()
     return IndexMetadata.get('lock', 'index', UNLOCKED) == LOCKED and last_update is not None and (last_update < timeout)
@@ -116,7 +124,12 @@ def index_due_for_update():
     seconds = time_since_index()
     seconds_check = time_since_index_check()
 
-    if (seconds is not None and seconds_check is not None) and (seconds < interval or seconds_check < interval):
+    if (
+        seconds is not None
+        and seconds_check is not None
+    ) and (
+            seconds < interval or seconds_check < interval
+    ):
         return False
 
     return True
@@ -144,7 +157,9 @@ def update_index(check_timeouts=True, force=False, reindex=False):
     # Check for update to repositories if configured to do so
     if (
         current_app.config['INDEXING_UPDATES_REPOSITORIES'] and
-        (is_index_master or current_app.config['INDEXING_UPDATES_REPOSITORIES_WITHOUT_LOCK'])
+        (is_index_master or current_app.config[
+            'INDEXING_UPDATES_REPOSITORIES_WITHOUT_LOCK'
+        ])
     ):
         current_repo.update()
 
@@ -162,11 +177,16 @@ def update_index(check_timeouts=True, force=False, reindex=False):
 
         for post in posts:
 
-            # If UUID has changed, check if we can find it elsewhere in the repository, and if so update index path
-            if post.uuid and ((post.path not in kr_dir) or (post.uuid != kr_dir[post.path].uuid)):
+            # If UUID has changed, check if we can find it elsewhere in the
+            # repository, and if so update index path
+            if post.uuid and (
+                    (post.path not in kr_dir)
+                    or (post.uuid != kr_dir[post.path].uuid)
+            ):
                 if post.uuid in kr_uuids:
                     logger.info(
-                        f'Updating location of post: {post.path} -> {kr_uuids[post.uuid].path}')
+                        f'Updating location of post: {post.path} -> \
+                            {kr_uuids[post.uuid].path}')
                     post.path = kr_uuids[post.uuid].path
 
             # If path of post no longer in directory, mark as unpublished
@@ -176,13 +196,18 @@ def update_index(check_timeouts=True, force=False, reindex=False):
                 post.status = current_repo.PostStatus.UNPUBLISHED
                 continue
 
-            # Update database according to current state of existing knowledge post and
-            # remove from kp_dir. This means that when this loop finishes, kr_dir will
-            # only contain posts which are new to the repo.
+            # Update database according to current state of existing
+            # knowledge post and remove from kp_dir. This means that
+            # when this loop finishes, kr_dir will only contain posts
+            # which are new to the repo.
             kp = kr_dir.pop(post.path)
 
             # Update metadata of post if required
-            if reindex or (kp.revision > post.revision or not post.is_published or kp.uuid != post.uuid):
+            if reindex or (
+                kp.revision > post.revision
+                or not post.is_published
+                or kp.uuid != post.uuid
+            ):
                 if kp.is_valid():
                     logger.info(f'Recording update to post at: {kp.path}')
                     post.update_metadata_from_kp(kp)
