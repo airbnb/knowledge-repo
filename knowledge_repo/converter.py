@@ -65,7 +65,8 @@ class KnowledgePostConverter(object, metaclass=SubclassRegisteringABCMeta):
                 if postprocessors is None:
                     postprocessors = []
                 for postprocessor, kwargs in postprocessors:
-                    KnowledgePostProcessor._get_subclass_for(postprocessor)(**kwargs).process(kp)
+                    KnowledgePostProcessor._get_subclass_for(
+                        postprocessor)(**kwargs).process(kp)
 
                 return kp
             finally:
