@@ -7,7 +7,7 @@ class StubKnowledgeRepository(KnowledgeRepository):
     def init(self):
         pass
 
-    # ------------- Repository actions / state ------------------------------------
+    # ------------- Repository actions / state --------------------------------
 
     def session_begin(self):
         pass
@@ -33,12 +33,12 @@ class StubKnowledgeRepository(KnowledgeRepository):
     def status_message(self):
         raise NotImplementedError
 
-    # -------------- Post retrieval methods --------------------------------------
+    # -------------- Post retrieval methods -----------------------------------
 
     def _dir(self, prefix, statuses):
         raise NotImplementedError
 
-    # -------------- Post submission / addition user flow --------------------
+    # -------------- Post submission / addition user flow ---------------------
 
     def _add_prepare(self, kp, path, update=False):
         raise NotImplementedError
@@ -61,7 +61,7 @@ class StubKnowledgeRepository(KnowledgeRepository):
     def _remove(self, path, all=False):
         raise NotImplementedError
 
-    # ----------- Knowledge Post Data Retrieval/Pushing Methods --------------------
+    # ----------- Knowledge Post Data Retrieval/Pushing Methods ---------------
 
     def _kp_uuid(self, path):
         raise NotImplementedError

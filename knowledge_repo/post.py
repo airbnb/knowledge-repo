@@ -22,38 +22,49 @@ Header = namedtuple('Header', ('name', 'type', 'input'))
 
 HEADER_REQUIRED_FIELD_TYPES = [
     Header('title', str, ci.GetInput(prompt='title')),
-    Header('authors', list, ci.GetInput(prompt='authors (comma separated)', convertor=ci.ListConvertor())),
+    Header('authors', list, ci.GetInput(
+        prompt='authors (comma separated)', convertor=ci.ListConvertor())),
     Header('tldr', str, ci.GetInput(prompt='tldr')),
-    Header('created_at', datetime,
-           ci.GetInput(prompt='created_at', convertor=ci.DateConvertor(), default=date.today())),
+    Header('created_at', datetime, ci.GetInput(
+        prompt='created_at', convertor=ci.DateConvertor(),
+        default=date.today())),
 ]
 
 HEADER_OPTIONAL_FIELD_TYPES = [
     Header('subtitle', str, ci.GetInput(prompt='subtitle', required=False)),
-    Header('tags', list, ci.GetInput(prompt='tags (comma separated)', convertor=ci.ListConvertor(), required=False)),
+    Header('tags', list, ci.GetInput(
+        prompt='tags (comma separated)', convertor=ci.ListConvertor(),
+        required=False)),
     Header('path', str, ci.GetInput(prompt='path', required=False)),
-    Header('updated_at', datetime,
-           ci.GetInput(prompt='updated_at', convertor=ci.DateConvertor(), default=datetime.now())),
-    Header('private', bool, ci.GetInput(prompt='private', convertor=ci.BooleanConvertor(), required=False)),
+    Header('updated_at', datetime, ci.GetInput(
+        prompt='updated_at', convertor=ci.DateConvertor(),
+        default=datetime.now())),
+    Header('private', bool, ci.GetInput(
+        prompt='private', convertor=ci.BooleanConvertor(), required=False)),
     # If true, this post starts out private
-    Header('allowed_groups', list,
-           ci.GetInput(prompt='allowed_groups (comma separated)', convertor=ci.ListConvertor(), required=False)),
-    Header('thumbnail', (int, str), ci.GetInput(prompt='thumbnail', required=False)),
+    Header('allowed_groups', list, ci.GetInput(
+        prompt='allowed_groups (comma separated)',
+        convertor=ci.ListConvertor(), required=False)),
+    Header('thumbnail', (int, str), ci.GetInput(
+        prompt='thumbnail', required=False)),
 ]
 
 HEADERS_ALL = {
     header.name: header
-    for header in itertools.chain(HEADER_REQUIRED_FIELD_TYPES, HEADER_OPTIONAL_FIELD_TYPES)
+    for header in itertools.chain(HEADER_REQUIRED_FIELD_TYPES,
+                                  HEADER_OPTIONAL_FIELD_TYPES)
 }
 
 # Headers to prompt for if missing when in interactive mode
-HEADERS_INTERACTIVE = ['title', 'subtitle', 'authors', 'tldr', 'created_at', 'tags']
+HEADERS_INTERACTIVE = ['title', 'subtitle', 'authors',
+                       'tldr', 'created_at', 'tags']
 
 HEADER_PATTERN = '^---(\n|\r)[\\s\\S]+?---(\n|\r)'
 
 HEADER_SAMPLE = """
 ---
-title: "This is a Knowledge Post title, quoted so we can use special characters like ':'"
+title: "This is a Knowledge Post title, quoted so we can use special
+        characters like ':'"
 authors:
 - sally_smarts
 - wesly_wisdom
@@ -64,7 +75,8 @@ created_at: 2016-06-29
 updated_at: 2016-06-30
 thumbnail: 2
 tldr: |
-    You can write any markdown you want here (the '|' character makes this an escaped section)
+    You can write any markdown you want here (the '|' character makes
+    this an escaped section)
 
     * bullet
     * bullet
@@ -83,7 +95,8 @@ tldr: |
 ---
 """
 
-YAML_MESSAGE = 'YAML header is missing. Please ensure that the top of your post has a header of the following form:\n' + HEADER_SAMPLE
+YAML_MESSAGE = ('YAML header is missing. Please ensure that the top of your '
+                'post has a header of the following form:\n' + HEADER_SAMPLE)
 
 
 # Use OrderedDict representations in Yaml, so post headers remain in order
@@ -149,7 +162,8 @@ class ReferenceCache(object):
     def get(self, key, default=None):
         try:
             return self[key]
-        except:
+        except Exception as e:
+            logger.warning(f'Exception encountered {e}')
             return default
 
     def __contains__(self, key):
@@ -170,7 +184,8 @@ class ReferenceCache(object):
                 cache = cache.get(parent, {})
         for key in cache:
             if isinstance(cache[key], dict):
-                for path in self.dir(parent=posixpath.join(parent or '', key), cache=cache[key]):
+                for path in self.dir(parent=posixpath.join(
+                        parent or '', key), cache=cache[key]):
                     yield posixpath.join(key, path)
             else:
                 yield key
@@ -178,12 +193,13 @@ class ReferenceCache(object):
 
 class KnowledgePost(object):
     '''
-    A "Knowledge Post" is a (virtual) folder in which there is a 'knowledge.md' file,
-    and potentially an 'images' and/or 'src' folder. It is "virtual" in the sense
-    that `KnowledgePost` objects store everything in memory, and use `KnowledgeRepository`
-    object instances to interface with "physical" realisations of them. For example,
-    in a GitKnowledgeRepository, the physical realisation is an actual folder; whereas
-    in a database-backed KnowledgeRepository, on the virtual structure is maintained.
+    A "Knowledge Post" is a (virtual) folder in which there is a 'knowledge.md'
+    file, and potentially an 'images' and/or 'src' folder. It is "virtual" in
+    the sense that `KnowledgePost` objects store everything in memory, and use
+    `KnowledgeRepository` object instances to interface with "physical"
+    realisations of them. For example, in a GitKnowledgeRepository, the
+    physical realisation is an actual folder; whereas in a database-backed
+    KnowledgeRepository, on the virtual structure is maintained.
     '''
 
     def __init__(self, path=None, revision=None, repository=None):
@@ -209,7 +225,8 @@ class KnowledgePost(object):
     def uuid(self):
         if not getattr(self, '_uuid', None):
             if self.repository is not None:
-                self._uuid = self.repository._kp_uuid(self.path)  # Use repository UUID (even if None)
+                # Use repository UUID (even if None)
+                self._uuid = self.repository._kp_uuid(self.path)
             else:
                 self._uuid = str(uuid.uuid4())
         return self._uuid
@@ -218,9 +235,10 @@ class KnowledgePost(object):
     def uuid(self, uuid):
         self._uuid = uuid
 
-    # ------------ Reference cache methods ------------------------------------------
+    # ------------ Reference cache methods ------------------------------------
     def _read_ref(self, ref):
-        if (ref not in self.__cache) and (self.repository is not None) and self.repository._kp_has_ref(self.path, ref):
+        if (ref not in self.__cache) and (self.repository is not None) \
+                and self.repository._kp_has_ref(self.path, ref):
             self.__cache[ref] = self.repository._kp_read_ref(self.path, ref)
         return self.__cache[ref]
 
@@ -231,18 +249,20 @@ class KnowledgePost(object):
         del self.__cache[ref]
 
     def _has_ref(self, ref):
-        return (ref in self.__cache) or (self.repository is not None) and self.repository._kp_has_ref(self.path, ref)
+        return (ref in self.__cache) or (self.repository is not None) \
+            and self.repository._kp_has_ref(self.path, ref)
 
     def _dir(self, parent=None):
         for ref in self.__cache.dir(parent=parent):
             if self.__cache[posixpath.join(parent or '', ref)] is not None:
                 yield ref
         if self.repository is not None:
-            for ref in self.repository._kp_dir(self.path, parent=parent, revision=self.revision):
+            for ref in self.repository._kp_dir(
+                    self.path, parent=parent, revision=self.revision):
                 if ref not in self.__cache:
                     yield ref
 
-    # ---------- Knowledge Post Data Population -----------------------------
+    # ---------- Knowledge Post Data Population -------------------------------
 
     def read(self, images=False, headers=True, body=True):
         if not (body or headers):
@@ -262,7 +282,8 @@ class KnowledgePost(object):
 
     @property
     def image_paths(self):
-        return [f'images/{image_name}' for image_name in self._dir(parent='images')]
+        return [f'images/{image_name}' for image_name
+                in self._dir(parent='images')]
 
     def read_image(self, name):
         return self._read_ref('images/' + name)
@@ -276,7 +297,9 @@ class KnowledgePost(object):
     @property
     def src_paths(self):
         srcs = [f'src/{src_name}' for src_name in self._dir(parent='src')]
-        legacy_srcs = [f'orig_src/{src_name}' for src_name in self._dir(parent='orig_src')]  # TODO: deprecate
+        # TODO: deprecate
+        legacy_srcs = [f'orig_src/{src_name}' for src_name
+                       in self._dir(parent='orig_src')]
         return srcs + legacy_srcs
 
     def read_src(self, ref):
@@ -303,7 +326,8 @@ class KnowledgePost(object):
 
         headers = self._verify_headers(headers, interactive=interactive)
 
-        md = (  # Format with unicode seems to have issue in Python 2, so we explicitly concatenate
+        md = (  # Format with unicode seems to have issue in Python 2,
+                # so we explicitly concatenate
                 '---\n' +
                 yaml.safe_dump(headers, default_flow_style=False) +
                 '---\n\n' +
@@ -330,7 +354,7 @@ class KnowledgePost(object):
             name = os.path.basename(filename)
         self.write_src(name, read_binary(filename))
 
-    # ------------- Knowledge Post Format ----------------------------------
+    # ------------- Knowledge Post Format -------------------------------------
 
     def _get_headers_from_yaml(self, yaml_str):
         try:
@@ -339,10 +363,10 @@ class KnowledgePost(object):
             return next(yaml.full_load_all(yaml_str))
         except yaml.YAMLError as e:
             logger.info(
-                'YAML header is incorrectly formatted or missing. The following '
-                f'information may be useful:\n{e}\nIf you continue to have '
-                'difficulties, try pasting your YAML header into an online parser '
-                'such as http://yaml-online-parser.appspot.com/.'
+                'YAML header is incorrectly formatted or missing. The '
+                f'following information may be useful:\n{e}\nIf you continue '
+                'to have difficulties, try pasting your YAML header into an '
+                'online parser such as http://yaml-online-parser.appspot.com/.'
             )
         except StopIteration as e:
             logger.info('YAML header is missing!')
@@ -352,32 +376,36 @@ class KnowledgePost(object):
         if not isinstance(headers, dict):
             raise RuntimeError()
         missing_required_headers = (
-            set(h.name for h in HEADER_REQUIRED_FIELD_TYPES).difference(headers)
+            set(h.name for h in
+                HEADER_REQUIRED_FIELD_TYPES).difference(headers)
         )
 
         if interactive:
             missing_suggested_headers = (
-                set(HEADERS_INTERACTIVE).difference(headers).difference(missing_required_headers)
+                set(HEADERS_INTERACTIVE).difference(
+                    headers).difference(missing_required_headers)
             )
 
             if missing_required_headers:
-                print(f'This post is missing the following required headers: {missing_required_headers}')
+                print('This post is missing the following '
+                      f'required headers: {missing_required_headers}')
             if missing_suggested_headers:
-                print(f'This post is missing the following suggested headers: {missing_suggested_headers}')
+                print('This post is missing the following suggested '
+                      f'headers: {missing_suggested_headers}')
             if missing_required_headers or missing_suggested_headers:
-                print(
-                    f'You will now be prompted for each missing header {missing_required_headers}.'
-                    'If you wish to abort the knowledge post creation, press Ctrl+C.'
-                )
+                print('You will now be prompted for each missing header '
+                      f'{missing_required_headers}. If you wish to abort '
+                      'the knowledge post creation, press Ctrl+C.')
 
                 for header in HEADERS_INTERACTIVE:
                     if header not in headers:
                         headers[header] = HEADERS_ALL[header].input.get_input()
         elif missing_required_headers:
             raise RuntimeError(
-                f'Knowledge post is missing required headers {missing_required_headers}.'
-                'Please rerun this operation in interactive mode, or add headers manually '
-                'to the post source file.'
+                'Knowledge post is missing required headers '
+                f'{missing_required_headers}. Please rerun this operation '
+                'in interactive mode, or add headers manually to the post '
+                'source file.'
             )
 
         for key, value in list(headers.items()):
@@ -464,14 +492,16 @@ class KnowledgePost(object):
             return False
         try:
             FormatChecks().process(self)
-        except:
+        except Exception as e:
+            logger.warning(f'Exception encountered {e}')
             return False
         return True
 
     @property
     def status(self):
         if self.repository is not None:
-            return self.repository._kp_status(self.path, revision=self.revision)
+            return self.repository._kp_status(
+                self.path, revision=self.revision)
 
     @property
     def is_published(self):
@@ -479,7 +509,8 @@ class KnowledgePost(object):
 
     @property
     def is_accepted(self):
-        return self.status in [self.repository.PostStatus.UNPUBLISHED, self.repository.PostStatus.PUBLISHED]
+        return self.status in [self.repository.PostStatus.UNPUBLISHED,
+                               self.repository.PostStatus.PUBLISHED]
 
     @property
     def web_uri(self):
@@ -488,29 +519,35 @@ class KnowledgePost(object):
 
     # Conversion/Import/Export methods
     @classmethod
-    def from_file(cls, filename, src_paths=[], format=None, postprocessors=None, interactive=False, **opts):
-        kp = KnowledgePostConverter.for_file(cls(), filename, format=format, postprocessors=postprocessors,
-                                             interactive=interactive).from_file(filename, **opts)
+    def from_file(cls, filename, src_paths=[], format=None,
+                  postprocessors=None, interactive=False, **opts):
+        kp = KnowledgePostConverter.for_file(
+            cls(), filename, format=format, postprocessors=postprocessors,
+            interactive=interactive).from_file(filename, **opts)
         if src_paths:
             for src_path in src_paths:
                 kp.add_srcfile(src_path)
         return kp
 
     @classmethod
-    def from_string(cls, string, src_strings={}, format=None, postprocessors=None, interactive=False, **opts):
-        kp = KnowledgePostConverter.for_format(cls(), format=format, postprocessors=postprocessors,
-                                               interactive=interactive).from_string(string, **opts)
+    def from_string(cls, string, src_strings={}, format=None,
+                    postprocessors=None, interactive=False, **opts):
+        kp = KnowledgePostConverter.for_format(
+            cls(), format=format, postprocessors=postprocessors,
+            interactive=interactive).from_string(string, **opts)
         if src_strings:
             for src_name, data in list(src_strings.items()):
                 kp.write_src(src_name, data)
         return kp
 
     def to_file(self, filename, format=None, interactive=False, **opts):
-        return KnowledgePostConverter.for_file(self, filename, format=format, interactive=interactive).to_file(filename,
-                                                                                                               **opts)
+        return KnowledgePostConverter.for_file(
+            self, filename, format=format,
+            interactive=interactive).to_file(filename, **opts)
 
     def to_string(self, format, interactive=False, **opts):
-        return KnowledgePostConverter.for_format(self, format, interactive=interactive).to_string(**opts)
+        return KnowledgePostConverter.for_format(
+            self, format, interactive=interactive).to_string(**opts)
 
 
 from .converter import KnowledgePostConverter  # noqa
