@@ -1,4 +1,4 @@
-var iconsJx = (function(){
+var iconsJx = (function () {
 
   function createEditTagsIcon() {
     var editIcon = $("<i>");

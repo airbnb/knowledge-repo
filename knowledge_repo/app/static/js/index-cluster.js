@@ -1,7 +1,7 @@
-var indexClusterJx = (function(){
+var indexClusterJx = (function () {
 
   function addFoldingToGroups() {
-    $('.cluster_dir').click(function(e) {
+    $('.cluster_dir').click(function (e) {
       e.stopPropagation();
       var icon = $(this).find("#" + this.id + "-glyph");
       $(icon).toggleClass("glyphicon-chevron-right glyphicon-chevron-down");
@@ -21,24 +21,24 @@ var indexClusterJx = (function(){
     $(clusterSelected)[0].setAttribute("checked", "checked");
     $(sortSelected)[0].setAttribute("checked", "checked");
 
-    $.each(clusterButtons, function(i, button) {
-      $("#" + button).click(function() {
+    $.each(clusterButtons, function (i, button) {
+      $("#" + button).click(function () {
         clusterSelected = '#' + (this).id;
         $(clusterSelected)[0].setAttribute("checked", "checked");
         if (sortSelected !== '') {
-            refreshPage(clusterSelected, sortSelected);
+          refreshPage(clusterSelected, sortSelected);
         }
       });
     });
 
-    $.each(sortButtons, function(i, button) {
-      $("#" + button).click(function() {
-          sortSelected = '#' + (this).id;
-          $(sortSelected)[0].setAttribute("checked", "checked")
-          if (clusterSelected !== '') {
-              refreshPage(clusterSelected, sortSelected);
-          }
-        });
+    $.each(sortButtons, function (i, button) {
+      $("#" + button).click(function () {
+        sortSelected = '#' + (this).id;
+        $(sortSelected)[0].setAttribute("checked", "checked")
+        if (clusterSelected !== '') {
+          refreshPage(clusterSelected, sortSelected);
+        }
+      });
     });
   }
 
@@ -58,11 +58,11 @@ var indexClusterJx = (function(){
 
   function refreshPage(clusterSelected, sortSelected) {
     var cluster = clusterSelected.replace('#', '')
-                                 .replace('cluster', '')
-                                 .toLowerCase();
+      .replace('cluster', '')
+      .toLowerCase();
     var sort = sortSelected.replace('#', '')
-                           .replace('sort', '')
-                           .toLowerCase();
+      .replace('sort', '')
+      .toLowerCase();
     var filter_var = $('#searchbar').val();
     var loc = '/cluster?group_by=' + cluster + '&sort_by=' + sort;
     if (sort === "alpha") {
