@@ -21,17 +21,21 @@ def set_up_indexing_timers(app):
 
     if app.check_thread_support(check_index=True, check_repositories=app.config['INDEXING_UPDATES_REPOSITORIES']):
         if os.environ['KNOWLEDGE_REPO_MASTER_UUID'] != app.uuid:
-            logger.info(f'Not spawning index-sync timers for non-master application instance: {app.uuid}')
+            logger.info(
+                f'Not spawning index-sync timers for non-master application instance: {app.uuid}')
             return
 
-        logger.info(f'Spawning index-sync timers for master application instance: {app.uuid}')
+        logger.info(
+            f'Spawning index-sync timers for master application instance: {app.uuid}')
 
         def index_watchdog(app):
             while True:
                 if not hasattr(app, 'sync_thread') or not app.sync_thread.is_alive():
-                    logger.warning("Master indexing thread has died. Restarting...")
+                    logger.warning(
+                        "Master indexing thread has died. Restarting...")
                     with app.app_context():
-                        app.sync_thread = multiprocessing.Process(target=index_sync_loop, args=(app,))
+                        app.sync_thread = multiprocessing.Process(
+                            target=index_sync_loop, args=(app,))
                         app.sync_thread.start()
                 time.sleep(app.config['INDEXING_TIMEOUT'])
 
@@ -42,7 +46,8 @@ def set_up_indexing_timers(app):
                     update_index(check_timeouts=False)
                 time.sleep(app.config['INDEXING_INTERVAL'])
 
-        app.index_watchdog = multiprocessing.Process(target=index_watchdog, args=(app,))
+        app.index_watchdog = multiprocessing.Process(
+            target=index_watchdog, args=(app,))
         app.index_watchdog.start()
     else:
         @app.before_request
@@ -57,9 +62,11 @@ def acquire_index_lock():
             db_session.commit()
             if (
                 IndexMetadata.get('lock', 'index_master') == current_app.uuid or
-                time_since(IndexMetadata.get_last_update('lock', 'index_master'), default=current_app.config["INDEXING_TIMEOUT"] + 1) > current_app.config["INDEXING_TIMEOUT"]
+                time_since(IndexMetadata.get_last_update('lock', 'index_master'),
+                           default=current_app.config["INDEXING_TIMEOUT"] + 1) > current_app.config["INDEXING_TIMEOUT"]
             ):
-                IndexMetadata.set('lock', 'index_master', current_app.uuid)  # Update/set lock and update timestamp
+                # Update/set lock and update timestamp
+                IndexMetadata.set('lock', 'index_master', current_app.uuid)
                 return True
         finally:
             IndexMetadata.set('lock', 'master_check', None)
@@ -68,7 +75,8 @@ def acquire_index_lock():
 
 
 def is_indexing():
-    timeout = current_app.config["INDEXING_TIMEOUT"]  # Default index timeout to 10 minutes (after which indexing will be permitted to run again)
+    # Default index timeout to 10 minutes (after which indexing will be permitted to run again)
+    timeout = current_app.config["INDEXING_TIMEOUT"]
     last_update = time_since_index()
     return IndexMetadata.get('lock', 'index', UNLOCKED) == LOCKED and last_update is not None and (last_update < timeout)
 
@@ -156,12 +164,14 @@ def update_index(check_timeouts=True, force=False, reindex=False):
             # If UUID has changed, check if we can find it elsewhere in the repository, and if so update index path
             if post.uuid and ((post.path not in kr_dir) or (post.uuid != kr_dir[post.path].uuid)):
                 if post.uuid in kr_uuids:
-                    logger.info(f'Updating location of post: {post.path} -> {kr_uuids[post.uuid].path}')
+                    logger.info(
+                        f'Updating location of post: {post.path} -> {kr_uuids[post.uuid].path}')
                     post.path = kr_uuids[post.uuid].path
 
             # If path of post no longer in directory, mark as unpublished
             if post.path not in kr_dir:
-                logger.info(f'Recording unpublished status for post at {post.path}')
+                logger.info(
+                    f'Recording unpublished status for post at {post.path}')
                 post.status = current_repo.PostStatus.UNPUBLISHED
                 continue
 
@@ -176,7 +186,8 @@ def update_index(check_timeouts=True, force=False, reindex=False):
                     logger.info(f'Recording update to post at: {kp.path}')
                     post.update_metadata_from_kp(kp)
                 else:
-                    logger.warning(f'Update to post at "{kp.path}" is corrupt.')
+                    logger.warning(
+                        f'Update to post at "{kp.path}" is corrupt.')
 
         # Add the new posts that remain in kr_dir
         for kp_path, kp in kr_dir.items():
