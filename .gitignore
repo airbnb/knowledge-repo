@@ -99,7 +99,8 @@ ENV/
 /.ropeproject
 
 # Visual Studio Code
-.vscode/*
+# Save the recommended settings
+# .vscode/*
 
 *.iml
 **/.idea
