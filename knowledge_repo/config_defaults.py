@@ -5,8 +5,8 @@ import re
 
 # A function called to see whether a specified path is permitted in the
 # repository. Only enforced when creating/modifying posts. It should return
-# the path as a standard unix path (virtual folders separated by '/' and the
-# final node should end in '.kp'). It should raise an exception if the
+# the path as a standard unix path (virtual folders separated by '/' and
+# the final node should end in '.kp'). It should raise an exception if the
 # provided path is is not permitted in the knowledge repository. A default
 # implementation is provided using `path_patterns`, which can be provided
 # more readily in a YAML configuration file.
@@ -17,8 +17,8 @@ def path_parse(repo, path):
         if re.match(pattern, path):
             return path
     raise ValueError(
-        f"Provided path '{path}' does not match any of the" +
-        " following patterns:\n" +
+        f"Provided path '{path}' does not match any of " +
+        "the following patterns:\n" +
         '\n'.join(f"'{pattern}': {desc}" for pattern,
                   desc in repo.config.path_patterns.items())
     )
