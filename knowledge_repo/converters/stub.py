@@ -9,7 +9,8 @@ class StubConverter(KnowledgePostConverter):
 
     @property
     def dependencies(self):
-        # Dependencies required for this converter on top of core knowledge-repo dependencies
+        # Dependencies required for this converter on top of
+        # core knowledge-repo dependencies
         return []
 
     def from_file(self, filename, **opts):
