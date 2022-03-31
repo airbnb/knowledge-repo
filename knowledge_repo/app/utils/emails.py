@@ -35,13 +35,16 @@ def subscription_email_recipients(post, tag):
 
     users_rcvd_emails = [e.user_id for e in emails_sent]
     new_email_recipient_ids = [
-        user_id for user_id in subscriber_ids if user_id not in users_rcvd_emails]
+        user_id for user_id in subscriber_ids
+        if user_id not in users_rcvd_emails]
 
     if not new_email_recipient_ids:
         return []
     new_email_recipients = (db_session.query(User)
-                                      .filter(User.id.in_(new_email_recipient_ids))
-                                      .all())
+                                      .filter(User.id.in_(
+                                          new_email_recipient_ids
+                                      ))
+                            .all())
     return new_email_recipients
 
 
@@ -50,7 +53,8 @@ def send_subscription_emails(post):
         with that tag was published to the repo
     """
     if 'mail' not in current_app.config:
-        logger.warning('Mail subsystem is not configured. Silently dropping email.')
+        logger.warning(
+            'Mail subsystem is not configured. Silently dropping email.')
         return
 
     # if this post is tagged as private - send no emails
@@ -81,7 +85,8 @@ def send_subscription_email(post, tag):
     if not recipient_users:
         return
 
-    recipients_bcc = [usernames_to_emails([user.identifier])[0] for user in recipient_users]
+    recipients_bcc = [usernames_to_emails([user.identifier])[
+        0] for user in recipient_users]
 
     if not recipients_bcc:
         return
@@ -90,7 +95,8 @@ def send_subscription_email(post, tag):
     subject = f'New knowledge post: {post.title}'
     post_authors = [p.format_name for p in post.authors]
     post_tags = [t.name for t in post.tags]
-    msg = Message(subject=subject, recipients=default_recipients, bcc=recipients_bcc)
+    msg = Message(subject=subject, recipients=default_recipients,
+                  bcc=recipients_bcc)
 
     # Extract bytes from post thumbnail or fallback to the default one
     thumb_bytes = None

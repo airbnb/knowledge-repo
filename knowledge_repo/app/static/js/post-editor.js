@@ -1,48 +1,48 @@
-var postEditorJx = (function() {
+var postEditorJx = (function () {
 
     function urlExists(url) {
         var http = new XMLHttpRequest();
         http.open('HEAD', url, false);
         try {
             http.send();
-        } catch(err) {
+        } catch (err) {
             console.log(err)
         }
-            return http.status !== 404;
+        return http.status !== 404;
     }
 
 
     function parseDate(ds, errorName) {
-      var parsedDate = ds.split("-");
-      var errorMessage = errorName  + " is not in the right format. \
+        var parsedDate = ds.split("-");
+        var errorMessage = errorName + " is not in the right format. \
                           Make sure it's YYYY-mm-dd! Your post was not saved, please try again";
-      if (parsedDate.length !== 3) {
-        alert(errorMessage);
-        return false;
-      }
-      var year = parsedDate[0].trim();
-      var month = parsedDate[1].trim();
-      var day = parsedDate[2].trim();
-      if (year.length !== 4) {
-        alert(errorMessage);
-        return false;
-      }
+        if (parsedDate.length !== 3) {
+            alert(errorMessage);
+            return false;
+        }
+        var year = parsedDate[0].trim();
+        var month = parsedDate[1].trim();
+        var day = parsedDate[2].trim();
+        if (year.length !== 4) {
+            alert(errorMessage);
+            return false;
+        }
 
-      if (parseInt(month) <= 0 || parseInt(month) >= 13) {
-        alert(errorMessage);
-        return false;
-      }
+        if (parseInt(month) <= 0 || parseInt(month) >= 13) {
+            alert(errorMessage);
+            return false;
+        }
 
-      if (parseInt(day) <= 0 || parseInt(day) >= 32) {
-        alert(errorMessage);
-        return false;
-      }
+        if (parseInt(day) <= 0 || parseInt(day) >= 32) {
+            alert(errorMessage);
+            return false;
+        }
 
-      return true;
+        return true;
     }
 
 
-    function validatePost(typeahead_post_info, status){
+    function validatePost(typeahead_post_info, status) {
         var saveButton = $("#btn_save")[0];
         saveButton.setAttribute("class", "btn btn-large btn-primary");
         var error = false;
@@ -59,14 +59,14 @@ var postEditorJx = (function() {
         var feedImage = $("#post_image_feed")[0].value;
 
         if (title === '' || project === '' || tags === [] ||
-            tldr === '' || author === '' || markdown === ''){
-                alert("One of the fields was left empty! Your post was not saved, please try again");
-                error = true;
+            tldr === '' || author === '' || markdown === '') {
+            alert("One of the fields was left empty! Your post was not saved, please try again");
+            error = true;
         } else {
             // check to make sure the user didn't create another project
             if (typeahead_post_info.indexOf(project) === -1 && is_editor === 0) {
                 error_message = "Please do not create another project, use an existing one.\n" +
-                                "Your post was not saved, please try again. ";
+                    "Your post was not saved, please try again. ";
                 alert(error_message);
                 error = true;
             }
@@ -83,7 +83,7 @@ var postEditorJx = (function() {
         }
 
         // check the tags of the post
-        $.each(tags, function(i, tag) {
+        $.each(tags, function (i, tag) {
             tag = tag.trim();
             if (tag[0] !== '#') {
                 alert("The tag: " + tag + " needs a pound sign in front of it. Your post was not saved, please try again.");
@@ -102,7 +102,7 @@ var postEditorJx = (function() {
         // Check the dates
         checkCreatedAt = parseDate(createdAt, "Created_At");
         checkUpdatedAt = parseDate(updatedAt, "Updated_At");
-        if (!checkCreatedAt || !checkUpdatedAt){
+        if (!checkCreatedAt || !checkUpdatedAt) {
             error = true;
         }
 
@@ -125,7 +125,7 @@ var postEditorJx = (function() {
             'error': error
         }
 
- }
+    }
 
 
     return {

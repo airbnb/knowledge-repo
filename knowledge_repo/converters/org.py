@@ -20,7 +20,8 @@ class OrgConverter(KnowledgePostConverter):
     '''
     Converts .org documents to the markdown syntax needed for a knowledge repo.
 
-    Uses the .org metadata standard syntax to populate the metadata YAML required by the knowledge repo.
+    Uses the .org metadata standard syntax to populate the metadata YAML
+    required by the knowledge repo.
     (e.g. #+TITLE: the title becomes - title: the title)
 
     Metadata required fields equivalency:
@@ -35,7 +36,8 @@ class OrgConverter(KnowledgePostConverter):
 
     The names are the same as the YAML header
 
-    Note that in orgmode, the convention for designating many authors is to separate them using commas like so:
+    Note that in orgmode, the convention for designating many authors is to
+     separate them using commas like so:
     #+AUTHOR: author 1, author 2
     This convention was kept for every list element, so that
     #+KR_TAGS: tag1, tag2
@@ -43,7 +45,8 @@ class OrgConverter(KnowledgePostConverter):
     '''
     _registry_keys = [ORG]
 
-    # This dicts will help in converting org metadata (#+TITLE: {}) to yaml metadata (title: {})
+    # This dicts will help in converting org metadata (#+TITLE: {})
+    # to yaml metadata (title: {})
     metadata_required_fields = {
         "title": {
             "type": "string",
@@ -87,7 +90,8 @@ class OrgConverter(KnowledgePostConverter):
 
     @property
     def dependencies(self):
-        # Dependencies required for this converter on top of core knowledge-repo dependencies
+        # Dependencies required for this converter on top of
+        # core knowledge-repo dependencies
         return []
 
     def from_file(self, filename, **opts):
@@ -153,7 +157,8 @@ class OrgConverter(KnowledgePostConverter):
 
     def convert_text(self, line):
         '''
-        Translates a single line of 'regular' text from orgmode syntax to markdown syntax
+        Translates a single line of 'regular' text from orgmode syntax
+        to markdown syntax
         '''
 
         new_line = line
@@ -217,7 +222,8 @@ class OrgConverter(KnowledgePostConverter):
             groups = match.groupdict()
             found = string[match.start():match.end()]
 
-            new_string = new_string.replace(found, replace_fmt.format(**groups))
+            new_string = new_string.replace(
+                found, replace_fmt.format(**groups))
 
         return new_string
 
@@ -264,7 +270,8 @@ class OrgConverter(KnowledgePostConverter):
 
     def convert_code(self, line):
         '''
-        Translates a single line of a code block in orgmode syntax to markdown syntax.
+        Translates a single line of a code block in orgmode syntax to markdown
+        syntax.
         '''
         if "#+begin_src" in line.lower():
             new_line = "```"
@@ -283,7 +290,8 @@ class OrgConverter(KnowledgePostConverter):
 
     def convert_example(self, line):
         '''
-        Translates a single line of an 'example' block in orgmode syntax to markdown syntax
+        Translates a single line of an 'example' block in orgmode syntax
+        to markdown syntax
         '''
         if "#+begin_example" in line.lower() or "#+end_example" in line.lower() or "#+results" in line.lower():
             return None

@@ -1,4 +1,4 @@
-var markdownJx = (function(){
+var markdownJx = (function () {
 
   function escapeEquationBlocks(text, sep) {
     // input: string of markdown and/or latex
@@ -32,30 +32,30 @@ var markdownJx = (function(){
     var postContent = {};
     postContent.content = markdownString;
     $.ajax({
-        type: "POST",
-        dataType: "json",
-        data: JSON.stringify(postContent),
-        contentType: "application/json",
-        url: '/draft?draft={{ draft_id }}',
-        async: true,
-        success: function(response_data) {
-          var draftId = response_data['draft_id'];
-          if (mode === 'preview') {
-            window.location = "/preview?draft=" + draftId;
-          }
-          else {
-            window.location = "/editor?draft=" + draftId;
-          }
-        },
-        error: function(response_data) {
-          console.log("ERROR");
-          console.log(JSON.stringify(response_data));
-          alert("Your draft wasn't saved!");
+      type: "POST",
+      dataType: "json",
+      data: JSON.stringify(postContent),
+      contentType: "application/json",
+      url: '/draft?draft={{ draft_id }}',
+      async: true,
+      success: function (response_data) {
+        var draftId = response_data['draft_id'];
+        if (mode === 'preview') {
+          window.location = "/preview?draft=" + draftId;
         }
+        else {
+          window.location = "/editor?draft=" + draftId;
+        }
+      },
+      error: function (response_data) {
+        console.log("ERROR");
+        console.log(JSON.stringify(response_data));
+        alert("Your draft wasn't saved!");
+      }
     });
   }
 
-function refreshRenderedMarkdown() {
+  function refreshRenderedMarkdown() {
     var markdownString = $('#markdown-text').val();
 
     //escape underscores in equations
@@ -84,16 +84,16 @@ function refreshRenderedMarkdown() {
       if (err) throw err;
       //make sure images are not larger than the page
       content = content.split('<img ')
-                       .join('<img style="max-width:100%"');
+        .join('<img style="max-width:100%"');
       //make tables look prettier:
       content = content.split('<table>')
-                       .join('<table class="table table-striped table-condensed table-bordered">');
+        .join('<table class="table table-striped table-condensed table-bordered">');
       content = content.split('<table class="dataframe">')
-                       .join('<table class="table table-striped table-condensed table-bordered">');
+        .join('<table class="table table-striped table-condensed table-bordered">');
       $('#rendered-markdown').html(content);
     });
     try {
-      MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+      MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
     }
     catch (e) {
       console.log(e);
@@ -101,18 +101,18 @@ function refreshRenderedMarkdown() {
   }
 
   var timeout = null;
-  $("#markdown-text").on("input",function(e){
-    if($(this).data("lastval")!== $(this).val()){
-      $(this).data("lastval",$(this).val());
+  $("#markdown-text").on("input", function (e) {
+    if ($(this).data("lastval") !== $(this).val()) {
+      $(this).data("lastval", $(this).val());
 
-      $(this).height( 0 );
-      $(this).height( this.scrollHeight );
+      $(this).height(0);
+      $(this).height(this.scrollHeight);
 
       if (timeout !== null) {
         clearTimeout(timeout);
       }
       //if no new input is entered within 1 second, apply the filters
-      timeout = setTimeout(function() {
+      timeout = setTimeout(function () {
         refreshRenderedMarkdown();
       }, 500);
     }

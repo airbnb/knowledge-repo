@@ -15,10 +15,10 @@ class GDocConverter(DocxConverter):
 
     def _find_doc(self, path, after=None, max_attempts=60, delay=1):
         """
-        Look in the nominated path for a new "docx" document for a file modified
-        after `after`. If none are found, retry every `delay` seconds for at
-        most `max_attempts` attempts. If no documents are found, raise a
-        `RuntimeError`.
+        Look in the nominated path for a new "docx" document for a file
+        modified after `after`. If none are found, retry every `delay`
+        seconds for at most `max_attempts` attempts. If no documents are
+        found, raise a `RuntimeError`.
         """
         count = 0
         while count < max_attempts:
@@ -54,7 +54,8 @@ class GDocConverter(DocxConverter):
         raise RuntimeError(f"Cannot find 'docx' document in {path}.")
 
     def from_file(self, url, download_path=None, **opts):
-        m = re.match('https://docs.google.com/document/d/(?P<doc_id>[^/]+)/', url)
+        m = re.match(
+            'https://docs.google.com/document/d/(?P<doc_id>[^/]+)/', url)
 
         if not m:
             raise ValueError("Invalid Google Docs url.")
@@ -68,7 +69,8 @@ class GDocConverter(DocxConverter):
         time.sleep(2)
 
         download_path = download_path or os.path.expanduser('~/Downloads')
-        logger.info(f"Looking for downloaded Google Docs file in '{download_path}'...")
+        logger.info(
+            f"Looking for downloaded Google Docs file in '{download_path}'...")
         filename = self._find_doc(download_path, after=time_start)
 
         DocxConverter.from_file(self, filename, **opts)
@@ -77,5 +79,6 @@ class GDocConverter(DocxConverter):
         if 'title' in headers and headers['title'].startswith('[]'):
             headers['title'] = re.sub(r'\[\]\{[^\}]+\}', '', headers['title'])
         if 'subtitle' in headers and headers['subtitle'].startswith('[]'):
-            headers['subtitle'] = re.sub(r'\[\]\{[^\}]+\}', '', headers['subtitle'])
+            headers['subtitle'] = re.sub(
+                r'\[\]\{[^\}]+\}', '', headers['subtitle'])
         self.kp.update_headers(**headers)

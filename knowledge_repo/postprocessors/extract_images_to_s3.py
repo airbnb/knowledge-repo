@@ -18,8 +18,8 @@ class ExtractImagesToS3(ExtractImages):
     reduce the size of repositories. It replaces local images with remote urls
     based on `http_image_root`.
 
-    `s3_image_root` should be the root of the image folder on an S3 remote, such
-    as "s3://my_bucket/images".
+    `s3_image_root` should be the root of the image folder on an S3 remote,
+    such as "s3://my_bucket/images".
     `http_image_root` should be the root of the server where the images will be
     accessible after uploading.
 
@@ -45,7 +45,8 @@ class ExtractImagesToS3(ExtractImages):
             img_ext = posixpath.splitext(img_path)[1]
 
             # Make random filename for image
-            random_string = ''.join(random.choice(string.ascii_lowercase) for i in range(6))
+            random_string = ''.join(random.choice(
+                string.ascii_lowercase) for i in range(6))
             fname_img = '{repo_name}_{time}_{random_string}{ext}'.format(
                 repo_name=repo_name,
                 time=int(round(time.time() * 100)),
@@ -54,7 +55,8 @@ class ExtractImagesToS3(ExtractImages):
 
             # Copy image to accessible folder on S3
             fname_s3 = posixpath.join(self.s3_image_root, repo_name, fname_img)
-            # Note: The following command may need to be prefixed with a login agent;
+            # Note: The following command may need to be prefixed with a
+            # login agent;
             # for example, to handle multi-factor authentication.
             cmd = f"aws s3 cp '{tmp_path}' {fname_s3}"
             logger.info(f'Uploading images to S3: {cmd}')

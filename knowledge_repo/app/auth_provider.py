@@ -21,14 +21,21 @@ class KnowledgeAuthProvider(object, metaclass=SubclassRegisteringABCMeta):
         app.auth_providers = []
         for provider in app.config.get('AUTH_PROVIDERS', [DEBUG, OAUTH]):
             if not isinstance(provider, KnowledgeAuthProvider):
-                provider = cls._get_subclass_for(provider.lower())(name=provider, app=app)
-            app.register_blueprint(provider.blueprint, url_prefix='/'.join((prefix, provider.name)))
+                provider = cls._get_subclass_for(
+                    provider.lower())(name=provider, app=app)
+            app.register_blueprint(
+                provider.blueprint,
+                url_prefix='/'.join((prefix, provider.name)))
             app.auth_providers.append(provider)
 
     def __init__(self, name, app=None, **kwargs):
         self.name = name
         self.app = app
-        self.blueprint = Blueprint('auth_provider_' + self.name, __name__, template_folder='../templates')
+        self.blueprint = Blueprint(
+            'auth_provider_' + self.name,
+            __name__,
+            template_folder='../templates'
+        )
         self.prepare_blueprint(self.blueprint)
         self.init(**kwargs)
 
@@ -37,7 +44,8 @@ class KnowledgeAuthProvider(object, metaclass=SubclassRegisteringABCMeta):
 
     def prepare_blueprint(self, blueprint):
         blueprint.add_url_rule('/', view_func=self.prompt, methods=['GET'])
-        blueprint.add_url_rule('/authorize', view_func=self.authorize, methods=['GET', 'POST'])
+        blueprint.add_url_rule(
+            '/authorize', view_func=self.authorize, methods=['GET', 'POST'])
         return blueprint
 
     @property

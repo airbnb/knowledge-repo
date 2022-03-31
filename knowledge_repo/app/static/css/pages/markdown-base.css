@@ -27,27 +27,27 @@
 .renderedMarkdown h4,
 .renderedMarkdown h5,
 .renderedMarkdown h6 {
-  color: black;
-  margin-top: 1.5em;
-  margin-bottom: 0.5em;
-  font-weight: bold;
+    color: black;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-weight: bold;
 }
 
 .renderedMarkdown span.title:nth-of-type(1) {
-  margin-top: 1em;
-  text-align: center;
-  display: block;
-  font-size: 2.2em;
-  margin-top: .67em;
-  margin-bottom: .3em;
+    margin-top: 1em;
+    text-align: center;
+    display: block;
+    font-size: 2.2em;
+    margin-top: .67em;
+    margin-bottom: .3em;
 }
 
 .renderedMarkdown span.subtitle {
-  text-align: center;
-  display: block;
-  font-size: 1.5em;
-  font-style: italic;
-  margin-bottom: .3em;
+    text-align: center;
+    display: block;
+    font-size: 1.5em;
+    font-style: italic;
+    margin-bottom: .3em;
 }
 
 .renderedMarkdown h1 {
@@ -122,18 +122,24 @@
     padding: 2px;
     border-collapse: separate;
 }
+
 .renderedMarkdown thead th {
     border-left: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
 }
+
 .renderedMarkdown thead th:first-child {
     border-left: none;
 }
-.renderedMarkdown thead > tr:last-child > th {
+
+.renderedMarkdown thead>tr:last-child>th {
     border-bottom: 1px solid #aaa;
     vertical-align: bottom;
 }
-.renderedMarkdown tr, th, td {
+
+.renderedMarkdown tr,
+th,
+td {
     text-align: center;
     vertical-align: middle;
     padding: 0.5em 0.5em;
@@ -142,34 +148,44 @@
     max-width: none;
     border: none;
 }
+
 .renderedMarkdown th {
     font-weight: bold;
     text-align: right;
 }
+
 .renderedMarkdown thead th {
     text-align: center;
 }
+
 .renderedMarkdown tr th {
-    background: rgba(255,255,255,0.5);
+    background: rgba(255, 255, 255, 0.5);
 }
-.renderedMarkdown tr > td:first-child:empty {
+
+.renderedMarkdown tr>td:first-child:empty {
     background: #fff;
 }
-.renderedMarkdown tr > td:first-child:empty + th {
+
+.renderedMarkdown tr>td:first-child:empty+th {
     border-left: 1px solid #aaa;
 }
-.renderedMarkdown tr > th + td {
+
+.renderedMarkdown tr>th+td {
     border-left: 1px solid #aaa;
 }
-.renderedMarkdown tr > td + th {
+
+.renderedMarkdown tr>td+th {
     border-left: 1px solid #000;
 }
+
 .renderedMarkdown tbody tr:nth-child(odd) {
     background: #f5f5f5;
 }
+
 .renderedMarkdown tbody tr:hover {
     background: rgba(66, 165, 245, 0.2);
 }
+
 /* Footnotes for tables generated from other sources via pandoc are in a .footnotes div */
 .renderedMarkdown .footnotes {
     background: #eee;
@@ -178,6 +194,7 @@
     margin-top: -1em;
     padding: 0.5em;
 }
+
 .renderedMarkdown .footnotes hr {
     display: none;
 }
@@ -187,74 +204,79 @@
 }
 
 .renderedMarkdown .codehilite {
-  margin-top: 25px;
-  margin-bottom: 25px;
+    margin-top: 25px;
+    margin-bottom: 25px;
 }
 
 .renderedMarkdown .code-output {
-  background: #fafafa;
-  padding: 15px;
-  overflow: auto;
-  border-left: solid #6BD2CA 10px;
+    background: #fafafa;
+    padding: 15px;
+    overflow: auto;
+    border-left: solid #6BD2CA 10px;
 }
 
-.renderedMarkdown .codehilite + .code-output  {
-  margin-top: -1em;
-  margin-left: -1.5em;
-  margin-right: -1.5em;
-  font-family: monospace;
+.renderedMarkdown .codehilite+.code-output {
+    margin-top: -1em;
+    margin-left: -1.5em;
+    margin-right: -1.5em;
+    font-family: monospace;
 }
 
 .renderedMarkdown .pre {
-  white-space: pre;
+    white-space: pre;
 }
 
 
 /* Code highlighting */
-.codetoggle, .codetoggleall {
-  background-color: #ccc;
-  color: #FFFFFF;
-  width: 6em;
-  padding: 3px;
-  text-align: center;
-  font-family: sans-serif;
-  border-top-right-radius: 4px;
-  border-bottom-left-radius: 4px;
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+.codetoggle,
+.codetoggleall {
+    background-color: #ccc;
+    color: #FFFFFF;
+    width: 6em;
+    padding: 3px;
+    text-align: center;
+    font-family: sans-serif;
+    border-top-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .codetoggleall {
-  width: 140px;
-  border-top-right-radius: 0px;
-  border-radius: 8px;
-  top: -35px;
-  z-index: 3;
+    width: 140px;
+    border-top-right-radius: 0px;
+    border-radius: 8px;
+    top: -35px;
+    z-index: 3;
 }
 
-.codetoggle:hover, .codetoggleall:hover {
-  background-color: #00a699;
-  color: #fff;
+.codetoggle:hover,
+.codetoggleall:hover {
+    background-color: #00a699;
+    color: #fff;
     cursor: pointer;
-  opacity: 1;
-  transition: background-color 0.2s;
+    opacity: 1;
+    transition: background-color 0.2s;
 }
 
-.codetoggle:active, .codetoggleall:active {
-  background: #edd114;
+.codetoggle:active,
+.codetoggleall:active {
+    background: #edd114;
 }
 
 @media (max-width: 992px) {
-    .codetoggle, .codetoggleall {
-        display:none;
+
+    .codetoggle,
+    .codetoggleall {
+        display: none;
     }
 }
 
-.renderedMarkdown ul > li > p {
-  margin-left: 0;
+.renderedMarkdown ul>li>p {
+    margin-left: 0;
 }
 
 .renderedMarkdown .codehilite {
@@ -272,8 +294,8 @@
 }
 
 .renderedMarkdown .stats .style {
-  right: 4px;
-  padding: 9px;
+    right: 4px;
+    padding: 9px;
 }
 
 .renderedMarkdown .codehilite .codetoggle {
@@ -306,6 +328,7 @@
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
 }
+
 .renderedMarkdown .footnote hr {
     display: none;
 }
@@ -320,7 +343,7 @@
 }
 
 .btn-default:hover {
-  order-color: #d8d8d8;
+    order-color: #d8d8d8;
 }
 
 .side-panel .btn-download:hover {
@@ -334,16 +357,16 @@
     list-style-type: decimal;
 }
 
-.side-panel .toc ul.nav > li {
+.side-panel .toc ul.nav>li {
     display: list-item;
     margin-left: 1.5em;
     font-weight: normal;
 }
 
-.side-panel .toc ul.nav > li > a {
+.side-panel .toc ul.nav>li>a {
     padding: 3px;
 }
 
-.side-panel .toc ul.nav > li.active {
+.side-panel .toc ul.nav>li.active {
     font-weight: bold;
 }

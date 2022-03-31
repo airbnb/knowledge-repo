@@ -112,19 +112,25 @@ class IndentsAsCellOutputProcessor(BlockProcessor):
             # new code blocks, append this block to the previous, adding back
             # linebreaks removed from the split into a list.
 
-            block_is_html = block_is_html and not isinstance(sibling.text, AtomicString)
+            block_is_html = block_is_html and not isinstance(
+                sibling.text, AtomicString)
 
             block = u'\n'.join([sibling.text, block])
             output = sibling
         else:
             # This is a new codeblock. Create the elements and insert text.
-            output = markdown.util.etree.SubElement(parent, 'div', {'class': 'code-output'})
+            output = markdown.util.etree.SubElement(
+                parent, 'div', {'class': 'code-output'})
 
-        # If not HTML, add the `pre` class so that we know to render output as raw text
-        if not block_is_html and 'pre' not in output.get('class', 'code-output'):
+        # If not HTML, add the `pre` class
+        # so that we know to render output as raw text
+        if not block_is_html and 'pre' not in output.get(
+            'class', 'code-output'
+        ):
             output.set('class', ' '.join([output.get('class', ''), 'pre']))
 
-        output.text = f'{block}\n' if block_is_html else AtomicString(f'{block}\n')
+        output.text = f'{block}\n' if block_is_html else AtomicString(
+            f'{block}\n')
 
         if theRest:
             # This block contained unindented line(s) after the first indented
@@ -139,7 +145,8 @@ class IndentsAsCellOutput(Extension):
         md.preprocessors.add("code_isolation",
                              IndentsAsCellOutputPreprocessor(md),
                              "<html_block")
-        md.parser.blockprocessors['code'] = IndentsAsCellOutputProcessor(md.parser)
+        md.parser.blockprocessors['code'] = IndentsAsCellOutputProcessor(
+            md.parser)
 
 
 class KnowledgeMetaPreprocessor(Preprocessor):
@@ -169,11 +176,13 @@ class KnowledgeMetaExtension(Extension):
 class MathJaxPattern(markdown.inlinepatterns.Pattern):
 
     def __init__(self):
-        markdown.inlinepatterns.Pattern.__init__(self, r'(?<!\\)(\$\$?)(.+?)\2')
+        markdown.inlinepatterns.Pattern.__init__(
+            self, r'(?<!\\)(\$\$?)(.+?)\2')
 
     def handleMatch(self, m):
         node = markdown.util.etree.Element('mathjax')
-        node.text = markdown.util.AtomicString(m.group(2) + m.group(3) + m.group(2))
+        node.text = markdown.util.AtomicString(
+            m.group(2) + m.group(3) + m.group(2))
         return node
 
 
@@ -192,7 +201,10 @@ class HTMLConverter(KnowledgePostConverter):
     def init(self):
         self.kp_images = self.kp.read_images()
 
-    def _render_markdown(self, skip_headers=False, images_base64_encode=True, urlmappers=[]):
+    def _render_markdown(self,
+                         skip_headers=False,
+                         images_base64_encode=True,
+                         urlmappers=[]):
         """
         Returns the `Markdown` instance as well as the rendered html output
         as a tuple: (`Markdown`, str).
@@ -218,7 +230,10 @@ class HTMLConverter(KnowledgePostConverter):
 
         return md, html
 
-    def to_string(self, skip_headers=False, images_base64_encode=True, urlmappers=[]):
+    def to_string(self,
+                  skip_headers=False,
+                  images_base64_encode=True,
+                  urlmappers=[]):
         """
         Renders the markdown as html
         """
