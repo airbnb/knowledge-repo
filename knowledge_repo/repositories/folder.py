@@ -101,7 +101,8 @@ class FolderKnowledgeRepository(KnowledgeRepository):
                         folders.remove(folder)
 
                 posts.update(
-                    os.path.join(os.path.relpath(path, start=self.path), folder)
+                    os.path.join(os.path.relpath(
+                        path, start=self.path), folder)
                     for folder in folders if folder.endswith('.kp')
                 )
                 posts.update(
@@ -202,7 +203,8 @@ class FolderKnowledgeRepository(KnowledgeRepository):
         raise NotImplementedError
 
     def _kp_new_revision(self, path, uuid=None):
-        self._kp_write_ref(path, 'REVISION', encode(self._kp_get_revision(path) + 1))
+        self._kp_write_ref(path, 'REVISION', encode(
+            self._kp_get_revision(path) + 1))
         if uuid:
             self._kp_write_ref(path, 'UUID', encode(uuid))
 

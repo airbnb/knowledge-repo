@@ -46,12 +46,15 @@ class DbKnowledgeRepository(KnowledgeRepository):
         metadata = MetaData()
         postref_table = Table(table_name, metadata,
                               Column('id', Integer, primary_key=True),
-                              Column('created_at', DateTime, default=func.now()),
-                              Column('updated_at', DateTime, default=func.now(), onupdate=func.current_timestamp()),
+                              Column('created_at', DateTime,
+                                     default=func.now()),
+                              Column('updated_at', DateTime, default=func.now(
+                              ), onupdate=func.current_timestamp()),
                               Column('uuid', String(512)),
                               Column('path', String(512)),
                               Column('revision', Integer, default=0),
-                              Column('status', Integer, default=self.PostStatus.DRAFT.value),
+                              Column('status', Integer,
+                                     default=self.PostStatus.DRAFT.value),
                               Column('ref', String(512)),
                               Column('data', LargeBinary))
         self.engine = create_engine(engine_uri, pool_recycle=3600)
@@ -99,8 +102,10 @@ class DbKnowledgeRepository(KnowledgeRepository):
     def _dir(self, prefix, statuses):
         query = self.session.query(self.PostRef.path)
         if prefix is not None:
-            query = query.filter(self.PostRef.status.like('{}%'.format(prefix)))
-        query = query.filter(self.PostRef.status.in_([status.value for status in statuses]))
+            query = query.filter(
+                self.PostRef.status.like('{}%'.format(prefix)))
+        query = query.filter(self.PostRef.status.in_(
+            [status.value for status in statuses]))
 
         for (prefix,) in query.distinct():
             if prefix is not None:
@@ -115,25 +120,33 @@ class DbKnowledgeRepository(KnowledgeRepository):
 
     def _submit(self, path):  # Submit a post for review
         # Latest revision for draft
-        revision = self._kp_get_revision(path, self.PostStatus.DRAFT, enforce_exists=True)
-        self.__set_post_status(path, status=self.PostStatus.SUBMITTED, revision=revision)
+        revision = self._kp_get_revision(
+            path, self.PostStatus.DRAFT, enforce_exists=True)
+        self.__set_post_status(
+            path, status=self.PostStatus.SUBMITTED, revision=revision)
 
     def _accept(self, path):  # Approve a post to publish
         # Latest revision for submitted draft
-        revision = self._kp_get_revision(path, self.PostStatus.SUBMITTED, enforce_exists=True)
+        revision = self._kp_get_revision(
+            path, self.PostStatus.SUBMITTED, enforce_exists=True)
         if self.__get_post_status(path, revision) != self.PostStatus.PUBLISHED:
-            self.__set_post_status(path, status=self.PostStatus.UNPUBLISHED, revision=revision)
+            self.__set_post_status(
+                path, status=self.PostStatus.UNPUBLISHED, revision=revision)
 
     def _publish(self, path):  # Publish a post for general perusal
         # Latest revision for unpublished
-        revision = self._kp_get_revision(path, self.PostStatus.UNPUBLISHED, enforce_exists=True)
+        revision = self._kp_get_revision(
+            path, self.PostStatus.UNPUBLISHED, enforce_exists=True)
         if self.__get_post_status(path, revision) == self.PostStatus.UNPUBLISHED:
-            self.__set_post_status(path, status=self.PostStatus.PUBLISHED, revision=revision)
+            self.__set_post_status(
+                path, status=self.PostStatus.PUBLISHED, revision=revision)
 
     def _unpublish(self, path):  # Unpublish a post
         # Latest revision for published post
-        revision = self._kp_get_revision(path, self.PostStatus.PUBLISHED, enforce_exists=True)
-        self.__set_post_status(path, status=self.PostStatus.UNPUBLISHED, revision=revision)
+        revision = self._kp_get_revision(
+            path, self.PostStatus.PUBLISHED, enforce_exists=True)
+        self.__set_post_status(
+            path, status=self.PostStatus.UNPUBLISHED, revision=revision)
 
     def _remove(self, path, all=False):
         raise NotImplementedError
@@ -153,12 +166,14 @@ class DbKnowledgeRepository(KnowledgeRepository):
                                  .filter(self.PostRef.path == path)
                                  .filter(self.PostRef.revision == revision)
                                  .distinct()).all()
-        return self.PostStatus(min([pr.status if pr.status else 0 for pr in post_refs]))  # return the most 'open' status
+        # return the most 'open' status
+        return self.PostStatus(min([pr.status if pr.status else 0 for pr in post_refs]))
 
     # ----------- Knowledge Post Data Retrieval/Pushing Methods --------------------
 
     def _kp_uuid(self, path):
-        result = self.session.query(self.PostRef.uuid).filter(self.PostRef.path == path).first()
+        result = self.session.query(self.PostRef.uuid).filter(
+            self.PostRef.path == path).first()
         if result:
             return result[0]
         return None
@@ -179,14 +194,16 @@ class DbKnowledgeRepository(KnowledgeRepository):
                                .filter(self.PostRef.revision == revision)).first()
 
         if not postref:
-            raise ValueError("No such post exists for path '{}' and revision '{}'.".format(path, revision))
+            raise ValueError(
+                "No such post exists for path '{}' and revision '{}'.".format(path, revision))
 
         if detailed:
             return self.__get_post_status(path, revision), None
         return self.__get_post_status(path, revision)
 
     def _kp_get_revision(self, path, status=None, enforce_exists=False):
-        query = self.session.query(self.PostRef.revision).filter(self.PostRef.path == path)
+        query = self.session.query(self.PostRef.revision).filter(
+            self.PostRef.path == path)
         if status is not None:
             query.filter(self.PostRef.status == status.value)
         revision = query.order_by(self.PostRef.revision.desc()).first()
@@ -195,7 +212,8 @@ class DbKnowledgeRepository(KnowledgeRepository):
         if revision:
             revision = revision[0]
         if enforce_exists and revision is None:
-            raise ValueError('No post found at {} (with status of {})'.format(path, status))
+            raise ValueError(
+                'No post found at {} (with status of {})'.format(path, status))
         return revision or 0
 
     def _kp_get_revisions(self, path):
@@ -236,7 +254,8 @@ class DbKnowledgeRepository(KnowledgeRepository):
         raise NotImplementedError
 
     def _kp_write_ref(self, path, reference, data, uuid=None, revision=None):
-        revision = revision or self._kp_get_revision(path, enforce_exists=False) or 0
+        revision = revision or self._kp_get_revision(
+            path, enforce_exists=False) or 0
 
         postref = (self.session.query(self.PostRef)
                                .filter(self.PostRef.path == path)

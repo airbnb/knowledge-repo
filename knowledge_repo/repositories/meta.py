@@ -9,18 +9,22 @@ class MetaKnowledgeRepository(KnowledgeRepository):
         pass
 
     def __repos_for_prefix(self, path_prefix=None):
-        repo_prefixes = sorted(self.uri.keys(), key=lambda x: len(x), reverse=True)
+        repo_prefixes = sorted(
+            self.uri.keys(), key=lambda x: len(x), reverse=True)
         for repo_prefix in repo_prefixes:
             if path_prefix is None or path_prefix.startswith(repo_prefix):
-                repo_prefix, repo, repo_path = self.__repo_for_path(path_prefix or repo_prefix)
+                repo_prefix, repo, repo_path = self.__repo_for_path(
+                    path_prefix or repo_prefix)
                 repo_path = None if not repo_path else repo_path
                 yield repo_prefix, repo, repo_path
 
     def __repo_for_path(self, path):
-        path_prefixes = sorted(self.uri.keys(), key=lambda x: len(x), reverse=True)
+        path_prefixes = sorted(
+            self.uri.keys(), key=lambda x: len(x), reverse=True)
         for prefix in path_prefixes:
             if path.startswith(prefix):
-                relpath = posixpath.relpath(path, prefix or '.') if path else ''
+                relpath = posixpath.relpath(
+                    path, prefix or '.') if path else ''
                 return prefix, self.uri[prefix], relpath if relpath != '.' else None
         raise ValueError(f"No KnowledgeRepository found for '{path}', "
                          f"paths must be prefixed with {path_prefixes}.")
