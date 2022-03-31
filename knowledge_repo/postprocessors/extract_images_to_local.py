@@ -15,14 +15,14 @@ logger = logging.getLogger(__name__)
 class ExtractImagesToLocalServer(ExtractImages):
     """
     This KnowledgePostProcessor subclass extracts images from posts to a local
-    directory. It is assumed that a local http server is then serving these images
-    from the local directory. It is designed to be used upon addition to a knowledge
-    repository, which can reduce the size of repositories. It replaces local images
-    with urls relative to `http_image_root` (the base url of the local http server).
-
-    `image_dir` should be the root of the image folder which is accessible locally.
-    `http_image_root` should be the root of the server where the images will be
-    accessible (e.g. 'http://localhost:8000').
+    directory. It is assumed that a local http server is then serving these
+    images from the local directory. It is designed to be used upon addition
+    to a knowledge repository, which can reduce the size of repositories. It
+    replaces local images with urls relative to `http_image_root` (the base
+    url of the local http server).
+    `image_dir` should be the root of the image folder which is accessible
+    locally. `http_image_root` should be the root of the server where the
+    images will be accessible (e.g. 'http://localhost:8000').
     """
 
     _registry_keys = ['extract_images_to_local']
