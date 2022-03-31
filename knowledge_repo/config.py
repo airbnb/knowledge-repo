@@ -68,7 +68,8 @@ class KnowledgeRepositoryConfig(dict):
                 if os.path.exists(value):
                     self.__defaults_from_file(value)
                 else:
-                    logger.warning(f'Configuration file {value} does not exist.')
+                    logger.warning(
+                        f'Configuration file {value} does not exist.')
             elif isinstance(value, type(None)):
                 pass
             else:
@@ -91,7 +92,8 @@ class KnowledgeRepositoryConfig(dict):
         if filename.endswith(PY_EXTENSION):
             time_str = str(time.time()).replace('.', '')
             module_name = f'knowledge_repo.config_{time_str}'
-            spec = importlib.util.spec_from_file_location(module_name, filename)
+            spec = importlib.util.spec_from_file_location(
+                module_name, filename)
             config = importlib.util.module_from_spec(spec)
             sys.modules[module_name] = module
             spec.loader.exec_module(module)

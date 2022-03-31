@@ -264,12 +264,14 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
 
         current_datetime = datetime.now()
         authors = kp.headers['authors']
-        new_authors = [self.config.username_parse(author) for author in authors]
+        new_authors = [self.config.username_parse(
+            author) for author in authors]
         if new_authors != authors or kp.headers['updated_at'] < current_datetime:
             kp.update_headers(authors=new_authors, updated_at=current_datetime)
 
         for postprocessor, postprocessor_kwargs in self.config.postprocessors:
-            KnowledgePostProcessor._get_subclass_for(postprocessor)(**postprocessor_kwargs).process(kp)
+            KnowledgePostProcessor._get_subclass_for(
+                postprocessor)(**postprocessor_kwargs).process(kp)
 
         cleanup_kwargs = self._add_prepare(kp, path, update, **kwargs)
 
@@ -345,7 +347,8 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
         assert all([not segment.endswith(KP_EXTENSION) for segment in path.split(
             '/')[:-1]]), "The post path may not contain a directory named '*.kp'."
         if path == '.' or path.startswith('..'):
-            raise ValueError(f"Provided path '{path}' is outside of the knowledge repository.")
+            raise ValueError(
+                f"Provided path '{path}' is outside of the knowledge repository.")
         if not path.endswith(KP_EXTENSION):
             path += KP_EXTENSION
         return path
@@ -395,14 +398,16 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
 
     def _kp_save(self, kp, path, update=False):
         if not update and self.has_post(path):
-            raise ValueError("A knowledge post with the same path already exists. To update it, set the update flag.")
+            raise ValueError(
+                "A knowledge post with the same path already exists. To update it, set the update flag.")
         kp.uuid = self._kp_uuid(path) or kp.uuid
         kp.path = path
         kp.revision = self._kp_new_revision(path, uuid=kp.uuid)
         kp.repository = self
 
         for ref in kp._dir():
-            self._kp_write_ref(path, ref, kp._read_ref(ref), uuid=kp.uuid, revision=kp.revision)
+            self._kp_write_ref(path, ref, kp._read_ref(
+                ref), uuid=kp.uuid, revision=kp.revision)
 
     @property
     def web_uri(self):
