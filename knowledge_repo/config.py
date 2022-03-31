@@ -35,8 +35,8 @@ class KnowledgeRepositoryConfig(dict):
         self[attr] = value
 
     def __dir__(self):
-        return list(set(list(self.DEFAULT_CONFIGURATION.keys())
-                        + list(self.keys())))
+        return list(set(
+            list(self.DEFAULT_CONFIGURATION.keys()) + list(self.keys())))
 
     def update(self, *values, **kwargs):
         for value in values:
