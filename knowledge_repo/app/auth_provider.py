@@ -24,7 +24,8 @@ class KnowledgeAuthProvider(object, metaclass=SubclassRegisteringABCMeta):
                 provider = cls._get_subclass_for(
                     provider.lower())(name=provider, app=app)
             app.register_blueprint(
-                provider.blueprint, url_prefix='/'.join((prefix, provider.name)))
+                provider.blueprint,
+                url_prefix='/'.join((prefix, provider.name)))
             app.auth_providers.append(provider)
 
     def __init__(self, name, app=None, **kwargs):
