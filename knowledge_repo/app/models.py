@@ -197,7 +197,10 @@ class PageView(db.Model):
                 version=__version__
             )
             errorlog = None
-            log.object_id, log.object_type, log.object_action, reextract_after_request = self.extract_objects(
+            log.object_id,
+            log.object_type,
+            log.object_action,
+            reextract_after_request = self.extract_objects(
                 *args, **kwargs)
             # Add log here to ensure pageviews are accurate
             db_session.add(log)
@@ -471,7 +474,9 @@ class Post(db.Model):
         excluded_tags = current_app.config.get('EXCLUDED_TAGS', [])
         return any([tag.name in excluded_tags for tag in self.tags])
 
-    _groups = db.relationship('Group', secondary=assoc_post_group, backref='posts',
+    _groups = db.relationship('Group',
+                              secondary=assoc_post_group,
+                              backref='posts',
                               lazy='subquery')
 
     @hybrid_property
@@ -524,7 +529,9 @@ class Post(db.Model):
 
     @is_published.expression
     def is_published(self):
-        return func.coalesce(self._status, 0) == current_repo.PostStatus.PUBLISHED.value
+        return func.coalesce(
+            self._status, 0
+        ) == current_repo.PostStatus.PUBLISHED.value
 
     _views = db.relationship('PageView', lazy='dynamic',
                              primaryjoin="and_(foreign(PageView.object_id)==Post.id, "
