@@ -35,7 +35,8 @@ class KnowledgeRepositoryConfig(dict):
         self[attr] = value
 
     def __dir__(self):
-        return list(set(list(self.DEFAULT_CONFIGURATION.keys()) + list(self.keys())))
+        return list(set(
+            list(self.DEFAULT_CONFIGURATION.keys()) + list(self.keys())))
 
     def update(self, *values, **kwargs):
         for value in values:
@@ -107,6 +108,7 @@ class KnowledgeRepositoryConfig(dict):
             if not key.startswith('_'):
                 if not force and key not in self.DEFAULT_CONFIGURATION:
                     logger.debug(
-                        f'Ignoring configuration key `{key}` which is not a valid configuration key.')
+                        f'Ignoring configuration key `{key}` '
+                        'which is not a valid configuration key.')
                 else:
                     d[key] = getattr(module, key)

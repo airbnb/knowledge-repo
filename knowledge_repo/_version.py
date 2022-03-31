@@ -1,28 +1,57 @@
 import os
 import subprocess
 
-__all__ = ['__author__', '__author_email__', '__version__', '__git_uri__', '__dependencies__', '__optional_dependencies__']
+__all__ = ['__author__', '__author_email__', '__version__',
+           '__git_uri__', '__dependencies__', '__optional_dependencies__']
 
-__author__ = "Erik Ritter (maintainer), Serena Jiang, John Bodley, Bill Ulammandakh, Naoya Kanai, Robert Chang, Dan Frank,  Chetan Sharma,  Matthew Wardrop"
-__author_email__ = "erik.ritter@airbnb.com, serena.jiang@airbnb.com, john.bodley@airbnb.com, bill.ulammandakh@airbnb.com, naoya.kanai@airbnb.com, robert.chang@airbnb.com, dan.frank@airbnb.com, chetan.sharma@airbnb.com, mpwardrop@gmail.com"
-__version__ = "0.9.0"
+__author__ = '''
+    Erik Ritter (maintainer),
+    Serena Jiang,
+    John Bodley,
+    Bill Ulammandakh,
+    Naoya Kanai,
+    Robert Chang,
+    Dan Frank,
+    Chetan Sharma,
+    Matthew Wardrop
+    '''
+
+__author_email__ = '''
+    erik.ritter@airbnb.com,
+    serena.jiang@airbnb.com,
+    john.bodley@airbnb.com,
+    bill.ulammandakh@airbnb.com,
+    naoya.kanai@airbnb.com,
+    robert.chang@airbnb.com,
+    dan.frank@airbnb.com,
+    chetan.sharma@airbnb.com,
+    mpwardrop@gmail.com
+    '''
+
+__version__ = '0.9.0'
+
 try:
     with open(os.devnull, 'w') as devnull:
-        __version__ += '_' + subprocess.check_output(['git', 'rev-parse', 'HEAD'], shell=False, stderr=devnull).decode('utf-8').replace('\n', '')
-except:
+        __version__ += '_' + subprocess.check_output(
+            ['git', 'rev-parse', 'HEAD'],
+            shell=False, stderr=devnull).decode('utf-8').replace('\n', '')
+except Exception as e:
+    print(f'Exception encountered: {e}')
     pass
+
 __git_uri__ = "https://github.com/airbnb/knowledge-repo.git"
 
-# These are the core dependencies, and should include all packages needed for accessing repositories
-# and running a non-server-side instance of the flask application. Optional dependencies for converters/etc
-# should be defined elsewhere.
+# These are the core dependencies, and should include all packages needed
+# for accessing repositories and running a non-server-side instance of the
+# flask application. Optional dependencies for converters/etc should be
+# defined elsewhere.
 __dependencies__ = [
     # Knowledge Repository Dependencies
     'pyyaml',  # Yaml parser and utilities
     'markdown==3.3.4',  # Markdown conversion utilities
     'pygments==2.10.0',  # Code highlighting support in markdown
     'gitpython==3.1.18',  # Git abstraction
-    'tabulate==0.8.9',  # Rendering information prettily in knowledge_repo script
+    'tabulate==0.8.9',  # Rendering prettily in knowledge_repo script
     'cooked_input',  # Used for interactive input from user in CLI tooling
     'requests',  # Used for downloading images
     'ipython_genutils',  # Used by Markdown conversion utilities
@@ -68,10 +97,13 @@ __optional_dependencies__ = {
 
     # Testing dependencies
     'dev': [
-        'pycodestyle',  # PEP8 conformance
-        'nose',  # Testing framework
         'beautifulsoup4',  # HTML/XML parser
-        'coverage'  # Documentation coverage tester
+        'coverage',  # Documentation coverage tester
+        'nose',  # Testing framework
+        'pep8',  # PEP8
+        'pycodestyle'  # PEP8 conformance
     ]
 }
-__optional_dependencies__['all'] = [dep for deps in __optional_dependencies__.values() for dep in deps]
+
+__optional_dependencies__['all'] = [
+    dep for deps in __optional_dependencies__.values() for dep in deps]
