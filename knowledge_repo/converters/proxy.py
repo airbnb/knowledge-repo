@@ -13,8 +13,10 @@ class ProxyConverter(KnowledgePostConverter):
         # added to post headers.
 
         # Google presentations should be embedded in "embed" mode.
-        gpres = re.match('^https://docs.google.com/presentation/d/(?P<pres_id>[^/]+)/edit(?P<slide_query>.*)$', url)
+        gpres = re.match(
+            '^https://docs.google.com/presentation/d/(?P<pres_id>[^/]+)/edit(?P<slide_query>.*)$', url)
         if gpres:
-            url = "https://docs.google.com/presentation/d/{}/embed{}".format(*gpres.groups())
+            url = "https://docs.google.com/presentation/d/{}/embed{}".format(
+                *gpres.groups())
 
         self.kp_write("", headers={'proxy': url})
