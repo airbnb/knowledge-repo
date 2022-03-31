@@ -1,4 +1,4 @@
-var helpersJx = (function(){
+var helpersJx = (function () {
   var path = document.location.pathname
 
   function getParameterByName(name, url) {
@@ -24,11 +24,11 @@ var helpersJx = (function(){
     document.location = newlocation;
   }
 
-  function linkifyHeaders(){
+  function linkifyHeaders() {
     // Turn all headers to links (except h1, which is the title)
     var all_headers = [$("h2"), $("h3"), $("h4"), $("h5"), $("h6")]
-    $.each(all_headers, function(index, value){
-      $.each(value, function(i, v) {
+    $.each(all_headers, function (index, value) {
+      $.each(value, function (i, v) {
         var inner_html = v.innerHTML;
         var inner_html_no_special = inner_html.replace(/[^a-zA-Z\- ]/g, "");
         var inner_link = "#" + inner_html_no_special.toLowerCase().split(" ").join("-");

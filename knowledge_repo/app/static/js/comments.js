@@ -1,4 +1,4 @@
-var commentsJx = (function(){
+var commentsJx = (function () {
 
   function postComment(comment_author, post_author, post_title, post_path) {
     var comment_text = $('#comment-text').val()
@@ -26,9 +26,9 @@ var commentsJx = (function(){
   }
 
 
-  function deleteComment(post_path, comment_id){
+  function deleteComment(post_path, comment_id) {
     $.ajax({
-      type:"GET",
+      type: "GET",
       url: "/delete_comment?comment_id=" + comment_id,
       async: false
     });
