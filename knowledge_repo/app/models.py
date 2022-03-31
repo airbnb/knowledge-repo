@@ -30,42 +30,28 @@ class IndexMetadata(db.Model):
     type = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(512), nullable=False)
     value = db.Column(db.String(512), nullable=True)
-    updated_at = db.Column(
-        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     @classmethod
     def get(cls, type, name, default=None):
-        m = db_session.query(
-            IndexMetadata
-        ).filter(
-            IndexMetadata.type == type
-        ).filter(
-            IndexMetadata.name == name
-        ).first()
+        m = db_session.query(IndexMetadata).filter(IndexMetadata.type == type).filter(IndexMetadata.name == name).first()
         if m is not None:
             return m.value
         return default
 
     @classmethod
     def set(cls, type, name, value):
-        m = db_session.query(IndexMetadata).filter(
-            IndexMetadata.type == type).filter(
-                IndexMetadata.name == name
-        ).first()
+        m = db_session.query(IndexMetadata).filter(IndexMetadata.type == type).filter(IndexMetadata.name == name).first()
         if m is not None:
             m.value = value
             m.updated_at = datetime.utcnow()
         else:
-            m = IndexMetadata(type=type, name=name, value=value,
-                              updated_at=datetime.utcnow())
+            m = IndexMetadata(type=type, name=name, value=value, updated_at=datetime.utcnow())
             db_session.add(m)
 
     @classmethod
     def get_last_update(cls, type, name):
-        m = db_session.query(IndexMetadata).filter(
-            IndexMetadata.type == type).filter(
-                IndexMetadata.name == name
-        ).first()
+        m = db_session.query(IndexMetadata).filter(IndexMetadata.type == type).filter(IndexMetadata.name == name).first()
         if m is not None:
             return m.updated_at
         return None
@@ -74,10 +60,8 @@ class IndexMetadata(db.Model):
 class PostAuthorAssoc(db.Model):
     __tablename__ = 'assoc_post_author'
 
-    post_id = db.Column(db.Integer, db.ForeignKey(
-        'posts.id'), nullable=False, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(
-        'users.id'), nullable=False, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, primary_key=True)
     order = db.Column(db.Integer)
 
     post = db.relationship('Post', lazy='joined')
@@ -115,8 +99,7 @@ class Comment(db.Model):
     text = db.Column(db.Text)
     type = db.Column(db.String(100), default='post')
     created_at = db.Column(db.DateTime, default=func.now())
-    updated_at = db.Column(
-        db.DateTime, default=func.now(), onupdate=func.now())
+    updated_at = db.Column(db.DateTime, default=func.now(), onupdate=func.now())
 
 
 class ErrorLog(db.Model):
@@ -133,10 +116,8 @@ class ErrorLog(db.Model):
     @classmethod
     def from_exception(cls, e):
         tb = sys.exc_info()[-1]
-        filename, linenumber, function, code = traceback.extract_tb(
-            sys.exc_info()[-1])[-1]
-        filename = os.path.relpath(
-            filename, os.path.join(os.path.dirname(__file__), '..'))
+        filename, linenumber, function, code = traceback.extract_tb(sys.exc_info()[-1])[-1]
+        filename = os.path.relpath(filename, os.path.join(os.path.dirname(__file__), '..'))
         e_args = '; '.join(str(a) for a in e.args)
         return ErrorLog(
             function=function,
@@ -173,8 +154,7 @@ class PageView(db.Model):
     created_at = db.Column(db.DateTime, default=func.now())
     version = db.Column(db.String(100), default=__version__)
 
-    __table_args__ = (Index('object_id_type_action_index',
-                      object_id, object_type, object_action),)
+    __table_args__ = (Index('object_id_type_action_index', object_id, object_type, object_action),)
 
     class logged(object):
 
@@ -197,13 +177,8 @@ class PageView(db.Model):
                 version=__version__
             )
             errorlog = None
-            log.object_id,
-            log.object_type,
-            log.object_action,
-            reextract_after_request = self.extract_objects(
-                *args, **kwargs)
-            # Add log here to ensure pageviews are accurate
-            db_session.add(log)
+            log.object_id, log.object_type, log.object_action, reextract_after_request = self.extract_objects(*args, **kwargs)
+            db_session.add(log)  # Add log here to ensure pageviews are accurate
 
             try:
                 return self._route(*args, **kwargs)
@@ -218,8 +193,7 @@ class PageView(db.Model):
                 # Extract object id and type after response generated (if requested) to ensure
                 # most recent data is collected
                 if reextract_after_request:
-                    log.object_id, log.object_type, log.object_action, _ = self.extract_objects(
-                        *args, **kwargs)
+                    log.object_id, log.object_type, log.object_action, _ = self.extract_objects(*args, **kwargs)
 
                 if errorlog is not None:
                     log.id_errorlog = errorlog.id
@@ -238,8 +212,7 @@ class PageView(db.Model):
             except Exception as e:
                 logger.warning(f'Error using object extractor: {e}')
                 object_info = {'id': (-1), 'type': None}
-            assert isinstance(
-                object_info, dict), 'Object extractors must return a dictionary.'
+            assert isinstance(object_info, dict), 'Object extractors must return a dictionary.'
             assert len(set(['id', 'type']).difference(object_info.keys())) == 0 and \
                 len(set(object_info.keys()).difference(['id', 'type', 'action', 'may_change'])) == 0, \
                 ("Object extractors must at least include the keys 'id' and 'type', and "
@@ -256,8 +229,7 @@ class Vote(db.Model):
     object_id = db.Column(db.Integer)
     object_type = db.Column(db.String(100), default='post')
     created_at = db.Column(db.DateTime, default=func.now())
-    updated_at = db.Column(
-        db.DateTime, default=func.now(), onupdate=func.now())
+    updated_at = db.Column(db.DateTime, default=func.now(), onupdate=func.now())
 
 
 @unique_constructor(
@@ -270,16 +242,13 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=func.now())
 
-    # Unique identifier across all login methods
-    identifier = db.Column(db.String(500))
+    identifier = db.Column(db.String(500))  # Unique identifier across all login methods
 
-    # Username used to log in (may differ from identifier)
-    username = db.Column(db.String(500))
+    username = db.Column(db.String(500))  # Username used to log in (may differ from identifier)
     password = db.Column(db.String(500))  # Password for local logins
 
     name = db.Column(db.String(500))  # Name as determined by auth method
-    # Name as determined by user preferences
-    preferred_name = db.Column(db.String(500))
+    preferred_name = db.Column(db.String(500))  # Name as determined by user preferences
 
     email = db.Column(db.String(500))  # Email address
     avatar_uri = db.Column(db.Text())  # Either external url or data uri
@@ -288,8 +257,7 @@ class User(db.Model, UserMixin):
     last_login_at = db.Column(db.DateTime)  # Date of last login
 
     _posts_assoc = db.relationship('PostAuthorAssoc')
-    # This property should not directly modified
-    posts = association_proxy('_posts_assoc', 'post')
+    posts = association_proxy('_posts_assoc', 'post')  # This property should not directly modified
 
     # Method overrides for the UserMixin class for flask_login
     @property
@@ -474,9 +442,7 @@ class Post(db.Model):
         excluded_tags = current_app.config.get('EXCLUDED_TAGS', [])
         return any([tag.name in excluded_tags for tag in self.tags])
 
-    _groups = db.relationship('Group',
-                              secondary=assoc_post_group,
-                              backref='posts',
+    _groups = db.relationship('Group', secondary=assoc_post_group, backref='posts',
                               lazy='subquery')
 
     @hybrid_property
@@ -520,7 +486,7 @@ class Post(db.Model):
             self._status = None
         else:
             assert isinstance(status, KnowledgeRepository.PostStatus), \
-                'Status must be an instance of KnowledgeRepository.PostStatus. Status or None'
+                'Status must be an instance of KnowledgeRepository.PostStatus.Status or None'
             self._status = status.value
 
     @hybrid_property
@@ -529,9 +495,7 @@ class Post(db.Model):
 
     @is_published.expression
     def is_published(self):
-        return func.coalesce(
-            self._status, 0
-        ) == current_repo.PostStatus.PUBLISHED.value
+        return func.coalesce(self._status, 0) == current_repo.PostStatus.PUBLISHED.value
 
     _views = db.relationship('PageView', lazy='dynamic',
                              primaryjoin="and_(foreign(PageView.object_id)==Post.id, "
@@ -709,5 +673,4 @@ class Group(db.Model):
         self._users += self._prepare_users(users)
 
     def users_remove(self, users):
-        self._users = list(set(self._users).difference(
-            self._prepare_users(users)))
+        self._users = list(set(self._users).difference(self._prepare_users(users)))

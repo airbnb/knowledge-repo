@@ -7,10 +7,11 @@ Create Date: 2016-08-17 14:37:40.391822
 """
 
 # revision identifiers, used by Alembic.
-import sqlalchemy as sa
-from alembic import op
 revision = '1b385158fd32'
 down_revision = '40dfdcb2b07c'
+
+from alembic import op
+import sqlalchemy as sa
 
 
 def upgrade():
@@ -21,15 +22,12 @@ def upgrade():
         batch_op.add_column(sa.Column('order', sa.Integer(), nullable=True))
 
     with op.batch_alter_table('posts') as batch_op:
-        batch_op.add_column(
-            sa.Column('uuid', sa.String(length=100), nullable=True))
+        batch_op.add_column(sa.Column('uuid', sa.String(length=100), nullable=True))
         batch_op.create_unique_constraint('uq_uuid', ['uuid'])
 
     with op.batch_alter_table('pageviews') as batch_op:
-        batch_op.add_column(
-            sa.Column('object_action', sa.String(length=100), nullable=True))
-        batch_op.add_column(
-            sa.Column('version', sa.String(length=100), nullable=True))
+        batch_op.add_column(sa.Column('object_action', sa.String(length=100), nullable=True))
+        batch_op.add_column(sa.Column('version', sa.String(length=100), nullable=True))
 
 
 def downgrade():

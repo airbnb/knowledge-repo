@@ -10,7 +10,8 @@ from knowledge_repo.app.proxies import db_session
 class PostTest(unittest.TestCase):
 
     def setUp(self):
-        self.repo = KnowledgeRepository.for_uri('tests/test_repo', auto_create=True)
+        self.repo = KnowledgeRepository.for_uri(
+            'tests/test_repo', auto_create=True)
         self.app = self.repo.get_app(config='tests/config_server.py')
         self.client = self.app.test_client()
 
@@ -48,9 +49,11 @@ class PostTest(unittest.TestCase):
             distinct_viewers = post.view_user_count
             pageviews = post.view_count
 
-        db_pageviews_str = "Viewed {pageviews} times by {distinct_viewers} different users".format(**locals())
+        db_pageviews_str = "Viewed {pageviews} times by {distinct_viewers} different users".format(
+            **locals())
 
-        assert db_pageviews_str == pageviews_str, "'{}' is not '{}'!".format(db_pageviews_str, pageviews_str)
+        assert db_pageviews_str == pageviews_str, "'{}' is not '{}'!".format(
+            db_pageviews_str, pageviews_str)
 
     def test03_check_post_metadata(self):
         """
