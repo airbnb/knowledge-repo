@@ -152,9 +152,15 @@ def update_index(check_timeouts=True, force=False, reindex=False):
         posts = db_session.query(Post).all()
 
         for post in posts:
+            if isinstance(post.uuid, str) and post.uuid.startswith('\\x'):
+                decoded_post_uuid = bytes.fromhex(post.uuid.replace('\\x', ''))
+            elif isinstance(post.uuid, str):
+                decoded_post_uuid = bytes(post.uuid)
+            else:
+                decoded_post_uuid = post.uuid
 
             # If UUID has changed, check if we can find it elsewhere in the repository, and if so update index path
-            if post.uuid and ((post.path not in kr_dir) or (post.uuid != kr_dir[post.path].uuid)):
+            if post.uuid and ((post.path not in kr_dir) or (decoded_post_uuid != kr_dir[post.path].uuid)):
                 if post.uuid in kr_uuids:
                     logger.info(f'Updating location of post: {post.path} -> {kr_uuids[post.uuid].path}')
                     post.path = kr_uuids[post.uuid].path
@@ -171,7 +177,7 @@ def update_index(check_timeouts=True, force=False, reindex=False):
             kp = kr_dir.pop(post.path)
 
             # Update metadata of post if required
-            if reindex or (kp.revision > post.revision or not post.is_published or kp.uuid != post.uuid):
+            if reindex or (kp.revision > post.revision or not post.is_published or kp.uuid != decoded_post_uuid):
                 if kp.is_valid():
                     logger.info(f'Recording update to post at: {kp.path}')
                     post.update_metadata_from_kp(kp)
