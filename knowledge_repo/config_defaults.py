@@ -17,7 +17,8 @@ def path_parse(repo, path):
             return path
     raise ValueError(
         "Provided path '{path}' does not match any of the following patterns:\n" +
-        '\n'.join(f"'{pattern}': {desc}" for pattern, desc in repo.config.path_patterns.items())
+        '\n'.join(f"'{pattern}': {desc}" for pattern,
+                  desc in repo.config.path_patterns.items())
     )
 
 
