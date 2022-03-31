@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
     $("#searchbar")[0].setSelectionRange(1000, 1000);
 
     $('#searchbar').typeahead({
@@ -8,7 +8,7 @@ $(document).ready(function() {
     }, {
         name: 'knowledge_posts',
         limit: 20,
-        display: function(item) {
+        display: function (item) {
             return item.title + " - " + item.author;
         },
         templates: {
@@ -17,13 +17,13 @@ $(document).ready(function() {
                 'Unable to find any posts that match the current query' +
                 '</div>'
             ),
-            suggestion: function(data) {
+            suggestion: function (data) {
                 return '<p style="overflow-wrap:break-word">' + data.title + ' – <em>' + data.author + '</em></p>';
             }
         },
-        source: function(q, sync, async) {
+        source: function (q, sync, async) {
             $.ajax('/ajax/index/typeahead?search=' + q, {
-                success: function(data, status) {
+                success: function (data, status) {
                     async(JSON.parse(data));
                 }
             })
@@ -31,11 +31,11 @@ $(document).ready(function() {
     });
 
 
-    $('#searchbar').bind('typeahead:select', function(obj, datum, name) {
+    $('#searchbar').bind('typeahead:select', function (obj, datum, name) {
         window.location = '/post/' + encodeURIComponent(datum.path);
     });
 
-    $('#searchbar').keypress(function(event) {
+    $('#searchbar').keypress(function (event) {
         var keycode = (event.keyCode ? event.keyCode : event.which);
         if (keycode == '13') {
             var path = document.location.pathname;
@@ -48,7 +48,7 @@ $(document).ready(function() {
 
 
     function update_panel_widths(panel_name) {
-        if (window.matchMedia( "(min-width: 1200px)" ).matches){
+        if (window.matchMedia("(min-width: 1200px)").matches) {
             $(panel_name).width($(panel_name).parent().width());
             $(panel_name).css("position", "fixed");
         } else {
