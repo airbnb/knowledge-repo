@@ -19,7 +19,8 @@ def set_up_indexing_timers(app):
     if not app.config['INDEXING_ENABLED']:
         return False
 
-    if app.check_thread_support(check_index=True, check_repositories=app.config['INDEXING_UPDATES_REPOSITORIES']):
+    if app.check_thread_support(check_index=True,
+                                check_repositories=app.config['INDEXING_UPDATES_REPOSITORIES']):
         if os.environ['KNOWLEDGE_REPO_MASTER_UUID'] != app.uuid:
             logger.info(
                 f'Not spawning index-sync timers for non-master application instance: {app.uuid}')

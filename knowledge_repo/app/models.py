@@ -35,8 +35,13 @@ class IndexMetadata(db.Model):
 
     @classmethod
     def get(cls, type, name, default=None):
-        m = db_session.query(IndexMetadata).filter(
-            IndexMetadata.type == type).filter(IndexMetadata.name == name).first()
+        m = db_session.query(
+            IndexMetadata
+        ).filter(
+            IndexMetadata.type == type
+        ).filter(
+            IndexMetadata.name == name
+        ).first()
         if m is not None:
             return m.value
         return default
@@ -44,7 +49,9 @@ class IndexMetadata(db.Model):
     @classmethod
     def set(cls, type, name, value):
         m = db_session.query(IndexMetadata).filter(
-            IndexMetadata.type == type).filter(IndexMetadata.name == name).first()
+            IndexMetadata.type == type).filter(
+                IndexMetadata.name == name
+        ).first()
         if m is not None:
             m.value = value
             m.updated_at = datetime.utcnow()
@@ -56,7 +63,9 @@ class IndexMetadata(db.Model):
     @classmethod
     def get_last_update(cls, type, name):
         m = db_session.query(IndexMetadata).filter(
-            IndexMetadata.type == type).filter(IndexMetadata.name == name).first()
+            IndexMetadata.type == type).filter(
+                IndexMetadata.name == name
+        ).first()
         if m is not None:
             return m.updated_at
         return None
