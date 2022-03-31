@@ -3,12 +3,13 @@
 import re
 
 
-# A function called to see whether a specified path is permitted in the repository
-# Only enforced when creating/modifying posts. It should return the path as a standard
-# unix path (virtual folders separated by '/' and the final node should end in '.kp').
-# It should raise an exception if the provided path is is not permitted in the knowledge
-# repository. A default implementation is provided using `path_patterns`, which
-# can be provided more readily in a YAML configuration file.
+# A function called to see whether a specified path is permitted in the
+# repository. Only enforced when creating/modifying posts. It should return
+# the path as a standard unix path (virtual folders separated by '/' and the
+# final node should end in '.kp'). It should raise an exception if the
+# provided path is is not permitted in the knowledge repository. A default
+# implementation is provided using `path_patterns`, which can be provided
+# more readily in a YAML configuration file.
 def path_parse(repo, path):
     if not path.endswith('.kp'):
         path += '.kp'
@@ -16,7 +17,8 @@ def path_parse(repo, path):
         if re.match(pattern, path):
             return path
     raise ValueError(
-        "Provided path '{path}' does not match any of the following patterns:\n" +
+        f"Provided path '{path}' does not match any of the" +
+        " following patterns:\n" +
         '\n'.join(f"'{pattern}': {desc}" for pattern,
                   desc in repo.config.path_patterns.items())
     )
@@ -29,17 +31,17 @@ path_patterns = {
 }
 
 
-# A dictionary of aliases which point to knowledge posts. This allows you to alias posts
-# which may be useful to forward old links to new locations, or to give certain posts
-# precedence. It also allows the post path to violate the normal naming rules of posts.
-# The only condition is that they cannot mask an existing post url, in which case the
-# alias is silently ignored.
+# A dictionary of aliases which point to knowledge posts. This allows you to
+# alias posts which may be useful to forward old links to new locations, or to
+# give certain posts precedence. It also allows the post path to violate the
+# normal naming rules of posts. The only condition is that they cannot mask an
+# existing post url, in which case the alias is silently ignored.
 aliases = {}
 
 
-# Postprocessors to apply when importing KnowledgePost objects into the repository.
-# Note that KnowledgePost objects by default run 'extract_images' and 'format_checks'.
-# Order is important. Should be a list of tuples, of form:
+# Postprocessors to apply when importing KnowledgePost objects into the
+# repository. Note that KnowledgePost objects by default run 'extract_images'
+# and 'format_checks'. Order is important. Should be a list of tuples, of form:
 # ('name of postprocessor', {'init_kwarg': 'value'})
 postprocessors = {}
 
@@ -48,16 +50,17 @@ postprocessors = {}
 editors = []
 
 
-# Function to check whether provided username is a valid username, and if not, mutate it
-# such that it is. Should raise an exception if that is not possible, and otherwise
-# return the parsed username. A default implementation is provided using
-# `username_pattern`, which can be provided more readily in a YAML configuration
-# file.
+# Function to check whether provided username is a valid username, and if
+# not, mutate it such that it is. Should raise an exception if that is not
+# possible, and otherwise return the parsed username. A default implementation
+# is provided using `username_pattern`, which can be provided more readily in
+# a YAML configuration file.
 def username_parse(repo, username):
     pattern = repo.config.username_pattern
     if not re.match(pattern, username):
         raise ValueError(
-            f"Username '{username}' does not follow the required pattern: '{pattern}'"
+            f"Username '{username}' does not follow "
+            f"the required pattern: '{pattern}'"
         )
     return username
 
@@ -111,21 +114,21 @@ web_uri_base = None
 
 # If administrators of this knowledge repository want to suggest a specific
 # knowledge_repo version requirement when interacting with the repository using
-# the `knowledge_repo` script, they may do so here. Users can always work around
-# this restriction by using the `--dev` flag to the `knowledge_repo` script. If
-# the value supplied is a string starting with '!', it is taken to refer to a
-# git tag or commit hash on the upstream Knowledge Repo repository, and the
-# `knowledge_repo` script will clone the required  Knowledge Repo version and
-# chain commands to it. Otherwise, it is interpreted as a pip-like version
-# description (e.g. '==x.y.z', '>0.1.2<=0.8.0', etc), and the currently running
-# version of the `knowledge_repo` library is checked at runtime.
+# the `knowledge_repo` script, they may do so here. Users can always work
+# around this restriction by using the `--dev` flag to the `knowledge_repo`
+# script. If the value supplied is a string starting with '!', it is taken to
+# refer to a git tag or commit hash on the upstream Knowledge Repo repository,
+# and the `knowledge_repo` script will clone the required  Knowledge Repo
+# version and chain commands to it. Otherwise, it is interpreted as a pip-like
+# version description (e.g. '==x.y.z', '>0.1.2<=0.8.0', etc), and the currently
+# running version of the `knowledge_repo` library is checked at runtime.
 required_tooling_version = None
 
 
 # WARNING: ADVANCED!
 # Function that is called on a Flask web app instance before it is launched
-# This is useful if you need to add a route for your local deployment, or other
-# equally invasive action. Not recommended unless you know exactly what you are doing.
-# It must return a KnowledgeFlask app instance.
+# This is useful if you need to add a route for your local deployment, or
+# other equally invasive action. Not recommended unless you know exactly what
+# you are doing. It must return a KnowledgeFlask app instance.
 def prepare_app(repo, app):
     return app

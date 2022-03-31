@@ -8,10 +8,12 @@ version_info = {}
 with open('knowledge_repo/_version.py') as version_file:
     exec(version_file.read(), version_info)
 
-# Batch file template for Windows (based on https://github.com/matthew-brett/myscripter/blob/master/setup.py)
+# Batch file template for Windows (based on
+# https://github.com/matthew-brett/myscripter/blob/master/setup.py)
 BATCHFILE_TEMPLATE = r"""
 @echo off
-REM Wrapper around {script_name} to execute script in Windows using the interpreter specified with the hashbang
+REM Wrapper around {script_name} to execute script in Windows
+REM using the interpreter specified with the hashbang
 set dirname=%~dp0
 set wrapped_script="%dirname%{script_name}"
 set /p line1=<%wrapped_script%
@@ -24,26 +26,32 @@ call "%py_exe%" %wrapped_script% %*
 """
 
 
-# Custom script installer for Windows (based on https://github.com/matthew-brett/myscripter/blob/master/setup.py)
+# Custom script installer for Windows (based on
+# https://github.com/matthew-brett/myscripter/blob/master/setup.py)
 class install_scripts_windows_wrapper(install_scripts):
     def run(self):
         install_scripts.run(self)
         if not os.name == "nt":
             return
         for script_path in self.get_outputs():
-            # If we can find an executable name in the #! top line of the script
-            # file, make .bat wrapper for script.
+            # If we can find an executable name in the #! top line of the
+            # script file, make .bat wrapper for script.
             with open(script_path) as fobj:
                 first_line = fobj.readline()
-            if not (first_line.startswith('#!') and 'python' in first_line.lower()):
-                log.info("Script does not appear to be a python executable. Skipping creation of batchfile wrapper")
+            if not (first_line.startswith('#!') and
+                    'python' in first_line.lower()):
+                log.info(
+                    "Script does not appear to be a python executable. "
+                    "Skipping creation of batchfile wrapper")
                 continue
             script_dirname, script_basename = os.path.split(script_path)
             script_name, _ = os.path.splitext(script_basename)
             batchfile_path = os.path.join(script_dirname, script_name + '.bat')
-            log.info("Making batchfile wrapper at {} (for {})".format(batchfile_path, script_path))
+            log.info("Making batchfile wrapper at {} (for {})".format(
+                batchfile_path, script_path))
 
-            batchfile_content = BATCHFILE_TEMPLATE.format(script_name=script_name)
+            batchfile_content = BATCHFILE_TEMPLATE.format(
+                script_name=script_name)
 
             if self.dry_run:
                 continue
@@ -57,7 +65,8 @@ setup(
         " A workflow for contributing company knowledge, in the form "
         " of RMarkdowns, iPythons, and Markdowns, rendered and organized"
         " to magnify research impact across teams and time "),
-    version=version_info['__version__'].split('_')[0],  # remove git revision if present
+    version=version_info['__version__'].split(
+        '_')[0],  # remove git revision if present
     author=version_info['__author__'],
     author_email=version_info['__author_email__'],
     packages=find_packages(),
