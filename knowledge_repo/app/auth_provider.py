@@ -31,7 +31,10 @@ class KnowledgeAuthProvider(object, metaclass=SubclassRegisteringABCMeta):
         self.name = name
         self.app = app
         self.blueprint = Blueprint(
-            'auth_provider_' + self.name, __name__, template_folder='../templates')
+            'auth_provider_' + self.name,
+            __name__,
+            template_folder='../templates'
+        )
         self.prepare_blueprint(self.blueprint)
         self.init(**kwargs)
 
@@ -58,7 +61,8 @@ class KnowledgeAuthProvider(object, metaclass=SubclassRegisteringABCMeta):
             raise RuntimeError("No such user or invalid credentials")
         assert self.validate(user)
         self._perform_login(user)
-        return redirect(session.get('requested_url') or url_for('index.render_feed'))
+        return redirect(session.get('requested_url')
+                        or url_for('index.render_feed'))
 
     def validate(self, user):
         return True
