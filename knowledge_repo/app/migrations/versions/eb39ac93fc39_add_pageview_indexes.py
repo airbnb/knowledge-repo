@@ -7,11 +7,10 @@ Create Date: 2019-11-15 15:30:55.010491
 """
 
 # revision identifiers, used by Alembic.
+import sqlalchemy as sa
+from alembic import op
 revision = 'eb39ac93fc39'
 down_revision = 'd15f6cac07e1'
-
-from alembic import op
-import sqlalchemy as sa
 
 
 def upgrade():
@@ -21,6 +20,7 @@ def upgrade():
         ["object_id", "object_type", "object_action"],
         unique=False,
     )
+
 
 def downgrade():
     op.drop_index("object_id_type_action_index", table_name="pageviews")
