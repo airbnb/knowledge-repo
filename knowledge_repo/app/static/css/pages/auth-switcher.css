@@ -1,12 +1,12 @@
 .navbar .navbar-brand {
     display: block;
     float: none;
-    height:inherit;
+    height: inherit;
     text-align: center;
 }
 
 .navbar .navbar-brand img {
-    height:3em;
+    height: 3em;
     margin: auto;
     margin-top: 1em;
     margin-bottom: 1em;
@@ -21,7 +21,8 @@ ul.auth-providers {
     border: 1px solid #aaa;
     border-radius: 5px;
 }
-ul.auth-providers > li > a {
+
+ul.auth-providers>li>a {
     padding: 1em;
     display: block;
     border-radius: 2px;
@@ -29,14 +30,16 @@ ul.auth-providers > li > a {
     color: #000;
     text-decoration: none;
 }
-ul.auth-providers > li > a:hover {
+
+ul.auth-providers>li>a:hover {
     padding: 1em;
     display: block;
     background: #d2f1ee;
     transition: background 0.2s;
     opacity: 1;
 }
-ul.auth-providers > li > a > img {
+
+ul.auth-providers>li>a>img {
     height: 3em;
     width: 3em;
     margin: 5px;
