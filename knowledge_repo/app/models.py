@@ -520,7 +520,7 @@ class Post(db.Model):
             self._status = None
         else:
             assert isinstance(status, KnowledgeRepository.PostStatus), \
-                'Status must be an instance of KnowledgeRepository.PostStatus.Status or None'
+                'Status must be an instance of KnowledgeRepository.PostStatus. Status or None'
             self._status = status.value
 
     @hybrid_property

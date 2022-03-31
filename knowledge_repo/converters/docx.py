@@ -13,7 +13,8 @@ class DocxConverter(KnowledgePostConverter):
 
     @property
     def dependencies(self):
-        # Dependencies required for this converter on top of core knowledge-repo dependencies
+        # Dependencies required for this converter on top of core
+        # knowledge-repo dependencies
         return ['pypandoc']
 
     def from_file(self, filename, **opts):
@@ -37,9 +38,11 @@ class DocxConverter(KnowledgePostConverter):
 
         # Image embeddings exported from docx files have fixed sizes in inches
         # which browsers do not understand. We remove these annotations.
-        md = re.sub(r'(\!\[[^\]]+?\]\([^\)]+?\))\{[^\}]+?\}', lambda m: m.group(1), md)
+        md = re.sub(
+            r'(\!\[[^\]]+?\]\([^\)]+?\))\{[^\}]+?\}', lambda m: m.group(1), md)
 
-        # Write markdown content to knowledge post (images will be extracted later)
+        # Write markdown content to knowledge post (images will be extracted
+        # later)
         self.kp_write(md)
 
     def cleanup(self):
