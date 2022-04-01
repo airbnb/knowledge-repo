@@ -19,33 +19,31 @@
 {% block header %} {{ top_header }} {% endblock %}
 
 {% block inner_content %}
-  <br>
+<br>
 
-  <table class="table table-bordered table-condensed" style='margin-left: -15px; background-color: white'>
-    <thead style='color: #9CA299'>
-      <tr>
-        {% for item in ['Title', 'Author', 'Tags', 'TL;DR', 'UpdatedAt', 'Views', 'Upvotes', 'Comments'] %}
-          {% if item in ['Views', 'Upvotes'] %}
-            <th style="min-width:100px; font-weight: normal">
-          {% elif item == 'TL;DR' %}
-            <th style="min-width:200px; font-weight: normal">
-          {% else %}
-            <th style="min-width:120px; font-weight: normal">
-          {% endif %}
-          {{ item }}
-          {% if (item != 'Tags' and item != 'TL;DR') %}
-            <i id="sortBy{{ item }}Asc" class="glyphicon glyphicon-chevron-up"
-              style='opacity:0.6'></i>
-            <i id="sortBy{{ item }}Desc" class="glyphicon glyphicon-chevron-down"
-               style='opacity:0.6'></i>
-          {% endif %}
-          </th>
-        {% endfor %}
-      </tr>
-    </thead>
-    <tbody>
+<table class="table table-bordered table-condensed" style='margin-left: -15px; background-color: white'>
+  <thead style='color: #9CA299'>
+    <tr>
+      {% for item in ['Title', 'Author', 'Tags', 'TL;DR', 'UpdatedAt', 'Views', 'Upvotes', 'Comments'] %}
+      {% if item in ['Views', 'Upvotes'] %}
+      <th style="min-width:100px; font-weight: normal">
+        {% elif item == 'TL;DR' %}
+      <th style="min-width:200px; font-weight: normal">
+        {% else %}
+      <th style="min-width:120px; font-weight: normal">
+        {% endif %}
+        {{ item }}
+        {% if (item != 'Tags' and item != 'TL;DR') %}
+        <i id="sortBy{{ item }}Asc" class="glyphicon glyphicon-chevron-up" style='opacity:0.6'></i>
+        <i id="sortBy{{ item }}Desc" class="glyphicon glyphicon-chevron-down" style='opacity:0.6'></i>
+        {% endif %}
+      </th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
 
-  {% for post in posts %}
+    {% for post in posts %}
     {% set idx_item = loop.index0 %}
     {% set stats = post_stats[post.path] %}
     <tr class="table-post">
@@ -59,39 +57,39 @@
         {{ format_authors(post.authors)|safe }}
       </td>
       <td id="tags-{{ idx_item }}">
-          {% for tag_obj in post.tags %}
-            {% set tag = tag_obj.name %}
-            {% if loop.last %}
-               <a href="/tag_pages?tag={{ tag|urlencode }}">{{ "#" + tag}}</a>
-              {% else %}
-               <a href="/tag_pages?tag={{ tag|urlencode }}">{{ "#" + tag}}</a>,
-              {% endif %}
-          {% endfor %}
+        {% for tag_obj in post.tags %}
+        {% set tag = tag_obj.name %}
+        {% if loop.last %}
+        <a href="/tag_pages?tag={{ tag|urlencode }}">{{ "#" + tag}}</a>
+        {% else %}
+        <a href="/tag_pages?tag={{ tag|urlencode }}">{{ "#" + tag}}</a>,
+        {% endif %}
+        {% endfor %}
       </td>
       <td id="tldr-{{ idx_item }}">
-          {%- set tldr = post['tldr'] | safe %}
-          {%- if tldr == None %}
-            {%- set tldr = "(No TL;DR)" %}
-          {%- endif %}
-          <i>{{ tldr | truncate(100, True) }} </i>
-          <a href="{{'/post/' + post.path|urlencode }}">
-            post.
-          </a>
+        {%- set tldr = post['tldr'] | safe %}
+        {%- if tldr == None %}
+        {%- set tldr = "(No TL;DR)" %}
+        {%- endif %}
+        <i>{{ tldr | truncate(100, True) }} </i>
+        <a href="{{'/post/' + post.path|urlencode }}">
+          post.
+        </a>
       </td>
       <td id="updated_at-{{ idx_item }}">
-          {{ post['updated_at'].date().isoformat() }}
+        {{ post['updated_at'].date().isoformat() }}
       </td>
       <td id="views-{{ idx_item }}">
-          {{ stats['all_views'] }}
+        {{ stats['all_views'] }}
       </td>
       <td id="upvotes-{{ idx_item}}">
-          {{ stats['total_likes']}}
+        {{ stats['total_likes']}}
       </td>
       <td id="comments-{{ idx_item }}">
-          {{ stats['total_comments']}}
+        {{ stats['total_comments']}}
       </td>
     </tr>
-  {% endfor %}
+    {% endfor %}
   </tbody>
 </table>
 
@@ -103,15 +101,15 @@
 {{ super () }}
 <script src="{{ url_for('static', filename='js/helpers.js')}}"></script>
 <script type="text/javascript">
-var start = {{ feed_params['start']|default(0) }}
-var results = {{ feed_params['results']|default(0) }}
-var filters = "{{ feed_params['filters']| default('') }}"
-var next_start = (start + results).toString();
-var prev_start = (start - results).toString();
-$(document).ready(function(){
+  var start = {{ feed_params['start']|default (0) }}
+  var results = {{ feed_params['results']|default (0) }}
+  var filters = "{{ feed_params['filters']| default('') }}"
+  var next_start = (start + results).toString();
+  var prev_start = (start - results).toString();
+  $(document).ready(function () {
     var table_button = $(".btn-table")[0];
     $(table_button).addClass("btn-active");
-    var glyphicon = $(".glyphicon-post-org.glyphicon-th")[0] ;
+    var glyphicon = $(".glyphicon-post-org.glyphicon-th")[0];
     $(glyphicon).addClass("glyphicon-active");
 
     var sort_by = "{{ feed_params['sort_by'] }}"
@@ -140,8 +138,8 @@ $(document).ready(function(){
         sort_by = sort_by;
     };
 
-    if (sort_desc == "True"){
-      sort_glyphicon = "#"  + sort_by + "Desc"
+    if (sort_desc == "True") {
+      sort_glyphicon = "#" + sort_by + "Desc"
     } else {
       sort_glyphicon = "#" + sort_by + "Asc"
     }
@@ -149,20 +147,20 @@ $(document).ready(function(){
     $(sort_glyphicon)[0].setAttribute('style', 'color: #565a5c')
 
     var col_names = ['Title', 'Author', 'CreatedAt', 'UpdatedAt', 'Views', 'Upvotes', 'Comments']
-    $.each(col_names, function(i, col){
-        var desc_sort = "#sortBy" + col + "Desc";
-        var asc_sort = "#sortBy" + col + "Asc";
-        var new_location = '/table?start=' + start.toString() + '&results=' + results.toString() + '&sort_by=' + col
-        if(filters != 'None') {
-          new_location = new_location + '&filters=' + filters
-        }
-        $(desc_sort).click(function(){
-            document.location = new_location
-        });
-        $(asc_sort).click(function(){
-            document.location = new_location + '&sort_asc=1'
-        });
+    $.each(col_names, function (i, col) {
+      var desc_sort = "#sortBy" + col + "Desc";
+      var asc_sort = "#sortBy" + col + "Asc";
+      var new_location = '/table?start=' + start.toString() + '&results=' + results.toString() + '&sort_by=' + col
+      if (filters != 'None') {
+        new_location = new_location + '&filters=' + filters
+      }
+      $(desc_sort).click(function () {
+        document.location = new_location
+      });
+      $(asc_sort).click(function () {
+        document.location = new_location + '&sort_asc=1'
+      });
     });
-});
+  });
 </script>
 {% endblock %}
