@@ -1,84 +1,89 @@
 {% extends "base.html" %}
 
 {% macro format_authors(authors) %}
-  {% for author in authors %}
-    <a href='/feed?authors={{ author.identifier|urlencode }}'>
-      {{ author.format_name }}
-    </a>
-    {% if not loop.last %}
-      ,
-    {% endif %}
-  {% endfor %}
+{% for author in authors %}
+<a href='/feed?authors={{ author.identifier|urlencode }}'>
+  {{ author.format_name }}
+</a>
+{% if not loop.last %}
+,
+{% endif %}
+{% endfor %}
 {% endmacro %}
 
 {% macro pagination(max_pages=10, extremes=True, autohide=True) %}
-  {% if feed_params %}
-    {% set start = feed_params['start'] | default(0) %}
-    {% set results = feed_params['results'] | default(10) %}
-    {% set page = 1 if (start == 0) else (start//results + 1) %}
-    {% set page_count = feed_params['page_count'] | default(1) %}
+{% if feed_params %}
+{% set start = feed_params['start'] | default(0) %}
+{% set results = feed_params['results'] | default(10) %}
+{% set page = 1 if (start == 0) else (start//results + 1) %}
+{% set page_count = feed_params['page_count'] | default(1) %}
 
-    {% if autohide and page_count > 1 %}
-      {% set page_nums = pagination_pages(current_page=page, page_count=page_count, max_pages=max_pages, extremes=extremes) %}
-      <div class='pagination-bar' role="group">
-        <a href="{{ "#" if (page == 1) else modify_query(start=(page-2)*results) }}" class="pagination-stepper{% if page == 1 %} disabled{% endif %}"{% if page == 1 %} onclick="return false;"{% endif %}>
-          <i class="glyphicon glyphicon-chevron-left"></i>
-        </a>
-        <ul class="pagination">
-          {% for page_num in page_nums %}
-            {% if loop.index0 > 0 and page_num - page_nums[loop.index0 - 1] > 1 %}
-              <li class="disabled"><a>&middot;&middot;&middot;</a></li>
-            {% endif %}
-            <li {% if page == page_num %}class="active"{% endif %}><a href= "{{ modify_query(start=(page_num-1)*results) }}"> {{ page_num }} </a></li>
-          {% endfor %}
-        </ul>
-        <a href="{{ "#" if (page == page_count) else modify_query(start=page*results) }}" class="pagination-stepper{% if page == page_count %} disabled{% endif %}"{% if page == page_count %} onclick="return false;"{% endif %}>
-          <i class="glyphicon glyphicon-chevron-right"></i>
-        </a>
-      </div>
-
+{% if autohide and page_count > 1 %}
+{% set page_nums = pagination_pages(current_page=page, page_count=page_count, max_pages=max_pages, extremes=extremes) %}
+<div class='pagination-bar' role="group">
+  <a href="{{ " #" if (page==1) else modify_query(start=(page-2)*results) }}"
+    class="pagination-stepper{% if page == 1 %} disabled{% endif %}" {% if page==1 %} onclick="return false;" {% endif
+    %}>
+    <i class="glyphicon glyphicon-chevron-left"></i>
+  </a>
+  <ul class="pagination">
+    {% for page_num in page_nums %}
+    {% if loop.index0 > 0 and page_num - page_nums[loop.index0 - 1] > 1 %}
+    <li class="disabled"><a>&middot;&middot;&middot;</a></li>
     {% endif %}
-  {% endif %}
+    <li {% if page==page_num %}class="active" {% endif %}><a href="{{ modify_query(start=(page_num-1)*results) }}"> {{
+        page_num }} </a></li>
+    {% endfor %}
+  </ul>
+  <a href="{{ " #" if (page==page_count) else modify_query(start=page*results) }}"
+    class="pagination-stepper{% if page == page_count %} disabled{% endif %}" {% if page==page_count %}
+    onclick="return false;" {% endif %}>
+    <i class="glyphicon glyphicon-chevron-right"></i>
+  </a>
+</div>
+
+{% endif %}
+{% endif %}
 {% endmacro %}
 
 {% block content %}
-  <!-- Index rendering mode switch -->
-  <div class="row">
-    <div class="col-md-5">
-      <div class="btn-group btn-group-justified index-view-btn-group" role="group">
-        <a href="/feed" class="btn btn-default btn-card no-underline" role="button">
-          <i class="glyphicon glyphicon-post-org glyphicon-align-justify"></i>
-          <span class="index-view-name"> Card </span>
-        </a>
-        <a href="/table" class="btn btn-default btn-table no-underline" role="button">
-          <i class="glyphicon glyphicon-post-org glyphicon-th"></i>
-          <span class="index-view-name"> Table </span>
-        </a>
-        <a href="/cluster" class="btn btn-default btn-cluster no-underline" role="button">
-          <i class="glyphicon glyphicon-post-org glyphicon-th-list"></i>
-          <span class="index-view-name"> Cluster </span>
-        </a>
-      </div>
+<!-- Index rendering mode switch -->
+<div class="row">
+  <div class="col-md-5">
+    <div class="btn-group btn-group-justified index-view-btn-group" role="group">
+      <a href="/feed" class="btn btn-default btn-card no-underline" role="button">
+        <i class="glyphicon glyphicon-post-org glyphicon-align-justify"></i>
+        <span class="index-view-name"> Card </span>
+      </a>
+      <a href="/table" class="btn btn-default btn-table no-underline" role="button">
+        <i class="glyphicon glyphicon-post-org glyphicon-th"></i>
+        <span class="index-view-name"> Table </span>
+      </a>
+      <a href="/cluster" class="btn btn-default btn-cluster no-underline" role="button">
+        <i class="glyphicon glyphicon-post-org glyphicon-th-list"></i>
+        <span class="index-view-name"> Cluster </span>
+      </a>
     </div>
-
-    {# Show pagination at top unless showing clusters. #}
-    {% if request.endpoint != 'index.render_cluster' %}
-    <div class='pull-right visible-md-block visible-lg-block'>
-      {{ pagination(max_pages=5, extremes=False) }}
-    </div>
-    {% endif %}
-
   </div>
 
-  <!-- Container for index items -->
-  <div class="col-12">
-    {% block inner_content %}
-    {% endblock %}
-  </div>
-
-  {# Show pagination at bottom of page unless showing clusters. #}
+  {# Show pagination at top unless showing clusters. #}
   {% if request.endpoint != 'index.render_cluster' %}
-  {{ pagination(max_pages=10) }}
+  <div class='pull-right visible-md-block visible-lg-block'>
+    {{ pagination(max_pages=5, extremes=False) }}
+  </div>
   {% endif %}
+
+</div>
+
+<!-- Container for index items -->
+<div class="col-12">
+  {% block inner_content %}
+  {% endblock %}
+</div>
+
+{# Show pagination at bottom of page unless showing clusters. #}
+{% if request.endpoint != 'index.render_cluster' %}
+{{ pagination(max_pages=10) }}
+{% endif %}
 
 {% endblock %}
