@@ -6,6 +6,8 @@ __all__ = ['__author__', '__author_email__', '__version__',
 
 __author__ = '''
     Erik Ritter (maintainer),
+    Henry Wu,
+    Jing Guo,
     Serena Jiang,
     John Bodley,
     Bill Ulammandakh,
@@ -18,6 +20,8 @@ __author__ = '''
 
 __author_email__ = '''
     erik.ritter@airbnb.com,
+    henry.wu@airbnb.com,
+    jing.guo@airbnb.com,
     serena.jiang@airbnb.com,
     john.bodley@airbnb.com,
     bill.ulammandakh@airbnb.com,
