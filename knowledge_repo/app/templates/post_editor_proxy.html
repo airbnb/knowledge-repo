@@ -3,7 +3,10 @@
 {% block metadata_fields %}
 {{ super() }}
 <label for="post_proxy"> Linked Post URL: </label>
-<input id="post_proxy" class="form-control" type="text" value="{{ proxy if proxy else ''}}"></input>
+<input id="post_proxy"
+       class="form-control"
+       type="text"
+       value="{{ proxy if proxy else ''}}"></input>
 <br>
 {% endblock %}
 

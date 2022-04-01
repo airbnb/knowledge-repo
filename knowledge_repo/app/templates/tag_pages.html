@@ -4,90 +4,100 @@
 
 
 {% block inner_content %}
-<br>
-<div class='panel' style='margin-left: -15px; margin-right: -15px'>
-  <div class="panel-header"> {{ full_tag }} </div>
-  <div class="panel-body">
-    {{ tag_description }} <br>
-    POCs: {{ tag_pocs }}
-  </div>
-  <div class="panel-footer" style='text-align:left'>
-    {% set tag_flat = full_tag.replace("/", "__") %}
-    {% if full_tag in feed_params['subscriptions'] %}
-    <button class="btn btn-primary btn-unsubscribe" id="tag-subscription-top__{{ tag_flat }}" style='font-color:white'>
-      <i class='glyphicon glyphicon-remove-sign glyphicon-white'></i>Unsubscribe
-    </button>
-    {% else %}
-    <button class="btn btn-default btn-subscribe" id="tag-subscription-top__{{ tag_flat }}" style='font-color:white'>
-      <i class='glyphicon glyphicon-ok-sign glyphicon-filled'></i>Subscribe
-    </button>
-    {% endif %}
-  </div>
-</div>
-
-<div class="row row-space-4"></div>
-
-<div class="panel-header" style='margin-left: -15px; margin-right: -15px'>
-  All Posts with tag: {{ full_tag }}
-</div>
-
-{% for post in posts %}
-{% set idx_item = loop.index0 %}
-{% set stats = post_stats[post.path] %}
-<div class='row row-space-4 panel feed-post'>
-  <div class='panel-header panel-light'>
-    <div class="col-md-10">
-      <a href="{{'/post/' + post.path|urlencode }}">
-        {{ post.title |title }}
-      </a>
+  <br>
+  <div class='panel' style='margin-left: -15px; margin-right: -15px'>
+    <div class="panel-header"> {{ full_tag }} </div>
+    <div class="panel-body">
+      {{ tag_description }} <br>
+      POCs: {{ tag_pocs }}
     </div>
-    <div class='feed-post-counts'>
-      <i class="glyphicon glyphicon-eye-open"> </i> {{ stats['all_views'] }}&nbsp
-      <i class="glyphicon glyphicon-heart-empty"></i> {{ stats['total_likes']}}&nbsp
-      <i class="glyphicon glyphicon-comment"></i> {{ stats['total_comments']}}
+    <div class="panel-footer" style='text-align:left'>
+      {% set tag_flat = full_tag.replace("/", "__") %}
+      {% if full_tag in feed_params['subscriptions'] %}
+        <button class="btn btn-primary btn-unsubscribe" id="tag-subscription-top__{{ tag_flat }}" style='font-color:white'>
+          <i class='glyphicon glyphicon-remove-sign glyphicon-white'></i>Unsubscribe
+        </button>
+      {% else %}
+        <button class="btn btn-default btn-subscribe" id="tag-subscription-top__{{ tag_flat }}" style='font-color:white'>
+          <i class='glyphicon glyphicon-ok-sign glyphicon-filled'></i>Subscribe
+        </button>
+      {% endif %}
     </div>
   </div>
-  <div class='panel-body'>
-    <div class="col-md-6">
-      <ul class="post-list" style='list-style-type: none; padding-left: 0px'>
-        <li class="feed-author"> {{ format_authors(post.authors) |safe }}</li>
-        <li class="feed-date"> Updated: {{ post['updated_at'].date().isoformat() }}</li>
-        <li class="feed-tags">
-          {% for tag_obj in post.tags %}
-          {% set tag = tag_obj.name %}
-          {% set tag_flat = tag.replace("/", "__") %}
-          <a href="/tag_pages?tag={{ tag|urlencode }}" data-tag-name="{{ tag_flat }}" data-container="body"
-            data-toggle="popover" data-placement="bottom" data-html="true" {% if tag in feed_params['subscriptions'] %}
-            class="label label-tag label-subscribed pop" data-content="<div class='content'>
+
+  <div class="row row-space-4"></div>
+
+  <div class="panel-header" style='margin-left: -15px; margin-right: -15px'>
+    All Posts with tag: {{ full_tag }}
+  </div>
+
+  {% for post in posts %}
+    {% set idx_item = loop.index0 %}
+    {% set stats = post_stats[post.path] %}
+    <div class='row row-space-4 panel feed-post'>
+      <div class='panel-header panel-light'>
+        <div class = "col-md-10">
+          <a href="{{'/post/' + post.path|urlencode }}">
+            {{ post.title |title }}
+          </a>
+        </div>
+        <div class='feed-post-counts'>
+          <i class="glyphicon glyphicon-eye-open"> </i> {{ stats['all_views'] }}&nbsp
+          <i class="glyphicon glyphicon-heart-empty"></i> {{ stats['total_likes']}}&nbsp
+          <i class="glyphicon glyphicon-comment"></i> {{ stats['total_comments']}}
+        </div>
+      </div>
+      <div class='panel-body'>
+        <div class="col-md-6">
+          <ul class="post-list" style='list-style-type: none; padding-left: 0px'>
+            <li class="feed-author"> {{ format_authors(post.authors) |safe }}</li>
+            <li class="feed-date"> Updated: {{ post['updated_at'].date().isoformat() }}</li>
+            <li class="feed-tags">
+              {% for tag_obj in post.tags %}
+                {% set tag = tag_obj.name %}
+                {% set tag_flat = tag.replace("/", "__") %}
+                <a  href="/tag_pages?tag={{ tag|urlencode }}"
+                    data-tag-name="{{ tag_flat }}"
+                    data-container="body"
+                    data-toggle="popover"
+                    data-placement="bottom"
+                    data-html="true"
+                    {% if tag in feed_params['subscriptions'] %}
+                      class="label label-tag label-subscribed pop"
+                      data-content="<div class='content'>
                        <button class='btn btn-small btn-primary btn-unsubscribe'
                                title=''
                                id='tag-subscription-{{idx_item}}__{{tag_flat}}'>
                          <i class='glyphicon glyphicon-remove-sign glyphicon-white'></i>Unsubscribe
-                     </button></div>" {% else %} class="label label-tag label-unsubscribed pop" data-content="<div class='content'>
+                     </button></div>"
+                    {% else %}
+                      class="label label-tag label-unsubscribed pop"
+                      data-content="<div class='content'>
                        <button class='btn btn-small btn-default btn-subscribe'
                              title=''
                              id='tag-subscription-{{idx_item}}__{{tag_flat}}'>
                          <i class='glyphicon glyphicon-ok-sign glyphicon-filled'></i>Subscribe
-                       </button></div>" {% endif %} class="text">
-            {{ "#" + tag}}
-          </a>
-          {% endfor %}
-        </li>
-      </ul>
-      <p class="feed-tldr">
-        <i>{{ post['tldr']|safe }}</i>
-        <br>
-        <br>
-        <a href="{{'/post/' + post.path|urlencode }}">Read post</a>
-      </p>
+                       </button></div>"
+                    {% endif %}
+                    class="text">
+                  {{ "#" + tag}}
+                </a>
+              {% endfor %}
+            </li>
+          </ul>
+          <p class="feed-tldr">
+            <i>{{ post['tldr']|safe }}</i>
+            <br>
+            <br>
+            <a href="{{'/post/' + post.path|urlencode }}">Read post</a>
+          </p>
+        </div>
+        <div class="col-md-6">
+          <center><img src="{{ post['thumbnail'] if post['thumbnail'] else '/static/images/default_thumbnail.png' }}" style="max-width:100%;max-height:225px" /></center>
+        </div>
+      </div>
     </div>
-    <div class="col-md-6">
-      <center><img src="{{ post['thumbnail'] if post['thumbnail'] else '/static/images/default_thumbnail.png' }}"
-          style="max-width:100%;max-height:225px" /></center>
-    </div>
-  </div>
-</div>
-{% endfor %}
+  {% endfor %}
 
 {% endblock %}
 
@@ -97,41 +107,40 @@
 <script src="{{ url_for('static', filename='js/tags.js')}}" type='text/javascript'></script>
 <script type="text/javascript">
 
-  $(".pop").popover({ trigger: "manual", html: true, animation: false, delay: 100 })
+  $(".pop").popover({ trigger: "manual" , html: true, animation:false, delay: 100})
     .on("mouseenter", function () {
-      var _this = this;
-      $(this).popover("show");
-      $(".popover").on("mouseleave", function () {
-        $(_this).popover('hide');
-      });
+        var _this = this;
+        $(this).popover("show");
+        $(".popover").on("mouseleave", function () {
+            $(_this).popover('hide');
+        });
     }).on("mouseleave", function () {
-      var _this = this;
-      setTimeout(function () {
-        if (!$(".popover:hover").length) {
-          $(_this).popover("hide");
-        }
-      }, 300);
+        var _this = this;
+        setTimeout(function () {
+            if (!$(".popover:hover").length) {
+                $(_this).popover("hide");
+            }
+        }, 300);
+  });
+
+  $(document).ready(function(){
+      var start = {{ feed_params['start']|default(0) }};
+      var results = {{ feed_params['results']|default(10) }};
+      var next_start = start + results;
+      var prev_start = start - results;
+      var filters = "{{ feed_params['filters']|default("") }}";
+
+    $(".next_btn").on("click", function(){
+      helpersJx.changePage(next_start, results, filters)
     });
 
-  $(document).ready(function () {
-    var start = {{ feed_params['start']|default (0)
-  }};
-  var results = {{ feed_params['results']|default (10) }};
-  var next_start = start + results;
-  var prev_start = start - results;
-  var filters = "{{ feed_params['filters']|default("") }}";
+    $(".prev_btn").on("click", function(){
+      helpersJx.changePage(prev_start, results, filters)
+    })
 
-  $(".next_btn").on("click", function () {
-    helpersJx.changePage(next_start, results, filters)
-  });
-
-  $(".prev_btn").on("click", function () {
-    helpersJx.changePage(prev_start, results, filters)
-  })
-
-  $(document.body).on('click', "button[id^=tag-subscription]", function () {
-    tagsJx.addTagSubscriptionListener($(this)[0]);
-  });
+    $(document.body).on('click',"button[id^=tag-subscription]",function () {
+      tagsJx.addTagSubscriptionListener($(this)[0]);
+    });
   });
 
 </script>

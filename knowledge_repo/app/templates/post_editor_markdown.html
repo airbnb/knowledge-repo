@@ -8,41 +8,39 @@
   </div>
   <div class="col-md-5">
     <span class="group-by-options">
-      <div class="radio-inline radio-cluster">
-        <label>
-          <input type="radio" name="cluster-radio" id="markdown-only">Text Editor Only
-        </label>
-      </div>
-      <div class="radio-inline radio-cluster">
-        <label>
-          <input type="radio" name="cluster-radio" id="split-view" checked='checked'> Split View
-        </label>
-      </div>
-      <div class="radio-inline radio-cluster">
-        <label>
-          <input type="radio" name="cluster-radio" id="rendered-only">Rendered Only
-        </label>
-      </div>
-    </span>
+    <div class="radio-inline radio-cluster">
+      <label>
+        <input type="radio" name="cluster-radio" id="markdown-only">Text Editor Only
+      </label>
+    </div>
+    <div class="radio-inline radio-cluster">
+      <label>
+        <input type="radio" name="cluster-radio" id="split-view" checked='checked'> Split View
+      </label>
+    </div>
+    <div class="radio-inline radio-cluster">
+      <label>
+        <input type="radio" name="cluster-radio" id="rendered-only">Rendered Only
+      </label>
+    </div>
+  </span>
   </div>
 </div>
 <div class="row row-space-3"></div>
 
 <div class="row">
   <div class="col-md-12">
-    <a class="col-md-3" target="_blank" rel="noopener noreferrer"
-      href="https://daringfireball.net/projects/markdown/basics" style="padding-right: 13px">
-      How to write Markdown
-      <i class="glyphicon glyphicon-new-window"></i>
-    </a>
+    <a class="col-md-3" target="_blank" rel="noopener noreferrer" href="https://daringfireball.net/projects/markdown/basics" style="padding-right: 13px">
+     How to write Markdown
+     <i class="glyphicon glyphicon-new-window"></i>
+   </a>
   </div>
 </div>
 <div class="row row-space-2"></div>
 <div class="row">
   <div class="col-md-12">
     <div class="col-md-6" id="post_text_div">
-      <textarea class="input input-resize-both form-control" id="post_text" type="text"
-        placeholder="Start writing markdown here" style="height:750px; width:100%">{{markdown if markdown}}</textarea>
+      <textarea class="input input-resize-both form-control" id="post_text" type="text" placeholder="Start writing markdown here" style="height:750px; width:100%">{{markdown if markdown}}</textarea>
     </div>
     <div class="col-md-6" id="rendered-markdown">
     </div>
@@ -55,7 +53,7 @@
 {{ super() }}
 
 <script>
-  $("#markdown-only").on("click", function () {
+  $("#markdown-only").on("click", function() {
     var md_text = $("#post_text_div")[0];
     var rendered_text = $("#rendered-markdown")[0];
     md_text.className = "col-md-12"
@@ -64,7 +62,7 @@
     rendered_text.style.display = "none";
   })
 
-  $("#split-view").on("click", function () {
+  $("#split-view").on("click", function() {
     var md_text = $("#post_text_div")[0];
     var rendered_text = $("#rendered-markdown")[0];
     md_text.className = "col-md-6";
@@ -75,7 +73,7 @@
     rendered_text.style.display = "inherit";
   });
 
-  $("#rendered-only").on("click", function () {
+  $("#rendered-only").on("click", function() {
     var md_text = $("#post_text_div")[0];
     var rendered_text = $("#rendered-markdown")[0];
     md_text.style.visibility = "hidden";
@@ -92,7 +90,7 @@
       '#post_updated_at', '#post_tags', '#post_tldr'
     ]
     var metadata_vals = {}
-    $.each(metadata_ids, function (i, mid) {
+    $.each(metadata_ids, function(i, mid) {
       metadata_key = mid.split("_")[1];
       textfield = $(mid)[0].value;
       metadata_vals[metadata_key] = textfield;
@@ -140,11 +138,11 @@
     }
 
     // Using async version of marked
-    marked(markdownString, function (err, content) {
+    marked(markdownString, function(err, content) {
       if (err) throw err;
       //make sure images are not larger than the page
       content = content.split('<img ').join('<img style="max-width:100%"')
-      //make tables look prettier:
+        //make tables look prettier:
       content = content.split('<table>').join('<table class="table table-striped table-condensed table-bordered">')
       content = content.split('<table class="dataframe">').join('<table class="table table-striped table-condensed table-bordered">')
       $('#rendered-markdown').html(content)
@@ -158,7 +156,7 @@
   }
 
   var timeout = null;
-  $("#post_text").on("input", function (e) {
+  $("#post_text").on("input", function(e) {
     if ($(this).data("lastval") != $(this).val()) {
       $(this).data("lastval", $(this).val());
 
@@ -167,7 +165,7 @@
         clearTimeout(timeout);
       }
       //if no new input is entered within 1 second, apply the filters
-      timeout = setTimeout(function () {
+      timeout = setTimeout(function() {
         refreshRenderedMarkdown();
       }, 500);
     };
@@ -177,10 +175,10 @@
     '#post_updated_at', '#post_tags', '#post_tldr'
   ]
 
-  $.each(metadata_fields, function (i, field) {
+  $.each(metadata_fields, function(i, field) {
     var timeout = null;
     if (field != "#post_tags") {
-      $(field).on("input", function (e) {
+      $(field).on("input", function(e) {
         if ($(this).data("lastval") != $(this).val()) {
           $(this).data("lastval", $(this).val());
 
@@ -188,7 +186,7 @@
             clearTimeout(timeout);
           }
           //if no new input is entered within 1 second, apply the filters
-          timeout = setTimeout(function () {
+          timeout = setTimeout(function() {
             refreshRenderedMarkdown();
           }, 500);
         };
@@ -196,9 +194,9 @@
     }
   })
 
-  $(document).ready(function () {
+  $(document).ready(function() {
     marked.setOptions({
-      highlight: function (code, lang) {
+      highlight: function(code, lang) {
         try {
           return hljs.highlight(lang, code, true).value;
         } catch (err) {
