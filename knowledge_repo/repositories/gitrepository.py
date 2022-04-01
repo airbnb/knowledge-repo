@@ -175,8 +175,8 @@ class GitKnowledgeRepository(KnowledgeRepository):
         branch = status['branch']
         message = f"Currently checked out on the `{branch}` branch."
         if len(status['changed_files']) > 0:
-            message += "Files modified: \n {modified}".format(
-                modified='\n\t- '.join(status['changed_files']))
+            modified='\n\t- '.join(status['changed_files'])
+            message += f'Files modified: \n {modified}'
         return message
 
     # ---------------- Git properties and actions -------------------------
@@ -249,16 +249,17 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
         # Deal with ambiguity
         if interactive:
-            print("There are multiple branches for post '{}'.".format(path))
+            print(f"There are multiple branches for post '{path}'.")
             for i, branch in enumerate(branches):
-                print("{}. {}".format(i, branch))
+                print(f'{i}. {branch}')
             response = None
             while not isinstance(response, int):
                 response = input(
                     'Please select the branch you would like to use: ')
                 try:
                     response = int(response)
-                except:
+                except Exception as e:
+                    print(f'Exception encountered: {e}')
                     response = None
         else:
             response = 0
@@ -272,14 +273,14 @@ class GitKnowledgeRepository(KnowledgeRepository):
             return self.git.active_branch
 
         if not isinstance(branch, str):
-            raise ValueError("'{}' of type `{}` is not a valid branch descriptor.".format(
-                branch, type(branch)))
+            raise ValueError(f"'{branch}' of type `{type(branch)}` "
+                             "is not a valid branch descriptor.")
 
         try:
             return self.git.branches[branch]
         except IndexError:
             raise ValueError(
-                "Specified branch `{}` does not exist.".format(branch))
+                f"Specified branch `{branch}` does not exist.")
 
     def git_checkout(self, branch, soft=False, reset=False, create=False):
         if not create:
@@ -290,8 +291,11 @@ class GitKnowledgeRepository(KnowledgeRepository):
         if soft and self.git.active_branch.name not in [self.config.published_branch, branch] and not self.git.active_branch.name.endswith('.kp'):
             response = None
             while response not in ['y', 'n']:
-                response = input('It looks like you have checked out the `{}` branch, whereas we were expecting to use `{}`. Do you want to use your current branch instead? (y/n) '.format(
-                    self.git.active_branch.name, branch))
+                active_branch = self.git.active_branch.name
+                response = input(
+                    f"It looks like you have checked out the `{active_branch}`"
+                    f" branch, whereas we were expecting to use `{branch}`. Do"
+                    " you want to use your current branch instead? (y/n) ")
                 if response == 'y':
                     branch = self.git.active_branch.name
 
@@ -306,7 +310,8 @@ class GitKnowledgeRepository(KnowledgeRepository):
                 ref_head = self.git_remote.refs.master if self.git_has_remote else self.git.branches.master
             else:
                 logger.warning(
-                    "The branch `{}` already exists as upstream, and you maybe clobbering someone's work. Please check.".format(ref_head.name))
+                    f"The branch `{ref_head.name}` already exists as upstream,"
+                    " and you maybe clobbering someone's work. Please check.")
             branch = self.git.create_head(branch, ref_head, force=True)
         else:
             branch = self.git_branch(branch)
@@ -348,23 +353,26 @@ class GitKnowledgeRepository(KnowledgeRepository):
             branch = branch or path
         else:
             logger.warning(
-                "This repository does not have a remote, and so post review is being skipped. Adding post directly into published branch...")
+                "This repository does not have a remote, so post review is "
+                "being skipped. Adding post directly into published branch...")
             branch = self.config.published_branch
 
         # Create or checkout the appropriate branch for this project
         logger.info(
-            "Checking out (and/or creating) a new branch `{}`...".format(branch))
+            f"Checking out (and/or creating) a new branch `{branch}`...")
         branch_obj = self.git_checkout(
             branch, soft=True, reset=squash, create=True)
         branch = branch_obj.name
 
-        # Verify that post path does not exist (unless we are updating the post)
+        # Verify that post path does not exist (unless we are updating
+        # the post)
         assert update or not os.path.exists(
-            target), "A knowledge post already exists at '{}'! If you wanted to update it, please pass the '--update' flag.".format(path)
+            target), f"A knowledge post already exists at '{path}'! " + \
+            "If you wanted to update it, please pass the '--update' flag."
 
         # Add knowledge post to local branch
         logger.info(
-            "Adding and committing '{}' to local branch `{}`...".format(path, branch))
+            f"Adding and committing '{path}' to local branch `{branch}`...")
 
     def _add_cleanup(self, kp, path, update=False, branch=None, squash=False, message=None):
         self.git.index.add([path])
@@ -392,25 +400,33 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
     def _submit(self, path=None, branch=None, force=False):
         if not self.git_has_remote:
-            raise RuntimeError("Could not find remote repository `{}` into which this branch should be submitted.".format(
-                self.config.remote_name))
+            remote_name = self.config.remote_name
+            raise RuntimeError(
+                f"Could not find remote repository `{remote_name}` into "
+                "which this branch should be submitted.")
         if branch is None and path is None:
             raise ValueError(
                 "To submit a knowledge post, a path to the post and/or a git branch must be specified.")
         if branch is None:
             branch = self.git_branch_for_post(path)
         if branch is None:
-            raise ValueError(
-                "It does not appear that you have any drafts in progress for '{}'.".format(path))
+            raise ValueError("It does not appear that you have "
+                             f"any drafts in progress for '{path}'.")
 
         try:
             self.git_remote.push(branch, force=force)
         except git.exc.GitCommandError as e:
+            remote_name = self.config.remote_name
+            remote_url = self.git_remote.url
+            err = e.stderr.strip()
             raise RuntimeError(
-                "Failed to push to remote repository {} ({}). Please check the following error, and then try again:\n\n{}".format(
-                    self.config.remote_name, self.git_remote.url, e.stderr.strip()))
+                f"Failed to push to remote repository {remote_name} "
+                f"({remote_url}). Please check the following error, "
+                f"and then try again:\n\n{err}")
 
-        logger.info("Pushed local branch `{}` to upstream branch `{}`. Please consider starting a pull request, or otherwise merging into master.".format(branch, branch))
+        logger.info(f"Pushed local branch `{branch}` to upstream branch "
+                    f"`{branch}`. Please consider starting a pull request, "
+                    "or otherwise merging into master.")
 
     def _publish(self, path):  # Publish a post for general perusal
         raise NotImplementedError
@@ -450,7 +466,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
             branch = self.git_branch(branch)
 
         if branch is None:
-            return ValueError("No such post: {}".format(path))
+            return ValueError(f'No such post: {path}')
 
         if branch.name == self.config.published_branch:
             status = self.PostStatus.PUBLISHED, None
