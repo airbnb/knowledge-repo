@@ -28,14 +28,17 @@ class GitKnowledgeRepository(KnowledgeRepository):
             try:
                 repo = git.Repo(path)
                 logger.warning(
-                    "Repository already exists for uri '{}'. Checking if configuration is needed...".format(uri))
+                    f"Repository already exists for uri '{uri}'. "
+                    "Checking if configuration is needed...")
             except git.InvalidGitRepositoryError:
                 if os.path.isdir(path):
                     logger.warning(
-                        "Upgrading existing directory at '{}' to a git knowledge repository...".format(path))
+                        f"Upgrading existing directory at '{path}' "
+                        "to a git knowledge repository...")
                 else:
                     raise RuntimeError(
-                        "File exists at nominated path: {}. Cannot proceed with repository initialization.".format(path))
+                        f"File exists at nominated path: {path}. "
+                        "Cannot proceed with repository initialization.")
 
         repo = git.Repo.init(path, mkdir=True)
 
@@ -49,8 +52,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
                 repo.index.add([filename])
                 added_files += 1
             else:
-                logger.warning(
-                    "Not overriding existing file '{}'.".format(filename))
+                logger.warning(f"Not overriding existing file '{filename}'.")
 
         if added_files > 0:
             repo.index.commit("Initial creation of knowledge repository.")
@@ -84,7 +86,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
                     self.git_read(config.replace('git:///', ''))))
             except KeyError:
                 logger.warning(
-                    "Repository missing configuration file: {}".format(config))
+                    f"Repository missing configuration file: {config}")
         else:
             self.config.update(config)
 
@@ -101,10 +103,9 @@ class GitKnowledgeRepository(KnowledgeRepository):
             if self.auto_create:
                 self.create(path)
             else:
-                raise ValueError(
-                    "Provided path '{}' does not exist.".format(path))
+                raise ValueError(f"Provided path '{path}' does not exist.")
         assert self.__is_valid_repo(
-            path), "Provided path '{}' is not a valid repository.".format(path)
+            path), f"Provided path '{path}' is not a valid repository."
         self._path = path
         self.uri = path  # Update uri to point to absolute path of repository
 
@@ -135,7 +136,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
     @property
     def revision(self):
         c = self.git.commit()
-        return "{}_{}".format(str(c.committed_date), c.hexsha)
+        return f'{c.committed_date}_{c.hexsha}'
 
     def update(self, branch=None):
         branch = branch or self.config.published_branch
@@ -146,8 +147,9 @@ class GitKnowledgeRepository(KnowledgeRepository):
         try:
             self.git_remote.fetch()
         except git.exc.GitCommandError:
-            logger.warning("Cannot fetch from remote repository hosted on {}. Continuing locally with potentially outdated code.".format(
-                self.__remote_host))
+            logger.warning(
+                f'Cannot fetch from remote repository hosted on {self.__remote_host}. '
+                'Continuing locally with potentially outdated code.')
             return
 
         current_branch = self.git.active_branch
@@ -170,8 +172,8 @@ class GitKnowledgeRepository(KnowledgeRepository):
     @property
     def status_message(self):
         status = self.status
-        message = "Currently checked out on the `{branch}` branch.".format(
-            branch=status['branch'])
+        branch = status['branch']
+        message = f"Currently checked out on the `{branch}` branch."
         if len(status['changed_files']) > 0:
             message += "Files modified: \n {modified}".format(
                 modified='\n\t- '.join(status['changed_files']))
@@ -455,14 +457,14 @@ class GitKnowledgeRepository(KnowledgeRepository):
         elif self.git_has_remote and branch.name in self.git_remote.refs:
             remote_branch = self.git_remote.refs[branch.name].name
             behind = len(list(self.git.iter_commits(
-                '{}..{}'.format(branch, remote_branch))))
+                f'{branch}..{remote_branch}')))
             ahead = len(list(self.git.iter_commits(
-                '{}..{}'.format(remote_branch, branch))))
+                f'{remote_branch}..{branch}')))
 
             status = (self.PostStatus.SUBMITTED,
-                      (" - {} commits behind".format(behind) if behind else '') +
-                      (" - {} commits ahead".format(ahead) if ahead else '') +
-                      (" [On branch: {}]".format(branch) if branch != path else ''))
+                      (f' - {behind} commits behind' if behind else '') +
+                      (f' - {ahead} commits ahead' if ahead else '') +
+                      (f' [On branch: {branch}]' if branch != path else ''))
         else:
             status = self.PostStatus.DRAFT, None
 
