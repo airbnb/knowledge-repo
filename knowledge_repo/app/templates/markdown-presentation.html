@@ -2,21 +2,21 @@
 
 {% block content %}
 
-    {{ super() }}
+{{ super() }}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/codehilite-friendly.css') }}">
-    <div id="renderedMarkdown">
-      <textarea id="source">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/codehilite-friendly.css') }}">
+<div id="renderedMarkdown">
+  <textarea id="source">
         {{ html|safe }}
       </textarea>
-      <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
-      </script>
-      <script>
-        var slideshow = remark.create();
-      </script>
-    </div>
+  <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
+  </script>
+  <script>
+    var slideshow = remark.create();
+  </script>
+</div>
 
-    <hr/>
+<hr />
 
 {% endblock %}
 
@@ -34,8 +34,7 @@
     "HTML-CSS": { availableFonts: ["TeX"] }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js">
 </script>
 <script>
   $(".btn-presentation").addClass("btn-active");
