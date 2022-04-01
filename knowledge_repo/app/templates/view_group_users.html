@@ -12,11 +12,11 @@
       <ul style='list-style-type:none'>
         {% for user in group.users %}
         <li> {{ user.format_name }} -
-            <a href="javascript:void(0)" onclick="delete_user({{user.id}});"> Delete User </a>
+          <a href="javascript:void(0)" onclick="delete_user({{user.id}});"> Delete User </a>
         </li>
         <br>
         {% endfor %}
-      <ul>
+        <ul>
     </div>
   </div>
 </div>
@@ -25,8 +25,8 @@
 {% block scripts %}
 {{ super() }}
 <script>
-function delete_user(user_id){
-  $.ajax({
+  function delete_user(user_id) {
+    $.ajax({
       type: "POST",
       dataType: "json",
       data: JSON.stringify(user_id),
@@ -35,6 +35,6 @@ function delete_user(user_id){
       async: false,
     });
     location.reload();
-}
+  }
 </script>
 {% endblock %}
