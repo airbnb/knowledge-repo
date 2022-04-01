@@ -2,9 +2,6 @@
     "python.linting.enabled": true,
     "python.linting.pycodestyleEnabled": true,
     "editor.formatOnSave": true,
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
-    },
     "[html]": {
         "editor.formatOnSave": false
     },
