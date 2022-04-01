@@ -190,8 +190,8 @@ class GitKnowledgeRepository(KnowledgeRepository):
         if prefix is not None:
             tree = tree[prefix]
         return [o.path for o in tree.traverse(
-                prune=lambda i, d: isinstance(i, git.Submodule)
-                or os.path.dirname(i.path).endswith('.kp'),
+                prune=lambda i, d: isinstance(i, git.Submodule) or
+                os.path.dirname(i.path).endswith('.kp'),
                 visit_once=False,
                 predicate=lambda i, d: i.path.endswith('.kp')
                 )]
