@@ -12,15 +12,13 @@
       <ul style='list-style-type:none'>
         {% for group in groups %}
         <li> {{ group.name }} -
-            <a href='/view_group_users?group_id={{group.id}}'> View Users </a>,
-            <a href='/add_group_users?group_id={{group.id}}'> Add Users </a>
+          <a href='/view_group_users?group_id={{group.id}}'> View Users </a>,
+          <a href='/add_group_users?group_id={{group.id}}'> Add Users </a>
         </li>
         <br>
         {% endfor %}
-      <ul>
+        <ul>
     </div>
   </div>
 </div>
 {% endblock %}
-
-
