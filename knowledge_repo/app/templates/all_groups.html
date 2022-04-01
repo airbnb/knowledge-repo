@@ -10,9 +10,8 @@
     </div>
     <div class="panel-body">
       <div class="col-12">
-        <textarea style='width: 80%; vertical-align:middle'
-                  placeholder=' Add new group names, separated by commas'
-                  id='add_groups'></textarea>
+        <textarea style='width: 80%; vertical-align:middle' placeholder=' Add new group names, separated by commas'
+          id='add_groups'></textarea>
         <button class="btn btn-large btn-default" style='vertical-align:bottom' id="btn_submit">Add groups</button>
       </div>
       <br> <br>
@@ -22,7 +21,7 @@
         <li> <a href="/add_group_users?group_id={{group.id}}"> {{ group.name }}</a></li>
         <br>
         {% endfor %}
-      <ul>
+        <ul>
     </div>
   </div>
 </div>
@@ -31,7 +30,7 @@
 {% block scripts %}
 {{ super () }}
 <script>
-$("#btn_submit").on("click", function(){
+  $("#btn_submit").on("click", function () {
     groups = $('#add_groups')[0].value.split(",")
     $.ajax({
       type: "POST",
@@ -42,6 +41,6 @@ $("#btn_submit").on("click", function(){
       async: false,
     });
     location.reload();
-});
+  });
 </script>
 {% endblock %}
