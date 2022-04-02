@@ -306,7 +306,8 @@ class OrgConverter(KnowledgePostConverter):
 
     def write_kp(self, new_lines, metadata):
         # Metadata header
-        metadata_str = "---\n{}\n---".format(dict_to_yaml(metadata))
+        metadata_yml = dict_to_yaml(metadata)
+        metadata_str = f'---\n{metadata_yml}\n---'
 
         body = metadata_str + "\n".join(new_lines)
 
