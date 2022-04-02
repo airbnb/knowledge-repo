@@ -47,8 +47,8 @@ class ExtractImagesToLocalServer(ExtractImages):
             random_name = ''.join(
                 random.choice(string.ascii_lowercase) for i in range(6))
             timestamp = int(round(time.time() * 100))
-            fname_img = f'{repo_name}_{timestamp}' + \
-                f'_{random_name}{img_ext}'.strip().replace(' ', '-')
+            fname_img = (f'{repo_name}_{timestamp}_'
+                         f'{random_name}{img_ext}').strip().replace(' ', '-')
 
             # See if a static file directory exists, if not, let's create
             if not os.path.exists(self.image_dir):
