@@ -8,13 +8,12 @@ class FormatChecks(KnowledgePostProcessor):
 
     def process(self, kp):
         headers = kp.headers
-        for field, typ, _ in HEADER_REQUIRED_FIELD_TYPES:
-            assert field in headers, \
-                "Required field `{field}` missing from headers."
-        for field, typ, _ in \
-                HEADER_REQUIRED_FIELD_TYPES + HEADER_OPTIONAL_FIELD_TYPES:
+        for field, typ, input in HEADER_REQUIRED_FIELD_TYPES:
+            assert field in headers, "Required field `{}` missing from headers.".format(
+                field)
+            assert isinstance(headers[field], typ), "Value for field `{}` is of type {}, and needs to be of type {}.".format(
+                field, type(headers[field]), typ)
+        for field, typ, input in HEADER_OPTIONAL_FIELD_TYPES:
             if field in headers:
-                header_field = headers[field]
-                assert isinstance(header_field, typ), \
-                    f"Value for field `{field}` is of type " + \
-                    f"{type(header_field)}, and needs to be of type {typ}."
+                assert isinstance(headers[field], typ), "Value for field `{}` is of type {}, and needs to be of type {}.".format(
+                    field, type(headers[field]), typ)
