@@ -116,6 +116,3 @@ ENV/
 
 # Mac OS X filesystem artifacts
 .DS_Store
-
-# Local run artifacts
-.knowledge_repo_config.yml
