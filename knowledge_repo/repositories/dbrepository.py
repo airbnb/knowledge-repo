@@ -190,14 +190,14 @@ class DbKnowledgeRepository(KnowledgeRepository):
     def _kp_status(self, path, revision=None, detailed=False):
         revision = revision or self._kp_get_revision(path, enforce_exists=True)
 
-        postref = (self.session.query(self.PostRef)
-                               .filter(self.PostRef.path == path)
-                               .filter(self.PostRef.revision == revision)).first()
+        postref = (
+            self.session.query(self.PostRef)
+                        .filter(self.PostRef.path == path)
+                        .filter(self.PostRef.revision == revision)).first()
 
         if not postref:
-            raise ValueError(
-                f"No such post exists for path '{path}'"
-                " and revision '{revision}'.")
+            raise ValueError(f"No such post exists for path '{path}'"
+                             f" and revision '{revision}'.")
 
         if detailed:
             return self.__get_post_status(path, revision), None
