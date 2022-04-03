@@ -89,8 +89,9 @@ class DbKnowledgeRepository(KnowledgeRepository):
         try:
             session = self.Session()
             session.remove()
-        except:
-            return {'status': 'unable to connect to uri {}'.format(self.uri)}
+        except Exception as e:
+            print(f'Exception encountered: {e}')
+            return {'status': f'unable to connect to uri {self.uri}'}
         return {'status': 'super'}
 
     @property
@@ -103,7 +104,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
         query = self.session.query(self.PostRef.path)
         if prefix is not None:
             query = query.filter(
-                self.PostRef.status.like('{}%'.format(prefix)))
+                self.PostRef.status.like(f'{prefix}%'))
         query = query.filter(self.PostRef.status.in_(
             [status.value for status in statuses]))
 
@@ -189,13 +190,14 @@ class DbKnowledgeRepository(KnowledgeRepository):
     def _kp_status(self, path, revision=None, detailed=False):
         revision = revision or self._kp_get_revision(path, enforce_exists=True)
 
-        postref = (self.session.query(self.PostRef)
-                               .filter(self.PostRef.path == path)
-                               .filter(self.PostRef.revision == revision)).first()
+        postref = (
+            self.session.query(self.PostRef)
+                        .filter(self.PostRef.path == path)
+                        .filter(self.PostRef.revision == revision)).first()
 
         if not postref:
-            raise ValueError(
-                "No such post exists for path '{}' and revision '{}'.".format(path, revision))
+            raise ValueError(f"No such post exists for path '{path}'"
+                             f" and revision '{revision}'.")
 
         if detailed:
             return self.__get_post_status(path, revision), None
@@ -213,7 +215,7 @@ class DbKnowledgeRepository(KnowledgeRepository):
             revision = revision[0]
         if enforce_exists and revision is None:
             raise ValueError(
-                'No post found at {} (with status of {})'.format(path, status))
+                f'No post found at {path} (with status of {status})')
         return revision or 0
 
     def _kp_get_revisions(self, path):

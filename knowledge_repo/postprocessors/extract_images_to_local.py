@@ -44,13 +44,11 @@ class ExtractImagesToLocalServer(ExtractImages):
             img_ext = os.path.splitext(img_path)[1]
 
             # Make random filename for image
-            random_string = ''.join(
+            random_name = ''.join(
                 random.choice(string.ascii_lowercase) for i in range(6))
-            fname_img = '{repo_name}_{time}_{random_string}{ext}'.format(
-                repo_name=repo_name,
-                time=int(round(time.time() * 100)),
-                random_string=random_string,
-                ext=img_ext).strip().replace(' ', '-')
+            timestamp = int(round(time.time() * 100))
+            fname_img = (f'{repo_name}_{timestamp}_'
+                         f'{random_name}{img_ext}').strip().replace(' ', '-')
 
             # See if a static file directory exists, if not, let's create
             if not os.path.exists(self.image_dir):

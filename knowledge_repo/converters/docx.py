@@ -30,7 +30,7 @@ class DocxConverter(KnowledgePostConverter):
             extra_args=[
                 '--standalone',
                 '--wrap=none',
-                '--extract-media={}'.format(wd)
+                f'--extract-media={wd}'
             ]
         )
 
