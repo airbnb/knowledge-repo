@@ -56,7 +56,7 @@ class ExtractImagesToLocalServer(ExtractImages):
 
             # Copy images to local http server directory
             new_path = os.path.join(self.image_dir, fname_img)
-            logger.info("Copying image {} to {}".format(tmp_path, new_path))
+            logger.info(f'Copying image {tmp_path} to {new_path}')
             try:
                 shutil.copyfile(tmp_path, new_path)
             except Exception as e:
