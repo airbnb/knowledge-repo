@@ -65,7 +65,8 @@ class ExtractImages(KnowledgePostProcessor):
 
     def collect_images_for_pattern(self, md, pattern=None):
         p = re.compile(pattern)
-        return [{'offset': m.start(), 'tag': m.group(0), 'src': m.group('src')} for m in p.finditer(md)]
+        return [{'offset': m.start(), 'tag': m.group(0), 'src': m.group('src')}
+                for m in p.finditer(md)]
 
     def collect_images(self, kp, images):
         image_mapping = {}
@@ -99,7 +100,8 @@ class ExtractImages(KnowledgePostProcessor):
     def skip_image(self, kp, image):
         if re.match('http[s]?://', image['src']):
             return True
-        if image['src'].startswith('images/') and image['src'] in kp.image_paths:
+        if image['src'].startswith('images/') and \
+                image['src'] in kp.image_paths:
             return True
         return False
 
