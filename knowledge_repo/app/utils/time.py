@@ -15,10 +15,10 @@ def human_readable_time_delta(seconds):
     if seconds is None:
         return "Never"
     elif seconds < 60:
-        return "{:d} seconds ago".format(int(round(seconds)))
+        return f'{seconds:.0f} seconds ago'
     elif seconds < 60 * 60:
-        return "{:d} minutes ago".format(int(round(seconds / 60)))
+        return f'{(seconds / 60):.0f} minutes ago'
     elif seconds < 24 * 60 * 60:
-        return "{:d} hours ago".format(int(round(seconds / 60 / 60)))
+        return f'{(seconds / 60 / 60):.0f} hours ago'
     else:
-        return "{:d} days ago".format(int(round(seconds / 60 / 60 / 24)))
+        return f'{(seconds / 60 / 60 / 24):.0f} days ago'
