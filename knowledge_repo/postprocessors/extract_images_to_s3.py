@@ -45,13 +45,11 @@ class ExtractImagesToS3(ExtractImages):
             img_ext = posixpath.splitext(img_path)[1]
 
             # Make random filename for image
-            random_string = ''.join(random.choice(
-                string.ascii_lowercase) for i in range(6))
-            fname_img = '{repo_name}_{time}_{random_string}{ext}'.format(
-                repo_name=repo_name,
-                time=int(round(time.time() * 100)),
-                random_string=random_string,
-                ext=img_ext).strip().replace(' ', '-')
+            random_name = ''.join(
+                random.choice(string.ascii_lowercase) for i in range(6))
+            timestamp = int(round(time.time() * 100))
+            fname_img = (f'{repo_name}_{timestamp}_'
+                         f'{random_name}{img_ext}').strip().replace(' ', '-')
 
             # Copy image to accessible folder on S3
             fname_s3 = posixpath.join(self.s3_image_root, repo_name, fname_img)

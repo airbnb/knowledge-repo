@@ -188,7 +188,8 @@ class MathJaxPattern(markdown.inlinepatterns.Pattern):
 
 class MathJaxExtension(markdown.Extension):
     def extendMarkdown(self, md, md_globals=None):
-        # Needs to come before escape matching because \ is pretty important in LaTeX
+        # Needs to come before escape matching because \ is
+        # pretty important in LaTeX
         md.inlinePatterns.add('mathjax', MathJaxPattern(), '<escape')
 
 
@@ -217,7 +218,10 @@ class HTMLConverter(KnowledgePostConverter):
 
         # proxy posts are assumed to be embeddable links
         if PROXY in self.kp.headers:
-            return None, '<a href="{0}">Linked Post</a>\n<iframe width=100% height=1000 src="{0}"></iframe>'.format(self.kp.headers['proxy'].strip())
+            proxy = self.kp.headers[PROXY].strip()
+            return None, (f'<a href="{proxy}">Linked Post</a>\n'
+                          f'<iframe width=100% height=1000 '
+                          f'src="{proxy}"></iframe>')
 
         html = ''
         if not skip_headers:
@@ -256,7 +260,8 @@ class HTMLConverter(KnowledgePostConverter):
                     return match.group(0).replace(match.group('url'), new_url)
             return None
 
-        return SubstitutionMapper(patterns=patterns, mappers=[urlmapper_proxy]).apply(html)
+        return SubstitutionMapper(patterns=patterns,
+                                  mappers=[urlmapper_proxy]).apply(html)
 
     # Utility methods
     def render_headers(self):
@@ -287,5 +292,6 @@ class HTMLConverter(KnowledgePostConverter):
                 image_data = base64.b64encode(self.kp_images[url])
                 image_mimetype = mimetypes.guess_type(url)[0]
                 if image_mimetype is not None:
-                    return f'data:{image_mimetype};base64, ' + image_data.decode(UTF8)
+                    return f'data:{image_mimetype};base64, ' + \
+                        image_data.decode(UTF8)
         return None

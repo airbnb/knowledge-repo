@@ -86,7 +86,7 @@ def show_views():
 
         methods = ','.join(rule.methods)
         url = url_for(rule.endpoint, **options)
-        line = unquote("{:50s} {:20s} {}".format(rule.endpoint, methods, url))
+        line = unquote(f'{rule.endpoint:50s} {methods:20s} {url}')
         output.append(line)
 
     return "<br />".join(sorted(output))
