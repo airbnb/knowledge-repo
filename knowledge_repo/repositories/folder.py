@@ -140,7 +140,8 @@ class FolderKnowledgeRepository(KnowledgeRepository):
     def _kp_uuid(self, path):
         try:
             return self._kp_read_ref(path, 'UUID')
-        except:
+        except Exception as e:
+            print(f'Exception encountered: {e}')
             return None
 
     def _kp_path(self, path, rel=None):
@@ -157,7 +158,8 @@ class FolderKnowledgeRepository(KnowledgeRepository):
         # revisions because using git rev-parse is slow.
         try:
             return int(self._kp_read_ref(path, 'REVISION'))
-        except:
+        except Exception as e:
+            print(f'Exception encountered: {e}')
             return 0
 
     def _kp_get_revisions(self, path):
