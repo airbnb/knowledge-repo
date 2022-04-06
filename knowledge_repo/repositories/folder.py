@@ -15,8 +15,10 @@ class FolderKnowledgeRepository(KnowledgeRepository):
     _registry_keys = ['', 'file']
 
     TEMPLATES = {
-        'README.md': get_path(__file__, '../templates', 'repository_readme.md'),
-        '.knowledge_repo_config.yml': get_path(__file__, '../templates', 'repository_config.yml'),
+        'README.md': get_path(
+            __file__, '../templates', 'repository_readme.md'),
+        '.knowledge_repo_config.yml': get_path(
+            __file__, '../templates', 'repository_config.yml'),
     }
 
     @classmethod
@@ -40,8 +42,8 @@ class FolderKnowledgeRepository(KnowledgeRepository):
     def from_uri(cls, uri, *args, **kwargs):
         """
         If this folder is actually a git repository, a `GitKnowledgeRepository`
-        is returned instead, unless the folder knowledge repository is explicitly
-        requested via the 'file://' protocol.
+        is returned instead, unless the folder knowledge repository is
+        explicitly requested via the 'file://' protocol.
         """
         check_for_git = True
         if uri.startswith('file://'):
@@ -73,7 +75,7 @@ class FolderKnowledgeRepository(KnowledgeRepository):
                 raise ValueError(f"Provided path '{path}' does not exist.")
         self._path = path
 
-    # ----------- Repository actions / state ------------------------------------
+    # ----------- Repository actions / state ----------------------------------
     @property
     def revision(self):
         return time.time()
@@ -93,7 +95,8 @@ class FolderKnowledgeRepository(KnowledgeRepository):
 
         if self.PostStatus.PUBLISHED in statuses:
 
-            for path, folders, files in os.walk(os.path.join(self.path, prefix or '')):
+            for path, folders, files in os.walk(
+                    os.path.join(self.path, prefix or '')):
 
                 # Do not visit hidden folders
                 for folder in folders:
@@ -110,7 +113,8 @@ class FolderKnowledgeRepository(KnowledgeRepository):
                     for file in files if file.endswith('.kp')
                 )
 
-        for post in sorted([post[2:] if post.startswith('./') else post for post in posts]):
+        for post in sorted([post[2:] if post.startswith('./')
+                            else post for post in posts]):
             yield post
 
     # ------------- Post submission / addition user flow ----------------------
@@ -135,7 +139,7 @@ class FolderKnowledgeRepository(KnowledgeRepository):
     def _remove(self, path, all=False):
         shutil.rmtree(os.path.join(self.path, path))
 
-    # ------------ Knowledge Post Data Retrieval Methods -------------------------
+    # ------------ Knowledge Post Data Retrieval Methods ----------------------
 
     def _kp_uuid(self, path):
         try:
@@ -145,7 +149,8 @@ class FolderKnowledgeRepository(KnowledgeRepository):
             return None
 
     def _kp_path(self, path, rel=None):
-        return KnowledgeRepository._kp_path(self, os.path.expanduser(path), rel=rel or self.path)
+        return KnowledgeRepository._kp_path(
+            self, os.path.expanduser(path), rel=rel or self.path)
 
     def _kp_exists(self, path, revision=None):
         return os.path.exists(os.path.join(self.path, path))
@@ -154,8 +159,8 @@ class FolderKnowledgeRepository(KnowledgeRepository):
         return self.PostStatus.PUBLISHED
 
     def _kp_get_revision(self, path):
-        # We use a 'REVISION' file in the knowledge post folder rather than using git
-        # revisions because using git rev-parse is slow.
+        # We use a 'REVISION' file in the knowledge post folder rather than
+        # using git revisions because using git rev-parse is slow.
         try:
             return int(self._kp_read_ref(path, 'REVISION'))
         except Exception as e:
@@ -178,22 +183,26 @@ class FolderKnowledgeRepository(KnowledgeRepository):
                 os.makedirs(ref_dir)
             write_binary(ref_path, data)
 
-    def _kp_dir(self, path, parent=None, revision=None):  # TODO: Account for revision
+    # TODO: Account for revision
+    def _kp_dir(self, path, parent=None, revision=None):
         path = os.path.join(self.path, path)
         if os.path.isdir(path):
             if parent:
                 path = os.path.join(path, parent)
-            for dirpath, dirnames, filenames in os.walk(os.path.join(self.path, path)):
+            for dirpath, dirnames, filenames in os.walk(
+                    os.path.join(self.path, path)):
                 for filename in filenames:
                     if dirpath == '' and filename == 'REVISION':
                         continue
-                    yield os.path.relpath(os.path.join(dirpath, filename), os.path.join(self.path, path))
+                    yield os.path.relpath(os.path.join(
+                        dirpath, filename), os.path.join(self.path, path))
         else:
             kp = KnowledgePost.from_file(path, format='kp')
             for reference in kp._dir(parent=parent):
                 yield reference
 
-    def _kp_has_ref(self, path, reference, revision=None):  # TODO: Account for revision
+    # TODO: Account for revision
+    def _kp_has_ref(self, path, reference, revision=None):
         path = os.path.join(self.path, path)
         if os.path.isdir(path):
             return os.path.isfile(os.path.join(path, reference))
