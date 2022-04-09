@@ -172,13 +172,13 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
 
     def post(self, path, revision=None):
         if path is None:
-            raise ValueError("path is None")
+            raise ValueError('path is None')
         path = self._kp_path(path)
         if not self.has_post(path, revision=revision) \
                 and path in self.config.aliases:
             path = self.config.aliases[path]
             if path in self.config.alias:
-                raise ValueError("Alias cycle detected.")
+                raise ValueError('Alias cycle detected.')
         assert self.has_post(path, revision=revision), \
             f"{self.__class__.__name__} does not have a post at '{path}'."
         return KnowledgePost(
@@ -191,7 +191,7 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
         else:
             prefixes = prefix
         assert all([prefix is None or isinstance(prefix, str) for prefix
-                    in prefixes]), "All path prefixes must be strings."
+                    in prefixes]), 'All path prefixes must be strings.'
         prefixes = [prefix if prefix is None else posixpath.relpath(prefix)
                     for prefix in prefixes]
         if isinstance(status, str):
@@ -262,12 +262,12 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
         path = self._kp_path(path)
         path = self.config.path_parse(path)
 
-        current_datetime = datetime.now()
+        now = datetime.now()
         authors = kp.headers['authors']
         new_authors = [self.config.username_parse(
             author) for author in authors]
-        if new_authors != authors or kp.headers['updated_at'] < current_datetime:
-            kp.update_headers(authors=new_authors, updated_at=current_datetime)
+        if new_authors != authors or kp.headers['updated_at'] < now:
+            kp.update_headers(authors=new_authors, updated_at=now)
 
         for postprocessor, postprocessor_kwargs in self.config.postprocessors:
             KnowledgePostProcessor._get_subclass_for(
@@ -301,11 +301,11 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
     def _submit(self, path):  # Submit a post for review
         raise NotImplementedError
 
-    def accept(self, path):  # Submit a post for review
+    def accept(self, path):  # Accept a post after review
         return self._accept(self._kp_path(path))
 
     @abstractmethod
-    def _accept(self, path):  # Submit a post for review
+    def _accept(self, path):  # Accept a post after review
         raise NotImplementedError
 
     def publish(self, path):  # Publish a post for general perusal
@@ -329,7 +329,7 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
     def _remove(self, path, all=False):
         raise NotImplementedError
 
-    # ----------- Knowledge Post Data Retrieval/Pushing Methods --------------------
+    # ----------- Knowledge Post Data Retrieval/Pushing Methods ---------------
 
     def _kp_repository_uri(self, path):
         return self.uri
@@ -344,11 +344,12 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
         path = os.path.relpath(os.path.abspath(os.path.join(rel, path)), rel)
         if os.name == 'nt':
             path = path.replace(os.path.sep, os.path.altsep)
-        assert all([not segment.endswith(KP_EXTENSION) for segment in path.split(
-            '/')[:-1]]), "The post path may not contain a directory named '*.kp'."
+        assert all([not segment.endswith(
+            KP_EXTENSION) for segment in path.split('/')[:-1]]), \
+            "The post path may not contain a directory named '*.kp'."
         if path == '.' or path.startswith('..'):
-            raise ValueError(
-                f"Provided path '{path}' is outside of the knowledge repository.")
+            raise ValueError(f"Provided path '{path}' is outside"
+                             " of the knowledge repository.")
         if not path.endswith(KP_EXTENSION):
             path += KP_EXTENSION
         return path
@@ -398,8 +399,8 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
 
     def _kp_save(self, kp, path, update=False):
         if not update and self.has_post(path):
-            raise ValueError(
-                "A knowledge post with the same path already exists. To update it, set the update flag.")
+            raise ValueError('A knowledge post with the same path already'
+                             ' exists. To update it, set the update flag.')
         kp.uuid = self._kp_uuid(path) or kp.uuid
         kp.path = path
         kp.revision = self._kp_new_revision(path, uuid=kp.uuid)
@@ -416,4 +417,5 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
     # ----------- Interface with web app ----------------------------------
     def get_app(self, *args, **kwargs):
         from . import app
-        return self.config.prepare_app(app.KnowledgeFlask(self, *args, **kwargs))
+        return self.config.prepare_app(
+            app.KnowledgeFlask(self, *args, **kwargs))
