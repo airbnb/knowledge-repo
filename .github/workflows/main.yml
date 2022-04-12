@@ -14,12 +14,17 @@ jobs:
         os: ["ubuntu-18.04", "macos-latest"]
         python-version: ['3.6', '3.7', '3.8', '3.9']
     steps:
-      - uses: actions/checkout@v2
-      - uses: conda-incubator/setup-miniconda@v2
+      - name: Checkout source
+        uses: actions/checkout@v2
+
+      - name: Set up Python Test Env and Python
+        uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: test
           python-version: '${{ matrix.python-version }}'
-      - shell: bash -l {0}
+
+      - name: CI Tests
+        shell: bash -l {0}
         run: |
           conda update --all --yes
           conda config --set always_yes yes --set changeps1 no
