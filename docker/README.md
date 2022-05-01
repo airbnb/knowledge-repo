@@ -7,7 +7,7 @@ Make sure you have Docker installed, and Docker Desktop is running.
 In the knowledge-repo folder, run the following command:
 
 <pre>
-docker build -t knowledge -f docker/Dockerfile.dev .
+docker build -t knowledge -f docker/Dockerfile .
 </pre>
 
 ## Run it locally
