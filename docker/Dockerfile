@@ -27,7 +27,7 @@ COPY . /app/knowledge-repo-$VERSION
 
 COPY docker/entrypoint.sh /app/knowledge-repo-$VERSION
 
-RUN ${PIP} install -r /app/knowledge-repo-$VERSION/docker/requirements.txt
+RUN ${PIP} install -r /app/knowledge-repo-$VERSION/requirements.txt
 
 WORKDIR /app/knowledge-repo-$VERSION
 
