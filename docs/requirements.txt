@@ -22,4 +22,4 @@ requests
 weasyprint
 ipython_genutils
 werkzeug==1.0
-
+MarkupSafe==2.0.1
