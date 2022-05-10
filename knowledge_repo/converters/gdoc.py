@@ -55,7 +55,7 @@ class GDocConverter(DocxConverter):
 
     def from_file(self, url, download_path=None, **opts):
         m = re.match(
-            'https://docs.google.com/document/d/(?P<doc_id>[^/]+)/', url)
+            r'https://docs\.google\.com/document/d/(?P<doc_id>[^/]+)/', url)
 
         if not m:
             raise ValueError("Invalid Google Docs url.")
