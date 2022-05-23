@@ -7,4 +7,4 @@ do
   find /data -name "*.$ext" -not -path '*.ipynb_checkpoints/*' | xargs -I{} sh -c 'base=$(basename "{}"); scripts/knowledge_repo add "{}" -p "$base"'
 done
 
-scripts/knowledge_repo runserver
+scripts/knowledge_repo runserver --port 7001
