@@ -2,8 +2,8 @@ cooked_input
 flask 
 Flask-Migrate 
 gitdb
-gitpython
-tabulate
+gitpython==3.1.18
+tabulate==0.8.9
 pyyaml 
 markdown==3.3.4
 pygments==2.10.0
@@ -20,3 +20,5 @@ traitlets
 ldap3
 requests
 weasyprint
+jinja2>=2.7,<=3.0.3
+werkzeug>=1.0,<=2.0.3

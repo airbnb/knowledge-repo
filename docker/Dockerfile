@@ -4,7 +4,7 @@ LABEL description="knowledge-repo service"
 
 # Define some build time variables
 ARG PIP=pip3
-ARG VERSION=0.9.1
+ARG VERSION=0.9.0
 
 # Install required tools and libraries
 RUN apt-get update && \
@@ -26,6 +26,8 @@ RUN wget https://github.com/airbnb/knowledge-repo/archive/v$VERSION.zip && \
 COPY . /app/knowledge-repo-$VERSION
 
 COPY docker/entrypoint.sh /app/knowledge-repo-$VERSION
+
+COPY docker/config.py /app/knowledge-repo-$VERSION
 
 RUN ${PIP} install -r /app/knowledge-repo-$VERSION/requirements.txt
 
