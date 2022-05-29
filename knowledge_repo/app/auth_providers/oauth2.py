@@ -41,7 +41,8 @@ PRESETS = {
         'auto_refresh_url': 'https://accounts.google.com/o/oauth2/token',
         'scopes': [
             'https://www.googleapis.com/auth/userinfo.email',
-            'https://www.googleapis.com/auth/userinfo.profile'
+            'https://www.googleapis.com/auth/userinfo.profile',
+            'openid'
         ],
         'user_info_endpoint': 'userinfo',
         'user_info_mapping': {
