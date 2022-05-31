@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 LOCKED = CHECKED = '1'
 UNLOCKED = '0'
 
+sync_lock = multiprocessing.Lock()
+
 
 def set_up_indexing_timers(app):
     if not app.config['INDEXING_ENABLED']:
@@ -47,9 +49,12 @@ def set_up_indexing_timers(app):
         def index_sync_loop(app):
             current_app.db.engine.dispose()
             while True:
-                with app.app_context():
-                    update_index(check_timeouts=False)
-                time.sleep(app.config['INDEXING_INTERVAL'])
+                sync_lock.acquire()
+                try:
+                    with app.app_context():
+                        update_index(check_timeouts=False)
+                finally:
+                    sync_lock.release()
 
         app.index_watchdog = multiprocessing.Process(
             target=index_watchdog, args=(app,))
