@@ -3,7 +3,7 @@ from .proxies import db_session, current_app, current_repo
 from .utils.emails import send_subscription_emails
 from .utils.time import time_since
 import logging
-import multiprocessing
+import multiprocess as multiprocessing
 import os
 import time
 
@@ -15,7 +15,30 @@ LOCKED = CHECKED = '1'
 UNLOCKED = '0'
 
 
+def index_sync_loop(app):
+    logger.info('test')
+    current_app.db.engine.dispose()
+    while True:
+        with app.app_context():
+            update_index(check_timeouts=False)
+        time.sleep(app.config['INDEXING_INTERVAL'])
+
+
+def index_watchdog(app):
+    logger.info('test')
+    while True:
+        if not hasattr(app, 'sync_thread') or not app.sync_thread.is_alive():
+            logger.warning(
+                "Master indexing thread has died. Restarting...")
+            with app.app_context():
+                app.sync_thread = multiprocessing.Process(
+                    target=index_sync_loop, args=(app,))
+                app.sync_thread.start()
+        time.sleep(app.config['INDEXING_TIMEOUT'])
+
+
 def set_up_indexing_timers(app):
+
     if not app.config['INDEXING_ENABLED']:
         return False
 
@@ -32,25 +55,6 @@ def set_up_indexing_timers(app):
         logger.info(
             f'Spawning index-sync timers for master application \
                 instance: {app.uuid}')
-
-        def index_watchdog(app):
-            while True:
-                if not hasattr(app, 'sync_thread') or not app.sync_thread.is_alive():
-                    logger.warning(
-                        "Master indexing thread has died. Restarting...")
-                    with app.app_context():
-                        app.sync_thread = multiprocessing.Process(
-                            target=index_sync_loop, args=(app,))
-                        app.sync_thread.start()
-                time.sleep(app.config['INDEXING_TIMEOUT'])
-
-        def index_sync_loop(app):
-            current_app.db.engine.dispose()
-            while True:
-                with app.app_context():
-                    update_index(check_timeouts=False)
-                time.sleep(app.config['INDEXING_INTERVAL'])
-
         app.index_watchdog = multiprocessing.Process(
             target=index_watchdog, args=(app,))
         app.index_watchdog.start()
