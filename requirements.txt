@@ -22,4 +22,4 @@ requests
 weasyprint
 jinja2>=2.7,<=3.0.3
 werkzeug>=1.0,<=2.0.3
-multiprepo
+multiprocess
