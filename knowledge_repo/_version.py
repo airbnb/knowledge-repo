@@ -57,6 +57,7 @@ __dependencies__ = [
     'cooked_input',  # Used for interactive input from user in CLI tooling
     'requests',  # Used for downloading images
     'ipython_genutils',  # Used by Markdown conversion utilities
+    'multiprocess',  # Temp solutuion to fix serilization issue
 
     # Flask App Dependencies
     'flask',  # Main flask framework

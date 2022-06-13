@@ -103,6 +103,8 @@ class KnowledgeFlask(Flask):
             self.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 
         used_db_uri = self.config['SQLALCHEMY_DATABASE_URI']
+        # Keep db connected to avoid PostgreSQL close unexpectedly the connection
+        self.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_pre_ping": True}
         logger.debug(f'Using database: {used_db_uri}')
 
         # Register database schema with flask app

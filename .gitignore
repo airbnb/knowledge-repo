@@ -80,6 +80,7 @@ celerybeat-schedule
 .env
 
 # docker
+docker/config.py
 # Dockerfile
 # docker-compose.yml
 
