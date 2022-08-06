@@ -12,6 +12,20 @@
                 "--port",
                 "7001"
             ]
+        },
+        {
+            "name": "Run Server Locally with config",
+            "type": "python",
+            "request": "launch",
+            "program": "scripts/knowledge_repo",
+            "console": "integratedTerminal",
+            "args": [
+                "runserver",
+                "--port",
+                "7001",
+                "--config",
+                "docker/config.py"
+            ]
         }
     ]
 }
