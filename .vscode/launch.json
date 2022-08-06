@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Server Locally",
+            "type": "python",
+            "request": "launch",
+            "program": "scripts/knowledge_repo",
+            "console": "integratedTerminal",
+            "args": [
+                "runserver",
+                "--port",
+                "7001"
+            ]
+        }
+    ]
+}
