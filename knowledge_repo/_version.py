@@ -65,7 +65,7 @@ __dependencies__ = [
     'flask_principal',  # Permissions management framework
     'flask_mail',  # Mail client and utilities
     'Flask-Migrate',  # Database migration utilities
-    'sqlalchemy',  # Database abstractions
+    'sqlalchemy==1.4.37',  # Database abstractions
     'jinja2>=2.7,<=3.0.3',  # Templating engine
     'werkzeug>=1.0,<=2.0.3',  # Development webserver
     'gunicorn',  # Deployed webserver
