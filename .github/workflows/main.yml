@@ -14,7 +14,7 @@ jobs:
     runs-on: '${{ matrix.os }}'
     strategy:
       matrix:
-        os: ["ubuntu-18.04", "macos-11"]
+        os: ["ubuntu-18.04", "macos-latest"]
         python-version: ['3.6', '3.7', '3.8', '3.9']
     steps:
       - name: Checkout source
@@ -34,7 +34,7 @@ jobs:
           conda info -a
           conda install -c conda-forge r-xfun=0.27 r-rlang=1.0.2 r-extrafont
           conda install -c conda-forge r-base=4.1.1 r-rmarkdown=2.13 r-ggplot2=3.3.5 r-plotly=4.10.0 pandoc=2.17.1.1
-          conda install -c conda-forge regex
+          conda install -c conda-forge regex=2021.9.30
           pip install pycodestyle
           pip install .[all]
           bash run_tests.sh
