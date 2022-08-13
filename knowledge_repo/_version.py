@@ -65,13 +65,13 @@ __dependencies__ = [
     'flask_principal',  # Permissions management framework
     'flask_mail',  # Mail client and utilities
     'Flask-Migrate',  # Database migration utilities
-    'sqlalchemy',  # Database abstractions
+    'sqlalchemy==1.4.37',  # Database abstractions
     'jinja2>=2.7,<=3.0.3',  # Templating engine
     'werkzeug>=1.0,<=2.0.3',  # Development webserver
     'gunicorn',  # Deployed webserver
     'inflection',  # String transformation library
     'pillow',  # Image thumbnailing
-    'weasyprint',  # Post PDF download option
+    'weasyprint==55.0',  # Post PDF download option
 ]
 
 __optional_dependencies__ = {
