@@ -70,7 +70,7 @@ __dependencies__ = [
     'werkzeug>=1.0,<=2.0.3',  # Development webserver
     'gunicorn',  # Deployed webserver
     'inflection',  # String transformation library
-    'pillow=9.1.1',  # Image thumbnailing
+    'pillow==9.1.1',  # Image thumbnailing
     'weasyprint==54.3',  # Post PDF download option
 ]
 
