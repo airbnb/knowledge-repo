@@ -79,7 +79,7 @@ __optional_dependencies__ = {
     'ipynb': [
         'nbformat',
         'nbconvert[execute]<6.0.0',
-        'traitlets==5.2.2'
+        'traitlets'
     ],
 
     # PDF to image conversion used by app
