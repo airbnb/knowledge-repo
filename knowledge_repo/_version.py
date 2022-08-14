@@ -79,13 +79,13 @@ __optional_dependencies__ = {
     'ipynb': [
         'nbformat',
         'nbconvert[execute]<6.0.0',
-        'traitlets'
+        'traitlets==5.2.2'
     ],
 
     # PDF to image conversion used by app
     'pdf': [
-        'PyPDF2',  # image for parsing PDFs to images
-        'wand',  # imagemagick integration for image uploading
+        'PyPDF2==2.1.1',  # image for parsing PDFs to images
+        'wand==0.6.7',  # imagemagick integration for image uploading
     ],
 
     # Optional OAuth library for external authentication support
@@ -101,10 +101,10 @@ __optional_dependencies__ = {
     # Testing dependencies
     'dev': [
         'beautifulsoup4',  # HTML/XML parser
-        'coverage',  # Documentation coverage tester
+        'coverage==6.4.1',  # Documentation coverage tester
         'nose',  # Testing framework
         'pep8',  # PEP8
-        'pycodestyle'  # PEP8 conformance
+        'pycodestyle==2.8.0'  # PEP8 conformance
     ]
 }
 
