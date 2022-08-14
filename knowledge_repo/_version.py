@@ -70,7 +70,7 @@ __dependencies__ = [
     'werkzeug>=1.0,<=2.0.3',  # Development webserver
     'gunicorn',  # Deployed webserver
     'inflection',  # String transformation library
-    'pillow<=9.1.1',  # Image thumbnailing
+    'pillow',  # Image thumbnailing
     'weasyprint==54.3',  # Post PDF download option
 ]
 
@@ -101,10 +101,10 @@ __optional_dependencies__ = {
     # Testing dependencies
     'dev': [
         'beautifulsoup4',  # HTML/XML parser
-        'coverage==6.2',  # Documentation coverage tester
+        'coverage',  # Documentation coverage tester
         'nose',  # Testing framework
         'pep8',  # PEP8
-        'pycodestyle==2.8.0'  # PEP8 conformance
+        'pycodestyle'  # PEP8 conformance
     ]
 }
 
