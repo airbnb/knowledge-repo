@@ -60,8 +60,8 @@ __dependencies__ = [
     'multiprocess',  # Temp solutuion to fix serilization issue
 
     # Flask App Dependencies
-    'flask==2.1.2',  # Main flask framework
-    'flask_login==0.6.1',  # User management framework
+    'flask<=2.1.2',  # Main flask framework
+    'flask_login<=0.6.1',  # User management framework
     'flask_principal',  # Permissions management framework
     'flask_mail',  # Mail client and utilities
     'Flask-Migrate',  # Database migration utilities
