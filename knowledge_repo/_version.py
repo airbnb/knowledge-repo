@@ -60,18 +60,18 @@ __dependencies__ = [
     'multiprocess',  # Temp solutuion to fix serilization issue
 
     # Flask App Dependencies
-    'flask',  # Main flask framework
-    'flask_login',  # User management framework
+    'flask<=2.1.2',  # Main flask framework
+    'flask_login<=0.6.1',  # User management framework
     'flask_principal',  # Permissions management framework
     'flask_mail',  # Mail client and utilities
     'Flask-Migrate',  # Database migration utilities
-    'sqlalchemy',  # Database abstractions
+    'sqlalchemy==1.4.37',  # Database abstractions
     'jinja2>=2.7,<=3.0.3',  # Templating engine
     'werkzeug>=1.0,<=2.0.3',  # Development webserver
     'gunicorn',  # Deployed webserver
     'inflection',  # String transformation library
     'pillow',  # Image thumbnailing
-    'weasyprint',  # Post PDF download option
+    'weasyprint==54.3',  # Post PDF download option
 ]
 
 __optional_dependencies__ = {
@@ -84,8 +84,8 @@ __optional_dependencies__ = {
 
     # PDF to image conversion used by app
     'pdf': [
-        'PyPDF2',  # image for parsing PDFs to images
-        'wand',  # imagemagick integration for image uploading
+        'PyPDF2==2.1.1',  # image for parsing PDFs to images
+        'wand==0.6.7',  # imagemagick integration for image uploading
     ],
 
     # Optional OAuth library for external authentication support
