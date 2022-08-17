@@ -30,7 +30,7 @@ Knowledge Repo Login
 </span>
 <ul class='auth-providers'>
   {% for provider in providers %}
-  <li><a href='login/{{ provider[' name'] }}?next={{request.args.next}}'><img src='{{ provider[' icon_uri'] }}' />{{
+  <li><a href='login/{{ provider['name'] }}?next={{request.args.next}}'><img src='{{ provider['icon_uri'] }}' />{{
       provider['link_text'] }}</a></li>
   {% endfor %}
 </ul>
