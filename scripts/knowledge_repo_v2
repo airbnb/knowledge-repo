@@ -16,7 +16,7 @@ import gitdb
 from tabulate import tabulate
 
 # Note:
-# This script is intented to created a seperate process wroking in parallel with existing knowledge_repo_v2
+# This script is intented to created a seperate v2 process wroking in parallel with existing knowledge_repo
 # At this stage, v2 behavior will 100% match with exsiting worflow
 
 # Register handler for SIGTERM, so we can run cleanup code if we are terminated
