@@ -58,7 +58,7 @@ __dependencies__ = [
     'requests',  # Used for downloading images
     'ipython_genutils',  # Used by Markdown conversion utilities
     'multiprocess',  # Temp solutuion to fix serilization issue
-    'importlib-metadata==4.13.0',
+    'importlib-metadata<=4.13.0',
 
     # Flask App Dependencies
     'flask<=2.1.2',  # Main flask framework
