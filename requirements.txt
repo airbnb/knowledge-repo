@@ -23,4 +23,4 @@ weasyprint
 jinja2>=2.7,<=3.0.3
 werkzeug>=1.0,<=2.0.3
 multiprocess
-importlib-metadata==4.13.0
+importlib-metadata<=4.13.0
