@@ -3,13 +3,14 @@ to add your organization and/or project to this document!
 
 Organizations
 ----------
- - [Airbnb](https://github.com/airbnb)
- - [Built In](https://github.com/builtinx)
+ - [Airbnb](https://airbnb.com)
+ - [Built In](https://builtin.com/)
  - [Databricks](https://databricks.com)
  - [Faculty](https://faculty.ai/)
- - [Postmates](https://github.com/postmates)
+ - [Postmates](https://postmates.com/)
  - [Recursion Pharmaceuticals](http://recursionpharma.com)
  - [YouGov](https://yougov.com)
+ - [Elucidata](https://elucidata.io/)
 
 Projects
 ----------
