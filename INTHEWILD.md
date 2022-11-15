@@ -6,11 +6,13 @@ Organizations
  - [Airbnb](https://airbnb.com)
  - [Bellhop](https://getbellhops.com/)
  - [Built In](https://builtin.com/)
+ - [Cabify](https://cabify.com)
  - [Databricks](https://databricks.com)
  - [Elucidata](https://elucidata.io/)
  - [Faculty](https://faculty.ai/)
  - [Postmates](https://postmates.com/)
  - [Recursion Pharmaceuticals](http://recursionpharma.com)
+ - [Wish](https://wish.com/)
  - [YouGov](https://yougov.com)
 
 Projects
