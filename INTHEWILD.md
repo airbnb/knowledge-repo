@@ -22,7 +22,7 @@ Organizations
  - [UNHCR WEB](http://www.unhcr.org)
  - [Upstart](http://www.upstart.com)
  - [Viasat](https://viasat.com)
- - [Wish](https://wish.com/)
+ - [Wish](https://wish.com)
  - [YouGov](https://yougov.com)
 
 Projects
