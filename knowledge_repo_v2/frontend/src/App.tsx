@@ -6,7 +6,7 @@ function App() {
         <br />
         coming soon
       </h1>
-      <p>Feel free to reach out to us if you have to share more ideas about v2?</p>
+      <p>Feel free to reach out to us if you have some ideas about v2?</p>
     </div>
   );
 }
