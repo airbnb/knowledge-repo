@@ -1,8 +1,12 @@
 function App() {
   return (
     <div className="App">
-      <h1>knowledge repo v2</h1>
-      <h2>coming soon</h2>
+      <h1 className="Info">
+        knowledge repo v2
+        <br />
+        coming soon
+      </h1>
+      <p>Feel free to reach out to us if you have to share more ideas about v2?</p>
     </div>
   );
 }
