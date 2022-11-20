@@ -1,0 +1,4 @@
+# virtualenv
+.venv/
+venv/
+ENV/
