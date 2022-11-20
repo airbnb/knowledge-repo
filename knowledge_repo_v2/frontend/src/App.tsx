@@ -1,6 +1,9 @@
+import Header from "./components/Header";
+
 function App() {
   return (
     <div className="App">
+      <Header title="Knowledge Repo"/>
       <h1 className="Info">
         knowledge repo v2
         <br />
