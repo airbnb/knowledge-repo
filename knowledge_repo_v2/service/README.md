@@ -4,7 +4,7 @@ Make sure you have Docker installed, and Docker Desktop is running.
 
 ## Build an image
 
-In the knowledge-repo folder, run the following command:
+In the knowledge-repo/knoweledge_repo_v2/service folder, run the following command:
 
 <pre>
 docker build . -t kp2-server
