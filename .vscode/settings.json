@@ -1,7 +1,12 @@
 {
     "python.linting.enabled": true,
     "python.linting.pycodestyleEnabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.formatting.provider": "black",
     "editor.formatOnSave": true,
+    "[python]": {
+        "editor.formatOnSave": true
+    },
     "[html]": {
         "editor.formatOnSave": false
     },
