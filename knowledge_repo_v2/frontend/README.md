@@ -16,4 +16,4 @@ docker build . -t kp2-frontend
 docker run -p 3000:3000 kp2-frontend
 </pre>
 
-After the server is up and running in Docker, the knowledge-repo service will be accessible at http://localhost:5050.
+After running in Docker, the knowledge-repo frontend will be accessible at http://localhost:3000.
