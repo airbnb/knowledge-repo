@@ -5,8 +5,15 @@ services:
     build: ./../frontend
     ports:
       - '3000:3000'
-
+    volumes:
+      - /app/node_modules
+      - ./../frontend:/app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
   service:
     build: ./../service
     ports:
       - '5050:5050'
+    volumes:
+      - /app/node_modules
+      - ./../service:/app
