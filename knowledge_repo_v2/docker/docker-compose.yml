@@ -15,5 +15,30 @@ services:
     ports:
       - '5050:5050'
     volumes:
-      - /app/node_modules
+      - /app/venv
       - ./../service:/app
+    environment:
+      NODE_ENV: production
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: knowledge_repo_dev
+    depends_on:
+      - db
+  db:
+    image: postgres:15.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=knowledge_repo_dev
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    ports:
+      - '5432:5432'
+
+volumes:
+  postgres_data:
