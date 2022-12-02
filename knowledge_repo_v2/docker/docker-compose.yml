@@ -12,27 +12,23 @@ services:
       - CHOKIDAR_USEPOLLING=true
   service:
     build: ./../service
+    command: python manage.py run -h 0.0.0.0
     ports:
-      - '5050:5050'
+      - '5050:5000'
     volumes:
       - /app/venv
       - ./../service:/app
-    environment:
-      NODE_ENV: production
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: knowledge_repo_dev
+    env_file:
+      - ./../service/.env.dev
     depends_on:
       - db
   db:
     image: postgres:15.1-alpine
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=knowledge_repo_dev
+      - POSTGRES_USER=knowledge_repo
+      - POSTGRES_PASSWORD=knowledge_repo
+      - POSTGRES_DB=knowledge_repo
     logging:
       options:
         max-size: 10m
