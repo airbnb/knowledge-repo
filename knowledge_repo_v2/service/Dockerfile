@@ -27,5 +27,3 @@ COPY . ./
 
 # Run entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]
-
-CMD ["python", "app.py"]

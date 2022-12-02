@@ -9,6 +9,7 @@ app.config.from_object("config.Config")
 db = SQLAlchemy(app)
 
 
+# [TODO] migrate to flask-migrate
 class User(db.Model):
     __tablename__ = "knowledge_post_author"
 
