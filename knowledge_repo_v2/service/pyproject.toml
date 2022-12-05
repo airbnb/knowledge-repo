@@ -2,7 +2,7 @@
 name = "knowledge-repo"
 version = "0.1.0"
 description = "knowledge_repo_v2_under_dev"
-authors = ["Your Name <you@example.com>"]
+authors = ["jing.guo@airbnb.com", "henry.wu@airbnb.com"]
 readme = "README.md"
 packages = [{include = "knowledge_repo"}]
 
