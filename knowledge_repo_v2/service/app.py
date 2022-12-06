@@ -1,23 +1,15 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 
 app = Flask(__name__)
 CORS(app)
 app.config.from_object("config.Config")
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
-
-# [TODO] migrate to flask-migrate
-class User(db.Model):
-    __tablename__ = "knowledge_post_author"
-
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(128), unique=True, nullable=False)
-
-    def __init__(self, email):
-        self.email = email
 
 @app.route("/")
 def hello():
