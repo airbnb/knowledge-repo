@@ -34,8 +34,8 @@ source ./venv/bin/activate
 
 echo
 echo -e "\033[1;35m* \033[0mInstalling dependencies"
-pip3 install --upgrade pip3
-pip3 install -r requirements.txt
+pip install --upgrade pip
+pip install -r requirements.txt
 
 # echo
 # echo -e "\033[1;35m* \033[0mInstalling pre-commit"
