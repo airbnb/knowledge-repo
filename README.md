@@ -18,6 +18,7 @@ For more information about the motivation and inspiration behind this project, w
 - **Documentation:** http://knowledge-repo.readthedocs.io
 - **Source:** https://github.com/airbnb/knowledge-repo
 - **Bug reports**: https://github.com/airbnb/knowledge-repo/issues
+- **Ask us questions on Slack**: https://join.slack.com/t/knowledgerepogroup/shared_invite/zt-1lzxytay8-R~15bODzwFGLO5mukFFCYQ
 
 ## Screenshots
 
@@ -30,7 +31,3 @@ For more information about the motivation and inspiration behind this project, w
 ![post_form](https://user-images.githubusercontent.com/8813413/83345204-49490280-a2c5-11ea-97e3-248192b01526.png)
 
 ![stats](https://user-images.githubusercontent.com/8813413/83345205-49490280-a2c5-11ea-9af2-2a01b69ae584.png)
-
-
-
-
