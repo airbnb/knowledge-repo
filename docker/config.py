@@ -10,7 +10,7 @@ from datetime import timedelta
 # not provided, it is assumed in these contexts to be
 # 'localhost:7000'. Be sure to specify this before deploying
 # into production.
-SERVER_NAME = None
+SERVER_NAME = 'localhost:7001'
 
 # The knowledge repository uses the secret key to sign user
 # sessions. If not specified, a unique secret key will be
@@ -40,7 +40,7 @@ DEBUG = False
 # ---------------------------------------------------
 # Database configuration
 # ---------------------------------------------------
-SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://knowledge_repo:password@localhost:5432/knowledge_repo'
 # If you are using a MySQL database, you must specify the URI as
 # demonstrated below.
 # SQLALCHEMY_DATABASE_URI = 'mysql://username:password@hostname/database'
@@ -68,7 +68,9 @@ DB_AUTO_UPGRADE = False
 # used for that class below.
 # By default, the knowledge repo offers:
 # ['debug', 'oauth2', 'bitbucket', 'github', 'google', 'ldap']
-AUTH_PROVIDERS = []
+AUTH_PROVIDERS = ['google']
+OAUTH_GOOGLE_CLIENT_ID = '<client id>'
+OAUTH_GOOGLE_CLIENT_SECRET = '<client secret>'
 
 # If you are going to use a OAuth provider, you will need to specify client ids
 # and private tokens. This can be done by instantiating instances of
