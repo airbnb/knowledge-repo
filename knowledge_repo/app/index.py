@@ -159,7 +159,6 @@ def index_up_to_date():
 def update_index(check_timeouts=True, force=False, reindex=False):
 
     logger.info('Update index...')
-    
     if not current_app.config['INDEXING_ENABLED']:
         return False
 
