@@ -16,7 +16,6 @@ UNLOCKED = '0'
 
 
 def index_sync_loop(app):
-    logger.info('test')
     current_app.db.engine.dispose()
     while True:
         with app.app_context():
@@ -25,7 +24,6 @@ def index_sync_loop(app):
 
 
 def index_watchdog(app):
-    logger.info('test')
     while True:
         if not hasattr(app, 'sync_thread') or not app.sync_thread.is_alive():
             logger.warning(
@@ -160,6 +158,7 @@ def index_up_to_date():
 @ErrorLog.logged
 def update_index(check_timeouts=True, force=False, reindex=False):
 
+    logger.info('Update index...')
     if not current_app.config['INDEXING_ENABLED']:
         return False
 
