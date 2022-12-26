@@ -27,6 +27,7 @@ __author_email__ = """
     erik.ritter@airbnb.com,
     henry.wu@airbnb.com,
     jing.guo@airbnb.com,
+    mengting.li@airbnb.com,
     john.bodley@airbnb.com,
     bill.ulammandakh@airbnb.com,
     naoya.kanai@airbnb.com,
