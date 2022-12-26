@@ -29,7 +29,7 @@ def upload_file_to_s3(
     if object_name is None:
         object_name = os.path.basename(file_name)
 
-    # Upload the file
+    # Download the file
     s3_client = boto3.client(
         "s3",
         aws_access_key_id=s3_aws_access_key_id,
