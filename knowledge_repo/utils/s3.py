@@ -6,7 +6,7 @@ import os
 logger = logging.getLogger(__name__)
 
 
-def upload_file(
+def upload_file_to_s3(
     file_name,
     s3_aws_access_key_id,
     s3_aws_secret_access_key,
