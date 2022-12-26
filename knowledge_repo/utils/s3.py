@@ -11,7 +11,7 @@ def get_s3_client(
     s3_aws_secret_access_key,
     s3_region_name,
 ):
-    """Get a boto3 S3 client
+    """Get a boto3 client for S3 operations
 
     :param s3_aws_access_key_id: aws access key id for s3
     :param s3_aws_secret_access_key: aws secret access key for s3
