@@ -1,4 +1,5 @@
 from datetime import timedelta
+
 # ---------------------------------------------------
 # Host configuration
 # ---------------------------------------------------
@@ -10,7 +11,7 @@ from datetime import timedelta
 # not provided, it is assumed in these contexts to be
 # 'localhost:7000'. Be sure to specify this before deploying
 # into production.
-SERVER_NAME = 'localhost:7001'
+SERVER_NAME = "localhost:7001"
 
 # The knowledge repository uses the secret key to sign user
 # sessions. If not specified, a unique secret key will be
@@ -27,10 +28,7 @@ SECRET_KEY = None
 # Note: Even if you set DEPLOY_HTTPS to True, you still need
 # to set the port to 443 manually.
 DEPLOY_HTTPS = False
-SSL_CERT = {
-    'cert': '/path/to/cert',
-    'key': '/path/to/key'
-}
+SSL_CERT = {"cert": "/path/to/cert", "key": "/path/to/key"}
 
 # ---------------------------------------------------
 # Debug configuration
@@ -40,7 +38,9 @@ DEBUG = False
 # ---------------------------------------------------
 # Database configuration
 # ---------------------------------------------------
-SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://knowledge_repo:password@localhost:5432/knowledge_repo'
+SQLALCHEMY_DATABASE_URI = (
+    "postgresql+psycopg2://knowledge_repo:password@localhost:5432/knowledge_repo"
+)
 # If you are using a MySQL database, you must specify the URI as
 # demonstrated below.
 # SQLALCHEMY_DATABASE_URI = 'mysql://username:password@hostname/database'
@@ -68,9 +68,9 @@ DB_AUTO_UPGRADE = False
 # used for that class below.
 # By default, the knowledge repo offers:
 # ['debug', 'oauth2', 'bitbucket', 'github', 'google', 'ldap']
-AUTH_PROVIDERS = ['google']
-OAUTH_GOOGLE_CLIENT_ID = '<client id>'
-OAUTH_GOOGLE_CLIENT_SECRET = '<client secret>'
+AUTH_PROVIDERS = ["google"]
+OAUTH_GOOGLE_CLIENT_ID = "<client id>"
+OAUTH_GOOGLE_CLIENT_SECRET = "<client secret>"
 
 # If you are going to use a OAuth provider, you will need to specify client ids
 # and private tokens. This can be done by instantiating instances of
@@ -212,10 +212,10 @@ REMEMBER_COOKIE_DURATION = timedelta(days=365)
 # organization.
 
 # Currently the port and protocol must both be included in the server address
-LDAP_SERVER = 'ldap://127.0.0.1:389'
+LDAP_SERVER = "ldap://127.0.0.1:389"
 # When entering this, note the "{0}" which denotes where the user_id
 # is inserted.
-LDAP_USERDN_SCHEMA = 'cn={user_id},ou=people,dc=planetexpress,dc=com'
+LDAP_USERDN_SCHEMA = "cn={user_id},ou=people,dc=planetexpress,dc=com"
 
 # ---------------------------------------------------
 # Policy configuration
@@ -325,7 +325,7 @@ INDEXING_ENABLED = True
 # a limited set of parent directories by setting
 # WEB_EDITOR_PREFIXES to a list of supported path prefixes.
 # e.g. ['webposts', 'projects']
-WEB_EDITOR_PREFIXES = ['webposts']
+WEB_EDITOR_PREFIXES = ["webposts"]
 
 
 # ---------------------------------------------------
@@ -333,10 +333,18 @@ WEB_EDITOR_PREFIXES = ['webposts']
 # ---------------------------------------------------
 # Posts with certain tags can be excluded from showing up
 # in the app. This can be useful for security purposes
-EXCLUDED_TAGS = ['private']
+EXCLUDED_TAGS = ["private"]
 
 
 # -------------
 # Collapse Code as Default Display Option
 # -------------
 COLLAPSE_CODE_DEFAULT = False
+
+
+# -------------
+# AWS related settings
+# -------------
+S3_AWS_ACCESS_KEY_ID = ""
+S3_AWS_SECRET_ACCESS_KEY = ""
+S3_AWS_REGION_NAME = ""
