@@ -1,133 +1,131 @@
 {% extends "base.html" %}
 
 {% block style_links %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/highlight/default.css')}}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/post_editor.css')}}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/highlight/default.css')}}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/post_editor.css')}}">
 {% endblock %}
 
 {% block title %} Knowledge {% endblock %}
 
 {% block content %}
-    {{ super() }}
-    <div class="col-lg-14">
+  {{ super() }}
+  <div class="col-lg-14">
     <div class="col-md-12" id="#header-panel">
-        <h3> {{ path if path else 'New Knowledge Post' }}
-            <div class="btn-group pull-right" style='margin-right: 15px'>
-                <button class="btn btn-large btn-default btn-webeditor" id="btn_save">
-                    Save & Preview
-                </button>
-                <button
-                        class="btn btn-large {{'btn-primary' if (status == 1 or status == 2) else 'btn-default'}} btn-webeditor" id="btn_in_review"
-                        data-toggle="modal"
-                        data-target="#webpost-send-for-review-modal">
-                    {% if status == 1 or status == 2 %}
-                        In Review Phase
-                    {% else %}
-                        Submit for Review
-                    {% endif %}
-                </button>
-                <button class="btn btn-large btn-webeditor {{'btn-primary' if status == 3 else 'btn-default'}}" id="btn_publish">
-                    {% if status == 3 %}
-                        Unpublish
-                    {% else %}
-                        Publish
-                    {% endif %}
-                </button>
-                {% if status > 0 %}
-                    <br>
-                    <p align="right">
-                        <label style="font-size:15px; padding-top:15px">
-                            <input type="checkbox" style="margin-left:15px;"
-                                   id="author_can_publish" {{ 'checked' if status > 1 }}>
-                            Approve for posting
-                            </input>
-                        </label>
-                    </p>
-                {% endif %}
-            </div>
-        </h3>
+      <h3> {{ path if path else 'New Knowledge Post' }}
+        <div class="btn-group pull-right" style='margin-right: 15px'>
+          <button class="btn btn-large btn-default btn-webeditor" id="btn_save">
+            Save & Preview
+          </button>
+          <button
+            class="btn btn-large {{'btn-primary' if (status == 1 or status == 2) else 'btn-default'}} btn-webeditor" id="btn_in_review"
+            data-toggle="modal"
+            data-target="#webpost-send-for-review-modal">
+            {% if status == 1 or status == 2 %}
+            In Review Phase
+            {% else %}
+            Submit for Review
+            {% endif %}
+          </button>
+          <button class="btn btn-large btn-webeditor {{'btn-primary' if status == 3 else 'btn-default'}}" id="btn_publish">
+            {% if status == 3 %}
+            Unpublish
+            {% else %}
+            Publish
+            {% endif %}
+          </button>
+          {% if status > 0 %}
+          <br>
+          <p align="right">
+          <label style="font-size:15px; padding-top:15px">
+            <input type="checkbox" style="margin-left:15px;"
+              id="author_can_publish" {{ 'checked' if status > 1 }}>
+              Approve for posting
+            </input>
+          </label>
+          </p>
+          {% endif %}
+        </div>
+      </h3>
     </div>
     {% include 'post_editor_review_modal.html' %}
     <div class="row row-space-2"></div>
     <div class="row col-md-12" id="metadata_fields">
-        <form>
-            <div class="form-group webeditor-form">
-                {% block metadata_fields %}
+      <form>
+        <div class="form-group webeditor-form">
+          {% block metadata_fields %}
 
-                    {% if not path %}
-                        <label for="post_path"> Post Save Path </label>
-                        <input id="post_path"
-                               class="form-control typeahead"
-                               type="text"
-                               placeholder="webposts/my_team/my_post_name"
-                               value=""></input>
-                        <br>
-                    {% endif %}
+          {% if not path %}
+          <label for="post_path"> Post Save Path </label>
+          <input id="post_path"
+          class="form-control typeahead"
+          type="text"
+          placeholder="webposts/my_team/my_post_name"
+          value=""></input>
+          <br>
+          {% endif %}
 
-                    <label for="post_title"> Title </label>
-                    <input id="post_title"
-                           class="form-control"
-                           type="text"
-                           value="{{ title if title else '' }}"></input>
-                    <br>
+          <label for="post_title"> Title </label>
+          <input id="post_title"
+                 class="form-control"
+                 type="text"
+                 value="{{ title if title else '' }}"></input>
+          <br>
 
-                    <label for="post_author"> Authors </label>
-                    <select id="post_author"
-                            class="js-example-tags form-control"
-                            type="text"
-                            multiple
-                            data-tags='true'>
-                        <option value='{{ username }}'>{{ username }}</option>
-                    </select>
-                    <br>
+          <label for="post_author"> Authors </label>
+          <select id="post_author"
+                  class="js-example-tags form-control"
+                  type="text"
+                  multiple
+                  data-tags='true'>
+            <option value='{{ username }}'>{{ username }}</option>
+          </select>
+          <br>
 
-                    <br>
+          <br>
 
-                    <label for="post_image_feed"> Feed Image (Optional)</label>
-                    <input id="post_image_feed"
-                           class="form-control"
-                           type="text"
-                           placeholder="https://website.com/my_cool_thumbnail.png"
-                           value="{{ feed_image if feed_image else ''}}"></input>
-                    <br>
+          <label for="post_image_feed"> Feed Image (Optional)</label>
+          <input id="post_image_feed"
+                 class="form-control"
+                 type="text"
+                 placeholder="https://website.com/my_cool_thumbnail.png"
+                 value="{{ feed_image if feed_image else ''}}"></input>
+          <br>
 
-                    <label for="post_tags"> Tags </label>
-                    <br>
-                    <div style="padding-left: 7px; color: #808080; font-size: 11pt">
-                        e.g. relevant_tag, topics/my_topic, teams/my_team
-                    </div>
-                    <select id="post_tags"
-                            class="js-example-tags form-control"
-                            type="text"
-                            multiple
-                            data-tags="true"
-                            value="{{ tags if tags else ''}}">
-                    </select>
-                    <br><br>
+          <label for="post_tags"> Tags </label>
+          <br>
+          <div style="padding-left: 7px; color: #808080; font-size: 11pt">
+            e.g. relevant_tag, topics/my_topic, teams/my_team
+          </div>
+          <select id="post_tags"
+                  class="js-example-tags form-control"
+                  type="text"
+                  multiple
+                  data-tags="true"
+                  value="{{ tags if tags else ''}}">
+          </select>
+          <br><br>
 
-                    <label for="post_tldr"> TLDR </label>
-                    <textarea id="post_tldr"
-                              class="form-control"
-                              type="text">{{tldr if tldr else ''}}</textarea>
-                    <br>
-                    <!-- {% if not path %}  fix this -->
-                        <label for="post_created_at"> Created At: </label>
-                        <input id="post_created_at"
-                               class="form-control"
-                               type="text"
-                               value="{{ created_at|format_date if created_at else '' }}"></input>
-                        <br>
+          <label for="post_tldr"> TLDR </label>
+          <textarea id="post_tldr"
+                    class="form-control"
+                    type="text">{{tldr if tldr else ''}}</textarea>
+          <br>
+          <label for="post_created_at"> Created At: </label>
+          <input id="post_created_at"
+                 class="form-control"
+                 type="text"
+                 value="{{ created_at|format_date if created_at else '' }}"></input>
+          <br>
 
-                        <label for="post_updated_at"> Updated At: </label>
-                        <input id="post_updated_at"
-                               class="form-control"
-                               type="text"
-                               value="{{ updated_at|format_date if updated_at else ''}}"></input>
-                        <br>
-                        <!-- {% endif %} -->
-                {% endblock %}
-            </div>
-        </form>
+          <label for="post_updated_at"> Updated At: </label>
+          <input id="post_updated_at"
+                 class="form-control"
+                 type="text"
+                 value="{{ updated_at|format_date if updated_at else ''}}"></input>
+          <br>
+          {% endblock %}
+        </div>
+      </form>
     </div>
     {% block render_block %} {% endblock %}
     <!-- Disabling the post reviewer commenting feature in the web UI for now because it's broken. To debug and enable later. -->
@@ -179,384 +177,384 @@
 {% endblock %}
 
 {% block scripts %}
-    {{ super() }}
-    <script>
-        var all_form_fields = ['#post_title', '#post_path',
-            '#post_created_at', '#post_updated_at',
-            '#post_author', '#post_image_feed', '#post_tags']
+{{ super() }}
+<script>
+var all_form_fields = ['#post_title', '#post_path',
+                       '#post_created_at', '#post_updated_at',
+                       '#post_author', '#post_image_feed', '#post_tags']
 
-        // This will ensure that when you
-        $.each(all_form_fields, function(i, v){
-            $(v).keydown(function(event){
-                if (event.keyCode == 13){
-                    return false;
-                }
-            })
-        })
-        $('#post_reviewers').keydown(function(event) {
-            if (event.keyCode == 13) {
-                $("#submission_close").click()
-                return false;
-            }
-        });
+// This will ensure that when you
+$.each(all_form_fields, function(i, v){
+  $(v).keydown(function(event){
+    if (event.keyCode == 13){
+      return false;
+    }
+  })
+})
+$('#post_reviewers').keydown(function(event) {
+  if (event.keyCode == 13) {
+    $("#submission_close").click()
+    return false;
+  }
+});
 
-        var substringMatcher = function(pageMeta) {
-            return function findMatches(q, cb) {
-                var matches, substringRegex;
+var substringMatcher = function(pageMeta) {
+  return function findMatches(q, cb) {
+    var matches, substringRegex;
 
-                // an array that will be populated with substring matches
-                matches = [];
+    // an array that will be populated with substring matches
+    matches = [];
 
-                // regex used to determine if a string contains the substring `q`
-                substrRegex = new RegExp(q, 'i');
+    // regex used to determine if a string contains the substring `q`
+    substrRegex = new RegExp(q, 'i');
 
-                // iterate through the pool of strings and for any string that
-                // contains the substring `q`, add it to the `matches` array
-                $.each(pageMeta, function(i, meta) {;
-                    if (substrRegex.test(meta)) {
-                        matches.push(meta)
-                    };
-                });
+    // iterate through the pool of strings and for any string that
+    // contains the substring `q`, add it to the `matches` array
+    $.each(pageMeta, function(i, meta) {;
+      if (substrRegex.test(meta)) {
+        matches.push(meta)
+      };
+    });
 
-                cb(matches);
-            };
-        };
+    cb(matches);
+  };
+};
 
-        $.get('/ajax_paths_typeahead', function(paths) {
-            paths = JSON.parse(paths);
-            $('#post_path').typeahead({
-                    hint: false,
-                    highlight: true,
-                    minLength: 1,
-                    value: '{{ path if path else '' }}'
-                },
-                {
-                    name: 'Paths',
-                    display: function (item) {
-                        return item;
-                    },
-                    source: substringMatcher(paths)
-                }
-            );
-        });
+$.get('/ajax_paths_typeahead', function(paths) {
+    paths = JSON.parse(paths);
+    $('#post_path').typeahead({
+      hint: false,
+      highlight: true,
+      minLength: 1,
+      value: '{{ path if path else '' }}'
+    },
+    {
+      name: 'Paths',
+      display: function (item) {
+        return item;
+      },
+      source: substringMatcher(paths)
+    }
+  );
+});
 
-        $.get('/ajax_tags_typeahead', function(typeahead_tags_info) {
-            var all_tags =  JSON.parse(typeahead_tags_info)
-            $.each(all_tags, function(i, tag){
-                var option_tag = new Option;
-                option_tag.value = tag;
-                option_tag.text = tag;
-                $("#post_tags")[0].appendChild(option_tag);
-            });
+$.get('/ajax_tags_typeahead', function(typeahead_tags_info) {
+  var all_tags =  JSON.parse(typeahead_tags_info)
+  $.each(all_tags, function(i, tag){
+     var option_tag = new Option;
+     option_tag.value = tag;
+     option_tag.text = tag;
+     $("#post_tags")[0].appendChild(option_tag);
+  });
 
-            var tags_in_list = {{ tags|safe }}
-                $('#post_tags').select2({
-                    placeholder: "Tags are in the form: #tag_type/tag_name. Start typing to see suggestions!"
-                });
+  var tags_in_list = {{ tags|safe }}
+  $('#post_tags').select2({
+    placeholder: "Tags are in the form: #tag_type/tag_name. Start typing to see suggestions!"
+  });
 
-            $("#post_tags").select2()
-                .val(tags_in_list)
-                .trigger("change")
+  $("#post_tags").select2()
+                 .val(tags_in_list)
+                 .trigger("change")
 
-            $("#post_tags").on("select2:select", function (e) {
-                // hack becaue refreshRenderedMarkdown doesn't work
-                if ($('#rendered-markdown').length) {
-                    var content = $('#rendered-markdown').html()
-                    var content_split = content.split("<strong>Tags</strong>:")
-                    var header = content_split[0]
-                    var split_again = (content_split[1]).split("<br>")
-                    var footer = split_again[1]
-                    var new_tags = $("#post_tags").select2().val()
-                    var new_tags_string = new_tags.join(", ")
-                    $("#rendered-markdown").html(header + "<strong>Tags</strong>:"  + new_tags + "<br>" + footer);
-                }
-            });
+  $("#post_tags").on("select2:select", function (e) {
+  // hack becaue refreshRenderedMarkdown doesn't work
+    if ($('#rendered-markdown').length) {
+      var content = $('#rendered-markdown').html()
+      var content_split = content.split("<strong>Tags</strong>:")
+      var header = content_split[0]
+      var split_again = (content_split[1]).split("<br>")
+      var footer = split_again[1]
+      var new_tags = $("#post_tags").select2().val()
+      var new_tags_string = new_tags.join(", ")
+      $("#rendered-markdown").html(header + "<strong>Tags</strong>:"  + new_tags + "<br>" + footer);
+    }
+  });
 
-            $("#post_tags").on("select2:selecting", function(e){
-                var new_tag = (e.params.args.data['text'].trim())
-                if (all_tags.indexOf(new_tag) === -1){
-                    var new_tag_group = new_tag.split("/")[0]
-                    var new_tag_type = new_tag.split("/")[1]
-                    alert("You're creating a new tag, are you sure you want to?");
-                    return true;
-                }
-                return true;
-            })
-        });
+  $("#post_tags").on("select2:selecting", function(e){
+    var new_tag = (e.params.args.data['text'].trim())
+    if (all_tags.indexOf(new_tag) === -1){
+        var new_tag_group = new_tag.split("/")[0]
+      var new_tag_type = new_tag.split("/")[1]
+      alert("You're creating a new tag, are you sure you want to?");
+      return true;
+    }
+    return true;
+  })
+});
 
-        $.get('/ajax_users_typeahead', function(typeahead_users_info){
-            var all_users = JSON.parse(typeahead_users_info);
-            var username = "{{ username }}";
-            $.each(all_users, function(i, user){
-                if (user != username){
-                    var option_tag = new Option;
-                    option_tag.value = user;
-                    option_tag.text = user;
-                    $("#post_author")[0].appendChild(option_tag);
-                }
-            })
-            var authors_default_text =  "Users contributing to the post."
-            var authors = {{ authors |safe}}
-                $.each(authors, function(i,v){
-                    authors[i] = v.trim()
-                });
+$.get('/ajax_users_typeahead', function(typeahead_users_info){
+  var all_users = JSON.parse(typeahead_users_info);
+  var username = "{{ username }}";
+  $.each(all_users, function(i, user){
+    if (user != username){
+      var option_tag = new Option;
+      option_tag.value = user;
+      option_tag.text = user;
+      $("#post_author")[0].appendChild(option_tag);
+    }
+  })
+  var authors_default_text =  "Users contributing to the post."
+  var authors = {{ authors |safe}}
+  $.each(authors, function(i,v){
+    authors[i] = v.trim()
+  });
 
-            $('#post_author').select2({
-                placeholder: authors_default_text
-            });
+  $('#post_author').select2({
+    placeholder: authors_default_text
+  });
 
-            $("#post_author").select2()
-                .val(authors)
-                .trigger("change")
-        })
-
-
+  $("#post_author").select2()
+                   .val(authors)
+                   .trigger("change")
+})
 
 
-        function escapeEquationBlocks(text, sep) {
 
-            var clean_text = ''
-            var equation_blocks = text.split(sep)
-            for (var i=0; i<equation_blocks.length; i++) {
 
-                if (i%2 == 0) {
-                    clean_text += equation_blocks[i]
-                    if (equation_blocks.length > 1 && i != equation_blocks.length - 1) {
-                        clean_text += sep
-                    }
-                }
-                else {
-                    clean_text += equation_blocks[i].split('_').join('\\_')
-                    if (i != equation_blocks.length - 1) {
-                        clean_text += sep
-                    }
-                }
-            }
-            return clean_text
+function escapeEquationBlocks(text, sep) {
+
+    var clean_text = ''
+    var equation_blocks = text.split(sep)
+    for (var i=0; i<equation_blocks.length; i++) {
+
+      if (i%2 == 0) {
+        clean_text += equation_blocks[i]
+        if (equation_blocks.length > 1 && i != equation_blocks.length - 1) {
+          clean_text += sep
         }
-
-
-        var status = {{ status }}
-
-        if (status < 2){
-            var published_button = $("#btn_publish")[0];
-            published_button.setAttribute("disabled", "disabled");
+      }
+      else {
+        clean_text += equation_blocks[i].split('_').join('\\_')
+        if (i != equation_blocks.length - 1) {
+          clean_text += sep
         }
+      }
+    }
+    return clean_text
+  }
 
 
-        var in_review_button = $("#btn_in_review")[0];
+var status = {{ status }}
 
-        $("#submission_close").on("click", function(){
-            in_review_button.setAttribute("class", "btn btn-large btn-primary");
-            in_review_button.innerText = 'In Review Phase';
-            status = 1;
+if (status < 2){
+  var published_button = $("#btn_publish")[0];
+  published_button.setAttribute("disabled", "disabled");
+}
 
-            // Get emails from modal
-            post_reviewers = $("#post_reviewers")[0].value
-            data = {
-                'new_status': status,
-                'post_reviewers': post_reviewers
-            }
 
-            // make an ajax call to change the status
-            $.ajax({
-                type: "POST",
-                dataType: "json",
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                url: '/ajax/editor/submit?path={{ path }}',
-                async: true,
-                success:function(response_data){
-                    alert("The status has been changed!")
-                    window.location = '{{ url_for('editor.editor', path=path) }}'
-                },
-                error: function(response_data){
-                    console.log("ERROR")
-                    console.log(JSON.stringify(response_data))
-                    if (response_data['status'] == 200){
-                        window.location = '{{ url_for('editor.editor', path=path) }}'
-                    } else {
-                        alert("Your post wasn't submitted for review, please try again!")
-                    }
-                }
-            })
-        })
+var in_review_button = $("#btn_in_review")[0];
 
-        if ( status > 0 ) {
-            $("#btn_publish").on("click", function(){
-                var publish_button_text = this.textContent.trim();
-                var url = '';
-                if (publish_button_text == "Unpublish"){
-                    url = '/ajax/editor/unpublish?path={{ path }}';
-                    alert_text = 'Your post has been unpublished! It will be hidden from the feed upon the next reindex.';
-                } else {
-                    url = '/ajax/editor/publish?path={{ path }}';
-                    alert_text = "Your post has been published! It will appear on the feed upon the next reindex.";
-                }
+$("#submission_close").on("click", function(){
+  in_review_button.setAttribute("class", "btn btn-large btn-primary");
+  in_review_button.innerText = 'In Review Phase';
+  status = 1;
 
-                $.ajax({
-                    type:"POST",
-                    contentType: 'application/json',
-                    url: url,
-                    async: true,
-                    success: function(response_data){
-                        alert(alert_text);
-                        location.reload();
-                    },
-                    error: function(response_data){
-                        console.log("ERROR");
-                        console.log(JSON.stringify(response_data));
-                    }
-                })
-            })
+  // Get emails from modal
+  post_reviewers = $("#post_reviewers")[0].value
+  data = {
+    'new_status': status,
+    'post_reviewers': post_reviewers
+  }
+
+  // make an ajax call to change the status
+  $.ajax({
+    type: "POST",
+    dataType: "json",
+    data: JSON.stringify(data),
+    contentType: 'application/json',
+    url: '/ajax/editor/submit?path={{ path }}',
+    async: true,
+    success:function(response_data){
+      alert("The status has been changed!")
+      window.location = '{{ url_for('editor.editor', path=path) }}'
+    },
+    error: function(response_data){
+      console.log("ERROR")
+      console.log(JSON.stringify(response_data))
+      if (response_data['status'] == 200){
+        window.location = '{{ url_for('editor.editor', path=path) }}'
+      } else {
+        alert("Your post wasn't submitted for review, please try again!")
+      }
+    }
+  })
+})
+
+if ( status > 0 ) {
+  $("#btn_publish").on("click", function(){
+    var publish_button_text = this.textContent.trim();
+    var url = '';
+    if (publish_button_text == "Unpublish"){
+      url = '/ajax/editor/unpublish?path={{ path }}';
+      alert_text = 'Your post has been unpublished! It will be hidden from the feed upon the next reindex.';
+    } else {
+      url = '/ajax/editor/publish?path={{ path }}';
+      alert_text = "Your post has been published! It will appear on the feed upon the next reindex.";
+    }
+
+    $.ajax({
+      type:"POST",
+      contentType: 'application/json',
+      url: url,
+      async: true,
+      success: function(response_data){
+        alert(alert_text);
+        location.reload();
+      },
+      error: function(response_data){
+        console.log("ERROR");
+        console.log(JSON.stringify(response_data));
+      }
+    })
+  })
+}
+
+$("#author_can_publish").on("click", function(){
+  var checked = this.can_approve;
+  $.ajax({
+    type: "POST",
+    contentType: "application/json",
+    url: "/ajax/editor/accept?path={{ path }}",
+    async: true,
+    success: function(response_data){
+      alert("The publishing status was changed!");
+      window.location = '{{ url_for('editor.editor', path=path) }}';
+    },
+    error: function(response_data){
+      alert("The publishing status was NOT changed");
+    }
+  });
+})
+
+$("#btn_save").on("click", function(){
+
+  path = {% if path %} '{{ path }}' {% else %} $('#post_path').typeahead('val') {% endif %}
+
+  data = {
+    'title': $("#post_title").val(),
+    'path': path,
+    'feed_image': $("#post_image_feed").val(),
+    'tags': $("#post_tags").select2().val(),
+    'tldr': $("#post_tldr").val(),
+    'status': status,
+    'created_at': $("#post_created_at").val(),
+    'updated_at': $("#post_updated_at").val(),
+    'author': $("#post_author").select2().val()
+  }
+
+  check_created_at = parseDate(data.created_at, "Created_At");
+  check_updated_at = parseDate(data.updated_at, "Updated_At");
+  if (!check_created_at || !check_updated_at){
+    this.setAttribute("class", "btn btn-large");
+    return;
+  }
+
+  if (data.title === '' || data.path === '' || data.tags === null || data.tldr === '' || data.author === null){
+    alert("One of the fields was left empty! Your post was not saved, please try again")
+    this.setAttribute("class", "btn btn-large");
+    return;
+  }
+
+  if ($("#post_text").length) {
+    data.markdown = encodeURIComponent($("#post_text").val())
+  } else {
+    data.markdown = ''
+  }
+
+  if ($("#post_proxy").length) {
+    data.proxy = $("#post_proxy").val()
+  }
+
+  if ($("#display_link").length) {
+    data.ipynb = $("#display_link").val()
+  }
+
+  $.ajax({
+      type: "POST",
+      dataType: "json",
+      data: JSON.stringify(data),
+      contentType: "application/json",
+      url: '/ajax/editor/save',
+      async: true,
+      success: function(response_data) {
+        if (response_data['success'] == 0) {
+          alert(response_data['msg'])
         }
-
-        $("#author_can_publish").on("click", function(){
-            var checked = this.can_approve;
-            $.ajax({
-                type: "POST",
-                contentType: "application/json",
-                url: "/ajax/editor/accept?path={{ path }}",
-                async: true,
-                success: function(response_data){
-                    alert("The publishing status was changed!");
-                    window.location = '{{ url_for('editor.editor', path=path) }}';
-                },
-                error: function(response_data){
-                    alert("The publishing status was NOT changed");
-                }
-            });
-        })
-
-        $("#btn_save").on("click", function(){
-
-            path = {% if path %} '{{ path }}' {% else %} $('#post_path').typeahead('val') {% endif %}
-
-            data = {
-                'title': $("#post_title").val(),
-                'path': path,
-                'feed_image': $("#post_image_feed").val(),
-                'tags': $("#post_tags").select2().val(),
-                'tldr': $("#post_tldr").val(),
-                'status': status,
-                'created_at': $("#post_created_at").val(),
-                'updated_at': $("#post_updated_at").val(),
-                'author': $("#post_author").select2().val()
-            }
-
-            check_created_at = parseDate(data.created_at, "Created_At");
-            check_updated_at = parseDate(data.updated_at, "Updated_At");
-            if (!check_created_at || !check_updated_at){
-                this.setAttribute("class", "btn btn-large");
-                return;
-            }
-
-            if (data.title === '' || data.path === '' || data.tags === null || data.tldr === '' || data.author === null){
-                alert("One of the fields was left empty! Your post was not saved, please try again")
-                this.setAttribute("class", "btn btn-large");
-                return;
-            }
-
-            if ($("#post_text").length) {
-                data.markdown = encodeURIComponent($("#post_text").val())
-            } else {
-                data.markdown = ''
-            }
-
-            if ($("#post_proxy").length) {
-                data.proxy = $("#post_proxy").val()
-            }
-
-            if ($("#display_link").length) {
-                data.ipynb = $("#display_link").val()
-            }
-
-            $.ajax({
-                type: "POST",
-                dataType: "json",
-                data: JSON.stringify(data),
-                contentType: "application/json",
-                url: '/ajax/editor/save',
-                async: true,
-                success: function(response_data) {
-                    if (response_data['success'] == 0) {
-                        alert(response_data['msg'])
-                    }
-                    else {
-                        $("#btn_save")[0].setAttribute("class", "btn btn-large");
-                        alert("The post was successfully saved!")
-                        window.location = '/edit/' + response_data['path']
-                    }
-                },
-                error: function(response_data) {
-                    $("#btn_save")[0].setAttribute("class", "btn btn-large");
-                    console.log("ERROR")
-                    console.log(JSON.stringify(response_data));
-                    alert("The post wasn't saved! Message: " + response_data['msg'])
-                }
-            });
-
-        });
-
-        function deleteReview(commentId) {
-            $.ajax({
-                type: "DELETE",
-                url: '/ajax/editor/review?path={{ path|urlencode }}&comment_id=' + commentId,
-                async: false
-            });
-            location.reload();
+        else {
+          $("#btn_save")[0].setAttribute("class", "btn btn-large");
+          alert("The post was successfully saved!")
+          window.location = '/edit/' + response_data['path']
         }
+      },
+      error: function(response_data) {
+        $("#btn_save")[0].setAttribute("class", "btn btn-large");
+        console.log("ERROR")
+        console.log(JSON.stringify(response_data));
+        alert("The post wasn't saved! Message: " + response_data['msg'])
+      }
+  });
 
-        function postReview() {
-            var commentText = $('#comment-text').val()
-            if (commentText == '') {
-                return;
-            }
-            var postContent = {
-                'text':commentText
-            }
-            $.ajax({
-                type: "POST",
-                dataType: "json",
-                data: JSON.stringify(postContent),
-                contentType: "application/json",
-                url: '/ajax/editor/review?path={{ path|urlencode }}',
-                async: false
-            });
-            location.reload();
-        }
+});
 
-        function parseDate(ds, error_name){
-            var parsed_date = ds.split("-")
-            var error_message = error_name  + " is not in the right format. \
+function deleteReview(commentId) {
+  $.ajax({
+      type: "DELETE",
+      url: '/ajax/editor/review?path={{ path|urlencode }}&comment_id=' + commentId,
+      async: false
+  });
+  location.reload();
+}
+
+function postReview() {
+  var commentText = $('#comment-text').val()
+  if (commentText == '') {
+    return;
+  }
+  var postContent = {
+    'text':commentText
+  }
+  $.ajax({
+      type: "POST",
+      dataType: "json",
+      data: JSON.stringify(postContent),
+      contentType: "application/json",
+      url: '/ajax/editor/review?path={{ path|urlencode }}',
+      async: false
+  });
+  location.reload();
+}
+
+function parseDate(ds, error_name){
+  var parsed_date = ds.split("-")
+  var error_message = error_name  + " is not in the right format. \
                       Make sure it's YYYY-mm-dd! Your post was not saved, please try again"
-            if (parsed_date.length != 3){
-                alert(error_message);
-                return false;
-            }
-            var year = parsed_date[0].trim()
-            var month = parsed_date[1].trim()
-            var day = parsed_date[2].trim()
-            if (year.length != 4){
-                alert(error_message);
-                return false;
-            }
+  if (parsed_date.length != 3){
+    alert(error_message);
+    return false;
+  }
+  var year = parsed_date[0].trim()
+  var month = parsed_date[1].trim()
+  var day = parsed_date[2].trim()
+  if (year.length != 4){
+    alert(error_message);
+    return false;
+  }
 
-            if (parseInt(month) <= 0 || parseInt(month) >= 13){
-                alert(error_message);
-                return false;
-            }
+  if (parseInt(month) <= 0 || parseInt(month) >= 13){
+    alert(error_message);
+    return false;
+  }
 
-            if (parseInt(day) <= 0 || parseInt(day) >= 32){
-                alert(error_message);
-                return false;
-            }
+  if (parseInt(day) <= 0 || parseInt(day) >= 32){
+    alert(error_message);
+    return false;
+  }
 
-            return true;
-        }
+  return true;
+}
 
-    </script>
-    <script type="text/x-mathjax-config">
+</script>
+<script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     extensions: ["tex2jax.js"],
     jax: ["input/TeX", "output/HTML-CSS"],
@@ -568,8 +566,8 @@
     "HTML-CSS": { availableFonts: ["TeX"] }
   });
 </script>
-    <script type="text/javascript"
-            src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js">
-    </script>
+<script type="text/javascript"
+  src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js">
+</script>
 
 {% endblock %}
