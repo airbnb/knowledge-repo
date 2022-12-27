@@ -27,16 +27,11 @@ from werkzeug.utils import secure_filename
 import json
 import logging
 import os
-from knowledge_repo.utils.s3 import (
-    get_s3_client,
-    upload_file_to_s3,
-)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 blueprint = get_blueprint("editor", __name__)
-s3_client = get_s3_client("", "", "us-west-2")  # todo: fix it
 
 
 def get_warning_msg(msg):
@@ -322,7 +317,6 @@ def s3_upload():
         if file_name is None:
             return get_warning_msg(f"File name is empty. Please re-upload!")
         bucket = data.get("bucket", "www.knowledge-repo.com")
-        # response = upload_file_to_s3(s3_client, file_name, bucket)
         response = True  # todo: replace it with real s3 upload
         if response:
             display_link = "https://s3.us-west-2.amazonaws.com/{0}/{1}".format(
