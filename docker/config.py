@@ -69,8 +69,10 @@ DB_AUTO_UPGRADE = False
 # By default, the knowledge repo offers:
 # ['debug', 'oauth2', 'bitbucket', 'github', 'google', 'ldap']
 AUTH_PROVIDERS = ["google"]
-OAUTH_GOOGLE_CLIENT_ID = "<client id>"
-OAUTH_GOOGLE_CLIENT_SECRET = "<client secret>"
+OAUTH_GOOGLE_CLIENT_ID = (
+    "239316671147-0sjgg1igsicboi9d7qrdkhqrjuqn4uis.apps.googleusercontent.com"
+)
+OAUTH_GOOGLE_CLIENT_SECRET = "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"
 
 # If you are going to use a OAuth provider, you will need to specify client ids
 # and private tokens. This can be done by instantiating instances of
@@ -350,4 +352,4 @@ COLLAPSE_CODE_DEFAULT = False
 # -------------
 S3_AWS_ACCESS_KEY_ID = ""
 S3_AWS_SECRET_ACCESS_KEY = ""
-S3_AWS_REGION_NAME = ""
+S3_AWS_REGION_NAME = "us-west-2"
