@@ -9,6 +9,7 @@ EXTRACT_IMAGES = 'extract_images'
 FORMAT_CHECKS = 'format_checks'
 GDOC = 'gdoc'
 IPYNB = 'ipynb'
+IPYNBv2 = "ipynbV2"
 KP = 'kp'
 KP_EXTENSION = '.kp'
 LDAP = 'ldap'

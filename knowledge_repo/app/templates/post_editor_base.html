@@ -59,7 +59,7 @@
           <input id="post_path"
           class="form-control typeahead"
           type="text"
-          placeholder="webposts/my_team/my_post_name" 
+          placeholder="webposts/my_team/my_post_name"
           value=""></input>
           <br>
           {% endif %}
@@ -87,7 +87,7 @@
           <input id="post_image_feed"
                  class="form-control"
                  type="text"
-                 placeholder="https://website.com/my_cool_thumbnail.png" 
+                 placeholder="https://website.com/my_cool_thumbnail.png"
                  value="{{ feed_image if feed_image else ''}}"></input>
           <br>
 
@@ -463,6 +463,10 @@ $("#btn_save").on("click", function(){
 
   if ($("#post_proxy").length) {
     data.proxy = $("#post_proxy").val()
+  }
+
+  if ($("#display_link").length) {
+    data.ipynb = $("#display_link").val()
   }
 
   $.ajax({

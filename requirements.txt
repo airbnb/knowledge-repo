@@ -16,11 +16,13 @@ flask_mail
 gunicorn 
 inflection 
 pillow
+psycopg2
 nbformat 
 nbconvert[execute] 
 traitlets
 ldap3
 requests
+requests_oauthlib
 weasyprint
 jinja2>=2.7,<=3.0.3
 werkzeug>=1.0,<=2.0.3

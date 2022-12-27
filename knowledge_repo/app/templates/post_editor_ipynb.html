@@ -1,0 +1,50 @@
+
+{% extends "post_editor_base.html" %}
+
+{% block metadata_fields %}
+    {{ super() }}
+    <form id="upload_banner" enctype="multipart/form-data" method="post" action="#">
+        <input id="file_upload" name="myfile" type="file" onchange="upload_file()"/>
+    </form>
+    <input type="hidden" id="display_link" name="display_link" value="">
+    <br>
+{% endblock %}
+
+
+{% block render_block %}
+    <div>
+        <h3>HTML Rendering</h3>
+        <iframe width=100% height=1000 src="{{ ipynb }}"></iframe>
+    </div>
+{% endblock render_block %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        function upload_file() {
+            var x = document.getElementById("file_upload");
+
+            var bucket = "www.knowledge-repo.com"
+            // make an ajax call to upload file to s3
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify({"file_name": x.value, "bucket": bucket}),
+                contentType: 'application/json',
+                url: '/ajax/editor/s3_upload',
+                async: true,
+                success:function(response_data){
+                    alert("The file(s) has been uploaded to s3!")
+                    console.log("response is" + JSON.stringify(response_data))
+                    document.getElementById("display_link").value = response_data["display_link"] || ''
+                },
+                error: function(response_data){
+                    console.log("ERROR")
+                    console.log(JSON.stringify(response_data))
+                }
+            })
+
+        }
+
+    </script>
+{% endblock scripts %}

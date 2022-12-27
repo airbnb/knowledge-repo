@@ -31,7 +31,7 @@ import os
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-blueprint = get_blueprint('editor', __name__)
+blueprint = get_blueprint("editor", __name__)
 
 
 def get_warning_msg(msg):
@@ -127,10 +127,11 @@ def editor(path=None):
     data['authors'] = json.dumps(data.get('authors'))
     data['tags'] = json.dumps(data.get('tags', []))
 
-    if 'proxy' in data or request.args.get('proxy', False):
-        return render_template('post_editor_proxy.html', **data)
-    return render_template('post_editor_markdown.html',
-                           **data)
+    if "proxy" in data or request.args.get("proxy", False):
+        return render_template("post_editor_proxy.html", **data)
+    if "ipynb" in data or request.args.get("ipynb", False):
+        return render_template("post_editor_ipynb.html", **data)
+    return render_template("post_editor_markdown.html", **data)
 
 
 @blueprint.route('/ajax/editor/save', methods=['GET', 'POST'])
@@ -179,6 +180,8 @@ def save_post():
     headers['tags'] = [tag.strip() for tag in data.get('tags', [])]
     if 'proxy' in data:
         headers['proxy'] = data['proxy']
+    if "ipynb" in data:
+        headers["ipynb"] = data["ipynb"]
 
     kp.write(unquote(data['markdown']), headers=headers)
     # add to repo
@@ -299,6 +302,32 @@ def review_comment():
             db_session.commit()
 
     return 'OK'
+
+
+@blueprint.route("/ajax/editor/s3_upload", methods=["POST", "GET"])
+@PageView.logged
+@permissions.post_edit.require()
+def s3_upload():
+    """Upload file(s) to AWS s3 path and return the display link in the response"""
+    if request.method == "POST":
+        data = request.get_json()
+        file_name = data.get("file_name", None)
+        object_name = os.path.basename(file_name.replace("\\", "/"))
+        logger.info("file_name: {0} & object_name: {1}".format(file_name, object_name))
+        if file_name is None:
+            return get_warning_msg(f"File name is empty. Please re-upload!")
+        bucket = data.get("bucket", "www.knowledge-repo.com")
+        response = True  # todo: replace it with real s3 upload
+        if response:
+            display_link = "https://s3.us-west-2.amazonaws.com/{0}/{1}".format(
+                bucket, object_name
+            )  # todo: make s3 region name be configurable
+            return json.dumps({"display_link": display_link, "success": True})
+        error_msg = "ERROR during upload file to s3"
+        logger.error(error_msg)
+        return get_error_msg(error_msg)
+
+    return "OK"
 
 
 # DEPRECATED
