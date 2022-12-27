@@ -316,6 +316,9 @@ INDEXING_ENABLED = True
 # MAIL_MAX_EMAILS = None  # default = None
 # MAIL_SUPPRESS_SEND = False  # default = app.testing
 # MAIL_ASCII_ATTACHMENTS = False  # default = False
+#
+# Detailed integration procedure with SendGrid is available at:
+# https://sendgrid.com/blog/sending-emails-from-python-flask-applications-with-twilio-sendgrid/
 
 
 # --------------------------------------------------

@@ -14,6 +14,7 @@ __author__ = """
     Erik Ritter (maintainer),
     Henry Wu,
     Jing Guo,
+    Mengting Li,
     John Bodley,
     Bill Ulammandakh,
     Naoya Kanai,
