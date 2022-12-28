@@ -128,8 +128,8 @@ def editor(path=None):
             )
 
     if (
-        current_user.identifier not in data["authors"]
-        or current_user.identifier in current_repo.config.editors
+        current_user.identifier not in data["authors"] or \
+        current_user.identifier in current_repo.config.editors
     ):
         data["can_approve"] = 1
 
@@ -168,8 +168,8 @@ def save_post():
     if path in current_repo:
         kp = current_repo.post(path)
         if (
-            current_user.identifier not in kp.headers["authors"]
-            and current_user.identifier not in current_repo.config.editors
+            current_user.identifier not in kp.headers["authors"] and \
+            current_user.identifier not in current_repo.config.editors
         ):
             return get_warning_msg(
                 f"Post with path {path} already exists and you are not "
@@ -195,8 +195,8 @@ def save_post():
     if "ipynb" in data:
         headers["ipynb"] = data["ipynb"]
         if (
-            data.get("file_name", None) is not None
-            and data.get("file_data", None) is not None
+            data.get("file_name", None) is not None and \
+            data.get("file_data", None) is not None
         ):
             response = s3_upload(data["file_name"], data["file_data"])
             if response is None:
