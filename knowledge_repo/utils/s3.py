@@ -2,8 +2,19 @@ from botocore.exceptions import ClientError
 import boto3
 import logging
 import os
+from s3path import S3Path
 
 logger = logging.getLogger(__name__)
+
+
+def parse_s3_path(s3_url):
+    """Get s3_path for S3 Object URL
+
+    :param s3_url: url of s3 object
+    :return: bucket and key name
+    """
+    path = S3Path.from_uri(s3_url)
+    return path.bucket, path.key
 
 
 def get_s3_client(
