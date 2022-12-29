@@ -121,4 +121,4 @@ ENV/
 
 # Local development artifacts
 .knowledge_repo_config.yml
-/docker/config.py
+docker/config.py
