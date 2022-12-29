@@ -1,5 +1,5 @@
 boto3==1.26.10
-botocore==1.29.37
+botocore==1.26.10
 cooked_input 
 flask==2.1.2
 Flask-Migrate 
