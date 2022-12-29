@@ -80,6 +80,8 @@ __dependencies__ = [
     "inflection",  # String transformation library
     "pillow",  # Image thumbnailing
     "weasyprint==54.3",  # Post PDF download option
+    "botocore",  # aws s3 integration
+    "boto3",  # aws s3 integration
 ]
 
 __optional_dependencies__ = {
