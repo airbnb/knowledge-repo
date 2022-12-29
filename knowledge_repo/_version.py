@@ -38,7 +38,7 @@ __author_email__ = """
     mpwardrop@gmail.com
     """
 
-__version__ = "0.9.2"
+__version__ = "0.9.1"
 
 try:
     with open(os.devnull, "w") as devnull:
