@@ -121,4 +121,8 @@ ENV/
 
 # Local development artifacts
 .knowledge_repo_config.yml
+<<<<<<< HEAD
 docker/config.py
+=======
+docker/config.py
+>>>>>>> 7ee0108 (fix)
