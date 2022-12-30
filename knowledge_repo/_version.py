@@ -82,6 +82,7 @@ __dependencies__ = [
     "weasyprint==54.3",  # Post PDF download option
     "botocore",  # aws s3 integration
     "boto3",  # aws s3 integration
+    "s3path"
 ]
 
 __optional_dependencies__ = {
