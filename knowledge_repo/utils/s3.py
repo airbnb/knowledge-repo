@@ -2,8 +2,7 @@ from botocore.exceptions import ClientError
 import boto3
 import logging
 import os
-
-# from s3path import S3Path
+from s3path import S3Path
 
 logger = logging.getLogger(__name__)
 
@@ -14,9 +13,8 @@ def parse_s3_path(s3_url):
     :param s3_url: url of s3 object
     :return: bucket and key name
     """
-    # path = S3Path.from_uri(s3_url)
-    # return path.bucket, path.key
-    return "", ""
+    path = S3Path.from_uri(s3_url)
+    return path.bucket, path.key
 
 
 def parse_s3_uri(s3_uri):
