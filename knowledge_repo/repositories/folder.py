@@ -144,8 +144,8 @@ class FolderKnowledgeRepository(KnowledgeRepository):
     def _kp_uuid(self, path):
         try:
             return self._kp_read_ref(path, 'UUID')
-        except Exception as e:
-            print(f'Exception encountered: {e}')
+        except Exception as ex:
+            logger.info(f'Existing UUID file was not found.')
             return None
 
     def _kp_path(self, path, rel=None):
@@ -163,8 +163,8 @@ class FolderKnowledgeRepository(KnowledgeRepository):
         # using git revisions because using git rev-parse is slow.
         try:
             return int(self._kp_read_ref(path, 'REVISION'))
-        except Exception as e:
-            print(f'Exception encountered: {e}')
+        except Exception as ex:
+            logger.info(f'Existing REVISION file was not found.')
             return 0
 
     def _kp_get_revisions(self, path):
