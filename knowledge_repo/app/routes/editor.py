@@ -32,13 +32,14 @@ import nbformat
 from nbconvert import HTMLExporter
 import io
 from knowledge_repo.constants import AWS_S3_BUCKET
-from knowledge_repo.utils.notion import get_notion_client
+from knowledge_repo.utils.notion import get_notion_client, create_page
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 blueprint = get_blueprint("editor", __name__)
 s3_client = get_s3_client("", "", "us-west-2")
+notion_client = get_notion_client("")
 
 
 def get_warning_msg(msg):
@@ -88,7 +89,6 @@ def editor(path=None):
     """Render the web post editor, either with the default values
     or if the post already exists, with what has been saved"""
 
-    # get_notion_client()
     prefixes = current_app.config.get("WEB_EDITOR_PREFIXES", None)
 
     if prefixes is not None:
@@ -214,6 +214,11 @@ def save_post():
     kp.write(unquote(data["markdown"]), headers=headers)
     # add to repo
     current_repo.add(kp, update=True, message=headers["title"])  # THIS IS DANGEROUS
+
+    logger.info(data)
+    # add into notion database
+    if "ipynb" in data:
+        create_page(notion_client=notion_client, params=headers)
 
     update_index()
     return json.dumps({"path": path})

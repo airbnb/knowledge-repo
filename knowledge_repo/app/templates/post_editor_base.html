@@ -475,6 +475,11 @@ $("#btn_save").on("click", function(){
     data.proxy = $("#post_proxy").val()
   }
 
+  if ($("#ipynb").length) {
+    data.ipynb = $("#ipynb").val()
+    console.log("ipynb" + data.ipynb)
+  }
+
   file_upload = document.getElementById("file_upload")
   file_data = document.getElementById("file_data")
   if(file_upload != null && file_data != null && file_upload.files.length && file_data.value.length) {
