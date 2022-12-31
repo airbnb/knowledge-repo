@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class S3Repository(KnowledgeRepository):
-    _registry_keys = ['s3', 's3a', 'gs', 'gcs']
+    _registry_keys = ['s3']
 
     TEMPLATES = {
         'README.md': get_path(
@@ -55,6 +55,8 @@ class S3Repository(KnowledgeRepository):
     # ---------------- Post retrieval methods --------------------------------
 
     def _dir(self, prefix, statuses):
+
+        
         pass
 
     # ------------- Post submission / addition user flow ----------------------
