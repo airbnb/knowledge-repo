@@ -21,6 +21,7 @@ class S3Repository(KnowledgeRepository):
     def init(self, config='.knowledge_repo_config.yml', auto_create=False):
         self.auto_create = auto_create
         self.s3_bucket, self.path = parse_s3_path(self.uri)
+        print(self.config)
         print(self)
 
     @classmethod
@@ -56,7 +57,7 @@ class S3Repository(KnowledgeRepository):
 
     def _dir(self, prefix, statuses):
 
-        
+
         pass
 
     # ------------- Post submission / addition user flow ----------------------

@@ -71,11 +71,12 @@ def upload_file_to_s3(
     return True
 
 
+# TODO handle post remove and update
 def download_dir_from_s3(
     s3_client,
     s3_bucket,
     s3_prefix,
-    local_dir='/.tmp_kp'
+    local_dir='tmp_kp'
 ):
     """Download a file from an object in an S3 bucket
 
@@ -83,7 +84,7 @@ def download_dir_from_s3(
     :param s3_bucket: Bucket to download from
     :param s3_prefix: pattern to match in s3 objects, can be treated as dir
     :param local_dir: local s3 path
-    :return: list of kp post location
+    :return: list of kp post locationls
     """
     keys = []
     dirs = []
@@ -105,17 +106,21 @@ def download_dir_from_s3(
                 dirs.append(key)
         next_token = results.get('NextContinuationToken')
     # create dir in case empty path in S3
-    for d in dirs:
-        dest_pathname = os.path.join(local_dir, d)
+    for dir in dirs:
+        dest_pathname = os.path.join(local_dir, dir)
         if not os.path.exists(os.path.dirname(dest_pathname)):
             os.makedirs(os.path.dirname(dest_pathname))
     # copy files from S3
-    for k in keys:
-        dest_pathname = os.path.join(local_dir, k)
+    for object_key in keys:
+        dest_pathname = os.path.join(local_dir, object_key)
         if not os.path.exists(os.path.dirname(dest_pathname)):
             os.makedirs(os.path.dirname(dest_pathname))
-        s3_client.download_file(s3_bucket, k, dest_pathname)
-    return dir
+        logger.info("Down files from: {object_key} to {dest_pathname}".format(
+            object_key=object_key,
+            dest_pathname=dest_pathname)
+            )
+        s3_client.download_file(s3_bucket, object_key, dest_pathname)
+    return dirs
 
 
 def put_object_to_s3(
