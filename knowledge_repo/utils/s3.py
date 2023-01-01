@@ -75,7 +75,7 @@ def download_dir_from_s3(
     s3_client,
     s3_bucket,
     s3_prefix,
-    local_dir='/tmp_kp'
+    local_dir='/.tmp_kp'
 ):
     """Download a file from an object in an S3 bucket
 
