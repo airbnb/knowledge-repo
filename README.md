@@ -23,7 +23,7 @@ For more information about the motivation and inspiration behind this project, w
 
 ## Live Demo
 
-A hosted version of this project is available at https://www.knowledge-repo.com.
+A hosted version of this project is available at https://www.knowledge-repo.com for demonstration.
 
 ## Screenshots
 
