@@ -20,9 +20,9 @@ class S3Repository(KnowledgeRepository):
 
     def init(self, config='.knowledge_repo_config.yml', auto_create=False):
         self.auto_create = auto_create
+        app = self.get_app()
         self.s3_bucket, self.path = parse_s3_path(self.uri)
-        print(self.config)
-        print(self)
+        print(app.config)
 
     @classmethod
     def from_uri(cls, uri, *args, **kwargs):
