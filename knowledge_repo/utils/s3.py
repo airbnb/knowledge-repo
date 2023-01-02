@@ -71,6 +71,34 @@ def upload_file_to_s3(
     return True
 
 
+def download_file_from_s3(
+    s3_client,
+    bucket,
+    object_name,
+    file_name=None,
+):
+    """Download a file from an object in an S3 bucket
+    :param s3_client: a boto3 S3 client
+    :param bucket: Bucket to download from
+    :param object_name: S3 object name
+    :param file_name: File to download. If not specified, object_name is used
+    :return: True if file was downloaded, else False
+    """
+
+    # If file_name was not specified, use object_name
+    if file_name is None:
+        file_name = os.path.basename(object_name)
+
+    # Download the file
+    try:
+        response = s3_client.download_file(bucket, object_name, file_name)
+        logger.info(response)
+    except ClientError as client_error:
+        logger.error(client_error)
+        return False
+    return True
+
+
 # TODO handle post remove and update
 def download_dir_from_s3(
     s3_client,
