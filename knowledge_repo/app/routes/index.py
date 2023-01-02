@@ -49,6 +49,29 @@ def site_map():
     return '<br />'.join(str(link) for link in links)
 
 
+@blueprint.route("/site-map.xml")
+@PageView.logged
+def site_map_xml():
+    feed_params = from_request_get_feed_params(request)
+    posts, post_stats = get_posts(feed_params)
+    values = []
+    app_domain = current_app.config.SERVER_NAME
+    for post in posts:
+        values.append(
+            {
+                "loc": "{app_domain}/post/{post_path}".format(
+                    app_domain=app_domain,
+                    post_path=post.path
+                    ),
+                "lastmod": post.updated_at,
+                "priority": 1
+            }
+        )
+    template = render_template('sitemap.xml', values=values)
+    response = make_response(template)
+    response.headers['Content-Type'] = 'application/xml'
+    return response
+
 @blueprint.route('/')
 @PageView.logged
 def render_index():
