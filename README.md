@@ -20,6 +20,11 @@ For more information about the motivation and inspiration behind this project, w
 - **Bug reports**: https://github.com/airbnb/knowledge-repo/issues
 - **Ask us questions on Slack**: https://join.slack.com/t/knowledgerepogroup/shared_invite/zt-1lzxytay8-R~15bODzwFGLO5mukFFCYQ
 
+
+## Live Demo
+
+A hosted version of this project is available at https://www.knowledge-repo.com.
+
 ## Screenshots
 
 ![feed](https://user-images.githubusercontent.com/8813413/83345201-451ce500-a2c5-11ea-8eb9-1fbeda22b213.png)
