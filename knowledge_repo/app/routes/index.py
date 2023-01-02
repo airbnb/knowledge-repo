@@ -62,7 +62,7 @@ def site_map_xml():
                 "loc": "{app_domain}/post/{post_path}".format(
                     app_domain=app_domain,
                     post_path=post.path
-                    ),
+                ),
                 "lastmod": post.updated_at,
                 "priority": 1
             }
@@ -71,6 +71,7 @@ def site_map_xml():
     response = make_response(template)
     response.headers['Content-Type'] = 'application/xml'
     return response
+
 
 @blueprint.route('/')
 @PageView.logged
