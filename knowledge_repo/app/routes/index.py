@@ -55,11 +55,11 @@ def site_map_xml():
     feed_params = from_request_get_feed_params(request)
     posts, post_stats = get_posts(feed_params)
     values = []
-    app_domain = current_app.config.SERVER_NAME
+    app_domain = request.url_root
     for post in posts:
         values.append(
             {
-                "loc": "{app_domain}/post/{post_path}".format(
+                "loc": "{app_domain}post/{post_path}".format(
                     app_domain=app_domain,
                     post_path=post.path
                 ),
