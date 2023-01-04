@@ -67,7 +67,6 @@ def site_map_xml():
                 "priority": 1
             }
         )
-
     template = render_template('sitemap.xml', values=values)
     response = make_response(template)
     response.headers['Content-Type'] = 'application/xml'
