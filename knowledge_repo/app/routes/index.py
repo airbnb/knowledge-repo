@@ -63,10 +63,11 @@ def site_map_xml():
                     app_domain=app_domain,
                     post_path=post.path
                 ),
-                "lastmod": post.updated_at,
+                "lastmod": post.updated_at.strftime("%Y-%m-%dT%H:%M:%S+00:00"),
                 "priority": 1
             }
         )
+
     template = render_template('sitemap.xml', values=values)
     response = make_response(template)
     response.headers['Content-Type'] = 'application/xml'
