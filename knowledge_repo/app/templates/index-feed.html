@@ -54,7 +54,7 @@
                 <span class='feed-tldr-expander'>+ Show More</span>
                 <span class='feed-stats'>
                     {% set stats = post_stats[post.path] %}
-                    <span title="Users who Viewed"><i class="glyphicon glyphicon-eye-open"> </i> {{ stats['distinct_views'] }}</span>
+                    <span title="Users who Viewed"><i class="glyphicon glyphicon-eye-open"> </i> {{ stats['all_views'] }}</span>
                     <span title="Number of Favorites"><i class="glyphicon glyphicon-heart-empty"></i> {{ stats['total_likes']}}</span>
                     <span title="Comments"><i class="glyphicon glyphicon-comment"></i> {{ stats['total_comments']}}</span>
                 </span>

@@ -142,6 +142,7 @@ def editor(path=None):
     if "proxy" in data or request.args.get("proxy", False):
         return render_template("post_editor_proxy.html", **data)
     if "ipynb" in data or request.args.get("ipynb", False):
+        data["ipynb"] = True
         return render_template("post_editor_ipynb.html", **data)
     return render_template("post_editor_markdown.html", **data)
 
