@@ -110,19 +110,21 @@
                     class="form-control"
                     type="text">{{tldr if tldr else ''}}</textarea>
           <br>
-          <label for="post_created_at"> Created At: </label>
-          <input id="post_created_at"
-                 class="form-control"
-                 type="text"
-                 value="{{ created_at|format_date if created_at else '' }}"></input>
-          <br>
+          {% if not ipynb %}
+            <label for="post_created_at"> Created At: </label>
+            <input id="post_created_at"
+                  class="form-control"
+                  type="text"
+                  value="{{ created_at|format_date if created_at else '' }}"></input>
+            <br>
 
-          <label for="post_updated_at"> Updated At: </label>
-          <input id="post_updated_at"
-                 class="form-control"
-                 type="text"
-                 value="{{ updated_at|format_date if updated_at else ''}}"></input>
-          <br>
+            <label for="post_updated_at"> Updated At: </label>
+            <input id="post_updated_at"
+                  class="form-control"
+                  type="text"
+                  value="{{ updated_at|format_date if updated_at else ''}}"></input>
+            <br>
+          {% endif %}
           {% endblock %}
         </div>
       </form>
@@ -182,6 +184,8 @@
 var all_form_fields = ['#post_title', '#post_path',
                        '#post_created_at', '#post_updated_at',
                        '#post_author', '#post_image_feed', '#post_tags']
+
+var ipynb = $("#ipynb").val() == 'True'
 
 // This will ensure that when you
 $.each(all_form_fields, function(i, v){
