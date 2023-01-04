@@ -50,8 +50,6 @@
             "program": "scripts/knowledge_repo",
             "console": "integratedTerminal",
             "args": [
-                "--repo",
-                "s3://www.knowledge-repo.com",
                 "runserver",
                 "--port",
                 "7001",
