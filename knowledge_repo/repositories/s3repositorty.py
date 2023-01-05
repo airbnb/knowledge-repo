@@ -1,6 +1,6 @@
 import os
 
-from knowledge_repo.utils.s3 import parse_s3_path
+from knowledge_repo.utils.s3 import parse_s3_uri, download_dir_from_s3
 from ..repository import KnowledgeRepository
 from ..utils.files import get_path
 import logging
@@ -20,9 +20,13 @@ class S3Repository(KnowledgeRepository):
 
     def init(self, config='.knowledge_repo_config.yml', auto_create=False):
         self.auto_create = auto_create
-        app = self.get_app()
-        self.s3_bucket, self.path = parse_s3_path(self.uri)
-        print(app.config)
+
+        self._s3_bucket, self._s3_client, self._dir = parse_s3_uri(self.uri)
+        self._path = os.path.join('tmp_kp', self._dir)
+        download_dir_from_s3(self._s3_client, self._s3_bucket, self._dir, self._path)
+        self.config.update(os.path.join(self.path, config))
+
+
 
     @classmethod
     def from_uri(cls, uri, *args, **kwargs):
@@ -40,14 +44,17 @@ class S3Repository(KnowledgeRepository):
     def path(self, path):
         self._path = path
 
+
     # ----------- Repository actions / state ----------------------------------
     @property
     def revision(self):
         pass
 
+
     @property
     def status(self):
         pass
+
 
     @property
     def status_message(self):
@@ -56,8 +63,32 @@ class S3Repository(KnowledgeRepository):
     # ---------------- Post retrieval methods --------------------------------
 
     def _dir(self, prefix, statuses):
+        posts = set()
 
+        if self.PostStatus.PUBLISHED in statuses:
 
+            for path, folders, files in os.walk(os.path.join(self.path, prefix or "")):
+
+                # Do not visit hidden folders
+                for folder in folders:
+                    if folder.startswith("."):
+                        folders.remove(folder)
+
+                posts.update(
+                    os.path.join(os.path.relpath(path, start=self.path), folder)
+                    for folder in folders
+                    if folder.endswith(".kp")
+                )
+                posts.update(
+                    os.path.join(os.path.relpath(path, start=self.path), file)
+                    for file in files
+                    if file.endswith(".kp")
+                )
+
+        for post in sorted(
+            [post[2:] if post.startswith("./") else post for post in posts]
+        ):
+            yield post
         pass
 
     # ------------- Post submission / addition user flow ----------------------

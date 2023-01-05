@@ -17,6 +17,17 @@ def parse_s3_path(s3_url):
     return path.bucket, path.key
 
 
+def parse_s3_uri(s3_uri):
+    """Get s3_path for S3 Object URL
+
+    :param s3_url: url of s3 object
+    :return: s3_bucket, s3_client
+    """
+    path = S3Path.from_uri(s3_uri)
+    uri_splt = path.key.split('/')
+    return path.bucket, get_s3_client(uri_splt[1], uri_splt[2], uri_splt[0]), uri_splt[3] if len(uri_splt) > 3 else ''
+
+
 def get_s3_client(
     s3_aws_access_key_id,
     s3_aws_secret_access_key,
