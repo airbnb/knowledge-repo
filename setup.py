@@ -68,6 +68,7 @@ setup(
         " of RMarkdowns, iPythons, and Markdowns, rendered and organized"
         " to magnify research impact across teams and time "
     ),
+    long_description_content_type="text/markdown",
     version=version_info["__version__"].split("_")[0],  # remove git revision if present
     author=version_info["__author__"],
     author_email=version_info["__author_email__"],
@@ -85,7 +86,6 @@ setup(
         "Intended Audience :: Information Technology",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: Apache Software License",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
