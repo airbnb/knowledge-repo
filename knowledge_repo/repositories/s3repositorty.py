@@ -28,8 +28,6 @@ class S3Repository(KnowledgeRepository):
         download_dir_from_s3(self._s3_client, self._s3_bucket, self._s3_dir, self._path)
         # self.config.update(os.path.join(self.path, config))
 
-
-
     @classmethod
     def from_uri(cls, uri, *args, **kwargs):
         return cls(uri, *args, **kwargs)
@@ -46,24 +44,20 @@ class S3Repository(KnowledgeRepository):
     def path(self, path):
         self._path = path
 
-
     # ----------- Repository actions / state ----------------------------------
     @property
     def revision(self):
         return time.time()
 
-
     @property
     def status(self):
         pass
-
 
     @property
     def status_message(self):
         pass
 
     # ---------------- Post retrieval methods --------------------------------
-
     def _dir(self, prefix, statuses):
         posts = set()
 
