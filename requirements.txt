@@ -30,3 +30,4 @@ multiprocess
 importlib-metadata==4.13.0
 sqlalchemy==1.4.37
 weasyprint==54.3
+s3path==0.3.4

@@ -1,15 +1,17 @@
 import os
 
-from knowledge_repo.utils.s3 import parse_s3_path
+from knowledge_repo.utils.s3 import parse_s3_uri, download_dir_from_s3
+from ..post import KnowledgePost
 from ..repository import KnowledgeRepository
-from ..utils.files import get_path
+from ..utils.files import get_path, read_binary, write_binary
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
 
 class S3Repository(KnowledgeRepository):
-    _registry_keys = ['s3', 's3a', 'gs', 'gcs']
+    _registry_keys = ['s3']
 
     TEMPLATES = {
         'README.md': get_path(
@@ -20,8 +22,11 @@ class S3Repository(KnowledgeRepository):
 
     def init(self, config='.knowledge_repo_config.yml', auto_create=False):
         self.auto_create = auto_create
-        self.s3_bucket, self.path = parse_s3_path(self.uri)
-        print(self)
+
+        self._s3_bucket, self._s3_client, self._s3_dir = parse_s3_uri(self.uri)
+        self._path = os.path.join('tmp_kp', self._s3_dir)
+        download_dir_from_s3(self._s3_client, self._s3_bucket, self._s3_dir, self._path)
+        # self.config.update(os.path.join(self.path, config))
 
     @classmethod
     def from_uri(cls, uri, *args, **kwargs):
@@ -42,7 +47,7 @@ class S3Repository(KnowledgeRepository):
     # ----------- Repository actions / state ----------------------------------
     @property
     def revision(self):
-        pass
+        return time.time()
 
     @property
     def status(self):
@@ -53,9 +58,33 @@ class S3Repository(KnowledgeRepository):
         pass
 
     # ---------------- Post retrieval methods --------------------------------
-
     def _dir(self, prefix, statuses):
-        pass
+        posts = set()
+
+        if self.PostStatus.PUBLISHED in statuses:
+
+            for path, folders, files in os.walk(os.path.join(self.path, prefix or "")):
+
+                # Do not visit hidden folders
+                for folder in folders:
+                    if folder.startswith("."):
+                        folders.remove(folder)
+
+                posts.update(
+                    os.path.join(os.path.relpath(path, start=self.path), folder)
+                    for folder in folders
+                    if folder.endswith(".kp")
+                )
+                posts.update(
+                    os.path.join(os.path.relpath(path, start=self.path), file)
+                    for file in files
+                    if file.endswith(".kp")
+                )
+
+        for post in sorted(
+            [post[2:] if post.startswith("./") else post for post in posts]
+        ):
+            yield post
 
     # ------------- Post submission / addition user flow ----------------------
     def _add_prepare(self, kp, path, update=False, **kwargs):
@@ -82,13 +111,19 @@ class S3Repository(KnowledgeRepository):
     # ------------ Knowledge Post Data Retrieval Methods ----------------------
 
     def _kp_uuid(self, path):
-        pass
+        try:
+            return self._kp_read_ref(path, "UUID")
+        except Exception as ex:
+            logger.info(f"Existing UUID file was not found.")
+            return None
 
     def _kp_path(self, path, rel=None):
-        pass
+        return KnowledgeRepository._kp_path(
+            self, os.path.expanduser(path), rel=rel or self.path
+        )
 
     def _kp_exists(self, path, revision=None):
-        pass
+        return os.path.exists(os.path.join(self.path, path))
 
     def _kp_status(self, path, revision=None, detailed=False, branch=None):
         return self.PostStatus.PUBLISHED
@@ -103,10 +138,29 @@ class S3Repository(KnowledgeRepository):
         pass
 
     def _kp_dir(self, path, parent=None, revision=None):
-        pass
+        path = os.path.join(self.path, path)
+        if os.path.isdir(path):
+            if parent:
+                path = os.path.join(path, parent)
+            for dirpath, dirnames, filenames in os.walk(os.path.join(self.path, path)):
+                for filename in filenames:
+                    if dirpath == "" and filename == "REVISION":
+                        continue
+                    yield os.path.relpath(
+                        os.path.join(dirpath, filename), os.path.join(self.path, path)
+                    )
+        else:
+            kp = KnowledgePost.from_file(path, format="kp")
+            for reference in kp._dir(parent=parent):
+                yield reference
 
     def _kp_has_ref(self, path, reference, revision=None):
-        pass
+        path = os.path.join(self.path, path)
+        if os.path.isdir(path):
+            return os.path.isfile(os.path.join(path, reference))
+        else:
+            kp = KnowledgePost.from_file(path, format="kp")
+            return kp._has_ref(reference)
 
     def _kp_diff(self, path, head, base):
         raise NotImplementedError
@@ -115,4 +169,9 @@ class S3Repository(KnowledgeRepository):
         pass
 
     def _kp_read_ref(self, path, reference, revision=None):
-        pass
+        path = os.path.join(self.path, path)
+        if os.path.isdir(path):
+            return read_binary(os.path.join(path, reference))
+        else:
+            kp = KnowledgePost.from_file(path, format="kp")
+            return kp._read_ref(reference)

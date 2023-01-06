@@ -17,6 +17,17 @@ def parse_s3_path(s3_url):
     return path.bucket, path.key
 
 
+def parse_s3_uri(s3_uri):
+    """Get s3_path for S3 Object URL
+
+    :param s3_url: url of s3 object
+    :return: s3_bucket, s3_client
+    """
+    path = S3Path.from_uri(s3_uri)
+    uri_splt = path.key.split('/')
+    return path.bucket, get_s3_client(uri_splt[1], uri_splt[2], uri_splt[0]), uri_splt[3] if len(uri_splt) > 3 else ''
+
+
 def get_s3_client(
     s3_aws_access_key_id,
     s3_aws_secret_access_key,
@@ -78,7 +89,6 @@ def download_file_from_s3(
     file_name=None,
 ):
     """Download a file from an object in an S3 bucket
-
     :param s3_client: a boto3 S3 client
     :param bucket: Bucket to download from
     :param object_name: S3 object name
@@ -98,6 +108,58 @@ def download_file_from_s3(
         logger.error(client_error)
         return False
     return True
+
+
+# TODO handle post remove and update
+def download_dir_from_s3(
+    s3_client,
+    s3_bucket,
+    s3_prefix,
+    local_dir='tmp_kp'
+):
+    """Download a file from an object in an S3 bucket
+
+    :param s3_client: a boto3 S3 client
+    :param s3_bucket: Bucket to download from
+    :param s3_prefix: pattern to match in s3 objects, can be treated as dir
+    :param local_dir: local s3 path
+    :return: list of kp post locationls
+    """
+    keys = []
+    dirs = []
+    next_token = ''
+    base_kwargs = {
+        'Bucket': s3_bucket,
+        'Prefix': s3_prefix,
+    }
+    while next_token is not None:
+        kwargs = base_kwargs.copy()
+        if next_token != '':
+            kwargs.update({'ContinuationToken': next_token})
+        results = s3_client.list_objects_v2(**kwargs)
+        for i in results.get('Contents'):
+            key = i.get('Key')
+            if key[-1] != '/':
+                keys.append(key)
+            else:
+                dirs.append(key)
+        next_token = results.get('NextContinuationToken')
+    # create dir in case empty path in S3
+    for dir in dirs:
+        dest_pathname = os.path.join(local_dir, dir)
+        if not os.path.exists(os.path.dirname(dest_pathname)):
+            os.makedirs(os.path.dirname(dest_pathname))
+    # copy files from S3
+    for object_key in keys:
+        dest_pathname = os.path.join(local_dir, object_key)
+        if not os.path.exists(os.path.dirname(dest_pathname)):
+            os.makedirs(os.path.dirname(dest_pathname))
+        logger.info("Down files from: {object_key} to {dest_pathname}".format(
+            object_key=object_key,
+            dest_pathname=dest_pathname)
+        )
+        s3_client.download_file(s3_bucket, object_key, dest_pathname)
+    return dirs
 
 
 def put_object_to_s3(
