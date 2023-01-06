@@ -126,3 +126,7 @@ docker/config.py
 # Knowledge Repo Configs
 .configs/
 configs/
+
+# S3 Knowledge Repo Data
+.tmp_kp/
+tmp_kp/
