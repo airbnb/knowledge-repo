@@ -157,7 +157,7 @@ def download_dir_from_s3(
         logger.info("Down files from: {object_key} to {dest_pathname}".format(
             object_key=object_key,
             dest_pathname=dest_pathname)
-            )
+        )
         s3_client.download_file(s3_bucket, object_key, dest_pathname)
     return dirs
 
