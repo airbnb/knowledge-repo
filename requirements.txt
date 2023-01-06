@@ -4,7 +4,7 @@ cooked_input
 flask==2.1.2
 Flask-Migrate 
 gitdb
-gitpython==3.1.18
+gitpython==3.1.30
 tabulate==0.8.9
 pyyaml 
 markdown==3.3.4
