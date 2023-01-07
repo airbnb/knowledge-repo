@@ -110,20 +110,23 @@
                     class="form-control"
                     type="text">{{tldr if tldr else ''}}</textarea>
           <br>
-          {% if not ipynb %}
-            <label for="post_created_at"> Created At: </label>
-            <input id="post_created_at"
-                  class="form-control"
-                  type="text"
-                  value="{{ created_at|format_date if created_at else '' }}"></input>
-            <br>
 
-            <label for="post_updated_at"> Updated At: </label>
-            <input id="post_updated_at"
-                  class="form-control"
-                  type="text"
-                  value="{{ updated_at|format_date if updated_at else ''}}"></input>
-            <br>
+          <label hidden="{{ 'hidden' if ipynb else '' }}" for="post_created_at"> Created At: </label>
+          <input type="{{ 'hidden' if ipynb else '' }}" id="post_created_at"
+                 class="form-control"
+                 type="text"
+                 value="{{ created_at|format_date if created_at else '' }}"></input>
+          {% if not ipynb %}
+          <br>
+          {% endif %}
+
+          <label hidden="{{ 'hidden' if ipynb else '' }}" for="post_updated_at"> Updated At: </label>
+          <input type="{{ 'hidden' if ipynb else '' }}" id="post_updated_at"
+                 class="form-control"
+                 type="text"
+                 value="{{ updated_at|format_date if updated_at else ''}}"></input>
+          {% if not ipynb %}
+          <br>
           {% endif %}
           {% endblock %}
         </div>
