@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
+>
+   <url>
+      <loc
+    >https://www.knowledge-repo.com/post/posts/main_explained_in_python.kp</loc>
+      <lastmod>2023-01-07T00:00:00+00:00</lastmod>
+      <priority>1</priority>
+   </url>
+   <url>
+      <loc
+    >https://www.knowledge-repo.com/post/posts/check_key_in_dict_python.kp</loc>
+      <lastmod>2023-01-06T00:00:00+00:00</lastmod>
+      <priority>1</priority>
+   </url>
+   <url>
+      <loc
+    >https://www.knowledge-repo.com/post/posts/generate_random_integers_java.kp</loc>
+      <lastmod>2023-01-03T00:00:00+00:00</lastmod>
+      <priority>1</priority>
+   </url>
+   <url>
+      <loc
+    >https://www.knowledge-repo.com/post/posts/git_pull_vs_git_fetch.kp</loc>
+      <lastmod>2023-01-02T00:00:00+00:00</lastmod>
+      <priority>1</priority>
+   </url>
+   <url>
+      <loc
+    >https://www.knowledge-repo.com/post/posts/rename_a_git_branch.kp</loc>
+      <lastmod>2023-01-01T00:00:00+00:00</lastmod>
+      <priority>1</priority>
+   </url>
+   <url>
+      <loc
+    >https://www.knowledge-repo.com/post/posts/remove_an_array_item_js.kp</loc>
+      <lastmod>2023-01-01T00:00:00+00:00</lastmod>
+      <priority>1</priority>
+   </url>
+   <url>
+      <loc
+    >https://www.knowledge-repo.com/post/posts/redirect_to_another_webpage_js.kp</loc>
+      <lastmod>2023-01-01T00:00:00+00:00</lastmod>
+      <priority>1</priority>
+   </url>
+   <url>
+      <loc>https://www.knowledge-repo.com/post/posts/yield_in_python.kp</loc>
+      <lastmod>2022-12-31T00:00:00+00:00</lastmod>
+      <priority>1</priority>
+   </url>
+   <url>
+      <loc>https://www.knowledge-repo.com/post/posts/comments_in_json.kp</loc>
+      <lastmod>2022-12-31T00:00:00+00:00</lastmod>
+      <priority>1</priority>
+   </url>
+   <url>
+      <loc
+    >https://www.knowledge-repo.com/post/posts/undo_last_git_commit.kp</loc>
+      <lastmod>2022-12-30T00:00:00+00:00</lastmod>
+      <priority>1</priority>
+   </url>
+</urlset>
