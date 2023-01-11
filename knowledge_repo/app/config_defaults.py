@@ -339,3 +339,15 @@ EXCLUDED_TAGS = ["private"]
 # Collapse Code as Default Display Option
 # -------------
 COLLAPSE_CODE_DEFAULT = False
+
+# -------------
+# AWS related settings
+# -------------
+S3_AWS_ACCESS_KEY_ID = ""
+S3_AWS_SECRET_ACCESS_KEY = ""
+S3_AWS_REGION_NAME = ""
+
+# -------------
+# Notion related configuration
+# -------------
+NOTION_AUTH = ""

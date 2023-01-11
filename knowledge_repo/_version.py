@@ -83,7 +83,7 @@ __dependencies__ = [
     "botocore",  # aws s3 integration
     "boto3",  # aws s3 integration
     "s3path==0.3.4",  # aws s3 path analysis
-    "notion-client",  # notion integration
+    "notion-client==2.0.0",  # notion integration
 ]
 
 __optional_dependencies__ = {
@@ -105,7 +105,7 @@ __optional_dependencies__ = {
         "nose",  # Testing framework
         "pep8",  # PEP8
         "pycodestyle",  # PEP8 conformance
-    ],
+    ]
 }
 
 __optional_dependencies__["all"] = [

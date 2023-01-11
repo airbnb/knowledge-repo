@@ -1,6 +1,7 @@
 from notion_client import Client, AsyncClient
 import logging
 from notion_client import APIResponseError
+from knowledge_repo.constants import KP_EDIT_PROD_LINK
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ def get_notion_async_client(auth):
     return AsyncClient(auth=auth)
 
 
-def query(notion_client, page_id):
+def query_page(notion_client, page_id):
     """Retrieve a Page object using the page ID specified
 
     :param notion_client: a notion client
@@ -31,7 +32,7 @@ def query(notion_client, page_id):
     :return: page object if found, else False
     """
     try:
-        return notion_client.pages.retrieve(page_id)
+        logger.info(notion_client.pages.retrieve(page_id))
     except APIResponseError as error:
         logging.error(error)
     return False
@@ -48,7 +49,13 @@ def create_page(notion_client, params):
     name = params.get("title", None)
     description = params.get("tldr", "")
     tags = [{"name": t} for t in params.get("tags", [])]
-    link = params.get("display_link", "")
+    path = params.get("path", "")
+    if len(path) > 0:
+        post_link = "/".join([KP_EDIT_PROD_LINK, path])
+        logger.info(post_link)
+    else:
+        post_link = ""
+    file_link = params.get("display_link", "")
 
     if name is None:
         logger.error("Page Name is Empty")
@@ -64,9 +71,12 @@ def create_page(notion_client, params):
                 "Name": {"title": [{"text": {"content": name}}]},
                 "Description": {"rich_text": [{"text": {"content": description}}]},
                 "Tags": {"multi_select": tags},
-                "Jupyter Notebook Display Link": {
-                    "rich_text": [{"text": {"content": link}}]
+                "Knowledge Repo Link": {
+                    "rich_text": [
+                        {"text": {"content": post_link, "link": {"url": post_link}}},
+                    ]
                 },
+                "Original File Link": {"rich_text": [{"text": {"content": file_link}}]},
             },
         )
     except APIResponseError as error:
