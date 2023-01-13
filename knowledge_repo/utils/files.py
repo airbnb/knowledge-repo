@@ -35,3 +35,8 @@ def write_binary(filename, content):
 def get_path(__file__, directory, filename):
     return os.path.abspath(
         os.path.join(os.path.dirname(__file__), directory, filename))
+
+
+# remove file name path prefix
+def remove_prefix(text, prefix):
+    return text[text.startswith(prefix) and len(prefix):]

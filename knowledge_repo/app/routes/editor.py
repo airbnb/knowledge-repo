@@ -199,6 +199,10 @@ def save_post():
             data.get("file_name", None) is not None and
             data.get("file_data", None) is not None
         ):
+            # save file to local env
+            with open(data["file_name"], "w") as text_file:
+                text_file.write(data["file_data"])
+
             response = s3_upload(data["file_name"], data["file_data"])
             if response is None:
                 error_msg = "ERROR during upload file to s3"
@@ -210,6 +214,9 @@ def save_post():
             headers["display_link"] = data["display_link"]
 
     kp.write(unquote(data["markdown"]), headers=headers)
+
+    # add to repo
+    current_repo.save(data["file_name"], path)
     # add to repo
     current_repo.add(kp, update=True, message=headers["title"])  # THIS IS DANGEROUS
 

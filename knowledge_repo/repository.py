@@ -283,6 +283,13 @@ class KnowledgeRepository(object, metaclass=SubclassRegisteringABCMeta):
 
         return kp
 
+    def save(self, file, path):
+        return self._save(file, self._kp_path(path))
+
+    @abstractmethod
+    def _save(self, file, path, src_paths=[]):
+        raise NotImplementedError
+
     @abstractmethod
     def _add_prepare(self, kp, path, update=False):
         raise NotImplementedError
