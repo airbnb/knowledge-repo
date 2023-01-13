@@ -1,7 +1,7 @@
 from .. import permissions
 from ..index import update_index
 from ..models import Comment, PageView, Post, PostAuthorAssoc
-from ..proxies import current_repo, current_user, db_session
+from ..proxies import current_repo, current_user, db_session, s3_client, notion_client
 from ..utils.emails import (
     send_review_email,
     send_reviewer_request_email,
@@ -27,19 +27,17 @@ from werkzeug.utils import secure_filename
 import json
 import logging
 import os
-from knowledge_repo.utils.s3 import get_s3_client, put_object_to_s3
+from knowledge_repo.utils.s3 import put_object_to_s3
 import nbformat
 from nbconvert import HTMLExporter
 import io
 from knowledge_repo.constants import AWS_S3_BUCKET
-from knowledge_repo.utils.notion import get_notion_client, create_page
+from knowledge_repo.utils.notion import create_page
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 blueprint = get_blueprint("editor", __name__)
-s3_client = get_s3_client("", "", "us-west-2")
-notion_client = get_notion_client("")
 
 
 def get_warning_msg(msg):
