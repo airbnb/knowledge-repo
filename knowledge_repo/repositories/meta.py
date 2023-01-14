@@ -70,6 +70,8 @@ class MetaKnowledgeRepository(KnowledgeRepository):
         return self.__distribute_attribute('status_message')
 
     # -------------- Post retrieval methods --------------------------------------
+    def _save(self, file, file_path, src_paths=[]):
+        raise NotImplementedError
 
     def _dir(self, prefix, statuses):
         # TODO: Handle masked paths

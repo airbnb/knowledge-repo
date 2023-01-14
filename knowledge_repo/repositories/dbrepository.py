@@ -99,6 +99,8 @@ class DbKnowledgeRepository(KnowledgeRepository):
         return self.status['status']
 
     # -------------- Post retrieval methods --------------------------------------
+    def _save(self, file, file_path, src_paths=[]):
+        raise NotImplementedError
 
     def _dir(self, prefix, statuses):
         query = self.session.query(self.PostRef.path)
