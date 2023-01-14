@@ -97,7 +97,7 @@ class S3Repository(KnowledgeRepository):
         # upload files to S3
         for dirpath, dirnames, filenames in os.walk(os.path.join(self._path, file_path)):
             for filename in filenames:
-                upload_file_to_s3(self._s3_client,  os.path.join(
+                upload_file_to_s3(self._s3_client, os.path.join(
                     dirpath, filename), self._s3_bucket, os.path.join(remove_prefix(dirpath, self._path), filename))
 
         # delete raw file after post processing and upload
