@@ -1,9 +1,10 @@
 import os
 
-from knowledge_repo.utils.s3 import parse_s3_uri, download_dir_from_s3
+from knowledge_repo.utils.s3 import parse_s3_uri, download_dir_from_s3, upload_file_to_s3
 from ..post import KnowledgePost
 from ..repository import KnowledgeRepository
-from ..utils.files import get_path, read_binary, write_binary
+from ..utils.files import get_path, read_binary, write_binary, remove_prefix
+from ..utils.encoding import encode
 import logging
 import time
 
@@ -25,7 +26,8 @@ class S3Repository(KnowledgeRepository):
 
         self._s3_bucket, self._s3_client, self._s3_dir = parse_s3_uri(self.uri)
         self._path = os.path.join('tmp_kp', self._s3_dir)
-        download_dir_from_s3(self._s3_client, self._s3_bucket, self._s3_dir, self._path)
+        download_dir_from_s3(
+            self._s3_client, self._s3_bucket, self._s3_dir, self._path)
         # self.config.update(os.path.join(self.path, config))
 
     @classmethod
@@ -71,7 +73,8 @@ class S3Repository(KnowledgeRepository):
                         folders.remove(folder)
 
                 posts.update(
-                    os.path.join(os.path.relpath(path, start=self.path), folder)
+                    os.path.join(os.path.relpath(
+                        path, start=self.path), folder)
                     for folder in folders
                     if folder.endswith(".kp")
                 )
@@ -87,6 +90,20 @@ class S3Repository(KnowledgeRepository):
             yield post
 
     # ------------- Post submission / addition user flow ----------------------
+    def _save(self, file, file_path, src_paths=[]):
+        kp = KnowledgePost.from_file(file, src_paths)
+        self.add(kp, file_path)
+
+        # upload files to S3
+        for dirpath, dirnames, filenames in os.walk(os.path.join(self._path, file_path)):
+            for filename in filenames:
+                upload_file_to_s3(self._s3_client, os.path.join(
+                    dirpath, filename), self._s3_bucket, os.path.join(remove_prefix(dirpath, self._path), filename))
+
+        # delete raw file after post processing and upload
+        if os.path.exists(file):
+            os.remove(file)
+
     def _add_prepare(self, kp, path, update=False, **kwargs):
         pass
 
@@ -94,10 +111,10 @@ class S3Repository(KnowledgeRepository):
         pass
 
     def _submit(self, path=None, branch=None, force=False):
-        pass
+        pass  # Added posts are already submitted
 
     def _publish(self, path):
-        pass
+        pass  # Added posts are already published
 
     def _unpublish(self, path):
         raise NotImplementedError
@@ -129,13 +146,21 @@ class S3Repository(KnowledgeRepository):
         return self.PostStatus.PUBLISHED
 
     def _kp_get_revision(self, path):
-        pass
+        try:
+            return int(self._kp_read_ref(path, "REVISION"))
+        except Exception as e:
+            print(f"Exception encountered: {e}")
+            return 0
 
     def _kp_get_revisions(self, path):
         raise NotImplementedError
 
     def _kp_write_ref(self, path, reference, data, uuid=None, revision=None):
-        pass
+        ref_path = os.path.join(self.path, path, reference)
+        ref_dir = os.path.dirname(ref_path)
+        if not os.path.exists(ref_dir):
+            os.makedirs(ref_dir)
+        write_binary(ref_path, data)
 
     def _kp_dir(self, path, parent=None, revision=None):
         path = os.path.join(self.path, path)
@@ -147,7 +172,8 @@ class S3Repository(KnowledgeRepository):
                     if dirpath == "" and filename == "REVISION":
                         continue
                     yield os.path.relpath(
-                        os.path.join(dirpath, filename), os.path.join(self.path, path)
+                        os.path.join(dirpath, filename), os.path.join(
+                            self.path, path)
                     )
         else:
             kp = KnowledgePost.from_file(path, format="kp")
@@ -166,7 +192,10 @@ class S3Repository(KnowledgeRepository):
         raise NotImplementedError
 
     def _kp_new_revision(self, path, uuid=None):
-        pass
+        self._kp_write_ref(path, "REVISION", encode(
+            self._kp_get_revision(path) + 1))
+        if uuid:
+            self._kp_write_ref(path, "UUID", encode(uuid))
 
     def _kp_read_ref(self, path, reference, revision=None):
         path = os.path.join(self.path, path)
