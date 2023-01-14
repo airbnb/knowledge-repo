@@ -58,6 +58,30 @@ def robots_txt():
     return send_from_directory(current_app.static_folder, request.path[1:])
 
 
+@blueprint.route("/site-map-posts")
+@PageView.logged
+def site_map_posts():
+    feed_params = from_request_get_feed_params(request)
+    posts, post_stats = get_posts(feed_params)
+    values = []
+    app_domain = request.url_root
+    for post in posts:
+        values.append(
+            {
+                "loc": "{app_domain}post/{post_path}".format(
+                    app_domain=app_domain,
+                    post_path=post.path
+                ),
+                "lastmod": post.updated_at.strftime("%Y-%m-%dT%H:%M:%S+00:00"),
+                "priority": 1
+            }
+        )
+    template = render_template('sitemap.xml', values=values)
+    response = make_response(template)
+    response.headers['Content-Type'] = 'application/xml'
+    return response
+
+
 @blueprint.route('/')
 @PageView.logged
 def render_index():
