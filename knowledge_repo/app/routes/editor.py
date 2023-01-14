@@ -203,6 +203,9 @@ def save_post():
             with open(data["file_name"], "w") as text_file:
                 text_file.write(data["file_data"])
 
+            # add to repo
+            current_repo.save(data["file_name"], path)
+
             response = s3_upload(data["file_name"], data["file_data"])
             if response is None:
                 error_msg = "ERROR during upload file to s3"
@@ -215,8 +218,6 @@ def save_post():
 
     kp.write(unquote(data["markdown"]), headers=headers)
 
-    # add to repo
-    current_repo.save(data["file_name"], path)
     # add to repo
     current_repo.add(kp, update=True, message=headers["title"])  # THIS IS DANGEROUS
 
