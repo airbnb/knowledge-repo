@@ -84,6 +84,7 @@ __dependencies__ = [
     "boto3",  # aws s3 integration
     "s3path==0.3.4",  # aws s3 path analysis
     "notion-client==2.0.0",  # notion integration
+    "gcloud==0.18.3"
 ]
 
 __optional_dependencies__ = {
