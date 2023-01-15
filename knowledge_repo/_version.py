@@ -57,7 +57,7 @@ __git_uri__ = "https://github.com/airbnb/knowledge-repo.git"
 # defined elsewhere.
 __dependencies__ = [
     # Knowledge Repository Dependencies
-    "pyyaml",  # Yaml parser and utilities
+    "pyyaml==6.0",  # Yaml parser and utilities
     "markdown==3.3.4",  # Markdown conversion utilities
     "pygments==2.10.0",  # Code highlighting support in markdown
     "gitpython==3.1.18",  # Git abstraction
@@ -80,9 +80,9 @@ __dependencies__ = [
     "inflection",  # String transformation library
     "pillow",  # Image thumbnailing
     "weasyprint==54.3",  # Post PDF download option
-    "botocore",  # aws s3 integration
-    "boto3",  # aws s3 integration
     "gcloud==0.18.3",  # google cloud storage integration
+    "botocore==1.29.37",  # aws s3 integration
+    "boto3==1.26.37",  # aws s3 integration
     "s3path==0.3.4",  # aws s3 path analysis
     "notion-client==2.0.0",  # notion integration
 ]
@@ -106,7 +106,7 @@ __optional_dependencies__ = {
         "nose",  # Testing framework
         "pep8",  # PEP8
         "pycodestyle",  # PEP8 conformance
-    ]
+    ],
 }
 
 __optional_dependencies__["all"] = [
