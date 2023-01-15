@@ -1,3 +1,5 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap'); */
+
 /* This file defines the css styles for the index route */
 
 #feed-posts {
@@ -6,7 +8,7 @@
 }
 
 .feed-post {
-    padding: 20px;
+    padding: 11px;
     border-radius: 12px;
     cursor: pointer;
     border: 1px solid #dcdada00;
@@ -29,10 +31,10 @@
 }
 
 .feed-post .feed-thumbnail {
-    height: 200px;
+    height: 110px;
     flex-shrink: 0;
     flex-grow: 0;
-    width: 200px;
+    width: 110px;
     position: relative;
     vertical-align: center;
     border-radius: 5px;
@@ -46,8 +48,8 @@
     right: 0;
     bottom: 0;
     left: 0;
-    max-height: 200px;
-    width: 200px;
+    max-height: 110px;
+    width: 110px;
     margin: auto;
     border-radius: 8px;
 }
@@ -71,28 +73,33 @@
 
 .feed-post .feed-title {
     margin-top: 0px;
-    font-size: 1.6em;
+    font-size: 1.5em;
     font-weight: bolder;
 }
 
-.feed-post .feed-authors,
-.feed-post .feed-tags {
+.feed-post .feed-authors {
     margin-bottom: .3em;
+    font-size: 0.8em;
+}
+
+.feed-post .feed-tags {
+    margin-bottom: .2em;
+    font-size: 0.7em;
 }
 
 .feed-post .feed-tldr {
-    height: 5em;
-    padding: 10px;
+    height: 2em;
+    padding: 3px;
     background: rgba(0, 0, 0, 0.03);
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
-    font-style: italic;
     text-align: justify;
     overflow: hidden;
+    font-size: 0.8em;
 }
 
 .feed-post .feed-tldr-expander {
-    padding: 3px;
+    padding: 2px;
     display: block;
     text-align: center;
     font-size: small;
@@ -155,4 +162,16 @@
     .feed-post .feed-metadata {
         margin-left: 0px;
     }
+}
+
+@font-face {
+    font-family: 'Sans-serif1';
+    src: url('path/to/Sans-serif1.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.font-style {
+    font-family: 'Sans-serif1', sans-serif;
+    line-height: 1.3;
 }

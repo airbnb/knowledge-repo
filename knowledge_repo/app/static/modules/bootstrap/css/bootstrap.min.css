@@ -246,11 +246,11 @@ th {
     }
 
     a[href]:after {
-        content: " ("attr(href) ")"
+        content: " (" attr(href) ")"
     }
 
     abbr[title]:after {
-        content: " ("attr(title) ")"
+        content: " (" attr(title) ")"
     }
 
     a[href^="javascript:"]:after,
@@ -6564,6 +6564,27 @@ button.list-group-item:hover {
 button.list-group-item {
     width: 100%;
     text-align: left
+}
+
+.bordered-link {
+    box-sizing: border-box;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #ddd;
+    background-color: white;
+    width: 80px;
+    height: 80px;
+    text-align: center;
+    color: #3c763d;
+    /* padding: 1px; */
+    /* padding: 6px 8px; */
+    border-radius: 4px
+}
+
+
+.bordered-link>.active>span:hover {
+    background-color: #3c763d;
+    color: white;
 }
 
 .list-group-item.disabled,

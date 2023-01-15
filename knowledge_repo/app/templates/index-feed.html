@@ -29,7 +29,7 @@
                 <i class='glyphicon glyphicon-ok-sign glyphicon-filled'></i>Subscribe
             </button></div>"
     {% endif %}
-        class="text">
+        class="text" style="font-size:0.9em;">
       {{ "#" + tag }}
     </a>
 {% endmacro %}
@@ -43,22 +43,22 @@
             <img src="{{ post['thumbnail'] if post['thumbnail'] else '/static/images/default_thumbnail.png' }}" />
         </div>
         <div class='feed-metadata'>
-                <span class="feed-title">{{ post.title }}</span>
-                <span class="feed-authors"> {{ format_authors(post.authors)|safe }}</span>
+                <span class="feed-title font-style">{{ post.title }}</span>
+                <!-- <span class="feed-authors"> {{ format_authors(post.authors)|safe }}</span> -->
                 <span class="feed-tags">
                     {% for tag_obj in post.tags %}
                         {{ render_tag(tag_obj.name, loop.index0) }}
                     {% endfor %}
                 </span>
-                <span class='feed-tldr'>{{ post['tldr']|safe }}</span>
-                <span class='feed-tldr-expander'>+ Show More</span>
+                <span class='feed-tldr font-style' id="feed-tldr">{{ post['tldr']|safe }}</span>
+                <span class='feed-tldr-expander' id="feed-tldr-expander">+ Show More</span>
                 <span class='feed-stats'>
                     {% set stats = post_stats[post.path] %}
                     <span title="Users who Viewed"><i class="glyphicon glyphicon-eye-open"> </i> {{ stats['all_views'] }}</span>
                     <span title="Number of Favorites"><i class="glyphicon glyphicon-heart-empty"></i> {{ stats['total_likes']}}</span>
                     <span title="Comments"><i class="glyphicon glyphicon-comment"></i> {{ stats['total_comments']}}</span>
                 </span>
-                <span class="feed-dates">Created on {{ post.created_at.strftime("%B %d, %Y") }} (last updated {{ post.updated_at.strftime("%B %d, %Y") }})</span>
+                <span class="feed-dates"> Author(s): {{ format_authors(post.authors)|safe }} Date: {{ post.created_at.strftime("%b %d, %Y") }}</span>
         </div>
     </div>
     {% endfor %}
@@ -72,6 +72,14 @@
 <script src="{{ url_for('static', filename='js/helpers.js')}}" type='text/javascript'></script>
 <script src="{{ url_for('static', filename='js/tags.js')}}" type='text/javascript'></script>
 <script type="text/javascript">
+
+    let expander = document.getElementById("feed-tldr");
+    let expanderLink = document.getElementById("feed-tldr-expander");
+    if (expander.offsetHeight > 100) {
+        expanderLink.style.display = "block"; // Show the "Show More" link
+    } else {
+        expanderLink.style.display = "none"; // Hide the "Show More" link
+    }
 
   $(".pop").popover({ trigger: "manual" , html: true, animation:false, delay: 100})
     .on("mouseenter", function () {
