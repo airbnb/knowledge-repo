@@ -82,9 +82,9 @@ __dependencies__ = [
     "weasyprint==54.3",  # Post PDF download option
     "botocore",  # aws s3 integration
     "boto3",  # aws s3 integration
+    "gcloud==0.18.3",  # google cloud storage integration
     "s3path==0.3.4",  # aws s3 path analysis
     "notion-client==2.0.0",  # notion integration
-    "gcloud==0.18.3"
 ]
 
 __optional_dependencies__ = {
