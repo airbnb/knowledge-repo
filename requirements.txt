@@ -6,10 +6,9 @@ Flask-Migrate
 gitdb
 gitpython==3.1.30
 tabulate==0.8.9
-pyyaml 
 markdown==3.3.4
 pygments==2.10.0
-pyyaml 
+pyyaml==6.0
 flask_login==0.6.1
 flask_principal 
 flask_mail 
