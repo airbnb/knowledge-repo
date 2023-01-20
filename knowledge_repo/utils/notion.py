@@ -65,7 +65,7 @@ def create_page(notion_client, params):
         notion_client.pages.create(
             parent={
                 "type": "database_id",
-                "database_id": "85db4c309b6d4d00a6a1df19d56496b6",
+                "database_id": "db5961bf546c431381644efa2b24a01a",
             },
             properties={
                 "Name": {"title": [{"text": {"content": name}}]},
