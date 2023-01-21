@@ -21,7 +21,7 @@ detect and publish your new content in a timely manner.
 
 ### 2. Built-in Editor: 
 Utilize our user-friendly editor to compose and upload your posts in various formats including Jupyter Notebook, R 
-markdown, and Google document. We securely store your content on our internal storage for easy access and management. 
+markdown, and Google document link. We securely store your content on our internal storage for easy access and management. 
 Users can make updates, delete, share, and add comments to their posts after publishing.
 
 ## Getting Started
@@ -33,7 +33,7 @@ For more information about the motivation and inspiration behind this project, w
 
 ## Screenshots
 
-| Name                                              | Screenshot                                                                                                                    |
+| Name                                              | Screenshot(s)                                                                                                                 |
 |---------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
 | [Feed](https://www.knowledge-repo.com/feed)       | <img src="docs/images/feed.png" width="600" />                                                                                |
 | Example Post                                      | <img src="https://user-images.githubusercontent.com/8813413/83345203-48b06c00-a2c5-11ea-8edb-18e7f8f157ce.png" width="600" /> |
