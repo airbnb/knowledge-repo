@@ -351,3 +351,4 @@ S3_AWS_REGION_NAME = ""
 # Notion related configuration
 # -------------
 NOTION_AUTH = ""
+NOTION_DATABASE_ID = ""
