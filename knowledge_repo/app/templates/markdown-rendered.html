@@ -226,7 +226,7 @@ $.each(tags_list, function(i,tag){
   ahref = document.createElement("a")
   e_tag = encodeURIComponent(tag)
   f_tag = tag.replace("/", "__")
-  tag_name = "#" + tag
+  tag_name = tag
   tag_subscription_button_id_name = "tag-subscription-" + i + "__" + f_tag
   ahref.setAttribute("data-container", "body")
   ahref.setAttribute("data-toggle", "popover")

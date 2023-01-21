@@ -62,9 +62,9 @@
           {% for tag_obj in post.tags %}
             {% set tag = tag_obj.name %}
             {% if loop.last %}
-               <a href="/tag_pages?tag={{ tag|urlencode }}">{{ "#" + tag}}</a>
+               <a href="/tag_pages?tag={{ tag|urlencode }}">{{ tag }}</a>
               {% else %}
-               <a href="/tag_pages?tag={{ tag|urlencode }}">{{ "#" + tag}}</a>,
+               <a href="/tag_pages?tag={{ tag|urlencode }}">{{ tag }}</a>,
               {% endif %}
           {% endfor %}
       </td>
