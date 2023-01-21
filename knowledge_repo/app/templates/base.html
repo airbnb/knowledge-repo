@@ -17,7 +17,16 @@
   <script src="{{ url_for('static', filename='modules/select2/js/select2.min.js')}}"></script>
   <script src="{{ url_for('static', filename='modules/hightlight.pack.js/highlight.pack.js')}}"></script>
   <script src="{{ url_for('static', filename='modules/marked.js/marked.js')}}"></script>
+  <!-- Update ID from ENV -->
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PGDFSCG1GD"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
 
+    gtag('config', 'G-PGDFSCG1GD');
+  </script>
   <!-- require js is used for plotly, but has a bunch of collisions with other js packages
              make sure to have it be last js package imported -->
   <script src="{{ url_for('static', filename='modules/require.js/require.min.js')}}"></script>
