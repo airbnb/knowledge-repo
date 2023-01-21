@@ -20,6 +20,10 @@ For more information about the motivation and inspiration behind this project, w
 - **Bug reports**: https://github.com/airbnb/knowledge-repo/issues
 - **Ask us questions on Slack**: https://join.slack.com/t/knowledgerepogroup/shared_invite/zt-1lzxytay8-R~15bODzwFGLO5mukFFCYQ
 
+| PyPI Version | PyPI Downloads |
+| --- | --- |
+| [![PyPI version](https://badge.fury.io/py/knowledge-repo.svg)](https://badge.fury.io/py/knowledge-repo) | [![PyPI downloads](https://static.pepy.tech/personalized-badge/knowledge-repo?period=total&units=international_system&left_color=black&right_color=brightgreen&left_text=total%20downloads)](https://pepy.tech/project/knowledge-repo) [![PyPI monthly downloads](https://static.pepy.tech/personalized-badge/knowledge-repo?period=month&units=international_system&left_color=black&right_color=brightgreen&left_text=downloads/month)](https://pepy.tech/project/knowledge-repo) |
+
 
 ## Live Demo
 
