@@ -38,7 +38,7 @@ def query_page(notion_client, page_id):
     return False
 
 
-def create_page(notion_client, params):
+def create_page(notion_client, database_id, params):
     """Create a new page in the specified database
 
     :param notion_client: a notion client
@@ -65,7 +65,7 @@ def create_page(notion_client, params):
         notion_client.pages.create(
             parent={
                 "type": "database_id",
-                "database_id": "db5961bf546c431381644efa2b24a01a",
+                "database_id": database_id,
             },
             properties={
                 "Name": {"title": [{"text": {"content": name}}]},
