@@ -25,11 +25,9 @@
         <a class="btn btn-primary" href="create/ipynb" role="button"> Jupyter Notebook </a>
         <a class="btn btn-primary" href="create/Rmd" role="button"> R-Markdown </a>
         <a class="btn btn-primary" href="create/md" role="button"> Markdown </a>
-        {% if web_editor_enabled %}
-            <a class="btn btn-primary" href="{{ url_for('editor.editor') }}" role="button"> Web Editor </a>
-            <a class="btn btn-primary" href="{{ url_for('editor.editor', proxy='true') }}" role="button"> Linked Post </a>
-            <a class="btn btn-primary" href="{{ url_for('editor.editor', ipynb='true') }}" role="button"> Jupyter Notebook Post (Beta) </a>
-        {% endif %}
+        <a class="btn btn-primary" href="{{ url_for('editor.editor') }}" role="button"> Web Editor </a>
+        <a class="btn btn-primary" href="{{ url_for('editor.editor', proxy='true') }}" role="button"> Linked Post </a>
+        <a class="btn btn-primary" href="{{ url_for('editor.editor', ipynb='true') }}" role="button"> Jupyter Notebook Post (Beta) </a>
     </div>
 </center>
 
