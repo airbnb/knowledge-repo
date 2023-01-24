@@ -1,5 +1,5 @@
 User-Agent: *
-Allow: /feed
+Allow: /feed/
 Disallow: /stats
 Disallow: /create
 Disallow: /auth

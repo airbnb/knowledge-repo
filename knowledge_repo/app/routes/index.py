@@ -51,20 +51,19 @@ def site_map():
     return '<br />'.join(str(link) for link in links)
 
 
-@blueprint.route("/site-map.xml")
 @blueprint.route("/robots.txt")
 @PageView.logged
 def robots_txt():
     return send_from_directory(current_app.static_folder, request.path[1:])
 
 
-@blueprint.route("/site-map-posts")
+@blueprint.route("/site-map.xml")
 @PageView.logged
 def site_map_posts():
-    feed_params = from_request_get_feed_params(request)
-    posts, post_stats = get_posts(feed_params)
+    posts = db_session.query(Post).filter(Post.is_published)
     values = []
-    app_domain = request.url_root
+    # [TODO]handle https with deployed with action gateway
+    app_domain = request.url_root.replace("http", "https")
     for post in posts:
         values.append(
             {
