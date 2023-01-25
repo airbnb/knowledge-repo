@@ -8,6 +8,8 @@
             "program": "scripts/knowledge_repo",
             "console": "integratedTerminal",
             "args": [
+                "--repo",
+                "test_repo",
                 "runserver",
                 "--port",
                 "7001"
@@ -20,6 +22,8 @@
             "program": "scripts/knowledge_repo",
             "console": "integratedTerminal",
             "args": [
+                "--repo",
+                "test_repo",
                 "runserver",
                 "--port",
                 "7001",
@@ -35,7 +39,9 @@
             "console": "integratedTerminal",
             "args": [
                 "--repo",
-                "postgresql+psycopg2://knowledge_repo:password@localhost:5432/knowledge_repo:knowledge_repo",
+                "{}test_repo",
+                "--repo",
+                "{webposts}postgresql+psycopg2://knowledge_repo:password@localhost:5432/knowledge_repo:knowledge_repo",
                 "runserver",
                 "--port",
                 "7001",

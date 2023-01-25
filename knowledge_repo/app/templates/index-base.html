@@ -2,7 +2,7 @@
 
 {% macro format_authors(authors) %}
   {% for author in authors %}
-    <a href='/feed?authors={{ author.identifier|urlencode }}'>
+    <a class="btn author_tag" href='/feed?authors={{ author.identifier|urlencode }}'>
       {{ author.format_name }}
     </a>
     {% if not loop.last %}
@@ -58,32 +58,94 @@
   {% endif %}
 {% endmacro %}
 
+
 {% block content %}
   <!-- Index rendering mode switch -->
   <div class="row">
     <div class="col-md-5">
       <div class="btn-group btn-group-justified index-view-btn-group" role="group">
-        <a href="/feed" class="btn btn-default btn-card no-underline" role="button">
-          <i class="glyphicon glyphicon-post-org glyphicon-align-justify"></i>
-          <span class="index-view-name"> Card </span>
+      <!-- <li {% if tab == "Newest" %}class="active"{% endif %}> -->
+        <a href="/feed?tab=Newest" class="btn btn-default btn-card no-underline" role="button" onclick="updateActiveTag()">
+          <span class="index-view-name"> Newest </span>
         </a>
-        <a href="/table" class="btn btn-default btn-table no-underline" role="button">
-          <i class="glyphicon glyphicon-post-org glyphicon-th"></i>
-          <span class="index-view-name"> Table </span>
-        </a>
-        <a href="/cluster" class="btn btn-default btn-cluster no-underline" role="button">
-          <i class="glyphicon glyphicon-post-org glyphicon-th-list"></i>
-          <span class="index-view-name"> Cluster </span>
-        </a>
-      </div>
+      <!-- </li> -->
+      <a href="/feed?tab=Frequent" class="btn btn-default btn-table no-underline" role="button" id="tag_frequent">
+        <span class="index-view-name"> Frequent </span>
+      </a>
+      <a href="/feed?tab=Vote" class="btn btn-default btn-cluster no-underline" role="button" id="tag_vote">
+        <span class="index-view-name"> Vote </span>
+      </a>
+      <a class="btn btn-default btn-card no-underline" id="toggle-button" role="button" aria-expanded="false" aria-controls="uql-form">
+        <svg class="justify-content: center; display: flex" width="20" height="20" viewBox="0 -5 20 20">
+          <path d="M2 4h14v2H2V4Zm2 4h10v2H4V8Zm8 4H6v2h6v-2Z" fill="#06c6b6"></path>
+        </svg> Filter
+      </a>
     </div>
+{% endif %}
+{% endmacro %}
 
-    <div class="pull-right visible-md-block visible-lg-block">
-      {{ page_sizer() }}
+{% block panel_left %}
+<div class="sidebar2 homepage-side-panel">
+  <h2>Menu</h2>
+  <ul>
+    <li><a href="#">
+      <i class="glyphicon glyphicon-post-org glyphicon-align-justify"></i>
+      <span class="index-view-name"> Home </span>
+    <li><a href="/feed" role="button">
+        <i class="glyphicon glyphicon-post-org glyphicon-align-justify"></i>
+        <span class="index-view-name"> Card </span>
+      </a></li>
+    <li><a href="/table" role="button">
+      <i class="glyphicon glyphicon-post-org glyphicon-th"></i>
+      <span class="index-view-name"> Table </span>
+    </a></li>
+    <li><a href="/cluster" role="button">
+      <i class="glyphicon glyphicon-post-org glyphicon-th-list"></i>
+      <span class="index-view-name"> Cluster </span>
+    </a></li>
+  </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+<div data-controller="se-uql" data-se-uql-id="" data-se-uql-sanitize-tag-query="false">
+  <div class="row">    
+    <div class="col-md-6">
+      {{ sort_filter() }}
     </div>
+  
+  <div class="pull-right visible-md-block visible-lg-block">
+    {{ page_sizer() }}
   </div>
+</div>
 
-  <!-- Container for index items -->
+<div class="row">
+  <div class="col-md-6">
+  <form class="form-group form-base" id="uql-form">
+    <fieldset class="fieldset">
+      <legend class="legend font-style">Tagged with:</legend>
+      <div class="radio-inline radio-cluster">
+        <input class="radio" type="radio" name="tagModeId" value="Watched">
+        <label class="feed-tldr font-style">My subscribed tags</label>
+      </div>
+      <div class="margin-left: 0px">
+        <div class="radio-inline radio-cluster">
+          <input class="radio" type="radio" name="tagModeId" value="Watched">
+          <label class="feed-tldr font-style">The following tags</label>
+          <input type="text" autocomplete="off" tabindex="0" aria-autocomplete="list" aria-haspopup="listbox" role="combobox" aria-expanded="false" placeholder="e.g. python" style="width: 100px;">
+        </div>
+      </div>
+    </fieldset>
+    <div>
+    </div>
+    <button class="btn btn-default btn-card no-underline" style="justify-content: flex-end;" type="button" onclick="applySelection()">Apply</button>
+    <button class="btn btn-default btn-card no-underline" style="justify-content: flex-end;" type="reset" id="toggle-button">Cancel</button>
+  </form>
+</div>
+</div>
+</div>
+
+
   <div class="col-12">
     {% block inner_content %}
     {% endblock %}
@@ -94,4 +156,39 @@
   {{ pagination(max_pages=10) }}
   {% endif %}
 
+  <script type="text/javascript">
+    const form = document.querySelector("#uql-form");
+    const toggleButton = document.querySelector("#toggle-button");
+
+    // Initially hide the form
+    form.style.display = "none";
+
+    // Attach an event listener to the toggle button
+    toggleButton.addEventListener("click", () => {
+      if (form.style.display === "none") {
+        form.style.display = "block";
+        toggleButton.setAttribute("aria-expanded", true);
+      } else {
+        form.style.display = "none";
+        toggleButton.setAttribute("aria-expanded", false);
+      }
+    });
+
+
+    function updateActiveTag(id) {
+      var button = document.getElementById(id);
+      var isActive = false;
+
+      button.addEventListener("click", function() {
+        if (isActive) {
+          button.classList.remove("active");
+        } else {
+          button.classList.add("active");
+        }
+        isActive = !isActive;
+    });
+    }
+    
+    </script>
 {% endblock %}
+
