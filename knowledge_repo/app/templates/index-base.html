@@ -43,7 +43,7 @@
 
 {% macro page_sizer() %}
   {% if feed_params %}
-    {% set results = feed_params['results'] | default(5) %}
+    {% set results = feed_params['results'] | default(10) %}
     <ul class="pagination">
       <li {% if results == 5 %}class="active"{% endif %}>
         <a href="/feed?results=5" title="Show 5 items per page" aria-current="true">5</a>
