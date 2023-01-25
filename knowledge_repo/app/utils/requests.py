@@ -24,7 +24,7 @@ def from_request_get_feed_params(request):
     feed_params["filters"] = request.args.get('filters')
     feed_params["authors"] = request.args.get('authors')
     feed_params["start"] = int(request.args.get('start', 0))
-    feed_params["results"] = int(request.args.get('results', 5))
+    feed_params["results"] = int(request.args.get('results', 10))
     feed_params["sort_by"] = inflection.underscore(
         request.args.get('sort_by', 'updated_at'))
     feed_params["sort_desc"] = not bool(request.args.get('sort_asc', ''))
