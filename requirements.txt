@@ -15,7 +15,7 @@ flask_mail
 gunicorn 
 inflection 
 pillow
-psycopg2
+psycopg2-binary
 nbformat 
 nbconvert[execute] 
 traitlets
