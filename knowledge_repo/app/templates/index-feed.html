@@ -44,7 +44,6 @@
         </div>
         <div class='feed-metadata'>
                 <span class="feed-title font-style">{{ post.title }}</span>
-                <!-- <span class="feed-authors"> {{ format_authors(post.authors)|safe }}</span> -->
                 <span class="feed-tags">
                     {% for tag_obj in post.tags %}
                         {{ render_tag(tag_obj.name, loop.index0) }}
@@ -72,14 +71,6 @@
 <script src="{{ url_for('static', filename='js/helpers.js')}}" type='text/javascript'></script>
 <script src="{{ url_for('static', filename='js/tags.js')}}" type='text/javascript'></script>
 <script type="text/javascript">
-
-    let expander = document.getElementById("feed-tldr");
-    let expanderLink = document.getElementById("feed-tldr-expander");
-    if (expander.offsetHeight > 100) {
-        expanderLink.style.display = "block"; // Show the "Show More" link
-    } else {
-        expanderLink.style.display = "none"; // Hide the "Show More" link
-    }
 
   $(".pop").popover({ trigger: "manual" , html: true, animation:false, delay: 100})
     .on("mouseenter", function () {
