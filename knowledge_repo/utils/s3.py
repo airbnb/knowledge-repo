@@ -137,6 +137,8 @@ def download_dir_from_s3(
         if next_token != '':
             kwargs.update({'ContinuationToken': next_token})
         results = s3_client.list_objects_v2(**kwargs)
+        if results.get('Contents') is None:
+            return
         for i in results.get('Contents'):
             key = i.get('Key')
             if key[-1] != '/':
