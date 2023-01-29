@@ -104,6 +104,9 @@ class S3Repository(KnowledgeRepository):
         if os.path.exists(file):
             os.remove(file)
 
+        # return knowledge post
+        return kp
+
     def _add_prepare(self, kp, path, update=False, **kwargs):
         pass
 
