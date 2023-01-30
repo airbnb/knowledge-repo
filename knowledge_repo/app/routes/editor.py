@@ -344,7 +344,7 @@ def review_comment():
 def s3_upload(file_name, path, file_data):
     """Upload file(s) to AWS s3 path and return the display link in the response"""
 
-    if file_name == None or file_data == None or file_data == "":
+    if file_name is None or file_data is None or file_data == "":
         return get_warning_msg(f"File name is empty. Please re-upload!")
 
     response = put_object_to_s3(s3_client, file_data, AWS_S3_BUCKET, file_name)
@@ -363,7 +363,7 @@ def s3_upload(file_name, path, file_data):
                 s3_client,
                 html_data,
                 AWS_S3_BUCKET,
-                path+'.kp/'+html_file_name,
+                path + '.kp/' + html_file_name,
                 "text/html",
             )
 
