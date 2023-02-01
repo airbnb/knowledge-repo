@@ -363,7 +363,7 @@ def s3_upload(file_name, path, file_data):
                 s3_client,
                 html_data,
                 AWS_S3_BUCKET,
-                path + '.kp/' + html_file_name,
+                os.path.join(path + '.kp/' + html_file_name),
                 "text/html",
             )
 
