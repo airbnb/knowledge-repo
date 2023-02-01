@@ -222,7 +222,7 @@ def save_post():
     # generate dummp md for post redirect
     if "proxy" in data:
         kp.write(unquote(data["markdown"]), headers=headers)
-    
+
     # add to repo
     current_repo.add(kp, update=True, message=headers["title"])  # THIS IS DANGEROUS
 
