@@ -193,8 +193,8 @@ def save_post():
     headers["tags"] = [tag.strip() for tag in data.get("tags", [])]
     if "proxy" in data:
         headers["proxy"] = data["proxy"]
-        kp.write(unquote(data["markdown"]), headers=headers)
-    elif "ipynb" in data:
+
+    if "ipynb" in data:
         headers["ipynb"] = data["ipynb"]
         if (
             data.get("file_name", None) is not None and
@@ -219,6 +219,10 @@ def save_post():
         else:
             headers["display_link"] = data["display_link"]
 
+    # generate dummp md for post redirect
+    if "proxy" in data:
+        kp.write(unquote(data["markdown"]), headers=headers)
+    
     # add to repo
     current_repo.add(kp, update=True, message=headers["title"])  # THIS IS DANGEROUS
 
