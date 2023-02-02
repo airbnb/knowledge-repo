@@ -220,7 +220,7 @@ def save_post():
             headers["display_link"] = data["display_link"]
 
     # generate dummp md for post redirect
-    if "proxy" in data:
+    if "ipynb" not in data:
         kp.write(unquote(data["markdown"]), headers=headers)
 
     # add to repo
