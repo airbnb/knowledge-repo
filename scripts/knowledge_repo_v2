@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from knowledge_repo.app.deploy import KnowledgeDeployer, get_app_builder
+from knowledge_repo_v2.app.deploy import KnowledgeDeployer, get_app_builder
 import argparse
 import os
 import re
