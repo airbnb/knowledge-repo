@@ -1,0 +1,44 @@
+
+{% extends "post_editor_base.html" %}
+
+{% block metadata_fields %}
+    {{ super() }}
+    <form id="upload_banner" enctype="multipart/form-data" method="post" action="#">
+        <input id="file_upload" name="myfile" type="file" onchange="upload_file()"/>
+    </form>
+    <input type="hidden" id="display_link" name="display_link" value="{{ display_link if display_link else ''}}">
+    <input type="hidden" id="file_data" name="file_data" value="">
+    <input type="hidden" id="ipynb" name="ipynb" value="{{ ipynb }}">
+    <br>
+{% endblock %}
+
+
+{% block render_block %}
+    <div>
+        <h3>HTML Rendering</h3>
+        <iframe width=100% height=1000 src="{{ display_link }}"></iframe>
+    </div>
+{% endblock render_block %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        function upload_file() {
+            var x = document.getElementById("file_upload");
+            const f = document.getElementById("file_upload").files[0];  
+            if (f) {
+                read_file(f, function(event) {
+                    // use result in callback...
+                    document.getElementById("file_data").value = event.target.result
+                })
+            }
+        }
+
+        function read_file(file, on_load_callback) {
+            var reader = new FileReader();
+            reader.onload = on_load_callback;
+            reader.readAsText(file);
+        }
+
+    </script>
+{% endblock scripts %}

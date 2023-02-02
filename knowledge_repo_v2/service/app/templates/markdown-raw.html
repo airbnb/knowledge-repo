@@ -1,0 +1,15 @@
+{% extends "markdown-base.html" %}
+
+{% block content %}
+{{ super() }}
+<div class="renderedMarkdown">
+  {{ raw_post | safe }}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+$(".tab-raw").addClass('active');
+</script>
+{% endblock %}

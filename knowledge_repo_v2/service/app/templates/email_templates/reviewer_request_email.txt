@@ -1,0 +1,9 @@
+You've been asked to review a knowledge post!
+
+Link to post: {{ post_url }}
+
+Feel free to leave comments or you can allow the author to publish by clicking on the checkbox in the upper right. Knowledge Editors can also approve posts for publishing.
+
+Happy Reviewing!
+
+The Knowledge Editors

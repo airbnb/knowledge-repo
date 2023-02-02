@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}
+Knowledge Repo 404
+{% endblock %}
+
+{% block content %}
+<div class="col-12">
+  <div class="panel">
+    <center>
+      <div class="panel-header">
+        Page not found!
+      </div>
+    </center>
+
+    <center>
+      <div class="panel-body">
+        <div class="row row-space-2"></div>
+        <img src={{ url_for('static', filename='images/404.gif' ) }}>
+        <h3> </h3>
+        <a class="btn btn-danger btn-lg" href="/">Take me back</a>
+      </div>
+    </center>
+  </div>
+</div>
+{% endblock %}

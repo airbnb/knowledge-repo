@@ -1,0 +1,45 @@
+{% extends "index-base.html" %}
+
+
+{% block header %} Create Knowledge {% endblock %}
+
+
+{% block content %}
+<center>
+  <br>
+    <h3> Select an option below to add a new post </h3>
+</center>
+<br>
+<table class="table">
+    <tr>
+        <th class="tr">Description</th>
+        <th class="th">Action</th>
+    </tr>
+    <tr>
+        <td class="td">Download a knowledge post template notebook file (Jupyter)</td>
+        <td class="td"><a class="btn btn-primary" href="create/ipynb" role="button"> Jupyter Notebook </a></td>
+    </tr>
+    <tr>
+        <td class="td">Download a knowledge post template notebook file (R-Markdown)</td>
+        <td class="td"><a class="btn btn-primary" href="create/Rmd" role="button"> R-Markdown </a></td>
+    </tr>
+    <tr>
+        <td class="td">Download a knowledge post template notebook file (Markdown)</td>
+        <td class="td"><a class="btn btn-primary" href="create/md" role="button"> Markdown </a></td>
+    </tr>
+    <tr>
+        <td class="td">Write a post in Markdown directly in the Markdown web editor</td>
+        <td class="td"><a class="btn btn-primary" href="{{ url_for('editor.editor') }}" role="button"> Web Editor </a></td>
+    </tr>
+    <tr>
+        <td class="td">Link a post from elsewhere (e.g. Google Docs)</td>
+        <td class="td"><a class="btn btn-primary" href="{{ url_for('editor.editor', proxy='true') }}" role="button"> Linked Post </a></td>
+    </tr>
+    <tr>
+        <td class="td">Write a post with uploaded Jupyter Notebook</td>
+        <td class="td"><a class="btn btn-primary" href="{{ url_for('editor.editor', ipynb='true') }}" role="button"> Jupyter Notebook Post (Beta) </a></td>
+    </tr>
+</table>
+<br>
+
+{% endblock %}

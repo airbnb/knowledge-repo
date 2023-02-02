@@ -1,0 +1,45 @@
+{% extends "markdown-base.html" %}
+
+{% block content %}
+
+    {{ super() }}
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/codehilite-friendly.css') }}">
+    <div id="renderedMarkdown">
+      <textarea id="source">
+        {{ html|safe }}
+      </textarea>
+      <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
+      </script>
+      <script>
+        var slideshow = remark.create();
+      </script>
+    </div>
+
+    <hr/>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/CommonHTML", "output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+<script type="text/javascript"
+  src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js">
+</script>
+<script>
+  $(".btn-presentation").addClass("btn-active");
+  helpersJx.linkifyHeaders();
+</script>
+
+{% endblock %}
