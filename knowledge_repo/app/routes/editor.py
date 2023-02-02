@@ -193,6 +193,7 @@ def save_post():
     headers["tags"] = [tag.strip() for tag in data.get("tags", [])]
     if "proxy" in data:
         headers["proxy"] = data["proxy"]
+
     if "ipynb" in data:
         headers["ipynb"] = data["ipynb"]
         if (
@@ -204,9 +205,11 @@ def save_post():
                 text_file.write(data["file_data"])
 
             # add to repo
-            current_repo.save(data["file_name"], path)
+            kp = current_repo.save(data["file_name"], path)
 
-            response = s3_upload(data["file_name"], data["file_data"])
+            # upload to s3
+            response = s3_upload(data["file_name"], path, data["file_data"])
+
             if response is None:
                 error_msg = "ERROR during upload file to s3"
                 logger.error(error_msg)
@@ -216,7 +219,9 @@ def save_post():
         else:
             headers["display_link"] = data["display_link"]
 
-    kp.write(unquote(data["markdown"]), headers=headers)
+    # generate dummp md for post redirect
+    if "ipynb" not in data:
+        kp.write(unquote(data["markdown"]), headers=headers)
 
     # add to repo
     current_repo.add(kp, update=True, message=headers["title"])  # THIS IS DANGEROUS
@@ -340,10 +345,10 @@ def review_comment():
     return "OK"
 
 
-def s3_upload(file_name, file_data):
+def s3_upload(file_name, path, file_data):
     """Upload file(s) to AWS s3 path and return the display link in the response"""
 
-    if file_name is None or file_data is None or file_data is "":
+    if file_name is None or file_data is None or file_data == "":
         return get_warning_msg(f"File name is empty. Please re-upload!")
 
     response = put_object_to_s3(s3_client, file_data, AWS_S3_BUCKET, file_name)
@@ -362,7 +367,7 @@ def s3_upload(file_name, file_data):
                 s3_client,
                 html_data,
                 AWS_S3_BUCKET,
-                html_file_name,
+                os.path.join(path + '.kp/' + html_file_name),
                 "text/html",
             )
 
