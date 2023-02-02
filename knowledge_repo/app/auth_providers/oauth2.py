@@ -29,7 +29,7 @@ PRESETS = {
         'scopes': None,
         'user_info_endpoint': 'user',
         'user_info_mapping': {
-            'identifier': ['email', 'login'],
+            'identifier': ['login'],
             'name': 'name',
             'avatar_uri': 'avatar_url'
         }
