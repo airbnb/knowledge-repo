@@ -1,10 +1,8 @@
 {% extends "base.html" %}
 
-
 {% block title %}Stats{% endblock %}
 
 {% block content %}
-
   <br>
     <div class="panel">
       <div class="panel-header">Post Activity Per Week</div>
@@ -27,10 +25,6 @@
       <div id="posts_per_author"></div>
     </div>
   </br>
-
-
-
-
 {% endblock %}
 
 {% block scripts %}
@@ -56,7 +50,7 @@ function drawChart() {
   ]);
   data.sort(0);
   var chart = new google.visualization.LineChart(document.getElementById('pageviews_daily'));
-  chart.draw(data, {vAxis: {baseline: 0, viewWindow: {max:750}},
+  chart.draw(data, {vAxis: {baseline: 0},
                     colors: ['#ff5a5f'],
                     height: height,
                     hAxis: hAxisOpts});
@@ -125,7 +119,6 @@ function drawChart() {
                     colors: ['#007a87'],
                     height: height,
                     });
-
 }
 
 function search(s){
