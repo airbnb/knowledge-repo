@@ -5,7 +5,7 @@ cooked_input
 flask==2.1.2
 Flask-Migrate 
 gitdb
-gitpython==3.1.30
+gitpython==3.1.18
 tabulate==0.8.9
 markdown==3.3.4
 pygments==2.10.0
@@ -14,6 +14,7 @@ flask_login==0.6.1
 flask_principal 
 flask_mail 
 gunicorn 
+ipython_genutils
 inflection 
 pillow
 psycopg2-binary
