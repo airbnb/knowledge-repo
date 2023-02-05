@@ -111,7 +111,7 @@
                     type="text">{{tldr if tldr else ''}}</textarea>
           <br>
 
-          <label hidden="{{ 'hidden' if ipynb else '' }}" for="post_created_at"> Created At: </label>
+          <label class="{{ 'hidden' if ipynb else '' }}" for="post_created_at"> Created At: </label>
           <input type="{{ 'hidden' if ipynb else '' }}" id="post_created_at"
                  class="form-control"
                  type="text"
@@ -120,7 +120,7 @@
           <br>
           {% endif %}
 
-          <label hidden="{{ 'hidden' if ipynb else '' }}" for="post_updated_at"> Updated At: </label>
+          <label class="{{ 'hidden' if ipynb else '' }}" for="post_updated_at"> Updated At: </label>
           <input type="{{ 'hidden' if ipynb else '' }}" id="post_updated_at"
                  class="form-control"
                  type="text"
@@ -513,7 +513,7 @@ $("#btn_save").on("click", function(){
       },
       error: function(response_data) {
         $("#btn_save")[0].setAttribute("class", "btn btn-large");
-        console.log("ERROR")
+        console.log("ERROR" + error)
         console.log(JSON.stringify(response_data));
         alert("The post wasn't saved! Message: " + response_data['msg'])
         $btn.button('reset');
