@@ -1,0 +1,412 @@
+{% extends "markdown-base.html" %}
+
+{% block style_links %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/codehilite-friendly.css')}}">
+{% endblock %}
+
+{% block content %}
+
+    {{ super() }}
+
+    <div class="renderedMarkdown">
+        <span class='stats' style='position: absolute; right: 4px; padding: 9px; color: #aaa; top: 0px;'>
+            {% if page_views >= 0 %}
+              <i class="glyphicon glyphicon-eye-open" id="pageview_stats" style='color: #9CA299'></i>
+              <div id="pageview_stats" style="display: inline-block">
+                Viewed {{ page_views }} times
+              </div>
+            {% endif %}
+            {% if likes %}
+              <i class="glyphicon glyphicon-heart glyphicon-clickable pop" style="font-size:16pt; vertical-align: top;" id="tooltip-unlike" data-placement="bottom"
+               data-trigger="#tooltip-like"
+               data-container="body"
+               data-toggle="popover"
+               data-content='<div>Unlike This Post</div>'></i>
+            {% else %}
+              <i class="glyphicon glyphicon-heart-empty glyphicon-clickable pop" style="font-size:16pt; vertical-align: top;" id="tooltip-like" data-placement="bottom"
+               data-trigger="#tooltip-like"
+               data-container="body"
+               data-toggle="popover"
+               data-content='<div>Like This Post</div>'></i>
+            {% endif %}
+            {% if total_likes %}
+            + {{ total_likes }}
+            {% endif %}
+        </span>
+        {{ html|safe }}
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <h2> {{ comments | length }} Comments </h2>
+            </br>
+            <div>
+              <div class="row">
+                <div class="col-md-12">
+                  <textarea class="form-control" type="text" id="comment-text" style="height:87px;" placeholder="Leave a comment..."></textarea>
+                </div>
+              </div>
+            </div>
+            </br>
+            <div>
+              <button class="btn btn-primary" id="post_comment_btn">Post Comment</button>
+            </div>
+          </div>
+        </div>
+
+        <br>
+
+        <div class="row">
+          <div class="col-md-12">
+            {% for item in comments %}
+              {% set messageId = item.id %}
+              <div class="panel">
+                <div class="panel-header panel-light">
+                  <div class="row">
+                    <div class="col-md-11">
+                      <div class="post_comment">
+                        Posted by <b>{{ item.author }}</b> on {{ item.created_at|format_date }}
+                      </div>
+                    </div>
+                    <div class="col-md-1">
+                      <p style="text-align:right">
+                        <i class="glyphicon glyphicon-remove-sign" id="delete_comment__{{ messageId }}"></i>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel-body panel-light">
+                  <p> {{ item.text|safe }} </p>
+                </div>
+              </div>
+          {% endfor %}
+          </div>
+          </br>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/helpers.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tags.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static', filename='js/icons.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static', filename='js/comments.js') }}" type="text/javascript"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/CommonHTML", "output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+<script type="text/javascript"
+  src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js">
+</script>
+
+<script>
+$(document).on('ready', function(){
+  // Make the Rendered Markdown Button active
+  $(".tab-rendered").addClass('active');
+
+  // Activate scrollspy for dynamic highlighting the table of contents
+  $('body').scrollspy({ target: '.toc', offset: 71 })
+
+  // Wrap all tables in a div to allow for centering with overscroll
+  $('.renderedMarkdown table').wrap("<div class='table-wrapper'></div>")
+
+  // Initialize headers
+  helpersJx.linkifyHeaders();
+
+  // Initialize comments
+  var post_path = '{{ post_path }}';
+
+  $("#post_comment_btn").on('click', function(){
+      comment_author = '{{ username }}';
+      post_author = '{{ post_author }}';
+      post_title = '{{ title }}';
+      commentsJx.postComment(comment_author, post_author, post_title, post_path);
+      location.reload();
+  });
+
+  all_comment_delete_buttons = $("[id^=delete_comment]")
+  $.each(all_comment_delete_buttons, function(i,v){
+      $(v).on("click", function(){
+          var id = v.id;
+          var comment_id = id.split("__")[1];
+          if(comment_id) {
+            commentsJx.deleteComment(post_path, comment_id)
+            location.reload();
+          }
+      });
+  });
+  $(document.body).on('click',"button[id^=tag-subscription]",function () {
+    tagsJx.addTagSubscriptionListener($(this)[0]);
+  });
+
+  // Add code folding
+  $chunks = $('.codehilite');
+  $chunks.each(function () {
+		var orig_height = $(this).get(0).scrollHeight;
+		$('pre', this).prepend("<div class=\"codetoggle\">↕</div>");
+    });
+
+  // function to toggle chunk visibility
+  $('.codetoggle').click(function() {
+    var label = $(this).html();
+    if ($(this).data("expansion_status") == "expanded") {
+      $(this).data("expansion_status", "collapsed");
+	  var orig_height = $(this).parent().get(0).scrollHeight;
+	  var new_height = orig_height + 11;
+	  $(this).parent().css("overflow","auto");
+	  $(this).parent().animate({height: new_height+"px"}, 200);
+    } else {
+      $(this).data("expansion_status", "expanded");
+	  $(this).parent().css("overflow","hidden");
+	  $(this).parent().animate({height: "35px"}, 200);
+    }
+  });
+
+  $maindiv = $('.renderedMarkdown');
+  $maindiv.prepend("<div class=\"codetoggleall\">Collapse All Code</div>");
+
+  var toggleCode = function() {
+    var label = $(this).html();
+    if (label.indexOf("Expand All Code") >= 0) {
+      $(this).html(label.replace("Expand All Code", "Collapse All Code"));
+	  $(".codetoggle").each(function() {
+		  var label = $(this).html();
+		  $(this).html(label.replace("Expand", "Collapse"));
+		  var orig_height = $(this).parent().get(0).scrollHeight;
+		  var new_height = orig_height + 11;
+		  $(this).parent().css("overflow","auto");
+		  $(this).parent().css("height",new_height+"px");
+	  });
+    } else {
+      $(this).html(label.replace("Collapse All Code", "Expand All Code"));
+	  $(".codetoggle").each(function() {
+		  var label = $(this).html();
+		  $(this).parent().css("overflow","hidden");
+		  $(this).parent().css("height","35px");
+		  $(this).html(label.replace("Collapse", "Expand"));
+	  });
+    }
+  };
+
+  $('.codetoggleall').click(toggleCode);
+
+  {% if collapse_code %}
+    $('.codetoggleall').trigger( "click" )
+  {% endif %}
+})
+
+//Turn all the headers to be links
+var all_headers = [$("h1"), $("h2"), $("h3"), $("h4"), $("h5"), $("h6")]
+$.each(all_headers, function(index, value){
+  $.each(value, function(i, v){
+    var inner_html = v.innerHTML
+    inner_html_no_special = inner_html.replace(/[^a-zA-Z\- ]/g, "")
+    var inner_link = "#" + inner_html_no_special.toLowerCase().split(" ").join("-")
+    v.innerHTML = "<a href='" + inner_link + "' class=link-reset>" + inner_html + "</a>"
+  })
+})
+
+//turn all the tags into links, similar to what's done on the feed page
+var tags = $(".renderedMarkdown .metadata .tags")[0]
+var tags_list = {{ tags_list|safe }}
+var subscriptions_list = {{ user_subscriptions | safe }}
+$.each(tags_list, function(i,tag){
+  ahref = document.createElement("a")
+  e_tag = encodeURIComponent(tag)
+  f_tag = tag.replace("/", "__")
+  tag_name = tag
+  tag_subscription_button_id_name = "tag-subscription-" + i + "__" + f_tag
+  ahref.setAttribute("data-container", "body")
+  ahref.setAttribute("data-toggle", "popover")
+  ahref.setAttribute("data-placement", "bottom")
+  ahref.setAttribute("data-html", "true")
+  ahref.setAttribute("data-tag-name", f_tag)
+  if (subscriptions_list.indexOf(tag) >= 0) {
+    ahref.setAttribute("class", "label label-subscribed pop")
+    ahref.setAttribute("data-content", "<div class='content'>" +
+                  " <button class='btn btn-small btn-primary btn-unsubscribe'" +
+                        " title='' " +
+                          " id='" + tag_subscription_button_id_name + "'> " +
+                    " <i class='glyphicon glyphicon-remove-sign glyphicon-white'></i>Unsubscribe " +
+                  " </button> " +
+                  " </div>")
+  } else {
+    ahref.setAttribute("class", "label label-unsubscribed pop")
+    ahref.setAttribute("data-content", "<div class='content'>" +
+                  " <button class='btn btn-small btn-default btn-subscribe'" +
+                        " title='' " +
+                          " id='" + tag_subscription_button_id_name + "'> " +
+                    " <i class='glyphicon glyphicon-ok-sign glyphicon-filled'></i>Subscribe " +
+                  " </button> " +
+                  " </div>")
+  }
+  ahref.setAttribute("href", "/tag_pages?tag=" + e_tag)
+  ahref.setAttribute("style", "font-weight:normal")
+  if (i == 0){
+    ahref.innerHTML = " "
+    colon = document.createElement("text")
+    colon.innerHTML = "<b>Tags</b>: "
+    tags.appendChild(colon)
+  }
+  ahref.innerHTML = ahref.innerHTML + tag_name
+  tags.appendChild(ahref)
+  if (i != tags_list.length - 1){
+    comma = document.createElement("text")
+    comma.innerText = ", "
+    tags.appendChild(comma)
+  }
+})
+tags.nextSibling.remove()
+
+tags.innerHTML += "<i class='glyphicon glyphicon-edit icon-gray' style='font-size:12pt; padding-left:4px' id='tooltip-edit_tags'></i>"
+
+$(".pop").popover({ trigger: "manual" , html: true, animation:false, delay: 100})
+  .on("mouseenter", function () {
+      var _this = this;
+      $(this).popover("show");
+      $(".popover").on("mouseleave", function () {
+          $(_this).popover('hide');
+      });
+  }).on("mouseleave", function () {
+      var _this = this;
+      setTimeout(function () {
+          if (!$(".popover:hover").length) {
+              $(_this).popover("hide");
+          }
+      }, 300);
+});
+
+$('#tooltip-edit_tags').click(function(){
+  $('#tooltip-edit_tags')[0].setAttribute("style", "display:none")
+  previousSibling = $("#tooltip-edit_tags")[0].previousSibling
+  tags_string = tags_list.join(", ")
+  form = document.createElement("form")
+  input = document.createElement("input")
+  tags_text = document.createElement("text")
+  icon_class = document.createElement("i")
+  icon_class.setAttribute("class", "glyphicon glyphicon-upload icon-gray")
+  icon_class.setAttribute("style", "font-size:23px; padding-left:4px")
+  icon_class.setAttribute("id", "tooltip-save_tags")
+  tags_text.innerText = "Tags: "
+  input.setAttribute('type', 'text')
+  input.setAttribute('name', 'tags_list')
+  input.setAttribute('value', tags_string)
+  input.setAttribute('style', 'width:75%; display: inline-block')
+  input.setAttribute('id' , 'change_tags')
+  form.appendChild(tags_text)
+  tags.textContent = " "
+  form.appendChild(input)
+  form.appendChild(icon_class)
+  tags.appendChild(form)
+
+
+  $("#tooltip-save_tags").click(function(){
+    tags_string = $("#change_tags")[0].value
+    tags_list = tags_string.split(",")
+
+    var re = /^[a-z0-9\-\_\:\/]+$/i
+    var good = true
+    for (var i = 0; i < tags_list.length; i++){
+      tag = tags_list[i]
+      if (tag.length == 0){
+        alert("There is a tag with length 0 - possible a trailing comma?")
+        good = false
+        break
+      } else {
+        tag_name = tag.trim()
+        if (!(re.test(tag_name))){
+           alert("The tag contains special characters. Make sure there are only alphanumeric characters in your tag")
+           good = false
+           break
+        }
+      }
+    }
+    if (good) {
+    var postContent = {}
+      postContent['tags'] = tags_string
+      $.ajax({
+        type: "POST",
+        dataType: "json",
+        data: JSON.stringify(postContent),
+        contentType: "application/json",
+        url: '/tag_list?post_path={{ post_path|urlencode }}',
+        async: false
+      });
+      location.reload()
+    }
+  })
+
+  tags.nextSibling.remove()
+
+  // Allow user to edit tags
+  var edit_icon = iconsJx.createEditTagsIcon();
+  $(tags).after(edit_icon);
+
+  $("#tooltip-edit_tags").on("click", function(){
+      var edit_tooltip = $("#tooltip-edit_tags");
+      edit_tooltip.attr("style", "display:none");
+
+      var tags_string = tags_list.join(", ");
+      var form = $("<form>");
+      var input = $("<input>");
+
+      var tags_text = $("<text>");
+      tags_text.html("Tags: ");
+
+
+      var icon = iconsJx.createSaveTagsIcon();
+
+      input.attr("type", "text");
+      input.attr("name", "tags_list");
+      input.attr("style", "width:75%; display: inline-block");
+      input.attr("id", "change_tags");
+
+      form.append(tags_text);
+      tags.textContent = " ";
+      tags_text.innerHTML = "Tags: ";
+      form.append(input);
+      form.append(icon);
+      tags.appendChild(form[0]);
+      $("#change_tags")[0].value = tags_string;
+
+
+      $("#change_tags").keypress(function(e){
+          if (e.which == 13){
+              var tags_string = $("#change_tags")[0].value;
+              var post_path = "{{ post_path|urlencode }}";
+              tagsJx.changeAndSaveTags(post_path, tags_string);
+              return false;
+          };
+      });
+
+
+      $("#tooltip-save_tags").click(function(){
+          var tags_string = $("#change_tags")[0].value;
+          var post_path = "{{ post_path|urlencode }}";
+          tagsJx.changeAndSaveTags(post_path, tags_string);
+      });
+
+       $("form").submit(function(){
+          var tags_string = $("#change_tags")[0].value;
+          var post_path = "{{ post_path|urlencode }}";
+          tagsJx.changeAndSaveTags(post_path, tags_string);
+          return false
+      })
+  });
+
+});
+
+</script>
+{% endblock %}

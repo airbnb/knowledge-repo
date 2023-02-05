@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% if title %}
+{% block title %}{{title}}{% endblock %}
+{% endif %}
+
+{% block style_links %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/markdown-base.css')}}">
+{% endblock %}
+
+{% block panel_left %}
+{% if toc %}
+<div class='visible-lg-block'>
+<span class='section'>Table of Contents</span>
+{{toc|replace('<ul>', '<ul class="nav">')|replace('<div class="toc">','<div class="toc" id="toc">')|safe}}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block panel_right %}
+
+{% if can_download %}
+  <span class='section'>Downloads</span>
+  <a href="{{url_for('posts.download')}}?type=kp&post={{post_path|urlencode}}" class="btn btn-primary btn-download" style='display: block;'>Portable Knowledge Post</a>
+  <a href="{{url_for('posts.download')}}?type=pdf&post={{post_path|urlencode}}" class="btn btn-primary btn-download" style='display: block;'>PDF</a>
+  <a href="{{url_for('posts.download')}}?type=zip&post={{post_path|urlencode}}" class="btn btn-primary btn-download" style='display: block;'>ZIP Archive</a>
+  {% if downloads %}
+    <span class='subsection'>Source Files</span>
+    {% for file in downloads %}
+    <a href='{{url_for('posts.download')}}?type=source&post={{post_path|urlencode}}&path={{file|urlencode}}' class="btn btn-primary btn-download">{{ file.split('/')[1:] | join('/') }}</a>
+    {% endfor %}
+  {% endif %}
+{% endif %}
+
+{% if is_author and is_private %}
+<span class='section'>Post Permissions</span>
+<a href='post_groups?post_id={{post_id}}'>Add permissions for users</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+            <ul class="nav nav-tabs" style='margin-bottom: -1px; position: relative; z-index: 1;'>
+                <li role="presentation" class="tab-rendered"><a href="?">HTML</a></li>
+                <li role="presentation" class="tab-raw"><a href="?render=raw">Markdown</a></li>
+                {% if is_author and show_webeditor_button %}
+                <li role="presentation"><a href="/edit/{{post_path}}">Edit</a></li>
+                {% endif %}
+                {% if not webeditor_buttons and data_repo_git_root %}
+                  <a href='{{ data_repo_git_root}}/blob/master/{{post_path|urlencode}}'
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     style='padding-right:10px;'>
+                    View on Github
+                    <i class='glyphicon glyphicon-new-window'></i>
+                  </a>
+                  <a href='{{ data_repo_git_root}}/edit/master/{{post_path|urlencode}}' target="_blank" rel="noopener noreferrer">
+                    Edit on Github
+                    <i class='glyphicon glyphicon-new-window'></i>
+                  </a>
+                {% endif %}
+            </ul>
+        </div>
+      </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script src="{{ url_for('static', filename='js/tooltips.js') }}" type="text/javascript"></script>
+
+<script type="text/javascript">
+$("document").ready(function(){
+  var is_webeditor = false;
+  {% if webeditor_buttons %}
+  var is_webeditor = true;
+  {% endif %}
+  var post_id = "{{ post_id|urlencode }}";
+  var id = "{{ table_id }}";
+  var post_path = "{{ post_path }}"
+  var data_repo_github_root = "{{ data_repo_git_root }}"
+  tooltipsJx.initializeTooltips(is_webeditor, post_id, id, data_repo_github_root);
+});
+</script>
+{% endblock %}

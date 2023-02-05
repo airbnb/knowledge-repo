@@ -1,0 +1,108 @@
+{% extends "index-base.html" %}
+
+{% block header %}
+
+<text style="font-size:32px">Knowledge Clusters {% endblock %}</text>
+
+{% block inner_content %}
+  <br><br>
+  <div class="row cluster-header">
+    <div class="col-md-12" style='background-color:white'>
+      <div class="col-md-2 group-by-header">
+        <h5> Group posts by:</h5>
+      </div>
+      <span class="col-md-3 group-by-options">
+        <div class="radio-inline radio-cluster">
+          <label>
+            <input type="radio" name="cluster-radio" id="clusterFolder">Folder
+          </label>
+        </div>
+        <div class="radio-inline radio-cluster">
+          <label>
+            <input type="radio" name="cluster-radio" id="clusterTags">Tags
+          </label>
+        </div>
+        <div class="radio-inline radio-cluster">
+          <label>
+            <input type="radio" name="cluster-radio" id="clusterAuthor">Author
+          </label>
+        </div>
+      </span>
+      <div class="col-md-2 sort-by-header">
+        <h5> Sort by:</h5>
+      </div>
+      <span class="col-md-3 sort-by-options">
+        <div class="radio-inline radio-cluster">
+          <label>
+            <input type="radio" name="sort-radio" id="sortAlpha"> Alphabetically
+          </label>
+        </div>
+        <div class="radio-inline radio-cluster">
+          <label>
+            <input type="radio" name="sort-radio" id="sortCount">Count
+          </label>
+        </div>
+      </span>
+    <div style="clear:both"></div>
+    </div>
+  </div>
+  <ul id="cluster_list">
+  {%- for cluster, is_post, count, contents in grouped_data recursive %}
+    {%- if is_post %}
+      <li class="cluster_post" style="list-style-type:circle">
+        <a href="{{'/post/' + contents.path|urlencode }}">
+          {{ contents.title|replace('_', ' '|title )}}
+        </a>
+      </li>
+    {%- else %}
+      {%- if contents|length > 0 and cluster|length > 0 %}
+      {% set cluster_id = cluster|replace(' ', '__')|replace('-', '__') %}
+        <li id="{{ cluster_id|safe }}" class="cluster_dir" style="list-style-type:disc">
+          <div>
+            <h6 style="margin-bottom:0;margin-top:0">
+              {{ [cluster,' (', count, ')'] | join }}
+              <i id="{{ cluster_id|safe }}-glyph" class="glyphicon glyphicon-chevron-right cluster-dropdown"></i>
+            </h6>
+          </div>
+        </li>
+        <div id="{{ cluster_id|safe }}-content" style="display:none">
+          <ul style="margin-top: 0px">
+            {{ loop(contents) }}
+          </ul>
+        </div>
+      {%- endif %}
+    {%- endif %}
+  {%- endfor %}
+  </ul>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/index-cluster.js') }}"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    var cluster_button = $(".btn-cluster")[0];
+    $(cluster_button).addClass("btn-active");
+    var glyphicon = $(".glyphicon-post-org.glyphicon-th-list")[0] ;
+    $(glyphicon).addClass("glyphicon-active");
+
+    var tag = "{{ tag |default('', true)}}";
+    var clusterSelected = '#cluster{{ group_by|title }}';
+    var sortSelected = '#sort{{ sort_by|title }}';
+    var clusterButtons = ["clusterFolder", "clusterTags", "clusterAuthor"];
+    var sortButtons = ["sortAlpha", "sortCount"];
+    indexClusterJx.addFoldingToGroups();
+    indexClusterJx.clickTag(tag);
+    clusterSelected = indexClusterJx.getClusterSelected(clusterSelected);
+    sortSelected = indexClusterJx.getSortSelected(sortSelected);
+    $(clusterSelected)[0].setAttribute("checked", "checked")
+    $(sortSelected)[0].setAttribute("checked", "checked")
+    indexClusterJx.formatButtons(clusterSelected, clusterButtons, sortSelected, sortButtons);
+
+    function search(){
+      indexClusterJx.refreshPage(clusterSelected, sortSelected);
+    }
+  })
+</script>
+{% endblock %}

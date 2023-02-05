@@ -1,0 +1,258 @@
+{% extends "index-base.html" %}
+
+{% block header %}
+{% endblock %}
+
+{% block inner_content %}
+<div class="row col-12">
+  <div class="col-5">
+    <h3 style="text-align:left; padding-top:13px; padding-left:15px"> Batch Edit Tags</h3>
+  </div>
+</div>
+
+<table class="table table-bordered table-striped table-condensed">
+  <thead>
+    <tr>
+      {% for item in ['Tag', 'Number of Posts', 'Actions'] %}
+      <th>
+        {{ item }}
+        {% if item != 'Actions' %}
+        <i id="sortBy{{item|replace(' ', '_')}}Asc" class="glyphicon glyphicon-chevron-up"></i>
+        <i id="sortBy{{item|replace(' ', '_')}}Desc" class="glyphicon glyphicon-chevron-down"></i>
+        {% endif %}
+      </th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for tag in tags %}
+    {% set tag_id = tag.id %}
+    <tr>
+      <td> {{ tag.name }} </td>
+      <td>
+        {{ tags_to_posts[tag_id]|length}}
+        <button type="button" data-toggle="modal" data-target="#show_posts_{{tag_id|safe}}" class="btn"
+          style="background-color: transparent; padding-top: 0px; padding-left: 2px">
+          <i class="glyphicon glyphicon-clickable glyphicon-list"></i>
+        </button>
+
+        <div class="modal fade" id="show_posts_{{tag_id|safe}}" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-table">
+              <div class="modal-content">
+                <div id='modal-body-label' class="panel-header">
+                  {{ "All posts with tag: " + tag.name|safe }}
+                </div>
+                <div id="modal-body" class="panel-body">
+                  <ul>
+                    {% for post in tags_to_posts[tag_id] %}
+                    <li>
+                      <a href="{{'/post/' + post[0]|urlencode}}">
+                        {{ post[1] }}
+                      </a>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                  <p>
+                    <button class="btn btn-primary" data-dismiss="modal">Done</button>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <button type="button" data-toggle="modal" class="btn btn-batch-tags-invisible"
+          data-target="#rename_tags_{{tag_id|safe}}" style="padding-top: 0px">
+          <i class="glyphicon glyphicon-clickable glyphicon-edit"></i>
+        </button>
+        <button type="button" data-toggle="modal" class="btn btn-batch-tags-invisible"
+          data-target="#remove_tags_{{tag_id|safe}}" style="padding-top: 0px">
+          <i class="glyphicon glyphicon-clickable glyphicon-remove"></i>
+        </button>
+        <button type="button" data-toggle="modal" class="btn btn-batch-tags-invisible"
+          data-target="#remove_some_posts__{{tag_id|safe}}" style="padding-top: 0px">
+          <i class="glyphicon glyphicon-clickable glyphicon-minus-sign"></i>
+        </button>
+        <button type="button" data-toggle="modal" class="btn btn-batch-tags-invisible"
+          data-target="#edit_tag_description_{{tag_id|safe}}" style="padding-top: 0px">
+          <i class="glyphicon glyphicon-clickable glyphicon-tag"></i>
+        </button>
+
+        <div class="modal fade" id="rename_tags_{{tag_id|safe}}" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-table">
+              <div class="modal-cell">
+                <div class="modal-content">
+                  <div id='modal-body-label' class="panel-header">
+                    Rename Tag
+                  </div>
+                  <div id="modal-body" class="panel-body">
+                    <p>
+                      {{ "Are you sure you want to rename the tag: " + tag.name|safe + "?"}}
+                    </p>
+                    <div class="col-sm-8">
+                      <input id="{{tag_id}}__new_tag_name" type="text" placeholder="Enter the new tag name here:"
+                        class="batch-tags-text-field">
+                    </div>
+                    <br><br>
+                    <p>
+                      <button class="btn btn-primary" id="rename__{{tag_id}}" data-behavior='modal-close'>Rename
+                        Me</button>
+                      <button class="btn" data-dismiss="modal"> Cancel </button>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+        <div class="modal fade" id="remove_tags_{{tag_id|safe}}" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-table">
+              <div class="modal-cell">
+                <div class="modal-content">
+                  <div id='modal-body-label' class="panel-header">
+                    Delete Tag
+                  </div>
+                  <div id="modal-body" class="panel-body">
+                    <p>
+                      {{ "Are you sure you want to delete the tag: " + tag.name|safe + "?"}}
+                    </p>
+                    <p>
+                      <button class="btn btn-primary" id="delete__{{tag_id}}" data-behavior='modal-close'>Delete
+                        Me</button>
+                      <button class="btn" data-dismiss="modal"> Cancel </button>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade" id="remove_some_posts__{{tag_id|safe}}" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-table">
+              <div class="modal-cell">
+                <div class="modal-content">
+                  <div id='modal-body-label' class="panel-header">
+                    {{ "Remove " + full_tag|safe + " from certain posts" }}
+                  </div>
+                  <div id="modal-body" class="panel-body">
+                    <p id="{{'check_box__' ~ tag_id}}">
+                      {% for post in tags_to_posts[tag_id] %}
+                      <label>
+                        <input type='checkbox' id='{{post[0]}}'>
+                        <a href="{{ url_for('posts.render', path=post[0]) }}">
+                          {{ post[1] }}
+                        </a>
+                        </input>
+                      </label>
+                      <br>
+                      {% endfor %}
+                    </p>
+                    <p>
+                      <button class="btn btn-primary" id="{{'remove_posts__' ~ tag_id }}"
+                        data-behavior='modal-close'>Remove Tag From Posts</button>
+                      <button class="btn" data-dismiss="modal"> Cancel </button>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade" id="edit_tag_description_{{tag_id|safe}}" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-table">
+              <div class="modal-cell">
+                <div class="modal-content">
+                  <div id='modal-body-label' class="panel-header">
+                    Edit Tag Description
+                  </div>
+                  <div id="modal-body" class="panel-body">
+                    <p>
+                      {% if tags_to_desc[tag_id] != "" %}
+                      {{ "Are you sure you want to edit the description of " + tag.name|safe + "?"}} <br>
+                      {{ "The current description is: " + tags_to_desc[tag_id]|safe }}
+                      {% else %}
+                      {{ "No current description exists! Add the tag description below" }}
+                      {% endif %}
+                    </p>
+                    <div class="col-sm-8">
+                      <input id="{{tag_id}}__new_tag_description" type="text"
+                        placeholder="Enter the new tag description here:" class="batch-tags-text-field">
+                    </div>
+                    <br><br>
+                    <p>
+                      <button class="btn btn-primary" id="edit_desc__{{tag_id}}" data-behavior='modal-close'>Edit
+                        Me</button>
+                      <button class="btn" data-dismiss="modal"> Cancel </button>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/tags.js')}}" type='text/javascript'></script>
+
+<style>
+  [id^='rename_tags_'] {
+    font-size: 12pt;
+    padding-left: 8px;
+  }
+
+  [id^='remove_tags_'] {
+    font-size: 12pt;
+  }
+
+  .btn-group.pagination-group {
+    display: none;
+  }
+</style>
+<script type="text/javascript">
+  all_delete_buttons = $("[id^=delete_]")
+  $.each(all_delete_buttons, function (i, v) {
+    tagsJx.deleteTagPosts(v);
+  })
+
+  all_rename_buttons = $("[id^=rename__]")
+  $.each(all_rename_buttons, function (i, v) {
+    tagsJx.renameTagPosts(v);
+  })
+
+  remove_posts_buttons = $("[id^=remove_posts__]")
+  $.each(remove_posts_buttons, function (i, v) {
+    tagsJx.removeTagFromPosts(v);
+  })
+
+  edit_descs_buttons = $("[id^=edit_desc__]")
+  $.each(edit_descs_buttons, function (i, v) {
+    tagsJx.editTagDescription(v);
+  })
+
+  {% for item in ['Tag', 'Number of Posts'] %}
+  $("#sortBy{{item|replace(' ', '_')}}Desc").click(function () {
+    document.location = '/batch_tags?sort_by={{item|replace(" ", "_")}}'
+  });
+  $("#sortBy{{item|replace(' ','_')}}Asc").click(function () {
+    document.location = '/batch_tags?sort_by={{item|replace(" ", "_")}}&sort_asc=1'
+  });
+  {% endfor %}
+
+
+
+</script>
+{% endblock %}

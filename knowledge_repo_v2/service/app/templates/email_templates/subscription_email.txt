@@ -1,0 +1,9 @@
+Title: {{ post_title }}
+
+Author(s): {{ post_authors|join(', ') }}
+
+Tags(s): {{ post_tags|join(', ') }}
+
+{{ post_tldr | safe }}
+
+Link to post: {{ url_for('posts.render', path=page_id, _external=True) }}
