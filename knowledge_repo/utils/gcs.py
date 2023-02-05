@@ -3,31 +3,32 @@ from gcloud.exceptions import GCloudError
 from oauth2client.service_account import ServiceAccountCredentials
 import os
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
 
-def get_gcs_client(
-    client_id,
-    client_email,
-    private_key_id,
-    private_key,
-    gc_project,
-):
-    credentials_dict = {
-        'type': 'service_account',
-        'client_id': client_id,
-        'client_email': client_email,
-        'private_key_id': private_key_id,
-        'private_key': private_key,
-    }
+def parse_gcs_uri(uri):
+    """Get google cloud storage path from uri
+
+    :param uri: "gs://(.*?)/(.*)"
+    :return: bucket and path
+    """
+    matches = re.match("gs://(.*?)/(.*)", uri)
+    if matches:
+        return matches.groups()
+    else:
+        raise ValueError(f'Cannot interpret {uri}')
+
+
+def get_gcs_client(credentials_dict):
     credentials = ServiceAccountCredentials.from_json_keyfile_dict(
         credentials_dict
     )
-    return storage.Client(credentials=credentials, project=gc_project)
+    return storage.Client(credentials=credentials, project=credentials_dict['project_id'])
 
 
-def upload_file_from_gcs(
+def upload_file_to_gcs(
     gcs_client,
     bucket,
     blob_name,
@@ -105,4 +106,12 @@ def download_dir_from_gcs(
     gc_bucket = gcs_client.get_bucket(bucket_name=bucket)
     blobs = gc_bucket.list_blobs(prefix=blob_prefix)  # Get list of files
     for blob in blobs:
-        blob.download_to_filename(local_dir + blob.name)
+        if not blob.name.endswith('/'):
+            dest_pathname = os.path.join(local_dir + blob.name)
+            if not os.path.exists(os.path.dirname(dest_pathname)):
+                os.makedirs(os.path.dirname(dest_pathname))
+            logger.info("Down files from: {object_key} to {dest_pathname}".format(
+                object_key=blob.name,
+                dest_pathname=dest_pathname)
+            )
+            blob.download_to_filename(local_dir + blob.name)

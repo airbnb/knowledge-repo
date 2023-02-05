@@ -2,6 +2,7 @@ from flask import current_app
 from flask_login import current_user
 from werkzeug.local import LocalProxy
 from knowledge_repo.utils.s3 import get_s3_client
+from knowledge_repo.utils.gcs import get_gcs_client
 from knowledge_repo.utils.notion import get_notion_client
 
 __all__ = ["db_session", "current_repo", "current_user"]
@@ -13,6 +14,11 @@ s3_client = LocalProxy(
         current_app.config.get("S3_AWS_ACCESS_KEY_ID", ""),
         current_app.config.get("S3_AWS_SECRET_ACCESS_KEY", ""),
         current_app.config.get("S3_AWS_REGION_NAME", "us-west-2"),
+    )
+)
+gcs_client = LocalProxy(
+    lambda: get_gcs_client(
+        current_app.config.get("GOOGLE_CLOUD_AUTHENTICATION", "")
     )
 )
 notion_client = LocalProxy(
