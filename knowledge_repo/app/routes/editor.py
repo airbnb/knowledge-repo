@@ -89,7 +89,7 @@ def editor(path=None):
 
     prefixes = current_app.config.get("WEB_EDITOR_PREFIXES", None)
 
-    # [TODO] handle webpost better 
+    # [TODO] handle webpost better
     # if prefixes is not None:
     #     assert path is None or any(
     #         path.startswith(prefix) for prefix in prefixes
@@ -160,8 +160,8 @@ def save_post():
     prefixes = current_app.config["WEB_EDITOR_PREFIXES"]
     if prefixes == []:
         raise Exception("Web editing is not configured")
-    
-    # [TODO] handle webpost better 
+
+    # [TODO] handle webpost better
     # if prefixes is not None:
     #     if not any([path.startswith(prefix) for prefix in prefixes]):
     #         return get_warning_msg(f"Your post path must begin with one of {prefixes}")

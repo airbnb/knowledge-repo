@@ -8,6 +8,7 @@ from s3path import S3Path
 logger = logging.getLogger(__name__)
 AWS_S3_AUTH_PATH = '.configs/aws_s3_auth.json'
 
+
 def parse_s3_path(s3_url):
     """Get s3_path for S3 Object URL
 
@@ -47,6 +48,7 @@ def get_s3_client():
         aws_secret_access_key=credentials_dict["S3_AWS_SECRET_ACCESS_KEY"],
         region_name=credentials_dict["S3_AWS_REGION_NAME"],
     )
+
 
 def upload_file_to_s3(
     s3_client,

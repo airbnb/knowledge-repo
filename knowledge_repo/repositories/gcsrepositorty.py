@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 class GcsRepository(KnowledgeRepository):
     _registry_keys = ['gs', 'gcs']
+    _local_path = 'tmp_kp'
 
     TEMPLATES = {
         'README.md': get_path(
@@ -30,7 +31,7 @@ class GcsRepository(KnowledgeRepository):
 
         self._gcs_client = get_gcs_client()
 
-        self._path = os.path.join('tmp_kp', self._gs_dir)
+        self._path = os.path.join(self._local_path, self._gs_dir)
         download_dir_from_gcs(
             self._gcs_client, self._gs_bucket, self._gs_dir, self._path)
         self.config.update(os.path.join(self.path, config))
