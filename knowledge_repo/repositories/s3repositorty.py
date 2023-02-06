@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 class S3Repository(KnowledgeRepository):
     _registry_keys = ['s3']
+    _local_path = 'tmp_kp'
 
     TEMPLATES = {
         'README.md': get_path(
@@ -25,7 +26,7 @@ class S3Repository(KnowledgeRepository):
         self.auto_create = auto_create
 
         self._s3_bucket, self._s3_client, self._s3_dir = parse_s3_uri(self.uri)
-        self._path = os.path.join('tmp_kp', self._s3_dir)
+        self._path = os.path.join(self._local_path, self._s3_dir)
         download_dir_from_s3(
             self._s3_client, self._s3_bucket, self._s3_dir, self._path)
         # self.config.update(os.path.join(self.path, config))
@@ -120,7 +121,11 @@ class S3Repository(KnowledgeRepository):
         pass  # Added posts are already published
 
     def _unpublish(self, path):
-        raise NotImplementedError
+        # Latest revision for published post
+        revision = self._kp_get_revision(
+            path, self.PostStatus.PUBLISHED, enforce_exists=True)
+        self.__set_post_status(
+            path, status=self.PostStatus.UNPUBLISHED, revision=revision)
 
     def _accept(self, path):
         pass

@@ -89,10 +89,11 @@ def editor(path=None):
 
     prefixes = current_app.config.get("WEB_EDITOR_PREFIXES", None)
 
-    if prefixes is not None:
-        assert path is None or any(
-            path.startswith(prefix) for prefix in prefixes
-        ), "Editing this post online is not permitted by server configuration."
+    # [TODO] handle webpost better
+    # if prefixes is not None:
+    #     assert path is None or any(
+    #         path.startswith(prefix) for prefix in prefixes
+    #     ), "Editing this post online is not permitted by server configuration."
 
     # set defaults
     data = {
@@ -160,9 +161,10 @@ def save_post():
     if prefixes == []:
         raise Exception("Web editing is not configured")
 
-    if prefixes is not None:
-        if not any([path.startswith(prefix) for prefix in prefixes]):
-            return get_warning_msg(f"Your post path must begin with one of {prefixes}")
+    # [TODO] handle webpost better
+    # if prefixes is not None:
+    #     if not any([path.startswith(prefix) for prefix in prefixes]):
+    #         return get_warning_msg(f"Your post path must begin with one of {prefixes}")
 
     # TODO better handling of overwriting
     kp = None
@@ -207,6 +209,11 @@ def save_post():
             # add to repo
             kp = current_repo.save(data["file_name"], path)
 
+            # update kp author
+            for author in headers["authors"]:
+                if author not in kp.headers['authors']:
+                    kp.headers['authors'].append(author)
+
             # upload to s3
             response = s3_upload(data["file_name"], path, data["file_data"])
 
@@ -228,7 +235,9 @@ def save_post():
 
     # add into notion database
     if "ipynb" in data:
-        create_page(notion_client=notion_client, database_id=current_app.config.get("NOTION_DATABASE_ID", ""), params=headers)
+        notion_database_id = current_app.config.get("NOTION_DATABASE_ID", "")
+        if not notion_database_id:
+            create_page(notion_client=notion_client, database_id=current_app.config.get("NOTION_DATABASE_ID", ""), params=headers)
 
     update_index()
     return json.dumps({"path": path})

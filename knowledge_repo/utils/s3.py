@@ -2,9 +2,11 @@ from botocore.exceptions import ClientError
 import boto3
 import logging
 import os
+import json
 from s3path import S3Path
 
 logger = logging.getLogger(__name__)
+AWS_S3_AUTH_PATH = '.configs/aws_s3_auth.json'
 
 
 def parse_s3_path(s3_url):
@@ -28,11 +30,7 @@ def parse_s3_uri(s3_uri):
     return path.bucket, get_s3_client(uri_splt[1], uri_splt[2], uri_splt[0]), uri_splt[3] if len(uri_splt) > 3 else ''
 
 
-def get_s3_client(
-    s3_aws_access_key_id,
-    s3_aws_secret_access_key,
-    s3_region_name,
-):
+def get_s3_client():
     """Get a boto3 client for S3 operations
 
     :param s3_aws_access_key_id: aws access key id for s3
@@ -41,11 +39,14 @@ def get_s3_client(
     :return: a boto3 client for s3 operations
     """
 
+    with open(AWS_S3_AUTH_PATH) as source:
+        credentials_dict = json.load(source)
+
     return boto3.client(
         "s3",
-        aws_access_key_id=s3_aws_access_key_id,
-        aws_secret_access_key=s3_aws_secret_access_key,
-        region_name=s3_region_name,
+        aws_access_key_id=credentials_dict["S3_AWS_ACCESS_KEY_ID"],
+        aws_secret_access_key=credentials_dict["S3_AWS_SECRET_ACCESS_KEY"],
+        region_name=credentials_dict["S3_AWS_REGION_NAME"],
     )
 
 

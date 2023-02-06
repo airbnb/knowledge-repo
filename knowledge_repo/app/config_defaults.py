@@ -341,30 +341,7 @@ EXCLUDED_TAGS = ["private"]
 COLLAPSE_CODE_DEFAULT = False
 
 # -------------
-# AWS related settings
-# -------------
-S3_AWS_ACCESS_KEY_ID = ""
-S3_AWS_SECRET_ACCESS_KEY = ""
-S3_AWS_REGION_NAME = ""
-
-# -------------
 # Notion related configuration
 # -------------
 NOTION_AUTH = ""
 NOTION_DATABASE_ID = ""
-
-# -------------
-# Google Cloud related configuration
-# -------------
-GOOGLE_CLOUD_AUTHENTICATION = {
-    "type": "",
-    "project_id": "",
-    "private_key_id": "",
-    "private_key": "",
-    "client_email": "",
-    "client_id": "",
-    "auth_uri": "",
-    "token_uri": "",
-    "auth_provider_x509_cert_url": "",
-    "client_x509_cert_url": ""
-}
