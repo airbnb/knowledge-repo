@@ -44,7 +44,7 @@
             ]
         },
         {
-            "name": "Run S3 KP Server Locally with config",
+            "name": "Run Cloud Storage KP Server Locally with config",
             "type": "python",
             "request": "launch",
             "program": "scripts/knowledge_repo",

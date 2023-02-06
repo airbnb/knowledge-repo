@@ -4,8 +4,10 @@ from oauth2client.service_account import ServiceAccountCredentials
 import os
 import logging
 import re
+import json
 
 logger = logging.getLogger(__name__)
+GOOGLE_AUTH_PATH = '.configs/google_auth.json'
 
 
 def parse_gcs_uri(uri):
@@ -21,7 +23,11 @@ def parse_gcs_uri(uri):
         raise ValueError(f'Cannot interpret {uri}')
 
 
-def get_gcs_client(credentials_dict):
+def get_gcs_client():
+
+    with open(GOOGLE_AUTH_PATH) as source:
+        credentials_dict = json.load(source)
+
     credentials = ServiceAccountCredentials.from_json_keyfile_dict(
         credentials_dict
     )
@@ -30,9 +36,9 @@ def get_gcs_client(credentials_dict):
 
 def upload_file_to_gcs(
     gcs_client,
+    file_name,
     bucket,
     blob_name,
-    file_name=None,
 ):
     """Upload a file from an object in an GCS
     :param gcs_client: a gcloud client
@@ -50,8 +56,8 @@ def upload_file_to_gcs(
     try:
         bucket = gcs_client.get_bucket(bucket)
         blob = bucket.blob(blob_name)
-        response = blob.upload_from_filename(file_name)
-        logger.info(response)
+        blob.upload_from_filename(file_name)
+        logger.info("knowledge_repo uploaded successfully")
     except GCloudError as client_error:
         logger.error(client_error)
         return False

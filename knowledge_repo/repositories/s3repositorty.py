@@ -120,7 +120,11 @@ class S3Repository(KnowledgeRepository):
         pass  # Added posts are already published
 
     def _unpublish(self, path):
-        raise NotImplementedError
+        # Latest revision for published post
+        revision = self._kp_get_revision(
+            path, self.PostStatus.PUBLISHED, enforce_exists=True)
+        self.__set_post_status(
+            path, status=self.PostStatus.UNPUBLISHED, revision=revision)
 
     def _accept(self, path):
         pass

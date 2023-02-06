@@ -4,8 +4,7 @@ from knowledge_repo.utils.s3 import parse_s3_uri, download_dir_from_s3, upload_f
 from ..post import KnowledgePost
 from ..repository import KnowledgeRepository
 from ..utils.files import get_path, read_binary, write_binary, remove_prefix
-from ..app.proxies import current_app
-from ..utils.gcs import parse_gcs_uri, download_dir_from_gcs, get_gcs_client, upload_file_to_gcs
+from ..utils.gcs import get_gcs_client, parse_gcs_uri, download_dir_from_gcs, upload_file_to_gcs
 from ..utils.encoding import encode
 import logging
 import time
@@ -15,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class GcsRepository(KnowledgeRepository):
-    _registry_keys = ['gs']
+    _registry_keys = ['gs', 'gcs']
 
     TEMPLATES = {
         'README.md': get_path(
@@ -29,9 +28,7 @@ class GcsRepository(KnowledgeRepository):
         self._gs_bucket, self._gs_dir = parse_gcs_uri(
             self.uri)
 
-        with open('.configs/google_auth.json') as source:
-            auth = json.load(source)
-        self._gcs_client = get_gcs_client(auth)
+        self._gcs_client = get_gcs_client()
 
         self._path = os.path.join('tmp_kp', self._gs_dir)
         download_dir_from_gcs(
@@ -128,7 +125,11 @@ class GcsRepository(KnowledgeRepository):
         pass  # Added posts are already published
 
     def _unpublish(self, path):
-        raise NotImplementedError
+        # Latest revision for published post
+        revision = self._kp_get_revision(
+            path, self.PostStatus.PUBLISHED, enforce_exists=True)
+        self.__set_post_status(
+            path, status=self.PostStatus.UNPUBLISHED, revision=revision)
 
     def _accept(self, path):
         pass
