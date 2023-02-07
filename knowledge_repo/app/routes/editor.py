@@ -161,10 +161,10 @@ def save_post():
     if prefixes == []:
         raise Exception("Web editing is not configured")
 
-    # [TODO] handle webpost better
-    # if prefixes is not None:
-    #     if not any([path.startswith(prefix) for prefix in prefixes]):
-    #         return get_warning_msg(f"Your post path must begin with one of {prefixes}")
+    if "ipynb" not in data:
+        if prefixes is not None:
+            if not any([path.startswith(prefix) for prefix in prefixes]):
+                return get_warning_msg(f"Your post path must begin with one of {prefixes}")
 
     # TODO better handling of overwriting
     kp = None
