@@ -236,7 +236,7 @@ def save_post():
     # add into notion database
     if "ipynb" in data:
         notion_database_id = current_app.config.get("NOTION_DATABASE_ID", "")
-        if not notion_database_id:
+        if notion_database_id:
             create_page(notion_client=notion_client, database_id=current_app.config.get("NOTION_DATABASE_ID", ""), params=headers)
 
     update_index()
