@@ -18,7 +18,7 @@ inflection
 pillow
 psycopg2-binary
 nbformat 
-nbconvert[execute] 
+nbconvert[execute]<6.0.0
 traitlets
 ldap3
 requests
