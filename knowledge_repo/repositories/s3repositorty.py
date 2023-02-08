@@ -171,8 +171,7 @@ class S3Repository(KnowledgeRepository):
         write_binary(ref_path, data)
 
     def _kp_dir(self, path, parent=None, revision=None):
-        path = os.path.join(self.path, path)
-        if os.path.isdir(path):
+        if os.path.isdir(os.path.join(self.path, path)):
             if parent:
                 path = os.path.join(path, parent)
             for dirpath, dirnames, filenames in os.walk(os.path.join(self.path, path)):

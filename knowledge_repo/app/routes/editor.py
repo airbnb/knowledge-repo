@@ -161,10 +161,10 @@ def save_post():
     if prefixes == []:
         raise Exception("Web editing is not configured")
 
-    # [TODO] handle webpost better
-    # if prefixes is not None:
-    #     if not any([path.startswith(prefix) for prefix in prefixes]):
-    #         return get_warning_msg(f"Your post path must begin with one of {prefixes}")
+    if "ipynb" not in data:
+        if prefixes is not None:
+            if not any([path.startswith(prefix) for prefix in prefixes]):
+                return get_warning_msg(f"Your post path must begin with one of {prefixes}")
 
     # TODO better handling of overwriting
     kp = None
@@ -236,7 +236,7 @@ def save_post():
     # add into notion database
     if "ipynb" in data:
         notion_database_id = current_app.config.get("NOTION_DATABASE_ID", "")
-        if not notion_database_id:
+        if notion_database_id:
             create_page(notion_client=notion_client, database_id=current_app.config.get("NOTION_DATABASE_ID", ""), params=headers)
 
     update_index()
