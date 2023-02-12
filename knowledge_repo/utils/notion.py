@@ -38,11 +38,13 @@ def query_page(notion_client, page_id):
     return False
 
 
-def create_page(notion_client, database_id, params):
+def create_page(notion_client, database_id, params, post_link_prefix):
     """Create a new page in the specified database
 
     :param notion_client: a notion client
+    :param database_id: notion database id
     :param params: property values of this page.
+    :param post_link_prefix: post link prefix i.e. "localhost:7001"
     :return: True if page was created, else False
     """
 
@@ -51,7 +53,7 @@ def create_page(notion_client, database_id, params):
     tags = [{"name": t} for t in params.get("tags", [])]
     path = params.get("path", "")
     if len(path) > 0:
-        post_link = "/".join([KP_EDIT_PROD_LINK, path])
+        post_link = "/".join([post_link_prefix, path])
         logger.info(post_link)
     else:
         post_link = ""
