@@ -3,7 +3,7 @@ from .common import KnowledgeDeployer
 
 class FlaskDeployer(KnowledgeDeployer):
 
-    registry_keys = ['flask']
+    _registry_keys = ['flask']
 
     def start(self, **kwargs):
         self.app.start_indexing()
