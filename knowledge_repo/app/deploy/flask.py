@@ -5,8 +5,11 @@ class FlaskDeployer(KnowledgeDeployer):
 
     _registry_keys = ['flask']
 
-    def run(self, **kwargs):
+    def start(self, **kwargs):
         self.app.start_indexing()
+
+    def run(self, **kwargs):
+        self.start()
         return self.app.run(
             debug=self.app.config['DEBUG'],
             host=self.host,
