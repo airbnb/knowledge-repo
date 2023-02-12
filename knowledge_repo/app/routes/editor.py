@@ -237,7 +237,12 @@ def save_post():
     if "ipynb" in data:
         notion_database_id = current_app.config.get("NOTION_DATABASE_ID", "")
         if notion_database_id:
-            create_page(notion_client=notion_client, database_id=current_app.config.get("NOTION_DATABASE_ID", ""), params=headers)
+            create_page(
+                notion_client=notion_client,
+                database_id=current_app.config.get("NOTION_DATABASE_ID", ""),
+                params=headers,
+                post_link_prefix=current_app.config.get("SERVER_NAME")
+            )
 
     update_index()
     return json.dumps({"path": path})
