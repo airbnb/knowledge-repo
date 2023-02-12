@@ -31,19 +31,19 @@ Users can make updates, delete, share, and add comments to their posts after pub
 For more information about the motivation and inspiration behind this project, we encourage you to read our 
 [Medium Post](https://medium.com/airbnb-engineering/scaling-knowledge-at-airbnb-875d73eff091).
 
+## Contact
+- [**Bug reports**](https://github.com/airbnb/knowledge-repo/issues)
+- **Ask us questions**
+  - [**Knowlegde-repo Slack**](https://join.slack.com/t/knowledgerepogroup/shared_invite/zt-1oxlql877-R_WUl5qGWVOt3EMs9iRKZQ)
+  - **Email**: airbnb.knowledge.repo@gmail.com
+
 ## Screenshots
 
 | Name                                              | Screenshot(s)                                                                                                                 |
 |---------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
 | [Feed](https://www.knowledge-repo.com/feed)       | <img src="docs/images/feed.png" width="600" />                                                                                |
-| Example Post                                      | <img src="https://user-images.githubusercontent.com/8813413/83345203-48b06c00-a2c5-11ea-8edb-18e7f8f157ce.png" width="600" /> |
-| [New Post](https://www.knowledge-repo.com/create) | <img src="https://user-images.githubusercontent.com/8813413/83345202-4817d580-a2c5-11ea-9f75-964980c4c3c3.png" width="600" /> |
-| Post Form                                         | <img src="https://user-images.githubusercontent.com/8813413/83345204-49490280-a2c5-11ea-97e3-248192b01526.png" width="600" /> |
-| [Stats](https://www.knowledge-repo.com/stats)     | <img src="docs/images/stats1.png" width="295" />  <img src="docs/images/stats2.png" width="295" />                            |
-
-## Contact
-- [**Bug reports**](https://github.com/airbnb/knowledge-repo/issues)
-- **Ask us questions**
-  - [**Knowlegde-repo Slack**](https://join.slack.com/t/knowledgerepogroup/shared_invite/zt-1lzxytay8-R~15bODzwFGLO5mukFFCYQ)
-  - **Email**: airbnb.knowledge.repo@gmail.com
+| [Example Post](https://www.knowledge-repo.com/post/example%2Fexample_md.kp)       | <img src="https://user-images.githubusercontent.com/8813413/83345203-48b06c00-a2c5-11ea-8edb-18e7f8f157ce.png" width="600" /> |
+| [New Post](https://www.knowledge-repo.com/create)       | <img src="https://user-images.githubusercontent.com/8813413/83345202-4817d580-a2c5-11ea-9f75-964980c4c3c3.png" width="600" /> |
+| [Post Form](https://www.knowledge-repo.com/edit?proxy=true)       | <img src="https://user-images.githubusercontent.com/8813413/83345204-49490280-a2c5-11ea-97e3-248192b01526.png" width="600" /> |
+| [Stats](https://www.knowledge-repo.com/stats)       | <img src="docs/images/stats1.png" width="295" />  <img src="docs/images/stats2.png" width="295" />                            |
   
