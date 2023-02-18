@@ -98,8 +98,9 @@ class S3Repository(KnowledgeRepository):
         # upload files to S3
         for dirpath, dirnames, filenames in os.walk(os.path.join(self._path, file_path)):
             for filename in filenames:
+                content_type = "text/html" if filename.endswith(".html") else "binary/octet-stream"
                 upload_file_to_s3(self._s3_client, os.path.join(
-                    dirpath, filename), self._s3_bucket, os.path.join(remove_prefix(dirpath, self._path), filename))
+                    dirpath, filename), self._s3_bucket, os.path.join(remove_prefix(dirpath, self._path), filename), content_type)
 
         # delete raw file after post processing and upload
         if os.path.exists(file):
