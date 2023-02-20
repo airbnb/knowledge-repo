@@ -3,20 +3,10 @@ import boto3
 import logging
 import os
 import json
-from s3path import S3Path
+import re
 
 logger = logging.getLogger(__name__)
 AWS_S3_AUTH_PATH = '.configs/aws_s3_auth.json'
-
-
-def parse_s3_path(s3_url):
-    """Get s3_path for S3 Object URL
-
-    :param s3_url: url of s3 object
-    :return: bucket and key name
-    """
-    path = S3Path.from_uri(s3_url)
-    return path.bucket, path.key
 
 
 def parse_s3_uri(s3_uri):
@@ -25,9 +15,13 @@ def parse_s3_uri(s3_uri):
     :param s3_url: url of s3 object
     :return: s3_bucket, s3_client
     """
-    path = S3Path.from_uri(s3_uri)
-    uri_splt = path.key.split('/')
-    return path.bucket, get_s3_client(uri_splt[1], uri_splt[2], uri_splt[0]), uri_splt[3] if len(uri_splt) > 3 else ''
+
+    matches = re.match("s3://(.*?)/(.*)/(.*)/", s3_uri)
+    if matches:
+        bucket, _, key_name = matches.groups()
+    else:
+        raise ValueError(f'Cannot interpret {s3_uri}')
+    return bucket, get_s3_client(), key_name
 
 
 def get_s3_client():
@@ -55,6 +49,7 @@ def upload_file_to_s3(
     file_name,
     bucket,
     object_name=None,
+    content_type="binary/octet-stream",
 ):
     """Upload a file to an object in an S3 bucket
 
@@ -62,6 +57,7 @@ def upload_file_to_s3(
     :param file_name: File to upload
     :param bucket: Bucket to upload to
     :param object_name: S3 object name. If not specified, file_name is used
+    :param content_type: AWS S3 Content Type, default to "binary/octet-stream"
     :return: True if file was uploaded, else False
     """
 
@@ -75,6 +71,7 @@ def upload_file_to_s3(
             file_name,
             bucket,
             object_name,
+            ExtraArgs={'ContentType': content_type}
         )
         logger.info(response)
     except ClientError as client_error:

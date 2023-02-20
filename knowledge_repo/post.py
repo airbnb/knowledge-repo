@@ -14,6 +14,7 @@ import re
 import uuid
 import yaml
 import PIL.Image
+import markdown
 
 logger = logging.getLogger(__name__)
 
@@ -333,6 +334,10 @@ class KnowledgePost(object):
                 '---\n\n' +
                 md
         )
+
+        # convert md to html
+        html = markdown.markdown(md)
+        self._write_ref('knowledge.html', encode(html))
 
         self._write_ref('knowledge.md', encode(md))
 
