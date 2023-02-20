@@ -8,6 +8,7 @@ import re
 logger = logging.getLogger(__name__)
 AWS_S3_AUTH_PATH = '.configs/aws_s3_auth.json'
 
+
 def parse_s3_uri(s3_uri):
     """Get s3_path for S3 Object URL
 
