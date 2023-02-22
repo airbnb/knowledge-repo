@@ -25,8 +25,10 @@ from flask import (
 )
 from flask_login import login_required
 from sqlalchemy import case, desc
-import os
+import gzip
 import json
+import os
+
 
 blueprint = get_blueprint('index', __name__)
 
@@ -67,17 +69,17 @@ def site_map_posts():
     for post in posts:
         values.append(
             {
-                "loc": "{app_domain}post/{post_path}".format(
-                    app_domain=app_domain,
-                    post_path=post.path
-                ),
+                "loc": f"{app_domain}post/{post.path}",
                 "lastmod": post.updated_at.strftime("%Y-%m-%dT%H:%M:%S+00:00"),
                 "priority": 1
             }
         )
     template = render_template('sitemap.xml', values=values)
-    response = make_response(template)
+    content = gzip.compress(template.encode('utf-8'))
+    response = make_response(content)
     response.headers['Content-Type'] = 'application/xml'
+    response.headers['Content-length'] = len(content)
+    response.headers['Content-Encoding'] = 'gzip'
     return response
 
 
