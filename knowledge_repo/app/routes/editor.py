@@ -214,15 +214,6 @@ def save_post():
                 if author not in kp.headers['authors']:
                     kp.headers['authors'].append(author)
 
-            # upload to s3
-            response = s3_upload(data["file_name"], path, data["file_data"])
-
-            if response is None:
-                error_msg = "ERROR during upload file to s3"
-                logger.error(error_msg)
-                return get_error_msg(error_msg)
-            else:
-                headers["display_link"] = response
         else:
             headers["display_link"] = data["display_link"]
 
