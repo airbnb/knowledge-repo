@@ -79,6 +79,8 @@ celerybeat-schedule
 
 # dotenv
 .env
+.env_dev
+.env_prod
 
 # docker
 docker/config.py
