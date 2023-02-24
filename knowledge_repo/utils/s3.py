@@ -4,10 +4,11 @@ import logging
 import os
 import json
 import re
+from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
-AWS_S3_AUTH_PATH = '.configs/aws_s3_auth.json'
 
+load_dotenv()
 
 def parse_s3_uri(s3_uri):
     """Get s3_path for S3 Object URL
@@ -33,8 +34,7 @@ def get_s3_client():
     :return: a boto3 client for s3 operations
     """
 
-    with open(AWS_S3_AUTH_PATH) as source:
-        credentials_dict = json.load(source)
+    credentials_dict = os.getenv('AWS_S3_CREDENTIALS')
 
     return boto3.client(
         "s3",

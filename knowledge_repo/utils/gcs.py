@@ -5,9 +5,11 @@ import os
 import logging
 import re
 import json
+from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
-GOOGLE_AUTH_PATH = '.configs/google_auth.json'
+
+load_dotenv()
 
 
 def parse_gcs_uri(uri):
@@ -25,8 +27,7 @@ def parse_gcs_uri(uri):
 
 def get_gcs_client():
 
-    with open(GOOGLE_AUTH_PATH) as source:
-        credentials_dict = json.load(source)
+    credentials_dict = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
 
     credentials = ServiceAccountCredentials.from_json_keyfile_dict(
         credentials_dict
