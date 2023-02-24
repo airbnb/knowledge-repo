@@ -48,6 +48,7 @@ ul.auth-providers>li>a>img {
 
 span.auth-message {
     display: block;
-    font-size: 2em;
+    font-size: 1.5em;
+    font-weight: bold;
     text-align: center;
 }
