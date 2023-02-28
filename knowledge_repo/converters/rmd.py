@@ -59,10 +59,18 @@ class RmdConverter(KnowledgePostConverter):
         lines = read_text_lines(rmd_filename)
         header = body = ''
         delim_num = 0
+        isin_html_header = False
         for line in lines:
             if delim_num < 2:
                 header += line
             else:
+                if line.startswith('```{=html}'):
+                    isin_html_header = True
+                    line = ''
+                elif isin_html_header and line.startswith('```'):
+                    isin_html_header = False
+                    line = ''
+
                 body += line
             if line.strip() == '---':
                 delim_num += 1
