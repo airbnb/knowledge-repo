@@ -23,23 +23,55 @@ Knowledge Repo Login
 {% endblock %}
 
 {% block content %}
+
+<style>
+  .login-form {
+      display: block;
+      list-style-type: none;
+      width: 400px;
+      margin: 50px auto;
+      padding: 1em;
+      background: #fdfcfccf;
+      border: 1px solid #1d1b1bcf;
+      border-radius: 21px;
+      box-sizing: border-box;
+      box-shadow: 0.5px 1px 2px 0px #00000029;
+  }
+  .login-option {
+      display: block;
+      list-style-type: none;
+      width: 300px;
+      margin: 5px auto;
+      padding: 1em;
+      background: white;
+      border: 1px solid #000000;
+      border-radius: 11px;
+      box-sizing: border-box;
+      box-shadow: 0.5px 1px 2px 0px #00000029;
+  }
+</style>
+
+<div class='login-form'>
 {% if providers %}
-<span class='auth-message'>
-  The content you are attempting to access requires that you are logged in.
-  Please sign in using one of the following login methods to continue.
-</span>
-<ul class='auth-providers'>
-  {% for provider in providers %}
-  <li><a href='login/{{ provider['name'] }}?next={{request.args.next}}'><img src='{{ provider['icon_uri'] }}' />{{
-      provider['link_text'] }}</a></li>
-  {% endfor %}
-</ul>
+  <span class='auth-message'>
+    Sign in to Knowledge-Repo
+  </span>
+  <ul class='auth-providers'>
+    {% for provider in providers %}
+    <span class='login-option'>
+      <li><a href='login/{{ provider['name'] }}?next={{request.args.next}}'><img src='{{ provider['icon_uri'] }}' />{{
+          provider['link_text'] }}</a></li>
+    </span>
+    {% endfor %}
+  </ul>
 {% else %}
-<span class='auth-message'>
-  The content you are attempting to access requires that you are logged in.
-  <br><br>
-  Unfortunately, there are no authentication mechanisms configured. Please contact your system administrator to enable
-  authentication.
-</span>
+  <span class='auth-message'>
+    The content you are attempting to access requires that you are logged in.
+    <br><br>
+    Unfortunately, there are no authentication mechanisms configured. Please contact your system administrator to enable
+    authentication.
+  </span>
 {% endif %}
+</div>
+
 {% endblock %}

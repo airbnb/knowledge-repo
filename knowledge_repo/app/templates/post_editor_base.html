@@ -59,7 +59,7 @@
           <input id="post_path"
           class="form-control typeahead"
           type="text"
-          placeholder="webposts/my_team/my_post_name" 
+          placeholder="webposts/my_team/my_post_name"
           value=""></input>
           <br>
           {% endif %}
@@ -87,7 +87,7 @@
           <input id="post_image_feed"
                  class="form-control"
                  type="text"
-                 placeholder="https://website.com/my_cool_thumbnail.png" 
+                 placeholder="https://website.com/my_cool_thumbnail.png"
                  value="{{ feed_image if feed_image else ''}}"></input>
           <br>
 
@@ -110,19 +110,24 @@
                     class="form-control"
                     type="text">{{tldr if tldr else ''}}</textarea>
           <br>
-          <label for="post_created_at"> Created At: </label>
-          <input id="post_created_at"
+
+          <label class="{{ 'hidden' if ipynb else '' }}" for="post_created_at"> Created At: </label>
+          <input type="{{ 'hidden' if ipynb else '' }}" id="post_created_at"
                  class="form-control"
                  type="text"
                  value="{{ created_at|format_date if created_at else '' }}"></input>
+          {% if not ipynb %}
           <br>
+          {% endif %}
 
-          <label for="post_updated_at"> Updated At: </label>
-          <input id="post_updated_at"
+          <label class="{{ 'hidden' if ipynb else '' }}" for="post_updated_at"> Updated At: </label>
+          <input type="{{ 'hidden' if ipynb else '' }}" id="post_updated_at"
                  class="form-control"
                  type="text"
                  value="{{ updated_at|format_date if updated_at else ''}}"></input>
+          {% if not ipynb %}
           <br>
+          {% endif %}
           {% endblock %}
         </div>
       </form>
@@ -182,6 +187,8 @@
 var all_form_fields = ['#post_title', '#post_path',
                        '#post_created_at', '#post_updated_at',
                        '#post_author', '#post_image_feed', '#post_tags']
+
+var ipynb = $("#ipynb").val() == 'True'
 
 // This will ensure that when you
 $.each(all_form_fields, function(i, v){
@@ -427,6 +434,8 @@ $("#author_can_publish").on("click", function(){
 })
 
 $("#btn_save").on("click", function(){
+  var $btn = $(this);
+  $btn.button('loading');
 
   path = {% if path %} '{{ path }}' {% else %} $('#post_path').typeahead('val') {% endif %}
 
@@ -439,7 +448,8 @@ $("#btn_save").on("click", function(){
     'status': status,
     'created_at': $("#post_created_at").val(),
     'updated_at': $("#post_updated_at").val(),
-    'author': $("#post_author").select2().val()
+    'author': $("#post_author").select2().val(),
+    'display_link': $("#display_link").val(),
   }
 
   check_created_at = parseDate(data.created_at, "Created_At");
@@ -465,6 +475,24 @@ $("#btn_save").on("click", function(){
     data.proxy = $("#post_proxy").val()
   }
 
+  if ($("#ipynb").length) {
+    data.ipynb = $("#ipynb").val()
+    console.log("ipynb" + data.ipynb)
+  }
+
+  file_upload = document.getElementById("file_upload")
+  file_data = document.getElementById("file_data")
+  if(file_upload != null && file_data != null && file_upload.files.length && file_data.value.length) {
+    data.ipynb = true
+    data.file_name = file_upload.files[0].name
+    data.file_data = file_data.value
+  }
+
+  if ($("#display_link").length) {
+    data.display_link = $("#display_link").val()
+    data.ipynb = true
+  }
+
   $.ajax({
       type: "POST",
       dataType: "json",
@@ -481,12 +509,14 @@ $("#btn_save").on("click", function(){
           alert("The post was successfully saved!")
           window.location = '/edit/' + response_data['path']
         }
+        $btn.button('reset');
       },
       error: function(response_data) {
         $("#btn_save")[0].setAttribute("class", "btn btn-large");
         console.log("ERROR")
         console.log(JSON.stringify(response_data));
         alert("The post wasn't saved! Message: " + response_data['msg'])
+        $btn.button('reset');
       }
   });
 

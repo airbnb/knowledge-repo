@@ -1,0 +1,40 @@
+version: '2'
+
+services:
+  frontend:
+    build: ./../frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      - /app/node_modules
+      - ./../frontend:/app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+  service:
+    build: ./../service
+    command: python manage.py run -h 0.0.0.0
+    ports:
+      - '5050:5000'
+    volumes:
+      - /app/venv
+      - ./../service:/app
+    env_file:
+      - ./../service/.env.dev
+    depends_on:
+      - db
+  db:
+    image: postgres:15.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=knowledge_repo
+      - POSTGRES_PASSWORD=knowledge_repo
+      - POSTGRES_DB=knowledge_repo
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    ports:
+      - '5432:5432'
+
+volumes:
+  postgres_data:

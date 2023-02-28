@@ -14,33 +14,36 @@ logger = logging.getLogger(__name__)
 
 
 class GitKnowledgeRepository(KnowledgeRepository):
-    _registry_keys = ['git']
+    _registry_keys = ["git"]
 
     TEMPLATES = {
-        'README.md': get_path(
-            __file__, '../templates', 'repository_readme.md'),
-        '.knowledge_repo_config.yml': get_path(
-            __file__, '../templates', 'repository_config.yml'),
+        "README.md": get_path(__file__, "../templates", "repository_readme.md"),
+        ".knowledge_repo_config.yml": get_path(
+            __file__, "../templates", "repository_config.yml"
+        ),
     }
 
     @classmethod
     def create(cls, uri):
-        path = uri.replace('git://', '')
+        path = uri.replace("git://", "")
         if os.path.exists(path):
             try:
                 repo = git.Repo(path)
                 logger.warning(
                     f"Repository already exists for uri '{uri}'. "
-                    "Checking if configuration is needed...")
+                    "Checking if configuration is needed..."
+                )
             except git.InvalidGitRepositoryError:
                 if os.path.isdir(path):
                     logger.warning(
                         f"Upgrading existing directory at '{path}' "
-                        "to a git knowledge repository...")
+                        "to a git knowledge repository..."
+                    )
                 else:
                     raise RuntimeError(
                         f"File exists at nominated path: {path}. "
-                        "Cannot proceed with repository initialization.")
+                        "Cannot proceed with repository initialization."
+                    )
 
         repo = git.Repo.init(path, mkdir=True)
 
@@ -61,16 +64,15 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
         return GitKnowledgeRepository(path)
 
-    def init(self, config='git:///.knowledge_repo_config.yml',
-             auto_create=False):
-        self.config.update_defaults(published_branch='master')
-        self.config.update_defaults(remote_name='origin')
+    def init(self, config="git:///.knowledge_repo_config.yml", auto_create=False):
+        self.config.update_defaults(published_branch="master")
+        self.config.update_defaults(remote_name="origin")
         self.auto_create = auto_create
-        self.path = self.uri.replace('git://', '')
+        self.path = self.uri.replace("git://", "")
 
         # Check if a legacy configuration exists, and if so, print a warning
         try:
-            self.git_read('.knowledge_repo_config.py')
+            self.git_read(".knowledge_repo_config.py")
             logger.warning(
                 "This knowledge repository has a legacy configuration file "
                 "that will not be loaded due to security issues "
@@ -78,19 +80,22 @@ class GitKnowledgeRepository(KnowledgeRepository):
                 "behavior. Please talk to your local Knowledge Repo admins "
                 "for advice if you are unsure."
             )
-        except Exception as e:
-            print(f'Exception encountered: {e}')
+        except Exception as ex:
+            # No need to print out the exception, as it is expected
+            # print(f'Exception encountered: {ex}')
+            logger.info(".knowledge_repo_config.py was not found.")
             pass
 
-        if config.startswith('git:///'):
+        if config.startswith("git:///"):
             assert config.endswith(
-                '.yml'), "In-repository configuration must be a YAML file."
+                ".yml"
+            ), "In-repository configuration must be a YAML file."
             try:
-                self.config.update(yaml.safe_load(
-                    self.git_read(config.replace('git:///', ''))))
+                self.config.update(
+                    yaml.safe_load(self.git_read(config.replace("git:///", "")))
+                )
             except KeyError:
-                logger.warning(
-                    f"Repository missing configuration file: {config}")
+                logger.warning(f"Repository missing configuration file: {config}")
         else:
             self.config.update(config)
 
@@ -109,7 +114,8 @@ class GitKnowledgeRepository(KnowledgeRepository):
             else:
                 raise ValueError(f"Provided path '{path}' does not exist.")
         assert self.__is_valid_repo(
-            path), f"Provided path '{path}' is not a valid repository."
+            path
+        ), f"Provided path '{path}' is not a valid repository."
         self._path = path
         self.uri = path  # Update uri to point to absolute path of repository
 
@@ -122,7 +128,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
     @property
     def git(self):
-        if not hasattr(self, '_git'):
+        if not hasattr(self, "_git"):
             self._git = git.Repo(self.path)
         return self._git
 
@@ -140,7 +146,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
     @property
     def revision(self):
         c = self.git.commit()
-        return f'{c.committed_date}_{c.hexsha}'
+        return f"{c.committed_date}_{c.hexsha}"
 
     def update(self, branch=None):
         branch = branch or self.config.published_branch
@@ -151,9 +157,11 @@ class GitKnowledgeRepository(KnowledgeRepository):
         try:
             self.git_remote.fetch()
         except git.exc.GitCommandError:
-            logger.warning('Cannot fetch from remote repository hosted '
-                           f'on {self.__remote_host}. Continuing locally '
-                           'with potentially outdated code.')
+            logger.warning(
+                "Cannot fetch from remote repository hosted "
+                f"on {self.__remote_host}. Continuing locally "
+                "with potentially outdated code."
+            )
             return
 
         current_branch = self.git.active_branch
@@ -169,18 +177,18 @@ class GitKnowledgeRepository(KnowledgeRepository):
     @property
     def status(self):
         return {
-            'branch': self.git.active_branch.name,
-            'changed_files': [str(diff.a_path) for diff in self.git_diff()]
+            "branch": self.git.active_branch.name,
+            "changed_files": [str(diff.a_path) for diff in self.git_diff()],
         }
 
     @property
     def status_message(self):
         status = self.status
-        branch = status['branch']
+        branch = status["branch"]
         message = f"Currently checked out on the `{branch}` branch."
-        if len(status['changed_files']) > 0:
-            modified = '\n\t- '.join(status['changed_files'])
-            message += f'Files modified: \n {modified}'
+        if len(status["changed_files"]) > 0:
+            modified = "\n\t- ".join(status["changed_files"])
+            message += f"Files modified: \n {modified}"
         return message
 
     # ---------------- Git properties and actions -------------------------
@@ -189,12 +197,15 @@ class GitKnowledgeRepository(KnowledgeRepository):
         tree = commit.tree
         if prefix is not None:
             tree = tree[prefix]
-        return [o.path for o in tree.traverse(
-                prune=lambda i, d: isinstance(i, git.Submodule) or
-                os.path.dirname(i.path).endswith('.kp'),
+        return [
+            o.path
+            for o in tree.traverse(
+                prune=lambda i, d: isinstance(i, git.Submodule)
+                or os.path.dirname(i.path).endswith(".kp"),
                 visit_once=False,
-                predicate=lambda i, d: i.path.endswith('.kp')
-                )]
+                predicate=lambda i, d: i.path.endswith(".kp"),
+            )
+        ]
 
     def git_read(self, path, commit=None):
         commit = self.git.commit(commit or self.config.published_branch)
@@ -202,27 +213,34 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
     @property
     def git_local_branches(self):
-        unmerged_branches = [branch.replace(
-            '*', '').strip() for branch in self.git.git.branch(
-            '--no-merged', self.config.published_branch).split('\n')]
+        unmerged_branches = [
+            branch.replace("*", "").strip()
+            for branch in self.git.git.branch(
+                "--no-merged", self.config.published_branch
+            ).split("\n")
+        ]
         return unmerged_branches
 
     def __get_path_from_ref(self, ref):
-        refs = ref.split('/')
+        refs = ref.split("/")
         for i, ref in enumerate(refs):
-            if ref.endswith('.kp'):
+            if ref.endswith(".kp"):
                 break
-        if not ref.endswith('.kp'):
+        if not ref.endswith(".kp"):
             return None
-        return '/'.join(refs[:i + 1])
+        return "/".join(refs[: i + 1])
 
     def git_local_posts(self, branches=None, as_dict=False):
         if branches is None:
             branches = self.git_local_branches
         posts = {}
         for branch in branches:
-            posts[branch] = set([self.__get_path_from_ref(diff.a_path)
-                                for diff in self.git_diff(branch)])
+            posts[branch] = set(
+                [
+                    self.__get_path_from_ref(diff.a_path)
+                    for diff in self.git_diff(branch)
+                ]
+            )
             posts[branch].discard(None)
 
         if not as_dict:
@@ -255,15 +273,14 @@ class GitKnowledgeRepository(KnowledgeRepository):
         if interactive:
             print(f"There are multiple branches for post '{path}'.")
             for i, branch in enumerate(branches):
-                print(f'{i}. {branch}')
+                print(f"{i}. {branch}")
             response = None
             while not isinstance(response, int):
-                response = input(
-                    'Please select the branch you would like to use: ')
+                response = input("Please select the branch you would like to use: ")
                 try:
                     response = int(response)
                 except Exception as e:
-                    print(f'Exception encountered: {e}')
+                    print(f"Exception encountered: {e}")
                     response = None
         else:
             response = 0
@@ -277,14 +294,15 @@ class GitKnowledgeRepository(KnowledgeRepository):
             return self.git.active_branch
 
         if not isinstance(branch, str):
-            raise ValueError(f"'{branch}' of type `{type(branch)}` "
-                             "is not a valid branch descriptor.")
+            raise ValueError(
+                f"'{branch}' of type `{type(branch)}` "
+                "is not a valid branch descriptor."
+            )
 
         try:
             return self.git.branches[branch]
         except IndexError:
-            raise ValueError(
-                f"Specified branch `{branch}` does not exist.")
+            raise ValueError(f"Specified branch `{branch}` does not exist.")
 
     def git_checkout(self, branch, soft=False, reset=False, create=False):
         if not create:
@@ -292,17 +310,21 @@ class GitKnowledgeRepository(KnowledgeRepository):
             branch_obj.checkout()
             return branch_obj
 
-        if soft and self.git.active_branch.name not in \
-                [self.config.published_branch, branch] and not \
-                self.git.active_branch.name.endswith('.kp'):
+        if (
+            soft
+            and self.git.active_branch.name
+            not in [self.config.published_branch, branch]
+            and not self.git.active_branch.name.endswith(".kp")
+        ):
             response = None
-            while response not in ['y', 'n']:
+            while response not in ["y", "n"]:
                 active_branch = self.git.active_branch.name
                 response = input(
                     f"It looks like you have checked out the `{active_branch}`"
                     f" branch, whereas we were expecting to use `{branch}`. Do"
-                    " you want to use your current branch instead? (y/n) ")
-                if response == 'y':
+                    " you want to use your current branch instead? (y/n) "
+                )
+                if response == "y":
                     branch = self.git.active_branch.name
 
         if reset or branch not in [b.name for b in self.git.branches]:
@@ -313,12 +335,16 @@ class GitKnowledgeRepository(KnowledgeRepository):
                         ref_head = ref
                         break
             if not ref_head:
-                ref_head = self.git_remote.refs.master \
-                    if self.git_has_remote else self.git.branches.master
+                ref_head = (
+                    self.git_remote.refs.master
+                    if self.git_has_remote
+                    else self.git.branches.master
+                )
             else:
                 logger.warning(
                     f"The branch `{ref_head.name}` already exists as upstream,"
-                    " and you maybe clobbering someone's work. Please check.")
+                    " and you maybe clobbering someone's work. Please check."
+                )
             branch = self.git.create_head(branch, ref_head, force=True)
         else:
             branch = self.git_branch(branch)
@@ -327,11 +353,15 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
     def git_diff(self, ref=None, ref_base=None, patch=False):
         commit = self.git.commit(ref)
-        ref = self.git.merge_base(self.git.commit(
-            ref_base or self.config.published_branch), commit)[0]
+        ref = self.git.merge_base(
+            self.git.commit(ref_base or self.config.published_branch), commit
+        )[0]
         return commit.diff(ref, create_patch=patch)
 
     # ---------------- Post retrieval methods --------------------------------
+
+    def _save(self, file, file_path, src_paths=[]):
+        raise NotImplementedError
 
     def _dir(self, prefix, statuses):
         posts = set()
@@ -341,73 +371,72 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
         for status in statuses:
             if status == self.PostStatus.PUBLISHED:
-                posts.update(self.git_dir(
-                    prefix=prefix, commit=self.config.published_branch))
+                posts.update(
+                    self.git_dir(prefix=prefix, commit=self.config.published_branch)
+                )
             else:
                 for branch in local_posts:
                     for post_path in local_posts[branch]:
-                        if prefix is not None and \
-                                not post_path.startswith(prefix):
+                        if prefix is not None and not post_path.startswith(prefix):
                             continue
-                        if self._kp_status(
-                                post_path, branch=branch) in statuses:
+                        if self._kp_status(post_path, branch=branch) in statuses:
                             posts.add(post_path)
         for post in sorted(posts):
             yield post
 
     # ------------- Post submission / addition user flow ----------------------
-    def _add_prepare(self, kp, path, update=False,
-                     branch=None, squash=False, message=None):
+    def _add_prepare(
+        self, kp, path, update=False, branch=None, squash=False, message=None
+    ):
         target = os.path.abspath(os.path.join(self.path, path))
         if self.git_has_remote:
             branch = branch or path
         else:
             logger.warning(
                 "This repository does not have a remote, so post review is "
-                "being skipped. Adding post directly into published branch...")
+                "being skipped. Adding post directly into published branch..."
+            )
             branch = self.config.published_branch
 
         # Create or checkout the appropriate branch for this project
-        logger.info(
-            f"Checking out (and/or creating) a new branch `{branch}`...")
-        branch_obj = self.git_checkout(
-            branch, soft=True, reset=squash, create=True)
+        logger.info(f"Checking out (and/or creating) a new branch `{branch}`...")
+        branch_obj = self.git_checkout(branch, soft=True, reset=squash, create=True)
         branch = branch_obj.name
 
         # Verify that post path does not exist (unless we are updating
         # the post)
-        assert update or not os.path.exists(
-            target), f"A knowledge post already exists at '{path}'! " + \
-            "If you wanted to update it, please pass the '--update' flag."
+        assert update or not os.path.exists(target), (
+            f"A knowledge post already exists at '{path}'! "
+            + "If you wanted to update it, please pass the '--update' flag."
+        )
 
         # Add knowledge post to local branch
-        logger.info(
-            f"Adding and committing '{path}' to local branch `{branch}`...")
+        logger.info(f"Adding and committing '{path}' to local branch `{branch}`...")
 
-    def _add_cleanup(self, kp, path, update=False,
-                     branch=None, squash=False, message=None):
+    def _add_cleanup(
+        self, kp, path, update=False, branch=None, squash=False, message=None
+    ):
         self.git.index.add([path])
 
         # Commit the knowledge post and rollback if it fails
         try:
             if message is None:
-                message = input(
-                    "Please enter a commit message for this post: ")
+                message = input("Please enter a commit message for this post: ")
             self.git.index.commit(message)
         except (KeyboardInterrupt, Exception) as e:
             if message is None:
                 logger.warning(
                     f"No commit message input for post '{path}'. "
-                    "Rolling back post addition...")
+                    "Rolling back post addition..."
+                )
             else:
-                logger.error(
-                    "Something went wrong. Rolling back post addition...")
+                logger.error("Something went wrong. Rolling back post addition...")
             self.git.index.reset()
             try:
-                self.git.git.clean('-df', path)
-                self.git.git.checkout('--', path)
+                self.git.git.clean("-df", path)
+                self.git.git.checkout("--", path)
             except Exception as e:
-                print(f'Exception encountered: {e}')
+                print(f"Exception encountered: {e}")
                 pass
             raise e
 
@@ -416,16 +445,20 @@ class GitKnowledgeRepository(KnowledgeRepository):
             remote_name = self.config.remote_name
             raise RuntimeError(
                 f"Could not find remote repository `{remote_name}` into "
-                "which this branch should be submitted.")
+                "which this branch should be submitted."
+            )
         if branch is None and path is None:
             raise ValueError(
                 "To submit a knowledge post, a path to the post "
-                "and/or a git branch must be specified.")
+                "and/or a git branch must be specified."
+            )
         if branch is None:
             branch = self.git_branch_for_post(path)
         if branch is None:
-            raise ValueError("It does not appear that you have "
-                             f"any drafts in progress for '{path}'.")
+            raise ValueError(
+                "It does not appear that you have "
+                f"any drafts in progress for '{path}'."
+            )
 
         try:
             self.git_remote.push(branch, force=force)
@@ -436,11 +469,14 @@ class GitKnowledgeRepository(KnowledgeRepository):
             raise RuntimeError(
                 f"Failed to push to remote repository {remote_name} "
                 f"({remote_url}). Please check the following error, "
-                f"and then try again:\n\n{err}")
+                f"and then try again:\n\n{err}"
+            )
 
-        logger.info(f"Pushed local branch `{branch}` to upstream branch "
-                    f"`{branch}`. Please consider starting a pull request, "
-                    "or otherwise merging into master.")
+        logger.info(
+            f"Pushed local branch `{branch}` to upstream branch "
+            f"`{branch}`. Please consider starting a pull request, "
+            "or otherwise merging into master."
+        )
 
     def _publish(self, path):  # Publish a post for general perusal
         raise NotImplementedError
@@ -458,23 +494,25 @@ class GitKnowledgeRepository(KnowledgeRepository):
 
     def _kp_uuid(self, path):
         try:
-            return self._kp_read_ref(path, 'UUID')
+            return self._kp_read_ref(path, "UUID")
         except Exception as e:
-            print(f'Exception encountered: {e}')
+            print(f"Exception encountered: {e}")
             return None
 
     def _kp_path(self, path, rel=None):
         return KnowledgeRepository._kp_path(
-            self, os.path.expanduser(path), rel=rel or self.path)
+            self, os.path.expanduser(path), rel=rel or self.path
+        )
 
     def _kp_exists(self, path, revision=None):
         # For speed, first check whether it exists in the
         # checked out branch, then search more deeply
-        return os.path.isdir(os.path.join(self.path, path)) or \
-            (self.git_branch_for_post(path, interactive=False) is not None)
+        return os.path.isdir(os.path.join(self.path, path)) or (
+            self.git_branch_for_post(path, interactive=False) is not None
+        )
 
     def _kp_status(self, path, revision=None, detailed=False, branch=None):
-        if not hasattr(self, '_dir_cache'):
+        if not hasattr(self, "_dir_cache"):
             self._dir_cache = {path: None for path in self.dir()}
         if path in self._dir_cache:
             return self.PostStatus.PUBLISHED
@@ -484,21 +522,21 @@ class GitKnowledgeRepository(KnowledgeRepository):
             branch = self.git_branch(branch)
 
         if branch is None:
-            return ValueError(f'No such post: {path}')
+            return ValueError(f"No such post: {path}")
 
         if branch.name == self.config.published_branch:
             status = self.PostStatus.PUBLISHED, None
         elif self.git_has_remote and branch.name in self.git_remote.refs:
             remote_branch = self.git_remote.refs[branch.name].name
-            behind = len(list(self.git.iter_commits(
-                f'{branch}..{remote_branch}')))
-            ahead = len(list(self.git.iter_commits(
-                f'{remote_branch}..{branch}')))
+            behind = len(list(self.git.iter_commits(f"{branch}..{remote_branch}")))
+            ahead = len(list(self.git.iter_commits(f"{remote_branch}..{branch}")))
 
-            status = (self.PostStatus.SUBMITTED,
-                      (f' - {behind} commits behind' if behind else '') +
-                      (f' - {ahead} commits ahead' if ahead else '') +
-                      (f' [On branch: {branch}]' if branch != path else ''))
+            status = (
+                self.PostStatus.SUBMITTED,
+                (f" - {behind} commits behind" if behind else "")
+                + (f" - {ahead} commits ahead" if ahead else "")
+                + (f" [On branch: {branch}]" if branch != path else ""),
+            )
         else:
             status = self.PostStatus.DRAFT, None
 
@@ -510,9 +548,9 @@ class GitKnowledgeRepository(KnowledgeRepository):
         # We use a 'REVISION' file in the knowledge post folder rather
         # than using git revisions because using git rev-parse is slow.
         try:
-            return int(self._kp_read_ref(path, 'REVISION'))
+            return int(self._kp_read_ref(path, "REVISION"))
         except Exception as e:
-            print(f'Exception encountered: {e}')
+            print(f"Exception encountered: {e}")
             return 0
 
     def _kp_get_revisions(self, path):  # slow
@@ -534,14 +572,13 @@ class GitKnowledgeRepository(KnowledgeRepository):
     def _kp_dir(self, path, parent=None, revision=None):
         if parent:
             path = os.path.join(path, parent)
-        for dirpath, dirnames, filenames in os.walk(
-                os.path.join(self.path, path)):
+        for dirpath, dirnames, filenames in os.walk(os.path.join(self.path, path)):
             for filename in filenames:
                 if dirpath == "" and filename == "REVISION":
                     continue
                 yield os.path.relpath(
-                    os.path.join(dirpath, filename),
-                    os.path.join(self.path, path))
+                    os.path.join(dirpath, filename), os.path.join(self.path, path)
+                )
 
     # TODO: Account for revision
     def _kp_has_ref(self, path, reference, revision=None):
@@ -551,8 +588,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
         raise NotImplementedError
 
     def _kp_new_revision(self, path, uuid=None):
-        self._kp_write_ref(path, "REVISION", encode(
-            self._kp_get_revision(path) + 1))
+        self._kp_write_ref(path, "REVISION", encode(self._kp_get_revision(path) + 1))
         if uuid:
             self._kp_write_ref(path, "UUID", encode(uuid))
 
@@ -567,7 +603,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
     def __remote_host(self):
         if self.git_has_remote:
             # TODO: support more types of hosts
-            m = re.match(r'.*?@(.*?):\.*?', self.git_remote.url)
+            m = re.match(r".*?@(.*?):\.*?", self.git_remote.url)
             if m:  # shorthand ssh uri
                 return m.group(1)
         return None
@@ -576,7 +612,7 @@ class GitKnowledgeRepository(KnowledgeRepository):
     def __remote_port(self):
         port = 22
         if self.git_has_remote:
-            m = re.match(r'^(.*?)?@([^/:]*):?([0-9]+)?', self.git_remote.url)
+            m = re.match(r"^(.*?)?@([^/:]*):?([0-9]+)?", self.git_remote.url)
             if m:
                 if m.group(3):
                     port = m.group(3)

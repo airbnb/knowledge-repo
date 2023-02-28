@@ -11,7 +11,7 @@
   {% endfor %}
 {% endmacro %}
 
-{% macro pagination(max_pages=10, extremes=True, autohide=True) %}
+{% macro pagination(max_pages=20, extremes=True, autohide=True) %}
   {% if feed_params %}
     {% set start = feed_params['start'] | default(0) %}
     {% set results = feed_params['results'] | default(10) %}
@@ -36,8 +36,25 @@
           <i class="glyphicon glyphicon-chevron-right"></i>
         </a>
       </div>
-
     {% endif %}
+  {% endif %}
+{% endmacro %}
+
+{% macro page_sizer() %}
+  {% if feed_params %}
+    {% set results = feed_params['results'] | default(10) %}
+    <ul class="pagination">
+      <li {% if results == 5 %}class="active"{% endif %}>
+        <a href="/feed?results=5" title="Show 5 items per page" aria-current="true">5</a>
+      </li>
+      <li {% if results == 10 %}class="active"{% endif %}>
+        <a href="/feed?results=10" title="Show 10 items per page" aria-current="true">10</a>
+      </li>
+      <li {% if results == 20 %}class="active"{% endif %}>
+        <a href="/feed?results=20" title="Show 20 items per page" aria-current="true">20</a>
+      </li>
+      <span class="text" style="display:inline-flex;text-align:justify;align-items:center;line-height:35px;"> &nbsp;per page</span>
+    </ul>
   {% endif %}
 {% endmacro %}
 
@@ -61,13 +78,9 @@
       </div>
     </div>
 
-    {# Show pagination at top unless showing clusters. #}
-    {% if request.endpoint != 'index.render_cluster' %}
-    <div class='pull-right visible-md-block visible-lg-block'>
-      {{ pagination(max_pages=5, extremes=False) }}
+    <div class="pull-right visible-md-block visible-lg-block">
+      {{ page_sizer() }}
     </div>
-    {% endif %}
-
   </div>
 
   <!-- Container for index items -->

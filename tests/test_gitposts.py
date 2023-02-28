@@ -46,11 +46,9 @@ class PostTest(unittest.TestCase):
 
         with self.app.app_context():
             post = Post.query.get(self.post_id)
-            distinct_viewers = post.view_user_count
             pageviews = post.view_count
 
-        db_pageviews_str = "Viewed {pageviews} times by {distinct_viewers} different users".format(
-            **locals())
+        db_pageviews_str = "Viewed {pageviews} times".format(**locals())
 
         assert db_pageviews_str == pageviews_str, "'{}' is not '{}'!".format(
             db_pageviews_str, pageviews_str)

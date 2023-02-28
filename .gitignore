@@ -36,6 +36,7 @@ pip-delete-this-directory.txt
 
 # Unit test / coverage reports
 htmlcov/
+manual_test/
 tests/test_repo/
 .tox/
 .coverage
@@ -120,3 +121,12 @@ ENV/
 
 # Local development artifacts
 .knowledge_repo_config.yml
+docker/config.py
+
+# Knowledge Repo Configs
+.configs/
+configs/
+
+# S3 Knowledge Repo Data
+.tmp_kp/
+tmp_kp/

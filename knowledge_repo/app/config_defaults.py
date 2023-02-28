@@ -1,4 +1,5 @@
 from datetime import timedelta
+
 # ---------------------------------------------------
 # Host configuration
 # ---------------------------------------------------
@@ -27,10 +28,7 @@ SECRET_KEY = None
 # Note: Even if you set DEPLOY_HTTPS to True, you still need
 # to set the port to 443 manually.
 DEPLOY_HTTPS = False
-SSL_CERT = {
-    'cert': '/path/to/cert',
-    'key': '/path/to/key'
-}
+SSL_CERT = {"cert": "/path/to/cert", "key": "/path/to/key"}
 
 # ---------------------------------------------------
 # Debug configuration
@@ -40,7 +38,7 @@ DEBUG = False
 # ---------------------------------------------------
 # Database configuration
 # ---------------------------------------------------
-SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
 # If you are using a MySQL database, you must specify the URI as
 # demonstrated below.
 # SQLALCHEMY_DATABASE_URI = 'mysql://username:password@hostname/database'
@@ -210,10 +208,10 @@ REMEMBER_COOKIE_DURATION = timedelta(days=365)
 # organization.
 
 # Currently the port and protocol must both be included in the server address
-LDAP_SERVER = 'ldap://127.0.0.1:389'
+LDAP_SERVER = "ldap://127.0.0.1:389"
 # When entering this, note the "{0}" which denotes where the user_id
 # is inserted.
-LDAP_USERDN_SCHEMA = 'cn={user_id},ou=people,dc=planetexpress,dc=com'
+LDAP_USERDN_SCHEMA = "cn={user_id},ou=people,dc=planetexpress,dc=com"
 
 # ---------------------------------------------------
 # Policy configuration
@@ -314,6 +312,9 @@ INDEXING_ENABLED = True
 # MAIL_MAX_EMAILS = None  # default = None
 # MAIL_SUPPRESS_SEND = False  # default = app.testing
 # MAIL_ASCII_ATTACHMENTS = False  # default = False
+#
+# Detailed integration procedure with SendGrid is available at:
+# https://sendgrid.com/blog/sending-emails-from-python-flask-applications-with-twilio-sendgrid/
 
 
 # --------------------------------------------------
@@ -323,7 +324,7 @@ INDEXING_ENABLED = True
 # a limited set of parent directories by setting
 # WEB_EDITOR_PREFIXES to a list of supported path prefixes.
 # e.g. ['webposts', 'projects']
-WEB_EDITOR_PREFIXES = ['webposts']
+WEB_EDITOR_PREFIXES = ["webposts"]
 
 
 # ---------------------------------------------------
@@ -331,10 +332,16 @@ WEB_EDITOR_PREFIXES = ['webposts']
 # ---------------------------------------------------
 # Posts with certain tags can be excluded from showing up
 # in the app. This can be useful for security purposes
-EXCLUDED_TAGS = ['private']
+EXCLUDED_TAGS = ["private"]
 
 
 # -------------
 # Collapse Code as Default Display Option
 # -------------
 COLLAPSE_CODE_DEFAULT = False
+
+# -------------
+# Notion related configuration
+# -------------
+NOTION_AUTH = ""
+NOTION_DATABASE_ID = ""

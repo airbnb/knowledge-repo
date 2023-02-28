@@ -1,0 +1,8 @@
+User-Agent: *
+Allow: /feed/
+Disallow: /stats
+Disallow: /create
+Disallow: /auth
+
+
+Sitemap: https://www.knowledge-repo.com/site-map.xml

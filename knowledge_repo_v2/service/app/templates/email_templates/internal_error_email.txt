@@ -1,0 +1,51 @@
+{{ subject_line }}
+
+{% if is_git_post -%}
+    Is_git_post = {{ is_git_post }}
+{% else -%}
+    Is_git_post = N/A
+{% endif %}
+
+{% if path -%}
+    Path = {{ path }}
+{% else -%}
+    Path = N/A
+{% endif %}
+
+{% if title -%}
+    Title = {{ title }}
+{% else -%}
+    Title = N/A
+{% endif %}
+
+{% if author -%}
+    Author(s) = {{ author }}
+{% else -%}
+    Author(s) = N/A
+{% endif %}
+
+{% if user_id -%}
+    User_id = {{ user_id }}
+{% else -%}
+    User_id = NA
+{% endif %}
+
+{% if page_id -%}
+    Page = {{ page_id }}
+{% else -%}
+    Page = NA
+{% endif %}
+
+{% if tag_id -%}
+    Tag_id = {{ tag_id }}
+{% else -%}
+    Tag_id = NA
+{% endif %}
+
+{% if e -%}
+    Exceptions = {{ e }}
+{% else -%}
+    Exception = NA
+{% endif %}
+
+This email is for internal debugging only.

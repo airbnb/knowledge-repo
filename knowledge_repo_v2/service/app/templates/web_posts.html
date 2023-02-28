@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %} Knowledge Posts {% endblock %}
+
+{% block content %}
+
+    <br>
+    <div class="container">
+      <div class="col-md-12">
+        <div>
+          <i class="glyphicon glyphicon-edit" id="new-post" style:"opacity:0.4;"></i> New Post
+        </div>
+        <br>
+        <table class="table table-bordered table-webposts">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Created</th>
+              <th>Action</th>
+              <th>Review Status</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for post in posts %}
+            <tr>
+              <td>{{ post.title }} </td>
+              <td>{{ post.authors_string }} </td>
+              <td>{{ post.created_at|format_date  }} </td>
+              <td>
+                <i class="glyphicon glyphicon-edit" id="tooltip-edit-{{ post.id }}" data-toggle="tooltip" data-placement="top" title="Edit"></i>
+                <i class="glyphicon glyphicon-remove" id="tooltip-delete-{{ post.id }}" data-toggle="tooltip" data-placement="top" title="Delete"></i>
+              </td>
+              <td>
+              {% if post.webpost_status == 0 %}
+                Private
+              {% elif post.webpost_status == 1 %}
+                In Review
+              {% else %}
+                Published
+              {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript">
+
+$('[data-toggle="tooltip"]').tooltip();
+
+$("#new-post").click(function() {
+  document.location.href = "{{ url_for('editor.editor') }}";
+});
+
+{% for post in posts %}
+
+  $("#tooltip-edit-{{ post.id }}").click(function() {
+    document.location.href = "{{ url_for('editor.editor', path=post.id) }}";
+  });
+
+  $("#tooltip-delete-{{ post.id }}").click(function() {
+    if (confirm("Are you sure you want to delete this post? You won't be able to recover it if you do.")) {
+      $.ajax({
+        type: "GET",
+        url: '/ajax/editor/delete?post_id={{ post.id }}',
+        async: false
+      });
+    }
+    location.reload();
+  });
+
+{% endfor %}
+
+</script>
+
+{% endblock %}
+

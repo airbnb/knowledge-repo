@@ -1,0 +1,8 @@
+black==22.10.0
+flask==2.2.2
+flask-cors==3.0.10
+flask-sqlalchemy==3.0.2
+flask-migrate==4.0.0
+pylint==2.15.6
+pycodestyle==2.9.1
+psycopg2==2.9.4

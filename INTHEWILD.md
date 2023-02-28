@@ -3,12 +3,26 @@ to add your organization and/or project to this document!
 
 Organizations
 ----------
- - [Airbnb](https://github.com/airbnb)
- - [Built In](https://github.com/builtinx)
+ - [Airbnb](https://airbnb.com)
+ - [Bellhop](https://getbellhops.com)
+ - [Built In](https://builtin.com)
+ - [Cabify](https://cabify.com)
+ - [Casper](https://casper.com)
  - [Databricks](https://databricks.com)
- - [Faculty](https://faculty.ai/)
- - [Postmates](https://github.com/postmates)
+ - [Elucidata](https://elucidata.io)
+ - [Faculty](https://faculty.ai)
+ - [Intercom](https://intercom.com)
+ - [Keap Analytics](http://keap.com)
+ - [Mozilla](https://wiki.mozilla.org)
+ - [Opendoor](https://opendoor.com)
+ - [Postmates](https://postmates.com)
+ - [Rasa](https://rasa.com)
  - [Recursion Pharmaceuticals](http://recursionpharma.com)
+ - [The NetCircle](http://thenetcircle.com)
+ - [UNHCR WEB](http://www.unhcr.org)
+ - [Upstart](http://www.upstart.com)
+ - [Viasat](https://viasat.com)
+ - [Wish](https://wish.com)
  - [YouGov](https://yougov.com)
 
 Projects

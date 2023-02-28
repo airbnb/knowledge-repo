@@ -1,0 +1,66 @@
+{% extends "auth-switcher.html" %}
+
+{% block content %}
+
+<style>
+    .login-form {
+        display: block;
+        list-style-type: none;
+        width: 340px;
+        margin: 50px auto;
+        padding: 1em;
+        background: white;
+        border: 1px solid #e2ddddcf;
+        border-radius: 21px;
+        box-sizing: border-box;
+        box-shadow: 0.5px 1px 2px 0px #00000029;
+    }
+
+    .login-form>input {
+        display: block;
+        width: 100%;
+        border: 1px solid #e2ddddcf;
+        border-radius: 12px;
+        padding: 1em;
+        margin-bottom: 10px;
+        -webkit-box-sizing: border-box;
+        /* Safari/Chrome, other WebKit */
+        -moz-box-sizing: border-box;
+        /* Firefox, other Gecko */
+        box-sizing: border-box;
+        /* Opera/IE 8+ */
+    }
+
+    .login-form>input[type=submit] {
+        margin-bottom: 0px;
+    }
+
+    .login-form>p {
+        font-size: 30px;
+        text-align: center;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+        font-weight: 500;
+    }
+</style>
+
+<form name='login' action='authorize' method='POST' class='login-form'>
+    <p> Log in </p>
+    <input type='text' placeholder="Username" name='username' />
+    {% if not skip_password %}
+    <input type='password' placeholder="Password" name='password' required />
+    {% endif %}
+    {% if error_message %}
+    <div class="alert alert-danger" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>
+        {{ error_message }}
+    </div>
+    {% endif %}
+    <input type='submit' value='Sign in' />
+</form>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+
+{% block title %}Stats{% endblock %}
+
+{% block content %}
+
+  <br>
+    <div class="panel">
+      <div class="panel-header">Post Activity Per Week</div>
+      <div id="posts_week"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">Cumulative Number of Posts in the Repo</div>
+      <div id="posts_cum"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">Pageviews per Week</div>
+      <div id="pageviews_weeks"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">Pageviews per Day</div>
+      <div id="pageviews_daily"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">Number of posts per author</div>
+      <div id="posts_per_author"></div>
+    </div>
+  </br>
+
+
+
+
+{% endblock %}
+
+{% block scripts %}
+{{ super () }}
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+google.load('visualization', '1', {'packages':['corechart']});
+google.setOnLoadCallback(drawChart);
+
+function drawChart() {
+
+  var height = 500;
+  var hAxisOpts = {format: 'y-MM-dd', slantedText:true, slantedTextAngle: 40, title:'Date'}
+
+  // Daily PageViews
+  var data = new google.visualization.DataTable();
+  data.addColumn('date', 'Day');
+  data.addColumn('number', 'Pageviews');
+  data.addRows([
+          {%- for k, v in daily_pageviews.items() %}
+          [new Date({{ k.year }}, {{ k.month - 1 }}, {{ k.day }}), {{ v }}],
+          {%- endfor %}
+  ]);
+  data.sort(0);
+  var chart = new google.visualization.LineChart(document.getElementById('pageviews_daily'));
+  chart.draw(data, {vAxis: {baseline: 0, viewWindow: {max:750}},
+                    colors: ['#ff5a5f'],
+                    height: height,
+                    hAxis: hAxisOpts});
+
+  // Weekly Posts
+  var data = new google.visualization.DataTable();
+  data.addColumn('date', 'Week');
+  data.addColumn('number', 'Created_at');
+  data.addColumn('number', 'Updated_at')
+  data.addRows([
+          {%- for k, v in weekly_posts_created_and_updated.items() %}
+          [new Date({{ k.year }}, {{ k.month - 1 }}, {{ k.day }}), {{ v[0]}}, {{ v[1] }}],
+          {%- endfor %}
+  ]);
+  data.sort(0);
+  var chart = new google.visualization.LineChart(document.getElementById('posts_week'));
+  chart.draw(data, {vAxis: {baseline: 0},
+                    colors: ['#ff5a5f','#ffb400'],
+                    height: height,
+                    hAxis: hAxisOpts});
+
+  // Weekly Posts Cumulative
+  var data = new google.visualization.DataTable();
+  data.addColumn('date', 'Week');
+  data.addColumn('number', '# Posts')
+  data.addRows([
+          {%- for k, v in weekly_cumulative_posts.items() %}
+          [new Date({{ k.year }}, {{ k.month - 1 }}, {{ k.day }}), {{ v }}],
+          {%- endfor %}
+  ]);
+  data.sort(0);
+  var chart = new google.visualization.LineChart(document.getElementById('posts_cum'));
+  chart.draw(data, {vAxis: {baseline: 0},
+                    colors: ['#ff5a5f'],
+                    height: height,
+                    hAxis: hAxisOpts});
+
+  // Weekly PageViews
+  var data = new google.visualization.DataTable();
+  data.addColumn('date', 'Week');
+  data.addColumn('number', 'Pageviews');
+  data.addRows([
+          {%- for k, v in weekly_pageviews.items() %}
+          [new Date({{ k.year }}, {{ k.month - 1 }}, {{ k.day }}), {{ v }} ],
+          {%- endfor %}
+  ]);
+  data.sort(0);
+  var chart = new google.visualization.LineChart(document.getElementById('pageviews_weeks'));
+  chart.draw(data, {vAxis: {baseline: 0},
+                    colors: ['#007a87'],
+                    height: height,
+                    hAxis: hAxisOpts});
+
+  // Number of posts per author
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Author');
+  data.addColumn('number', 'Number of posts');
+  data.addRows([
+          {%- for k, v in post_per_author_count.items() %}
+          ["{{ k }}", {{ v }} ],
+          {%- endfor %}
+  ]);
+  data.sort(0);
+  var chart = new google.visualization.BarChart(document.getElementById('posts_per_author'));
+  chart.draw(data, {hAxis: {baseline: 0, gridlines: {count: -1}},
+                    colors: ['#007a87'],
+                    height: height,
+                    });
+
+}
+
+function search(s){
+  window.location = '/feed?filters=' + $('#searchbar').val()
+}
+
+</script>
+
+{% endblock %}

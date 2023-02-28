@@ -1,0 +1,29 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.App {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  text-align: center;
+  background: rgb(49, 49, 177);
+  background: linear-gradient(
+    0deg,
+    rgba(49, 49, 177, 1) 0%,
+    rgba(49, 49, 177, 1) 50%,
+    rgba(49, 49, 177, 0.6) 100%
+  );
+}
+
+.Info {
+  width: 100%;
+  margin: 15% auto;
+}

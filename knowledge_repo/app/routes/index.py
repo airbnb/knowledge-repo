@@ -20,11 +20,15 @@ from flask import (
     redirect,
     render_template,
     request,
+    send_from_directory,
+    url_for,
 )
 from flask_login import login_required
 from sqlalchemy import case, desc
-import os
+import gzip
 import json
+import os
+
 
 blueprint = get_blueprint('index', __name__)
 
@@ -47,6 +51,36 @@ def site_map():
         links.append((str(rule), rule.endpoint))
     # links is now a list of url, endpoint tuples
     return '<br />'.join(str(link) for link in links)
+
+
+@blueprint.route("/robots.txt")
+@PageView.logged
+def robots_txt():
+    return send_from_directory(current_app.static_folder, request.path[1:])
+
+
+@blueprint.route("/site-map.xml")
+@PageView.logged
+def site_map_posts():
+    posts = db_session.query(Post).filter(Post.is_published)
+    values = []
+    # [TODO]handle https with deployed with action gateway
+    app_domain = request.url_root.replace("http", "https")
+    for post in posts:
+        values.append(
+            {
+                "loc": f"{app_domain}post/{post.path}",
+                "lastmod": post.updated_at.strftime("%Y-%m-%dT%H:%M:%S+00:00"),
+                "priority": 1
+            }
+        )
+    template = render_template('sitemap.xml', values=values)
+    content = gzip.compress(template.encode('utf-8'))
+    response = make_response(content)
+    response.headers['Content-Type'] = 'application/xml'
+    response.headers['Content-length'] = len(content)
+    response.headers['Content-Encoding'] = 'gzip'
+    return response
 
 
 @blueprint.route('/')

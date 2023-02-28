@@ -1,10 +1,18 @@
 {
     "python.linting.enabled": true,
     "python.linting.pycodestyleEnabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.formatting.provider": "autopep8",
     "editor.formatOnSave": true,
+    "[python]": {
+        "editor.formatOnSave": true
+    },
     "[html]": {
         "editor.formatOnSave": false
     },
     "eslint.autoFixOnSave": true,
-    "tslint.autoFixOnSave": true
+    "tslint.autoFixOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    }
 }

@@ -24,7 +24,37 @@
                 "--port",
                 "7001",
                 "--config",
-                "docker/config.py"
+                ".configs/config.py"
+            ]
+        },
+        {
+            "name": "Run Database KP Server Locally with config",
+            "type": "python",
+            "request": "launch",
+            "program": "scripts/knowledge_repo",
+            "console": "integratedTerminal",
+            "args": [
+                "--repo",
+                "postgresql+psycopg2://knowledge_repo:password@localhost:5432/knowledge_repo:knowledge_repo",
+                "runserver",
+                "--port",
+                "7001",
+                "--config",
+                ".configs/config.py"
+            ]
+        },
+        {
+            "name": "Run Cloud Storage KP Server Locally with config",
+            "type": "python",
+            "request": "launch",
+            "program": "scripts/knowledge_repo",
+            "console": "integratedTerminal",
+            "args": [
+                "runserver",
+                "--port",
+                "7001",
+                "--config",
+                ".configs/config.py"
             ]
         }
     ]
