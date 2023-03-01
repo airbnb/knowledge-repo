@@ -29,6 +29,7 @@ ul.auth-providers>li>a {
     transition: background 0.3s;
     color: #000;
     text-decoration: none;
+    font-size: 1.2em;
 }
 
 ul.auth-providers>li>a:hover {
@@ -51,4 +52,28 @@ span.auth-message {
     font-size: 1.5em;
     font-weight: bold;
     text-align: center;
+}
+
+.login-form {
+    display: block;
+    list-style-type: none;
+    width: 400px;
+    margin: 50px auto;
+    padding: 1em;
+    background: #fdfcfccf;
+    border: 2px solid #1d1b1bcf;
+    border-radius: 21px;
+    box-sizing: border-box;
+    box-shadow: 0.5px 1px 2px 0px #00000029;
+}
+
+.login-option {
+    display: block;
+    list-style-type: none;
+    width: 300px;
+    margin: 5px auto;
+    padding: 1em;
+    background: white;
+    box-sizing: border-box;
+    box-shadow: 0.5px 1px 2px 0px #00000029;
 }
