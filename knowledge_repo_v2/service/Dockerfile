@@ -25,5 +25,5 @@ RUN ${PIP} install -r requirements.txt
 # Copy project
 COPY . ./
 
-# Run entrypoint.sh
-ENTRYPOINT ["./entrypoint.sh"]
+# # Run entrypoint.sh
+# ENTRYPOINT ["./entrypoint.sh"]
