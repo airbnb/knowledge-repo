@@ -11,6 +11,9 @@
 # production
 /build
 
+# Compiled binary addons (http://nodejs.org/api/addons.html)
+build/Release
+
 # misc
 .DS_Store
 .env.local
@@ -21,3 +24,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+
+# Optional REPL history
+.node_repl_history
+.next
