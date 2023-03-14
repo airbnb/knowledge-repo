@@ -64,11 +64,11 @@ def get_posts(feed_params):
 
     # sort - TODO clean up
     sort_by = feed_params['sort_by']
-    
+
     tab = feed_params['tab']
     if tab == 'Newest':
         sort_by = 'updated_at'
-    elif tab == 'Frequent': 
+    elif tab == 'Frequent':
         sort_by = 'allviews'
     elif tab == 'Vote':
         sort_by = 'upvotes'
