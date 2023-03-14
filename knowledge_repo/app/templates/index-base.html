@@ -1,80 +1,89 @@
 {% extends "base.html" %}
 
 {% macro format_authors(authors) %}
-  {% for author in authors %}
-    <a class="btn author_tag" href='/feed?authors={{ author.identifier|urlencode }}'>
-      {{ author.format_name }}
-    </a>
-    {% if not loop.last %}
-      ,
-    {% endif %}
-  {% endfor %}
+{% for author in authors %}
+<a class="btn author_tag" href='/feed?authors={{ author.identifier|urlencode }}'>
+  {{ author.format_name }}
+</a>
+{% if not loop.last %}
+,
+{% endif %}
+{% endfor %}
 {% endmacro %}
 
 {% macro pagination(max_pages=20, extremes=True, autohide=True) %}
-  {% if feed_params %}
-    {% set start = feed_params['start'] | default(0) %}
-    {% set results = feed_params['results'] | default(10) %}
-    {% set page = 1 if (start == 0) else (start//results + 1) %}
-    {% set page_count = feed_params['page_count'] | default(1) %}
+{% if feed_params %}
+{% set start = feed_params['start'] | default(0) %}
+{% set results = feed_params['results'] | default(10) %}
+{% set page = 1 if (start == 0) else (start//results + 1) %}
+{% set page_count = feed_params['page_count'] | default(1) %}
 
-    {% if autohide and page_count > 1 %}
-      {% set page_nums = pagination_pages(current_page=page, page_count=page_count, max_pages=max_pages, extremes=extremes) %}
-      <div class='pagination-bar' role="group">
-        <a href="{{ "#" if (page == 1) else modify_query(start=(page-2)*results) }}" class="pagination-stepper{% if page == 1 %} disabled{% endif %}"{% if page == 1 %} onclick="return false;"{% endif %}>
-          <i class="glyphicon glyphicon-chevron-left"></i>
-        </a>
-        <ul class="pagination">
-          {% for page_num in page_nums %}
-            {% if loop.index0 > 0 and page_num - page_nums[loop.index0 - 1] > 1 %}
-              <li class="disabled"><a>&middot;&middot;&middot;</a></li>
-            {% endif %}
-            <li {% if page == page_num %}class="active"{% endif %}><a href= "{{ modify_query(start=(page_num-1)*results) }}"> {{ page_num }} </a></li>
-          {% endfor %}
-        </ul>
-        <a href="{{ "#" if (page == page_count) else modify_query(start=page*results) }}" class="pagination-stepper{% if page == page_count %} disabled{% endif %}"{% if page == page_count %} onclick="return false;"{% endif %}>
-          <i class="glyphicon glyphicon-chevron-right"></i>
-        </a>
-      </div>
+{% if autohide and page_count > 1 %}
+{% set page_nums = pagination_pages(current_page=page, page_count=page_count, max_pages=max_pages, extremes=extremes) %}
+<div class='pagination-bar' role="group">
+  <a href="{{ " #" if (page==1) else modify_query(start=(page-2)*results) }}"
+    class="pagination-stepper{% if page == 1 %} disabled{% endif %}" {% if page==1 %} onclick="return false;" {% endif
+    %}>
+    <i class="glyphicon glyphicon-chevron-left"></i>
+  </a>
+  <ul class="pagination">
+    {% for page_num in page_nums %}
+    {% if loop.index0 > 0 and page_num - page_nums[loop.index0 - 1] > 1 %}
+    <li class="disabled"><a>&middot;&middot;&middot;</a></li>
     {% endif %}
-  {% endif %}
+    <li {% if page==page_num %}class="active" {% endif %}><a href="{{ modify_query(start=(page_num-1)*results) }}"> {{
+        page_num }} </a></li>
+    {% endfor %}
+  </ul>
+  <a href="{{ " #" if (page==page_count) else modify_query(start=page*results) }}"
+    class="pagination-stepper{% if page == page_count %} disabled{% endif %}" {% if page==page_count %}
+    onclick="return false;" {% endif %}>
+    <i class="glyphicon glyphicon-chevron-right"></i>
+  </a>
+</div>
+{% endif %}
+{% endif %}
 {% endmacro %}
 
 {% macro page_sizer() %}
-  {% if feed_params %}
-    {% set results = feed_params['results'] | default(10) %}
-    <ul class="pagination">
-      <li {% if results == 5 %}class="active"{% endif %}>
-        <a href="{{ modify_query(results=5) }}" title="Show 5 items per page" aria-current="true">5</a>
-      </li>
-      <li {% if results == 10 %}class="active"{% endif %}>
-        <a href="{{ modify_query(results=10) }}" title="Show 10 items per page" aria-current="true">10</a>
-      </li>
-      <li {% if results == 20 %}class="active"{% endif %}>
-        <a href="{{ modify_query(results=20) }}" title="Show 20 items per page" aria-current="true">20</a>
-      </li>
-      <span class="text" style="display:inline-flex;text-align:justify;align-items:center;line-height:35px;"> &nbsp;per page</span>
-    </ul>
-  {% endif %}
+{% if feed_params %}
+{% set results = feed_params['results'] | default(10) %}
+<ul class="pagination">
+  <li {% if results==5 %}class="active" {% endif %}>
+    <a href="{{ modify_query(results=5) }}" title="Show 5 items per page" aria-current="true">5</a>
+  </li>
+  <li {% if results==10 %}class="active" {% endif %}>
+    <a href="{{ modify_query(results=10) }}" title="Show 10 items per page" aria-current="true">10</a>
+  </li>
+  <li {% if results==20 %}class="active" {% endif %}>
+    <a href="{{ modify_query(results=20) }}" title="Show 20 items per page" aria-current="true">20</a>
+  </li>
+  <span class="text" style="display:inline-flex;text-align:justify;align-items:center;line-height:35px;"> &nbsp;per
+    page</span>
+</ul>
+{% endif %}
 {% endmacro %}
 
 
 {% macro sort_filter() %}
-  {% if feed_params %}
-    {% set tab = feed_params['tab'] | default('Newest') %}
-  <!-- Index rendering mode switch -->
-  <div class="row">
-    <div class="col-md-11">
-      <a href="/feed?tab=Newest" class="btn btn-default btn-card no-underline {% if tab == 'Newest' %} active {% endif %}" role="button">
-        <span class="index-view-name"> Newest </span>
-      </a>
-      <a href="/feed?tab=Frequent" class="btn btn-default btn-table no-underline {% if tab == 'Frequent' %} active {% endif %} " role="button">
-        <span class="index-view-name"> Frequent </span>
-      </a>
-      <a href="/feed?tab=Vote" class="btn btn-default btn-cluster no-underline {% if tab == 'Vote' %} active {% endif %}" role="button">
-        <span class="index-view-name"> Vote(s) </span>
-      </a>
-      <!-- <a class="btn btn-default btn-card no-underline" id="toggle-button" role="button" aria-expanded="false" aria-controls="uql-form">
+{% if feed_params %}
+{% set tab = feed_params['tab'] | default('Newest') %}
+<!-- Index rendering mode switch -->
+<div class="row">
+  <div class="col-md-11">
+    <a href="/feed?tab=Newest" class="btn btn-default btn-card no-underline {% if tab == 'Newest' %} active {% endif %}"
+      role="button">
+      <span class="index-view-name"> Newest </span>
+    </a>
+    <a href="/feed?tab=Frequent"
+      class="btn btn-default btn-table no-underline {% if tab == 'Frequent' %} active {% endif %} " role="button">
+      <span class="index-view-name"> Frequent </span>
+    </a>
+    <a href="/feed?tab=Vote" class="btn btn-default btn-cluster no-underline {% if tab == 'Vote' %} active {% endif %}"
+      role="button">
+      <span class="index-view-name"> Vote(s) </span>
+    </a>
+    <!-- <a class="btn btn-default btn-card no-underline" id="toggle-button" role="button" aria-expanded="false" aria-controls="uql-form">
         <svg class="justify-content: center; display: flex" width="20" height="20" viewBox="0 -5 20 20">
           <path d="M2 4h14v2H2V4Zm2 4h10v2H4V8Zm8 4H6v2h6v-2Z" fill="#06c6b6"></path>
         </svg> Filter
@@ -113,17 +122,17 @@
 
 {% block content %}
 <div data-controller="se-uql" data-se-uql-id="" data-se-uql-sanitize-tag-query="false">
-  <div class="row">    
+  <div class="row">
     <div class="col-md-6">
       {{ sort_filter() }}
     </div>
-  
-  <div class="pull-right visible-md-block visible-lg-block">
-    {{ page_sizer() }}
-  </div>
-</div>
 
-<!-- <div class="row">
+    <div class="pull-right visible-md-block visible-lg-block">
+      {{ page_sizer() }}
+    </div>
+  </div>
+
+  <!-- <div class="row">
   <div class="col-md-6">
   <form class="form-group form-base" id="uql-form">
     <fieldset class="fieldset">
@@ -150,17 +159,17 @@
 </div>
 
 
-  <div class="col-12">
-    {% block inner_content %}
-    {% endblock %}
-  </div>
+<div class="col-12">
+  {% block inner_content %}
+  {% endblock %}
+</div>
 
-  {# Show pagination at bottom of page unless showing clusters. #}
-  {% if request.endpoint != 'index.render_cluster' %}
-  {{ pagination(max_pages=10) }}
-  {% endif %}
+{# Show pagination at bottom of page unless showing clusters. #}
+{% if request.endpoint != 'index.render_cluster' %}
+{{ pagination(max_pages=10) }}
+{% endif %}
 
-  <script type="text/javascript">
+<script type="text/javascript">
     // const form = document.querySelector("#uql-form");
     // const toggleButton = document.querySelector("#toggle-button");
 
@@ -178,6 +187,5 @@
     //   }
     // });
 
-    </script>
+</script>
 {% endblock %}
-
