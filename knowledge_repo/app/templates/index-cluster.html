@@ -46,10 +46,10 @@
     <div style="clear:both"></div>
     </div>
   </div>
-  <ul id="cluster_list" class="col-md-14">
+  <ul id="cluster_list" class="col-md-14;margin-left: 20px;display: inline-flex;">
   {%- for cluster, is_post, count, contents in grouped_data recursive %}
     {%- if is_post %}
-      <li class="margin-left: 20px;" style="list-style-type:circle">
+      <li class="cluster-list-li" style="list-style-type:circle">
         <a href="{{'/post/' + contents.path|urlencode }}">
           {{ contents.title|replace('_', ' '|title )}}
         </a>
@@ -57,7 +57,7 @@
     {%- else %}
       {%- if contents|length > 0 and cluster|length > 0 %}
       {% set cluster_id = cluster|replace(' ', '__')|replace('-', '__')|replace('#', '__')|replace('.', '__') %}
-        <li id="{{ cluster_id|safe }}" class="cluster_dir" style="list-style-type:disc">
+        <li id="{{ cluster_id|safe }}" class="cluster_dir cluster-list-li" style="list-style-type:disc">
           <div>
             <h6 style="margin-bottom:0;margin-top:0;margin-left: 10px;">
               {{ [cluster,' (', count, ')'] | join }}
@@ -74,6 +74,7 @@
     {%- endif %}
   {%- endfor %}
   </ul>
+</nav>
 
 {% endblock %}
 

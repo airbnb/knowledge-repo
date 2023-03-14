@@ -45,13 +45,13 @@
     {% set results = feed_params['results'] | default(10) %}
     <ul class="pagination">
       <li {% if results == 5 %}class="active"{% endif %}>
-        <a href="/feed?results=5" title="Show 5 items per page" aria-current="true">5</a>
+        <a href="{{ modify_query(results=5) }}" title="Show 5 items per page" aria-current="true">5</a>
       </li>
       <li {% if results == 10 %}class="active"{% endif %}>
-        <a href="/feed?results=10" title="Show 10 items per page" aria-current="true">10</a>
+        <a href="{{ modify_query(results=10) }}" title="Show 10 items per page" aria-current="true">10</a>
       </li>
       <li {% if results == 20 %}class="active"{% endif %}>
-        <a href="/feed?results=20" title="Show 20 items per page" aria-current="true">20</a>
+        <a href="{{ modify_query(results=20) }}" title="Show 20 items per page" aria-current="true">20</a>
       </li>
       <span class="text" style="display:inline-flex;text-align:justify;align-items:center;line-height:35px;"> &nbsp;per page</span>
     </ul>
@@ -59,28 +59,29 @@
 {% endmacro %}
 
 
-{% block content %}
+{% macro sort_filter() %}
+  {% if feed_params %}
+    {% set tab = feed_params['tab'] | default('Newest') %}
   <!-- Index rendering mode switch -->
   <div class="row">
-    <div class="col-md-5">
-      <div class="btn-group btn-group-justified index-view-btn-group" role="group">
-      <!-- <li {% if tab == "Newest" %}class="active"{% endif %}> -->
-        <a href="/feed?tab=Newest" class="btn btn-default btn-card no-underline" role="button" onclick="updateActiveTag()">
-          <span class="index-view-name"> Newest </span>
-        </a>
-      <!-- </li> -->
-      <a href="/feed?tab=Frequent" class="btn btn-default btn-table no-underline" role="button" id="tag_frequent">
+    <div class="col-md-11">
+      <a href="/feed?tab=Newest" class="btn btn-default btn-card no-underline {% if tab == 'Newest' %} active {% endif %}" role="button">
+        <span class="index-view-name"> Newest </span>
+      </a>
+      <a href="/feed?tab=Frequent" class="btn btn-default btn-table no-underline {% if tab == 'Frequent' %} active {% endif %} " role="button">
         <span class="index-view-name"> Frequent </span>
       </a>
-      <a href="/feed?tab=Vote" class="btn btn-default btn-cluster no-underline" role="button" id="tag_vote">
-        <span class="index-view-name"> Vote </span>
+      <a href="/feed?tab=Vote" class="btn btn-default btn-cluster no-underline {% if tab == 'Vote' %} active {% endif %}" role="button">
+        <span class="index-view-name"> Vote(s) </span>
       </a>
-      <a class="btn btn-default btn-card no-underline" id="toggle-button" role="button" aria-expanded="false" aria-controls="uql-form">
+      <!-- <a class="btn btn-default btn-card no-underline" id="toggle-button" role="button" aria-expanded="false" aria-controls="uql-form">
         <svg class="justify-content: center; display: flex" width="20" height="20" viewBox="0 -5 20 20">
           <path d="M2 4h14v2H2V4Zm2 4h10v2H4V8Zm8 4H6v2h6v-2Z" fill="#06c6b6"></path>
         </svg> Filter
-      </a>
-    </div>
+      </a> -->
+    <!-- </div> -->
+  </div>
+</div>
 {% endif %}
 {% endmacro %}
 
@@ -88,21 +89,24 @@
 <div class="sidebar2 homepage-side-panel">
   <h2>Menu</h2>
   <ul>
-    <li><a href="#">
-      <i class="glyphicon glyphicon-post-org glyphicon-align-justify"></i>
-      <span class="index-view-name"> Home </span>
-    <li><a href="/feed" role="button">
-        <i class="glyphicon glyphicon-post-org glyphicon-align-justify"></i>
-        <span class="index-view-name"> Card </span>
-      </a></li>
-    <li><a href="/table" role="button">
-      <i class="glyphicon glyphicon-post-org glyphicon-th"></i>
-      <span class="index-view-name"> Table </span>
-    </a></li>
-    <li><a href="/cluster" role="button">
-      <i class="glyphicon glyphicon-post-org glyphicon-th-list"></i>
-      <span class="index-view-name"> Cluster </span>
-    </a></li>
+    <li>
+      <a href="/feed" role="button" class="btn btn-default btn-card no-underline">
+        <i class="glyphicon glyphicon-pencil"></i>
+        <span class="index-view-name"> Home </span>
+      </a>
+    </li>
+    <li>
+      <a href="/table" role="button" class="btn btn-default btn-table no-underline">
+        <i class="glyphicon glyphicon-th"></i>
+        <span class="index-view-name"> Table </span>
+      </a>
+    </li>
+    <li>
+      <a href="/cluster" role="button" class="btn btn-default btn-cluster no-underline">
+        <i class="glyphicon glyphicon-th-list"></i>
+        <span class="index-view-name"> Cluster </span>
+      </a>
+    </li>
   </ul>
 </div>
 {% endblock %}
@@ -119,7 +123,7 @@
   </div>
 </div>
 
-<div class="row">
+<!-- <div class="row">
   <div class="col-md-6">
   <form class="form-group form-base" id="uql-form">
     <fieldset class="fieldset">
@@ -142,7 +146,7 @@
     <button class="btn btn-default btn-card no-underline" style="justify-content: flex-end;" type="reset" id="toggle-button">Cancel</button>
   </form>
 </div>
-</div>
+</div> -->
 </div>
 
 
@@ -157,38 +161,23 @@
   {% endif %}
 
   <script type="text/javascript">
-    const form = document.querySelector("#uql-form");
-    const toggleButton = document.querySelector("#toggle-button");
+    // const form = document.querySelector("#uql-form");
+    // const toggleButton = document.querySelector("#toggle-button");
 
-    // Initially hide the form
-    form.style.display = "none";
+    // // Initially hide the form
+    // form.style.display = "none";
 
-    // Attach an event listener to the toggle button
-    toggleButton.addEventListener("click", () => {
-      if (form.style.display === "none") {
-        form.style.display = "block";
-        toggleButton.setAttribute("aria-expanded", true);
-      } else {
-        form.style.display = "none";
-        toggleButton.setAttribute("aria-expanded", false);
-      }
-    });
+    // // Attach an event listener to the toggle button
+    // toggleButton.addEventListener("click", () => {
+    //   if (form.style.display === "none") {
+    //     form.style.display = "block";
+    //     toggleButton.setAttribute("aria-expanded", true);
+    //   } else {
+    //     form.style.display = "none";
+    //     toggleButton.setAttribute("aria-expanded", false);
+    //   }
+    // });
 
-
-    function updateActiveTag(id) {
-      var button = document.getElementById(id);
-      var isActive = false;
-
-      button.addEventListener("click", function() {
-        if (isActive) {
-          button.classList.remove("active");
-        } else {
-          button.classList.add("active");
-        }
-        isActive = !isActive;
-    });
-    }
-    
     </script>
 {% endblock %}
 

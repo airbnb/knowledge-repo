@@ -1177,3 +1177,9 @@ author_tag {
   padding-bottom: 25px;
   border-radius: 0 0 12px 12px;
 }
+
+.cluster-list-li {
+  content: "•";
+  margin-right: 5px;
+  margin-left: 50px;
+}
