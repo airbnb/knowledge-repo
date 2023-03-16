@@ -279,7 +279,7 @@ class KnowledgeFlask(Flask):
 
             args_encoded = url_encode(args)
             return f'{request.path}?{args_encoded}'
-        
+
         @self.template_global()
         def get_current_path():
             path = request.path
