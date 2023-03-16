@@ -1053,7 +1053,7 @@ textarea {
 }
 
 /* Add some spacing and a shadow to the sidebar */
-.sidebar-wrapper {
+/* .sidebar-wrapper {
   min-height: 100vh;
   margin-right: -15rem;
   -webkit-transition: margin .25s ease-out;
@@ -1061,7 +1061,7 @@ textarea {
   -o-transition: margin .25s ease-out;
   transition: margin .25s ease-out;
   box-shadow: 2px 0px 10px 0px #aaa;
-}
+} */
 
 /* Style the active tab */
 .list-group-item.active {
@@ -1069,9 +1069,9 @@ textarea {
   color: #fff;
 }
 
-.sidebar {
+/* .sidebar {
   margin-top: 200px;
-}
+} */
 
 .list-group-item:hover {
   background-color: #f5f5f5;
@@ -1146,36 +1146,6 @@ ul {
 
 li {
   margin-bottom: 10px;
-}
-
-a {
-  color: #333;
-  text-decoration: none;
-  display: block;
-  padding: 12px;
-  transition: background-color 0.2s ease-in-out;
-}
-
-a:hover {
-  color: #00A699;
-  background-color: white;
-}
-
-author_tag {
-  width: 3px;
-  display: inline-block;
-  margin-top: -10px;
-  margin-left: 0px;
-  padding: 0px;
-}
-
-#cluster_post {
-  background-color: white;
-  margin-top: 0px;
-  margin-left: 20px;
-  padding-top: 10px;
-  padding-bottom: 25px;
-  border-radius: 0 0 12px 12px;
 }
 
 .cluster-list-li {

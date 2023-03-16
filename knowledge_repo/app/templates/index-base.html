@@ -2,7 +2,7 @@
 
 {% macro format_authors(authors) %}
 {% for author in authors %}
-<a class="btn author_tag" href='/feed?authors={{ author.identifier|urlencode }}'>
+<a href='/feed?authors={{ author.identifier|urlencode }}'>
   {{ author.format_name }}
 </a>
 {% if not loop.last %}
@@ -66,7 +66,7 @@
 
 
 {% macro sort_filter() %}
-{% if feed_params %}
+{% if feed_params and get_current_path() == 'feed' %}
 {% set tab = feed_params['tab'] | default('Newest') %}
 <!-- Index rendering mode switch -->
 <div class="row">
