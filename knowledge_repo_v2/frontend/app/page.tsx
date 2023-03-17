@@ -1,11 +1,14 @@
 import { type MDXRemoteSerializeResult } from "next-mdx-remote";
 import { serialize } from "next-mdx-remote/serialize";
 import { promises as fs } from "fs";
-import { MdxContent } from "./mdx-content";
+import { MdxContent } from "../components/mdx-content";
+import type { AppProps } from 'next/app';
+import ErrorBoundary from "../components/ErrorBoundary";
+
 
 type Frontmatter = {
   title: string;
-  date: string;
+  created_at: string;
 };
 
 type Post<TFrontmatter> = {
@@ -32,16 +35,21 @@ async function getPost(filepath: string): Promise<Post<Frontmatter>> {
   };
 }
 
-export default async function Home() {
-  // Get the serialized content and frontmatter
+
+
+export default async function Home(props: AppProps) {
+  const { Component, pageProps } = props;
+
   const { serialized, frontmatter } = await getPost("content/test_post.mdx");
 
   return (
-    <div style={{ maxWidth: 600, margin: "auto" }}>
-      <h1>{frontmatter.title}</h1>
-      <p>Published {frontmatter.date}</p>
-      <hr />
-      <MdxContent source={serialized} />
-    </div>
+    <ErrorBoundary>
+      <div style={{ maxWidth: 600, margin: "auto" }}>
+        <h1>{frontmatter.title}</h1>
+        <p>Published {frontmatter.created_at}</p>
+        <hr />
+        <MdxContent source={serialized} />
+      </div>
+    </ErrorBoundary>
   );
 }
