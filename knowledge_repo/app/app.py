@@ -281,6 +281,12 @@ class KnowledgeFlask(Flask):
             return f'{request.path}?{args_encoded}'
 
         @self.template_global()
+        def get_current_path():
+            path = request.path
+
+            return path.split('/')[-1]
+
+        @self.template_global()
         def pagination_pages(current_page, page_count, max_pages=5,
                              extremes=True):
             page_min = int(max(1, current_page - math.floor(

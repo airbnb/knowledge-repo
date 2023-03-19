@@ -2047,6 +2047,7 @@ pre code {
 .col-md-11,
 .col-md-12,
 .col-md-2,
+.col-md-2_5,
 .col-md-3,
 .col-md-4,
 .col-md-5,
@@ -2532,6 +2533,7 @@ pre code {
     .col-md-11,
     .col-md-12,
     .col-md-2,
+    .col-md-2_5,
     .col-md-3,
     .col-md-4,
     .col-md-5,
@@ -2580,6 +2582,10 @@ pre code {
 
     .col-md-3 {
         width: 25%
+    }
+
+    .col-md-2_5 {
+        width: 18%
     }
 
     .col-md-2 {
@@ -6558,7 +6564,14 @@ button.list-group-item:focus,
 button.list-group-item:hover {
     color: #555;
     text-decoration: none;
-    background-color: #f5f5f5
+    background-color: #ffffff
+}
+
+a.list-group-item.active,
+a.list-group-item:active {
+  background-color: #007bff; /* Change the background color when active */
+  color: rgb(223, 30, 30); /* Change the text color when active */
+  border-left: 3px solid #fff; /* Add a border when active */
 }
 
 button.list-group-item {

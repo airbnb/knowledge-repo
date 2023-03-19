@@ -31,6 +31,7 @@ def from_request_get_feed_params(request):
     username, user_id = current_user.identifier, current_user.id
     feed_params["username"] = username
     feed_params["user_id"] = user_id
+    feed_params["tab"] = request.args.get('tab')
 
     user_obj = (db_session.query(User)
                           .filter(User.id == user_id)

@@ -117,6 +117,7 @@
     color: #aaa;
     font-size: small;
     margin-top: 3px;
+    display: inline;
 }
 
 .feed-post .feed-stats {
