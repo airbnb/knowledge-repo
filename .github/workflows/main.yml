@@ -11,11 +11,11 @@ on:
 
 jobs:
   Build:
-    runs-on: '${{ matrix.os }}'
+    runs-on: "${{ matrix.os }}"
     strategy:
       matrix:
-        os: ['ubuntu-18.04', 'macos-latest']
-        python-version: ['3.7', '3.8', '3.9']
+        os: ["ubuntu-22.04", "macos-latest"]
+        python-version: ["3.7", "3.8", "3.9"]
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
@@ -24,7 +24,7 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: test
-          python-version: '${{ matrix.python-version }}'
+          python-version: "${{ matrix.python-version }}"
 
       - name: CI Tests
         shell: bash -l {0}
