@@ -14,6 +14,20 @@
             ]
         },
         {
+            "name": "Run Server Locally with a Git repo",
+            "type": "python",
+            "request": "launch",
+            "program": "scripts/knowledge_repo",
+            "console": "integratedTerminal",
+            "args": [
+                "--repo",
+                "~/test_repo",
+                "runserver",
+                "--port",
+                "7001"
+            ]
+        },
+        {
             "name": "Run Server Locally with config",
             "type": "python",
             "request": "launch",
