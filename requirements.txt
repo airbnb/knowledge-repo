@@ -33,3 +33,4 @@ weasyprint==54.3
 s3path==0.3.4
 notion-client==2.0.0
 gcloud==0.18.3
+python-dotenv==0.21.1
