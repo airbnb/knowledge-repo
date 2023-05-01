@@ -1,7 +1,7 @@
 boto3==1.26.37
 botocore==1.29.37
 cooked_input 
-flask==2.1.2
+flask==2.3.2
 Flask-Migrate 
 gitdb
 gitpython==3.1.18
