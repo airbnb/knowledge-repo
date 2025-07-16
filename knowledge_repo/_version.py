@@ -83,7 +83,6 @@ __dependencies__ = [
     "gcloud==0.18.3",  # google cloud storage integration
     "botocore==1.29.37",  # aws s3 integration
     "boto3==1.26.37",  # aws s3 integration
-    "s3path==0.3.4",  # aws s3 path analysis
     "notion-client==2.0.0",  # notion integration
 ]
 
